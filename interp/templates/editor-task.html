@@ -21,6 +21,8 @@
 "></script>
 
     <link rel="stylesheet" href="/static/css/simplemde.min.css">
+    <script type="text/javascript" src="/static/js/simplemde.min.js"></script>
+
     <link type="text/css" rel="stylesheet" href="/static/editor/editor.css">
 
 
@@ -54,29 +56,26 @@
 
 
 <div style="width: 100%; margin: auto">
+
     <div style=" height: 400px; width:48%; margin-top: 1%; position: relative; float:left ; direction: ltr">
-        <textarea id="original">{{ trans }}</textarea>
+    <textarea id="trans">{{ task }}</textarea>
     </div>
-
-
-    <div style=" height: 400px; width:48%; margin-top: 1%; position: relative; float:right ; direction: ltr; padding-left: 3%">
-        <div id="trans">{{ task }}</div>
-    </div>
-
 
     <div style="float:left; width: 4%">
         <button onclick="preview()" style="margin: auto">Preview</button>
-        <button onclick="send_data({{ quesId }})" style="margin: auto">Save</button>
-        <form action = "{% url 'generatepdf' %}" method = "post">
-            {% csrf_token %}
-            <input type="submit" name="GeneratePDF" value="PDF" />
-            <input type="hidden" name="quesId" value="{{ questId }}" />
-            <input type="hidden" name="isAdmin" value="No" />
-        </form>
+        <button onclick="send_data({{ taskId }})" style="margin: auto">Save</button>
+
+            <form action = "{% url 'generatepdf' %}" method = "post">
+                {% csrf_token %}
+                <input type="submit" name="GeneratePDF" value="PDF" />
+                <input type="hidden" name="TaskId" value="{{ taskId }}" />
+                <input type="hidden" name="isAdmin" value="Yes" />
+
+            </form>
 
     </div>
-</div>
-    <script type="text/javascript">
+    <div>
+        <script type="text/javascript">
 
             marked.setOptions({
                 renderer: new marked.Renderer(),
@@ -88,20 +87,23 @@
                 smartLists: true,
                 smartypants: false
             });
+
+            {% comment %}
+                        content = $('<textarea/>').html($('#moratab').html()).val();
+                        var editor = $('#moratab').moratab(content, {strings: {help: ''}});
+            {% endcomment %}
             var simplemde = new SimpleMDE({
-                element: document.getElementById("original")[0],
+                element: document.getElementById("trans")[0],
                 status: false,
                 toolbar: false
             });
-
 
             var page = -1; // -1 means not rendered and +1 means rendered
 
             function send_data(quesId) {
                 var mycontent = simplemde.value();
-                console.log('im heeree');
                 $.ajax({
-                    url: " {% url 'saveQuestion' %}",
+                    url: " {% url 'savetask' %}",
                     data: {
                         'content': mycontent,
                         'id': quesId,
@@ -118,39 +120,10 @@
                 return false;
             }
 
-            $(document).ready(function () {
-                var cont = $('#trans').text()
-                $('#trans').html(marked(cont));
-
-            });
             function preview() {
                 var mycontent = simplemde.value();
                 simplemde.togglePreview();
             }
-
-            function save_version_particle() {
-                var mycontent = simplemde.value();
-                console.log('im heeree');
-                $.ajax({
-                    url: " {% url 'saveVersionParticle' %}",
-                    data: {
-                        'content': mycontent,
-                        'id': {{ quesId }},
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    type: "POST",
-                    success: function (response) {
-                    },
-                    complete: function () {
-                    },
-                    error: function (xhr, textStatus, thrownError) {
-                    }
-                });
-                return false;
-
-            }
-            setInterval(save_version_particle,30000)
-
 
         </script>
 

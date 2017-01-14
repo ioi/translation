@@ -17,9 +17,6 @@
     <script type="text/javascript" src="/static/editor/syntax.js"></script>
     <script type="text/javascript" src="/static/editor/buttons.js"></script>
     <script type="text/javascript" src="/static/editor/editor.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js
-"></script>
-
     <link rel="stylesheet" href="/static/css/simplemde.min.css">
     <link type="text/css" rel="stylesheet" href="/static/editor/editor.css">
 
@@ -54,22 +51,27 @@
 
 
 <div style="width: 100%; margin: auto">
-    <div style=" height: 400px; width:48%; margin-top: 1%; position: relative; float:left ; direction: ltr">
-    <textarea id="original">
-        {{ orig }}
-    </textarea>
+
+    <div style=" height: 400px; width:48%; margin-top: 1%; position: relative; float:left ; direction: ltr; padding-left: 3%">
+        <div id="original">{{ task }}</div>
     </div>
 
     <div style=" height: 400px; width:48%; position: relative; float:left">
-        <div id="moratab" style="border: solid">{{ trans }}
-        </div>
+        <div id="moratab" style="border: solid; padding-right: 2%">{{ trans }}</div>
     </div>
 
     <div style="float:left; width: 4%">
         <button onclick="preview()" style="margin: auto">Preview</button>
         <button onclick="send_data({{ quesId }})" style="margin: auto">Save</button>
+        <form action = "{% url 'generatepdf' %}" method = "post">
+            {% csrf_token %}
+            <input type="submit" name="GeneratePDF" value="PDF" />
+            <input type="hidden" name="quesId" value="{{ quesId }}" />
+            <input type="hidden" name="isAdmin" value="No" />
+        </form>
+
     </div>
-    <div>
+</div>
         <script type="text/javascript">
 
             marked.setOptions({
@@ -85,16 +87,12 @@
 
             content = $('<textarea/>').html($('#moratab').html()).val();
             var editor = $('#moratab').moratab(content, {strings: {help: ''}});
-            var simplemde = new SimpleMDE({
-                element: document.getElementById("original")[0],
-                status: false,
-                toolbar: false
-            })
 
             var page = -1; // -1 means not rendered and +1 means rendered
 
             function send_data(quesId) {
                 var mycontent = $('#moratab').text();
+                console.log(mycontent.length);
                 console.log('im heeree');
                 $.ajax({
                     url: " {% url 'saveQuestion' %}",
@@ -114,12 +112,6 @@
                 return false;
             }
 
-            $(document).ready(function () {
-                console.log('im heeree');
-                var cont = $('#original').text()
-                $('#original').html(marked(cont));
-
-            });
             function preview() {
                 if (page == -1) {
                     var mycontent = $('#moratab').text();
@@ -132,6 +124,37 @@
                 page = -1 * page;
 
             }
+
+            function save_version_particle() {
+                var mycontent = $('#moratab').text();
+                console.log('im heeree');
+                $.ajax({
+                    url: " {% url 'saveVersionParticle' %}",
+                    data: {
+                        'content': mycontent,
+                        'id': {{quesId}},
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    type: "POST",
+                    success: function (response) {
+                    },
+                    complete: function () {
+                    },
+                    error: function (xhr, textStatus, thrownError) {
+                    }
+                });
+                return false;
+
+            }
+
+            window.setInterval(save_version_particle,30000)
+
+            $(document).ready(function () {
+                console.log('im heeree');
+                var cont = $('#original').text();
+                $('#original').html(marked(cont));
+
+            });
 
         </script>
 

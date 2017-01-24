@@ -65,7 +65,7 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Change Title</th>
+                        <th></th>
                         <th>Main Question</th>
                         <th>Version</th>
                     </tr>
@@ -73,7 +73,7 @@
                     <tbody>
                     {% for question in questions %}
                         <tr>
-                            <td></td>
+                            <td>Change Title</td>
                             <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
                             <td>Version</td>
                         </tr>
@@ -84,8 +84,11 @@
             {% else %}
                 <p style="text-align: left">No documents.</p>
             {% endif %}
+            <hr>
+            <h1>Create a New Task</h1>
             <form action = "{% url 'task' %}" method = "post">
                 {% csrf_token %}
+                <input type="text" name="title" placeholder="Task Title" required = "required">
                 <input type="submit" name="Create Task" value="Create" />
             </form>
         </div>

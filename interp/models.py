@@ -73,14 +73,14 @@ class VersionParticle(models.Model):
 
 # Uncomment here when wanted to email people
 
-def email_new_user(sender, **kwargs):
-    if kwargs["created"]:  # only for new users
-        new_user = kwargs["instance"]
-        print(new_user.email)
-        email = EmailMessage('Hello', 'World', to=[new_user.email])
-        email.send()
-        
-post_save.connect(email_new_user, sender=User)
+# def email_new_user(sender, **kwargs):
+#     if kwargs["created"]:  # only for new users
+#         new_user = kwargs["instance"]
+#         print(new_user.email)
+#         email = EmailMessage('Hello', 'World', to=[new_user.email])
+#         email.send()
+#
+# post_save.connect(email_new_user, sender=User)
 
 class Notification(models.Model):
     title = models.CharField(max_length=50)

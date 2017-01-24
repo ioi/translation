@@ -70,7 +70,7 @@
         <form action = "{% url 'generatepdf' %}" method = "post">
             {% csrf_token %}
             <input type="submit" name="GeneratePDF" value="PDF" />
-            <input type="hidden" name="quesId" value="{{ questId }}" />
+            <input type="hidden" name="quesId" value="{{ quesId }}" />
             <input type="hidden" name="isAdmin" value="No" />
         </form>
 

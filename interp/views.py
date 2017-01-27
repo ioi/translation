@@ -32,7 +32,7 @@ class Questions(View):
             trans = Translation.objects.create(user= user, task = task, language = user.language)
 
         if user.rtl == True:
-            return render(request,'editor.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id})
+            return render(request,'editor-fa.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id})
         else :
             return render(request,'editor-eng.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id})
 
@@ -176,7 +176,10 @@ class PrintPDf(View):
     html_text = ''
     def html_style(self,user):
         if user.rtl == True:
-            self.html_text = """<html dir="rtl"> <head> <meta charset="UTF-8"> </head> <body>""" + self.html_text + """</body></html>"""
+            self.html_text = """<html dir="rtl"> <head> <meta charset="UTF-8"> </head> <body style="white-space:pre-wrap">""" + self.html_text + """</body></html>"""
+        else :
+            self.html_text = """<html dir="ltr"> <head> <meta charset="UTF-8"> </head> <body style="white-space:pre-wrap">""" + self.html_text + """</body></html>"""
+
 
     def post(self,request):
         options = {
@@ -187,7 +190,7 @@ class PrintPDf(View):
             'margin-left': '0.75in',
             'encoding': "UTF-8",
         }
-
+        
         user = User.objects.get(username=request.user.username)
         id = request.POST['TaskId']
         task = Task.objects.get(id=int(id))
@@ -251,9 +254,12 @@ class SaveVersionParticle(View):
         print('in save version particle')
         id = request.POST['id']
         content = request.POST['content']
-        translation = Translation.objects.get(id=id)
+        task = Task.objects.get(id=id)
+        user = User.objects.get(username=request.user)
+        translation = Translation.objects.get(user=user, task=task)
         versionParticle = VersionParticle.objects.create(translation=translation, text=content, date_time = datetime.datetime.now())
         versionParticle.save()
+        print('version particle')
         return HttpResponse("done")
 
 class Notifications(View):

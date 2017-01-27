@@ -54,13 +54,27 @@
 </head>
 <body>
 
+<div style="width: 100%">
+    <div style="float:left; width: 100%; text-align: justify">
+        <form action = "{% url 'generatepdf' %}" method = "post" style="float: left;margin-right: 2%;margin-left: 18.5%">
+            {% csrf_token %}
+            <input class="btn" type="submit" name="GeneratePDF" value="PDF" />
+            <input type="hidden" name="TaskId" value="{{ taskId }}" />
+            <input type="hidden" name="isAdmin" value="Yes" />
+        </form>
+        <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
+        <button class="btn" onclick="send_data({{ taskId }})" style="float: left;margin-right: 2%">Save</button>
+
+    </div>
+</div>
 
 <div style="width: 100%; margin: auto">
 
-    <div style=" height: 400px; width:48%; margin-top: 1%; position: relative; float:left ; direction: ltr">
+    <div style=" height: 400px; width:48%; margin-top: 1%; margin-left: 1%; position: relative; float:left ; direction: ltr">
     <textarea id="trans">{{ task }}</textarea>
     </div>
 
+{% comment %}
     <div style="float:left; width: 4%">
         <button onclick="preview()" style="margin: auto">Preview</button>
         <button onclick="send_data({{ taskId }})" style="margin: auto">Save</button>
@@ -75,6 +89,7 @@
 
     </div>
     <div>
+{% endcomment %}
         <script type="text/javascript">
 
             marked.setOptions({
@@ -125,7 +140,7 @@
                 simplemde.togglePreview();
             }
 
-        </script>
 
+        </script>
 </body>
 </html>

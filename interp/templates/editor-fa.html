@@ -50,27 +50,37 @@
 <body>
 
 
-<div style="width: 100%; margin: auto">
-
-    <div style=" height: 400px; width:48%; margin-top: 1%; position: relative; float:left ; direction: ltr; padding-left: 3%">
-        <div id="original">{{ task }}</div>
-    </div>
-
-    <div style=" height: 400px; width:48%; position: relative; float:left">
-        <div id="moratab" style="border: solid; padding-right: 2%">{{ trans }}</div>
-    </div>
-
-    <div style="float:left; width: 4%">
-        <button onclick="preview()" style="margin: auto">Preview</button>
-        <button onclick="send_data({{ quesId }})" style="margin: auto">Save</button>
-        <form action = "{% url 'generatepdf' %}" method = "post">
+<div style="width: 100%">
+    <div style="float:left; width: 50%; text-align: justify">
+        <form action = "{% url 'generatepdf' %}" method = "post" style="float: left;margin-right: 2%;margin-left: 37%">
             {% csrf_token %}
-            <input type="submit" name="GeneratePDF" value="PDF" />
+            <input class="btn" type="submit" name="GeneratePDF" value="PDF" />
             <input type="hidden" name="quesId" value="{{ quesId }}" />
             <input type="hidden" name="isAdmin" value="No" />
         </form>
+        <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
+        <button class="btn" onclick="send_data({{ quesId }})" style="float: left;margin-right: 2%">Save</button>
 
     </div>
+    <div id="q_opt" class="btn-group" data-toggle="buttons" style="width: 50%;text-align: right">
+        <label class="btn btn-default active" id="d_op_0" style="margin-right: 37%"> <input id="q_op_0" name="op" type="radio" value="0">Task Preview</label>
+        <label class="btn btn-default" id="d_op_1"> <input id="q_op_1" name="op" type="radio" value="1">Task Markdown</label>
+        <label class="btn btn-default" id="d_op_2"> <input id="q_op_2" name="op" type="radio" value="2">Translate Preview</label>
+
+    </div>
+</div>
+
+<div style="width: 100%; margin: auto">
+
+
+    <div style=" height: 400px; width:48%; position: relative; float:left;margin-left: 1%;">
+        <div id="moratab" style="border: solid; padding-right: 2%;padding-left: 2%; border-width: thin">{{ trans }}</div>
+    </div>
+
+    <div style=" height: 400px; width:47%;  position: relative; float:left ; direction: ltr; padding-left: 3%;white-space: pre-wrap">
+        <div id="original">{{ task }}</div>
+    </div>
+
 </div>
         <script type="text/javascript">
 
@@ -153,10 +163,26 @@
                 console.log('im heeree');
                 var cont = $('#original').text();
                 $('#original').html(marked(cont));
+                $('#myVar').html(cont);
+
+            });
+            $(document).on('change', 'input:radio[id^="q_op_"]', function (event) {
+                console.log($('#q_op_0').is(':checked'));
+                if ($('#q_op_0').is(':checked')) {
+                    $('#original').html(marked($('#myVar').text()));
+                }
+                else if ($('#q_op_1').is(':checked')){
+                    $('#original').html($('#myVar').text());
+                }
+                else if ($('#q_op_2').is(':checked')) {
+                    var mycontent = $('#moratab').text();
+                    $('#original').html(marked(mycontent));
+                }
 
             });
 
         </script>
+    <input type="hidden" id="myVar" name="variable" value="{{variable}}">
 
 </body>
 </html>

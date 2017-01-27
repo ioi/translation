@@ -56,6 +56,8 @@
     <input type="hidden" name="TaskId" value="{{ taskId }}" />
     <input type="hidden" name="isAdmin" value="{{ isAdmin }}" />
 </form>
-{% autoescape off %}{{ content }}{% endautoescape %}
+
+<div style="white-space: pre-wrap; margin-left: 2%; margin-right: 2%">{% autoescape off %}{{ content }}{% endautoescape %}
+</div>
 </body>
 </html>

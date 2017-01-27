@@ -16,7 +16,7 @@ body,
   min-width: 970px;
 }
 
-/* Don't let the lead text change font-size. */
+/* Don't let the lead text change fonts-size. */
 .lead {
   font-size: 16px;
 }

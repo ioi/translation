@@ -20,44 +20,58 @@
     <!--Font-->
     <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600' rel='stylesheet'
           type='text/css'>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.js"></script>
 
 
 </head>
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li >
-                    <a class="btn btn-large navbar-btn" href="{% url 'logout' %}">Sign Out</a>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="width: 100%; font-family: sans-serif">
+    <div class="container" style="width: 100%">
+        <div id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" style="height: 100%; float: left">
+                <li style="margin-top: 10%; left: auto">
+                    <form action = "{% url 'printpdf' %}" method = "post">
+                        {% csrf_token %}
+                        <input id="finp" class="btn btn-lg" style="background-color: whitesmoke; color: black;padding-right: 15%;float: left" type="submit" name="GeneratePDF" value="Print PDF" />
+                        <input type="hidden" name="TaskId" value="{{ taskId }}" />
+                        <input type="hidden" name="isAdmin" value="{{ isAdmin }}" />
+                    </form>
                 </li>
             </ul>
 
         </div>
         <!-- /.navbar-collapse -->
+        <div class="" style="float: right">
+            <ul class="nav navbar-nav" style="height: 100%">
+                <li >
+                    <a class="btn" onclick="return false" style="pointer-events: none; background-color: transparent; color: white;margin-right: 30%"><i class="glyphicon glyphicon-user" style="font-size: 200%" > </i> <p style="margin-bottom: -50%">{{ user.username }}</p></a>
+                </li>
+                <li >
+                    <a class="btn" onclick="return false" style="pointer-events: none; background-color: transparent; color: white;margin-right: 30%"><i class="glyphicon glyphicon-flag" style="font-size: 200%" > </i> <p style="margin-bottom: -50%">{{ language }}</p></a>
+                </li>
+
+            </ul>
+        </div>
     </div>
     <!-- /.container -->
 </nav>
-<form action = "{% url 'printpdf' %}" method = "post">
-    {% csrf_token %}
-    <input type="submit" name="GeneratePDF" value="Print PDF" />
-    <input type="hidden" name="TaskId" value="{{ taskId }}" />
-    <input type="hidden" name="isAdmin" value="{{ isAdmin }}" />
-</form>
 
-<div style="white-space: pre-wrap; margin-left: 2%; margin-right: 2%">{% autoescape off %}{{ content }}{% endautoescape %}
-</div>
+<div id="trans" style="white-space: pre; margin-left: 2%; margin-right: 2%; margin-top: 3%">{{ content }}</div>
+<input type="hidden" id="myVar" name="variable" value="{{ content }}">
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        console.log('here');
+        var cont = $('#trans').text();
+        $('#trans').html(marked(cont));
+        $("h2").css("line-height","0");
+        $("h1").css("line-height","0");
+        $("h3").css("line-height","0");
+        $("h4").css("line-height","0");
+        //$('#finp').val(marked(cont));
+
+    })
+</script>
 </body>
 </html>

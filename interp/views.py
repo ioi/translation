@@ -15,11 +15,11 @@ class Home(View):
         task = Task.objects.all()
         print(task)
         translations = []
+        user = User.objects.get(username=request.user.username)
         for item in task:
             translations.append((item.id, item.title))
-
         print(translations)
-        return render(request, 'questions.html', context={'translations': translations})
+        return render(request, 'questions.html', context={'translations': translations, 'language':str(user.language.name + '-' + user.country.name)})
 
 
 class Questions(View):
@@ -111,7 +111,8 @@ class Tasks(View):
         questions = []
         for item in ques:
             questions.append((item.id, item.title))
-        return render(request, 'tasks.html', context={'questions': questions})
+        user = User.objects.get(username=request.user.username)
+        return render(request, 'tasks.html', context={'questions': questions,'language':str(user.language.name + '-' + user.country.name)})
 
     def post(self,request):
         print(request.POST['title'])
@@ -146,13 +147,14 @@ class GeneratePDf(View):
             'margin-bottom': '0.75in',
             'margin-left': '0.75in',
             'encoding': "UTF-8",
+            'line-gap': '2'
         }
         output_file = 'mypdf.pdf'
         print(request.POST['isAdmin'])
         if request.POST['isAdmin'] == 'Yes':
             id = request.POST['TaskId']
             task = Task.objects.get(id=int(id))
-            self.html_text = markdown.markdown(task.text, output_format ='html4',)
+            self.html_text = markdown.markdown(task.text, output_format ='html4')
             return render(request,'pdf.html', context={'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id})
 
         else:
@@ -161,6 +163,8 @@ class GeneratePDf(View):
             task = Task.objects.get(id=int(id))
             translation = Translation.objects.get(user=user, task=task)
             self.html_text = markdown.markdown(translation.text, output_format = 'html4')
+            self.html_text = """<div style="">""" + self.html_text + "</div>"
+            print(self.html_text)
             return render(request,'pdf.html', context={'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id})
             #pdfkit.from_string(html_text, output_file, options=options)
 
@@ -176,9 +180,9 @@ class PrintPDf(View):
     html_text = ''
     def html_style(self,user):
         if user.rtl == True:
-            self.html_text = """<html dir="rtl"> <head> <meta charset="UTF-8"> </head> <body style="white-space:pre-wrap">""" + self.html_text + """</body></html>"""
+            self.html_text = """<html dir="rtl"> <head> <meta charset="UTF-8"> <style> h1 {color:red ; line-height:0} h2 {color:red; line-height:0 !important} </style> </head> <body style="white-space:pre-wrap; line-height:1">""" + self.html_text + """</body></html>"""
         else :
-            self.html_text = """<html dir="ltr"> <head> <meta charset="UTF-8"> </head> <body style="white-space:pre-wrap">""" + self.html_text + """</body></html>"""
+            self.html_text = """<html dir="ltr"> <head> <meta charset="UTF-8"> <style> h1 {color:red; line-height:0} h2 {color:red; line-height:0 !important} </style> </head> <body style="white-space:pre-wrap;line-height:1 ">""" + self.html_text + """</body></html>"""
 
 
     def post(self,request):
@@ -190,7 +194,7 @@ class PrintPDf(View):
             'margin-left': '0.75in',
             'encoding': "UTF-8",
         }
-        
+
         user = User.objects.get(username=request.user.username)
         id = request.POST['TaskId']
         task = Task.objects.get(id=int(id))
@@ -207,7 +211,7 @@ class PrintPDf(View):
         file = open(output_file, 'rb')
         # We can add Style to html_text by calling html_style function
         self.html_style(user)
-        pdfkit.from_string(self.html_text, output_file,options=options)
+        pdfkit.from_string(self.html_text,output_file,options=options)
         response = HttpResponse(file, content_type='application/pdf')
         response['Content   -Disposition'] = 'inline;filename=some_file.pdf'
 

@@ -216,7 +216,7 @@ function draw(args) {
 	if (text_width / width >= 0.75) {
 		text_height = Math.floor(text_height * 0.75 * (width / text_width));
 	}
-	//Resetting font size if necessary
+	//Resetting fonts size if necessary
 	ctx.font = "bold " + (text_height * ratio) + "px " + font;
 	ctx.fillText(text, (width / 2), (height / 2), width);
 	return canvas.toDataURL("image/png");

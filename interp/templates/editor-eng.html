@@ -6,22 +6,27 @@
 <head>
     <title>IOI Translation</title>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="/static/js/jquery-3.1.1.min.js"></script>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-rtl/3.2.0-rc2/css/bootstrap-rtl.min.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.js"></script>
+    <link rel="stylesheet" href="/static/css/simplemde.min.css">
     <script src="/static/js/simplemde.min.js"></script>
     <script type="text/javascript" src="/static/editor/libs.js"></script>
     <script type="text/javascript" src="/static/editor/syntax.js"></script>
     <script type="text/javascript" src="/static/editor/buttons.js"></script>
     <script type="text/javascript" src="/static/editor/editor.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js
-"></script>
 
-    <link rel="stylesheet" href="/static/css/simplemde.min.css">
+    <link href="/static/css/bootstrap-switch.min.css" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="/static/editor/editor.css">
+    <script src="/static/js/bootstrap-switch.js"></script>
+    <link href="/static/css/toastr.min.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="/static/js/toastr.min.js"></script>
+   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600' rel='stylesheet'
+          type='text/css'>
 
 
     <style type="text/css">
@@ -51,10 +56,58 @@
 
 </head>
 <body>
+<nav class="navbar navbar-inverse " role="navigation" style="width: 100%" >
+    <div class="" style="width: 100%; margin :0.7%; margin-bottom: 5.2%">
+        <div id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav" style="height: 100%">
+                <li>
+                    <a class="btn" href="{% url 'firstpage' %}"
+                       style="background-color: transparent; color: white;margin-right: 30%; border:solid; border-color: white; padding-right: 20%"><i
+                            class="glyphicon glyphicon-home" style="font-size: 200%"></i></a>
+                </li>
+                <li style="margin-top: 2%">
+                    <a class="btn " data-toggle="modal" data-target="#sett-modal"
+                       style="background-color:whitesmoke; color: black;margin-right: 20%; padding-right: 15%"><i
+                            class="glyphicon glyphicon-cog" style="margin-right: 2%"></i> Setting</a>
+                </li>
+                <li style="margin-top: 2%">
+                    <a class="btn" href="{% url 'notifications' %}" data-toggle="modal" data-target="#notif-modal"
+                       style="background-color: whitesmoke; color: black;margin-right: 15%;padding-right: 15%"><i
+                            class="glyphicon glyphicon-envelope" style="margin-right: 2%"></i> Notifications</a>
+                </li>
+                <li style="margin-top: 2%">
+                    <a class="btn" href="{% url 'logout' %}" style="background-color: #d9534f; color: white"><i
+                            class="glyphicon glyphicon-log-out" style="margin-right: 2%"></i> Sign Out</a>
+                </li>
+            </ul>
 
-<div style="width: 100%">
-    <div style="float:left; width: 50%; text-align: justify">
-        <form action="{% url 'generatepdf' %}" method="post" style="float: left;margin-right: 2%;margin-left: 37%">
+        </div>
+        <!-- /.navbar-collapse -->
+        <div class="" style="float: right; margin-right: 1.5%">
+            <ul class="nav navbar-nav" style="height: 100%">
+                <li>
+                    <a class="btn" onclick="return false"
+                       style="pointer-events: none; background-color: transparent; color: white;margin-right: 30%"><i
+                            class="glyphicon glyphicon-user" style="font-size: 200%"> </i>
+                        <p style="margin-bottom: -50%">{{ user.username }}</p></a>
+                </li>
+                <li>
+                    <a class="btn" onclick="return false"
+                       style="pointer-events: none; background-color: transparent; color: white;margin-right: 30%"><i
+                            class="glyphicon glyphicon-flag" style="font-size: 200%"> </i>
+                        <p style="margin-bottom: -50%">{{ language }}</p></a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <!-- /.container -->
+</nav>
+
+<div style="width: 100%;">
+    <div style="float:left; width: 50%;">
+        <form action="{% url 'generatepdf' %}" method="post" style="float: left;margin-right: 2%;margin-left: 37%" >
             {% csrf_token %}
             <input class="btn" type="submit" name="GeneratePDF" value="PDF"/>
             <input type="hidden" name="quesId" value="{{ quesId }}"/>
@@ -65,19 +118,18 @@
 
     </div>
     <div id="q_opt" class="btn-group" data-toggle="buttons" style="width: 50%;text-align: right">
-        <label class="btn btn-default active" id="d_op_0" style="margin-right: 37%"> <input id="q_op_0" name="op"
-                                                                                            type="radio" value="0">Task
+        <label class="btn btn-default active" id="d_op_0" style="margin-left: 37%"> <input id="q_op_0" name="op"
+                                                                                           type="radio" value="0">Task
             Preview</label>
         <label class="btn btn-default" id="d_op_1"> <input id="q_op_1" name="op" type="radio" value="1">Task
             Markdown</label>
-        <label class="btn btn-default" id="d_op_2"> <input id="q_op_2" name="op" type="radio" value="2">Translate
-            Preview</label>
+        <label class="btn btn-default" id="d_op_2"> <input id="q_op_2" name="op" type="radio" value="2">Translat Preview</label>
 
     </div>
 </div>
 
-<div style="width: 100%; margin: auto">
-    <div style=" height: 400px; width:48%; margin-top: 1%; margin-left: 1%; position: relative; float:left ; direction: ltr">
+<div style="width: 100%;">
+    <div style=" height: 400px; width:48%; margin-top: 1%; margin-left: 1%; float:left ; direction: ltr">
         <textarea id="original">{{ trans }}</textarea>
     </div>
 

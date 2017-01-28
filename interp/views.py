@@ -32,9 +32,9 @@ class Questions(View):
             trans = Translation.objects.create(user= user, task = task, language = user.language)
 
         if user.rtl == True:
-            return render(request,'editor-fa.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id})
+            return render(request,'editor-fa.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id,'language':str(user.language.name + '-' + user.country.name)})
         else :
-            return render(request,'editor-eng.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id})
+            return render(request,'editor-eng.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id, 'language':str(user.language.name + '-' + user.country.name)})
 
 class SaveQuestion(View):
     def post(self,request):
@@ -122,10 +122,9 @@ class Tasks(View):
 
 class EditTask(View):
     def get(self,request,id):
-        print('in edit task')
         task = Task.objects.get(id=id)
-        print(task.text)
-        return render(request,'editor-task.html', context={'task' : task.text , 'taskId':id})
+        user = User.objects.get(username=request.user.username)
+        return render(request,'editor-task.html', context={'task' : task.text , 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
 
 class SaveTask(View):
     def post(self,request):
@@ -180,9 +179,9 @@ class PrintPDf(View):
     html_text = ''
     def html_style(self,user):
         if user.rtl == True:
-            self.html_text = """<html dir="rtl"> <head> <meta charset="UTF-8"> <style> h1 {color:red ; line-height:0} h2 {color:red; line-height:0 !important} </style> </head> <body style="white-space:pre-wrap; line-height:1">""" + self.html_text + """</body></html>"""
+            self.html_text = """<html dir="rtl"> <head> <meta charset="UTF-8"> <style> h1 { line-height:0} h2 { line-height:0 !important} </style> </head> <body style="white-space:pre-wrap; line-height:1">""" + self.html_text + """</body></html>"""
         else :
-            self.html_text = """<html dir="ltr"> <head> <meta charset="UTF-8"> <style> h1 {color:red; line-height:0} h2 {color:red; line-height:0 !important} </style> </head> <body style="white-space:pre-wrap;line-height:1 ">""" + self.html_text + """</body></html>"""
+            self.html_text = """<html dir="ltr"> <head> <meta charset="UTF-8"> <style> h1 { line-height:0} h2 { line-height:0 !important} </style> </head> <body style="white-space:pre-wrap;line-height:1 ">""" + self.html_text + """</body></html>"""
 
 
     def post(self,request):

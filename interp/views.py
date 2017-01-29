@@ -246,9 +246,9 @@ class GetVersion(View):
 
 class GetVersionParticle(View):
     def post(self,request):
-        print('in get version ')
+        print('in get version particle ')
         id = request.POST['id']
-        version = Version.objects.get(id=id)
+        version = VersionParticle.objects.get(id=id)
         print(version.text)
         return HttpResponse(version.text)
 
@@ -260,8 +260,12 @@ class SaveVersionParticle(View):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
         translation = Translation.objects.get(user=user, task=task)
+        if translation.text.strip() == content.strip():
+            return HttpResponse("Not Modified")
         versionParticle = VersionParticle.objects.create(translation=translation, text=content, date_time = datetime.datetime.now())
         versionParticle.save()
+        translation.text = content
+        translation.save()
         print('version particle')
         return HttpResponse("done")
 

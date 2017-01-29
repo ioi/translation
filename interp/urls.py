@@ -1,8 +1,9 @@
+from django.conf import settings
 __author__ = 'MiladDK'
 
 from django.conf.urls import url
 from .views import *
-
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -26,10 +27,9 @@ urlpatterns = [
     url(r'^printpdf/$', PrintPDf.as_view(), name='printpdf'),
 
     url(r'^notifications/$', Notifications.as_view(), name='notifications'),
-
     # url(r'^/list/$',List.as_view(), name='list'),
     # url(r'^/addtag/$',AddTag.as_view(), name='addtag'),
     # url(r'^/addcomment/$',AddComment.as_view(), name='addcomment'),
     # url(r'^/files/(?P<title>[\w .-]*)/$', Download.as_view(), name='download'),
 
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

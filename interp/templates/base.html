@@ -100,7 +100,6 @@
                     <form action="{% url 'setting' %}" class="form-horizontal" method="POST">
                         {% csrf_token %}
                         <div class="row">
-                            <div class="col-md-8" >
                                 <div style="width: 159px; float: left" class="bootstrap-switch-container"><span
                                         style="width: 53px;"
                                         class="bootstrap-switch-handle-on bootstrap-switch-primary">Right To Left</span><span
@@ -108,22 +107,19 @@
                                         style="width: 53px;"
                                         class="bootstrap-switch-handle-off bootstrap-switch-default"></span><input
                                         id="switch-modal" name= "rtl" checked="" type="checkbox"></div>
-                            </div>
                         </div>
                         <hr>
-                        <div class="col-md-9">
+                        <div class="row">
                             <div class="big-submit-button text-center">
                                 <input type="submit" class="btn btn-large btn-primary" value="Save">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="modal-footer">
-                <div style="text-align:center">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>
@@ -150,19 +146,19 @@ jQuery(document).ready(function($) {
 		receive_message: receiveMessage,
 		heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
 	});
-	var billboard = $('#billboard');
+	<!--var billboard = $('#billboard');-->
 
 	// send message though the Websocket to the server
-	$("#text_message").keydown(function(event) {
-		if (event.keyCode === 13) {
-			event.preventDefault();
-			ws4redis.send_message($('#text_message').val());
-		}
-	});
+	<!--$("#text_message").keydown(function(event) {-->
+		<!--if (event.keyCode === 13) {-->
+			<!--event.preventDefault();-->
+			<!--ws4redis.send_message($('#text_message').val());-->
+		<!--}-->
+	<!--});-->
 
-	$('#send_message').click(function() {
-		ws4redis.send_message($('#text_message').val());
-	});
+	<!--$('#send_message').click(function() {-->
+		<!--ws4redis.send_message($('#text_message').val());-->
+	<!--});-->
 
 	// receive a message though the Websocket from the server
 	function receiveMessage(msg) {

@@ -2,12 +2,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<div style="width: 100%">
-
-       <button onclick="revert_version()" style="width:7%;margin-left: 30%; margin-top:1%">Revert Version</button>
-
-        <div class="col-md-2" style="margin-top: 1%; float:left; position: relative; overflow-y: scroll; height:90vh">
+<script type="text/javascript" src="/static/js/marked.js"></script>
+<div class="row">
+    <button class="btn primary-btn" onclick="revert_version()" >Revert Version</button>
+</div>
+<div class="row">
+        <div class="col-md-2" >
             {% if versions %}
                 <table class="table">
                     <thead >
@@ -35,14 +35,15 @@
                 <p style="text-align: left">No documents.</p>
             {% endif %}
         </div >
-        <div class="col-md-10" style="width: 82%">
+        <div class="col-md-5" >
 
-            <div style=" height: 400px; width:40%; margin-top: 0%; position: relative; float:left ; direction: rtl; padding-left: 3%; white-space:pre;">
+            <div>
                 <div id="myversion"></div>
             </div>
+        </div>
+        <div class="col-md-5" style="border-left: 2px solid #ccc;">
 
-
-            <div style=" height: 400px; width:40%; margin-top: 0%; position: relative; float:left ; direction: rtl; padding-left: 3%;white-space:pre;">
+            <div >
                 <div id="original">{{ translation }}</div>
             </div>
         </div>

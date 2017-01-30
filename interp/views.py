@@ -272,3 +272,7 @@ class SaveVersionParticle(View):
 class Notifications(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'notifications.html', context={'notifs': Notification.objects.all().order_by('-pub_date')})
+
+class Test(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'test.html')

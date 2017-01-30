@@ -27,7 +27,8 @@ urlpatterns = [
     url(r'^printpdf/$', PrintPDf.as_view(), name='printpdf'),
 
     url(r'^notifications/$', Notifications.as_view(), name='notifications'),
-    # url(r'^/list/$',List.as_view(), name='list'),
+    url(r'^test/$', Test.as_view(), name='test'),
+                  # url(r'^/list/$',List.as_view(), name='list'),
     # url(r'^/addtag/$',AddTag.as_view(), name='addtag'),
     # url(r'^/addcomment/$',AddComment.as_view(), name='addcomment'),
     # url(r'^/files/(?P<title>[\w .-]*)/$', Download.as_view(), name='download'),

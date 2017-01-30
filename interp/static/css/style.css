@@ -223,6 +223,9 @@ color: #ccc;
 margin-top:40px;
 }
 
+.uncramped{
+	direction: ltr !important;
+}
 
 /* Responsive View
 =================================*/

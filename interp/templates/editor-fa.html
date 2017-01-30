@@ -8,8 +8,12 @@
     <script type="text/javascript" src="/static/editor/syntax.js"></script>
     <script type="text/javascript" src="/static/editor/buttons.js"></script>
     <script type="text/javascript" src="/static/editor/editor.js"></script>
+    <script type="text/javascript" src="/static/js/katex.js"></script>
+    <script type="text/javascript" src="/static/js/auto-render.min.js"></script>
+
     <link rel="stylesheet" href="/static/css/simplemde.min.css">
     <link type="text/css" rel="stylesheet" href="/static/editor/editor.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/katex.css">
 
 
 
@@ -42,11 +46,11 @@
     </div>
 </div>
 <div class="row" style="background:#e7e7e7">
-    <div class="col-md-6" style="border-right: 2px solid #ccc;">
-        <div id="moratab">{{ trans }}</div>
+    <div class="col-md-6" style="border-right: 2px solid #ccc;white-space: pre">
+        <div id="moratab" style="margin-top: -2%">{{ trans }}</div>
     </div>
     <div class="col-md-6" style="border-left: 2px solid #ccc;">
-        <div id="original" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; margin-top: 20px;">{{ task }}</div>
+        <div id="original" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; margin-top: 30px;">{{ task }}</div>
     </div>
 </div>
 
@@ -94,11 +98,14 @@
             function preview() {
                 if (page == -1) {
                     var mycontent = $('#moratab').text();
-                    content = mycontent;
                     $('#moratab').html(marked(mycontent)).css("font-family", "IRMitra");
+                    renderMathInElement(document.getElementById("moratab"));
+                    $('#moratab').css("direction","rtl");
+                    $('#myVarTrans').html(mycontent);
+
                 }
                 else {
-                    $('#moratab').moratab(content, {strings: {help: ''}});
+                    $('#moratab').moratab($('#myVarTrans').text(), {strings: {help: ''}});
                 }
                 page = -1 * page;
 
@@ -138,20 +145,25 @@
             $(document).on('change', 'input:radio[id^="q_op_"]', function (event) {
                 console.log($('#q_op_0').is(':checked'));
                 if ($('#q_op_0').is(':checked')) {
+                    $('#original').css("direction","ltr");
                     $('#original').html(marked($('#myVar').text()));
                 }
                 else if ($('#q_op_1').is(':checked')){
+                    $('#original').css("direction","ltr");
                     $('#original').html($('#myVar').text());
                 }
                 else if ($('#q_op_2').is(':checked')) {
+                    $('#original').css("direction","rtl");
                     var mycontent = $('#moratab').text();
                     $('#original').html(marked(mycontent));
+                    renderMathInElement(document.getElementById("original"));
                 }
 
             });
 
         </script>
     <input type="hidden" id="myVar" name="variable" value="{{variable}}">
+    <input type="hidden" id="myVarTrans" name="variable" value="{{variable}}">
 
 
 {% endblock %}

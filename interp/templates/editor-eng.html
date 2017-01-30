@@ -8,9 +8,11 @@
     <script type="text/javascript" src="/static/editor/syntax.js"></script>
     <script type="text/javascript" src="/static/editor/buttons.js"></script>
     <script type="text/javascript" src="/static/editor/editor.js"></script>
+    <script type="text/javascript" src="/static/js/katex.js"></script>
+    <script type="text/javascript" src="/static/js/auto-render.min.js"></script>
     <link rel="stylesheet" href="/static/css/simplemde.min.css">
     <link type="text/css" rel="stylesheet" href="/static/editor/editor.css">
-
+    <link type="text/css" rel="stylesheet" href="/static/css/katex.css">
 <div class="row">
     <div class="col-md-6">
         <form action = "{% url 'generatepdf' %}" method = "post" style="float: left;margin-right: 2%;margin-left: 37%">
@@ -40,24 +42,20 @@
     </div>
 </div>
 <div class="row" style="background:#e7e7e7">
-    <div class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px">
+    <div id="original1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px">
         <textarea id="original" style="background: #f5f5f5; padding: 10px; margin-top: 20px;">{{ trans }}</textarea>
     </div>
+    <div id="katexTemp1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px;display: none">
+        <div id="katexTemp" style="background: #f5f5f5; padding: 10px; white-space: normal">
+        </div>
+    </div>
+
     <div class="col-md-6" style="border-left: 2px solid #ccc;">
-        <div id="trans" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; margin-top: 20px;">{{ task }}</div>
+        <div id="trans" style="white-space: normal; background: #f5f5f5; padding: 10px; margin-top: 20px;">{{ task }}</div>
     </div>
 </div>
 
-<!--<div style="width: 100%;">-->
-    <!--<div style=" height: 400px; width:48%; margin-top: 1%; margin-left: 1%; float:left ; direction: ltr">-->
-        <!--<textarea id="original">{{ trans }}</textarea>-->
-    <!--</div>-->
 
-
-    <!--<div style=" height: 400px; width:47%; margin-top: 1%; position: relative; float:right ; direction: ltr; padding-left: 3%; white-space: pre-wrap">-->
-        <!--<div id="trans">{{ task }}</div>-->
-    <!--</div>-->
-<!--</div>-->
 <script type="text/javascript">
 
     marked.setOptions({
@@ -106,8 +104,23 @@
 
     });
     function preview() {
-        var mycontent = simplemde.value();
-        simplemde.togglePreview();
+        if (page == -1) {
+            var mycontent = simplemde.value();
+            //$('#original').html(marked(mycontent));
+            $('#katexTemp').html(marked(mycontent));
+            renderMathInElement(document.getElementById("katexTemp1"));
+            $('#original1').hide();
+            $('#katexTemp1').show();
+            $('#myVarTrans').html(mycontent);
+
+
+        }
+        else {
+            $('#original1').show();
+            $('#katexTemp1').hide();
+        }
+        page = -1 * page;
+
     }
 
     function save_version_particle() {
@@ -142,11 +155,13 @@
         else if ($('#q_op_2').is(':checked')) {
             var mycontent = simplemde.value();
             $('#trans').html(marked(mycontent));
+            renderMathInElement(document.getElementById("trans"));
+
         }
 
     });
 
 </script>
-<input type="hidden" id="myVar" name="variable" value="{{ variable }}">
-
+    <input type="hidden" id="myVar" name="variable" value="{{ variable }}"/>
+    <input type="hidden" id="myVarTrans" name="variable" value="{{variable}}"/>
 {% endblock %}

@@ -14,7 +14,7 @@
           ctx = canvas.getContext('2d');
 
   <!--PDFJS.workerSrc = '/static/js/pdf.worker.js';-->
-  PDFJS.getDocument('/static/img/pdftest.pdf').then(function getPdfHelloWorld(pdf) {
+  PDFJS.getDocument('/static/img/mypdf.pdf').then(function getPdfHelloWorld(pdf) {
     // Fetch the first page.
     pdf.getPage(1).then(function getPageHelloWorld(page) {
       var scale = 1.5;

@@ -258,6 +258,7 @@ class SaveVersionParticle(View):
         id = request.POST['id']
         content = request.POST['content']
         task = Task.objects.get(id=id)
+        print(request.user)
         user = User.objects.get(username=request.user.username)
         translation = Translation.objects.get(user=user, task=task)
         if translation.text.strip() == content.strip():

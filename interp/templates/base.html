@@ -148,19 +148,6 @@ jQuery(document).ready(function($) {
 		receive_message: receiveMessage,
 		heartbeat_msg: {{ WS4REDIS_HEARTBEAT }}
 	});
-	<!--var billboard = $('#billboard');-->
-
-	// send message though the Websocket to the server
-	<!--$("#text_message").keydown(function(event) {-->
-		<!--if (event.keyCode === 13) {-->
-			<!--event.preventDefault();-->
-			<!--ws4redis.send_message($('#text_message').val());-->
-		<!--}-->
-	<!--});-->
-
-	<!--$('#send_message').click(function() {-->
-		<!--ws4redis.send_message($('#text_message').val());-->
-	<!--});-->
 
 	// receive a message though the Websocket from the server
 	function receiveMessage(msg) {

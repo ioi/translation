@@ -19,17 +19,23 @@
 
 <div class="row">
     <div class="col-md-6">
-        <form action = "{% url 'generatepdf' %}" method = "post" style="float: left;margin-right: 2%;margin-left: 37%">
+{% comment %}
+        <form id="myForm" style="float: left;margin-right: 2%;margin-left: 37%">
             {% csrf_token %}
             <input class="btn" type="submit" name="GeneratePDF" value="PDF" />
             <input type="hidden" name="quesId" value="{{ quesId }}" />
             <input type="hidden" name="isAdmin" value="No" />
+            <input id="katexhtml" type="hidden" name="katexhtml"/>
         </form>
+{% endcomment %}
         <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
         <button class="btn" onclick="send_data({{ quesId }})" style="float: left;margin-right: 2%">Save</button>
+        <button class="btn" onclick="online_preview()" style="float: left;margin-right: 2%">Save</button>
+
     </div>
     <div  class="col-md-6">
         <div id="q_opt" class="btn-group" data-toggle="buttons">
+
             <label class="btn btn-default active" id="d_op_0">
                 <input id="q_op_0" name="op" type="radio" value="0">
                 Task Preview
@@ -40,7 +46,7 @@
             </label>
             <label class="btn btn-default" id="d_op_2">
                 <input id="q_op_2" name="op" type="radio" value="2">
-                Translate Preview
+                Online Preview
             </label>
         </div>
     </div>
@@ -51,7 +57,7 @@
     </div>
 
     <div id="katexTemp1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px;display: none; direction: rtl">
-        <div id="katexTemp" style="background: #f5f5f5; padding: 10px; white-space: pre-line;">
+        <div id="katexTemp" style="background: #f5f5f5; padding: 10px; white-space: pre-line;margin-top: 1.5%">
 
         </div>
     </div>
@@ -63,6 +69,19 @@
 
 
         <script type="text/javascript">
+            document.online_prev = false;
+            document.online_interval = 100000;
+           function online_preview() {
+                if (document.online_prev == true){
+                    $('#original').css("direction","rtl");
+                    var mycontent = $('#moratab').text();
+                    $('#original').html(marked(mycontent));
+                    renderMathInElement(document.getElementById("original"));
+
+
+                }
+
+            }
 
             marked.setOptions({
                 renderer: new marked.Renderer(),
@@ -110,7 +129,7 @@
 
                     $('#moratab1').hide();
                     $('#katexTemp1').show();
-
+                    document.getElementsByName("katexhtml").value = document.getElementById("katexTemp").innerHTML;
                 }
                 else {
                     $('#moratab1').show();
@@ -143,7 +162,32 @@
 
             }
 
+            $('#myForm').submit(function(e) {
+                document.getElementsByName("katexhtml").value = document.getElementById("katexTemp").innerHTML;
+                e.preventDefault()
+                $.ajax({
+                    url: " {% url 'generatepdf' %}",
+                    data: {
+                        'katexhtml': document.getElementById("katexTemp").innerHTML,
+                        'isAdmin':'No',
+                        'quesId': {{quesId}},
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    type: "POST",
+                    success: function (response) {
+                        console.log('in success');
+                        jso = jQuery.parseJSON(response);
+                        $('#test').html(jso['content']);
+                        console.log('after success')
+                    },
+                    complete: function () {
+                    },
+                    error: function (xhr, textStatus, thrownError) {
+                    }
+                });
+            });
             window.setInterval(save_version_particle,30000)
+            window.setInterval(online_preview,100000)
 
             $(document).ready(function () {
                 console.log('im heeree');
@@ -155,21 +199,30 @@
             $(document).on('change', 'input:radio[id^="q_op_"]', function (event) {
                 console.log($('#q_op_0').is(':checked'));
                 if ($('#q_op_0').is(':checked')) {
+                    document.online_prev = false;
+
                     $('#original').css("direction","ltr");
                     $('#original').html(marked($('#myVar').text()));
                     renderMathInElement(document.getElementById("original"));
 
                 }
                 else if ($('#q_op_1').is(':checked')){
+                    document.online_prev = false;
+
                     $('#original').css("direction","ltr");
                     $('#original').html($('#myVar').text());
                 }
                 else if ($('#q_op_2').is(':checked')) {
+                    document.online_prev = true;
+                    window.setInterval(online_preview,500)
+
+                    {% comment %}
                     $('#original').css("direction","rtl");
 
                     var mycontent = $('#moratab').text();
                     $('#original').html(marked(mycontent));
                     renderMathInElement(document.getElementById("original"));
+{% endcomment %}
 
                 }
 
@@ -177,6 +230,7 @@
 
         </script>
     <input type="hidden" id="myVar" name="variable" value="{{variable}}">
+    <div  id="test"></div>
 
 
 {% endblock %}

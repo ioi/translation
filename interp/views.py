@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import *
 import markdown,pdfkit
+import json
 import os
 import codecs
 # Create your views here.
@@ -148,23 +149,28 @@ class GeneratePDf(View):
             'encoding': "UTF-8",
             'line-gap': '2'
         }
+
+        self.html_text = request.POST['katexhtml']
+
         output_file = 'mypdf.pdf'
         print(request.POST['isAdmin'])
         if request.POST['isAdmin'] == 'Yes':
             id = request.POST['TaskId']
             task = Task.objects.get(id=int(id))
-            self.html_text = markdown.markdown(task.text, output_format ='html4')
-            return render(request,'pdf.html', context={'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id})
+            #self.html_text = markdown.markdown(task.text, output_format ='html4')
+            return HttpResponse(json.dumps({'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id}))
 
         else:
             id = request.POST['quesId']
             user = User.objects.get(username = request.user.username)
             task = Task.objects.get(id=int(id))
             translation = Translation.objects.get(user=user, task=task)
-            self.html_text = markdown.markdown(translation.text, output_format = 'html4')
+            #self.html_text = markdown.markdown(translation.text, output_format = 'html4')
             self.html_text = """<div style="">""" + self.html_text + "</div>"
             print(self.html_text)
-            return render(request,'pdf.html', context={'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id})
+            return HttpResponse(json.dumps({'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id}))
+
+           # return render(request,'pdf.html', context={'content':self.html_text,'isAdmin':request.POST['isAdmin'],'taskId':id})
             #pdfkit.from_string(html_text, output_file, options=options)
 
         file = open(output_file, 'rb')

@@ -30,7 +30,6 @@
 {% endcomment %}
         <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
         <button class="btn" onclick="send_data({{ quesId }})" style="float: left;margin-right: 2%">Save</button>
-        <button class="btn" onclick="online_preview()" style="float: left;margin-right: 2%">Save</button>
 
     </div>
     <div  class="col-md-6">
@@ -70,7 +69,6 @@
 
         <script type="text/javascript">
             document.online_prev = false;
-            document.online_interval = 100000;
            function online_preview() {
                 if (document.online_prev == true){
                     $('#original').css("direction","rtl");
@@ -194,12 +192,15 @@
                 var cont = $('#original').text();
                 $('#original').html(marked(cont));
                 $('#myVar').html(cont);
+                renderMathInElement(document.getElementById("original"));
+
 
             });
             $(document).on('change', 'input:radio[id^="q_op_"]', function (event) {
                 console.log($('#q_op_0').is(':checked'));
                 if ($('#q_op_0').is(':checked')) {
                     document.online_prev = false;
+                    window.setInterval(online_preview,100000)
 
                     $('#original').css("direction","ltr");
                     $('#original').html(marked($('#myVar').text()));
@@ -208,13 +209,15 @@
                 }
                 else if ($('#q_op_1').is(':checked')){
                     document.online_prev = false;
+                    window.setInterval(online_preview,100000);
 
                     $('#original').css("direction","ltr");
                     $('#original').html($('#myVar').text());
                 }
                 else if ($('#q_op_2').is(':checked')) {
                     document.online_prev = true;
-                    window.setInterval(online_preview,500)
+                    online_preview();
+                    window.setInterval(online_preview,1000);
 
                     {% comment %}
                     $('#original').css("direction","rtl");
@@ -225,9 +228,7 @@
 {% endcomment %}
 
                 }
-
             });
-
         </script>
     <input type="hidden" id="myVar" name="variable" value="{{variable}}">
     <div  id="test"></div>

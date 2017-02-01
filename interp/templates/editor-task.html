@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<script type="text/javascript" src="/static/js/marked.js"></script>
+    <script type="text/javascript" src="/static/js/marked.js"></script>
     <script src="/static/js/simplemde.min.js"></script>
     <script type="text/javascript" src="/static/editor/libs.js"></script>
     <script type="text/javascript" src="/static/editor/syntax.js"></script>
@@ -15,117 +15,126 @@
 
     <link type="text/css" rel="stylesheet" href="/static/css/katex.css">
 
-<div class="row">
-    <div class="col-md-6">
-        <form action="{% url 'generatepdf' %}" method="post" style="float: left;margin-right: 2%;margin-left: 18.5%">
-            {% csrf_token %}
-            <input class="btn" type="submit" name="GeneratePDF" value="PDF"/>
-            <input type="hidden" name="TaskId" value="{{ taskId }}"/>
-            <input type="hidden" name="isAdmin" value="Yes"/>
-        </form>
-        <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
-        <button class="btn" onclick="send_data({{ taskId }})" style="float: left;margin-right: 2%">Save</button>
-    </div>
-</div>
-
-<div class="row" style="background:#e7e7e7">
-    <div id="original1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px">
-        <textarea id="original" style="background: #f5f5f5; padding: 10px; margin-top: 20px;">{{ task }}</textarea>
-    </div>
-    <div id="katexTemp1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px;display: none">
-        <div id="katexTemp" style="background: #f5f5f5; padding: 10px; white-space: normal">
+    <div class="row">
+        <div class="col-md-6">
+            <form action="{% url 'generatepdf' %}" method="post"
+                  style="float: left;margin-right: 2%;margin-left: 18.5%">
+                {% csrf_token %}
+                <input class="btn" type="submit" name="GeneratePDF" value="PDF"/>
+                <input type="hidden" name="TaskId" value="{{ taskId }}"/>
+                <input type="hidden" name="isAdmin" value="Yes"/>
+            </form>
+            <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
+            <button class="btn" onclick="send_data({{ taskId }})" style="float: left;margin-right: 2%">Save</button>
         </div>
     </div>
 
-    <div class="col-md-6" style="border-left: 2px solid #ccc;">
-        <div id="trans" style="white-space: normal; background: #f5f5f5; padding: 10px; margin-top: 20px;"></div>
+    <div class="row" style="background:#e7e7e7">
+        <div id="original1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px;padding-bottom: 20px">
+            <textarea id="original" style="background: #f5f5f5; padding: 10px;">{{ task }}</textarea>
+        </div>
+        <div id="katexTemp1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px;display: none;padding-bottom: 20px">
+            <div id="katexTemp" style="background: #f5f5f5; padding: 10px; white-space: pre-wrap">
+            </div>
+        </div>
+
+        <div class="col-md-6" style="border-left: 2px solid #ccc;padding-bottom: 20px">
+            <div id="trans" style="white-space: pre-line; background: #f5f5f5; padding: 10px; margin-top: 2.5%"></div>
+        </div>
     </div>
-</div>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-    marked.setOptions({
-        renderer: new marked.Renderer(),
-        gfm: true,
-        tables: true,
-        breaks: false,
-        pedantic: false,
-        sanitize: false,
-        smartLists: true,
-        smartypants: false
-    });
-
-    var simplemde = new SimpleMDE({
-        element: document.getElementById("trans")[0],
-        status: false,
-        toolbar: false
-    });
-
-    var page = -1; // -1 means not rendered and +1 means rendered
-
-    function send_data(quesId) {
-        var mycontent = simplemde.value();
-        $.ajax({
-            url: " {% url 'savetask' %}",
-            data: {
-                'content': mycontent,
-                'id': quesId,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            type: "POST",
-            success: function (response) {
-            },
-            complete: function () {
-            },
-            error: function (xhr, textStatus, thrownError) {
-            }
+        marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: false,
+            pedantic: false,
+            sanitize: false,
+            smartLists: true,
+            smartypants: false
         });
-        return false;
-    }
 
-    function preview() {
-        if (page == -1) {
+        var simplemde = new SimpleMDE({
+            element: document.getElementById("trans")[0],
+            status: false,
+            toolbar: false
+        });
+
+        var page = -1; // -1 means not rendered and +1 means rendered
+
+        function send_data(quesId) {
             var mycontent = simplemde.value();
-            //$('#original').html(marked(mycontent));
-            $('#katexTemp').html(marked(mycontent));
-            renderMathInElement(document.getElementById("katexTemp1"));
-            $('#original1').hide();
-            $('#katexTemp1').show();
-
-
+            $.ajax({
+                url: " {% url 'savetask' %}",
+                data: {
+                    'content': mycontent,
+                    'id': quesId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                },
+                complete: function () {
+                },
+                error: function (xhr, textStatus, thrownError) {
+                }
+            });
+            return false;
         }
-        else {
-            $('#original1').show();
-            $('#katexTemp1').hide();
-        }
-        page = -1 * page;
 
-    }
+        function preview() {
+            if (page == -1) {
+                var mycontent = simplemde.value();
+                //$('#original').html(marked(mycontent));
+                $('#katexTemp').html(marked(mycontent));
+                renderMathInElement(document.getElementById("katexTemp1"));
+                $('#original1').hide();
+                $('#katexTemp1').show();
 
-{% comment %}
-    function save_version_particle() {
-        var mycontent = simplemde.value();
-        console.log('im heeree');
-        $.ajax({
-            url: " {% url 'saveVersionParticle' %}",
-            data: {
-                'content': mycontent,
-                'id': {{ quesId }},
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            type: "POST",
-            success: function (response) {
-            },
-            complete: function () {
-            },
-            error: function (xhr, textStatus, thrownError) {
+
             }
-        });
-        return false;
+            else {
+                $('#original1').show();
+                $('#katexTemp1').hide();
+            }
+            page = -1 * page;
 
-    }
-    setInterval(save_version_particle, 30000)
-{% endcomment %}
+        }
+        function online_preview() {
+                var mycontent = simplemde.value();
+                $('#trans').html(marked(mycontent));
+                renderMathInElement(document.getElementById("trans"));
 
-</script>
+        }
+
+        window.setInterval(online_preview, 1000)
+
+        {% comment %}
+            function save_version_particle() {
+                var mycontent = simplemde.value();
+                console.log('im heeree');
+                $.ajax({
+                    url: " {% url 'saveVersionParticle' %}",
+                    data: {
+                        'content': mycontent,
+                        'id': {{ quesId }},
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    type: "POST",
+                    success: function (response) {
+                    },
+                    complete: function () {
+                    },
+                    error: function (xhr, textStatus, thrownError) {
+                    }
+                });
+                return false;
+
+            }
+            setInterval(save_version_particle, 30000)
+        {% endcomment %}
+
+    </script>
 {% endblock %}

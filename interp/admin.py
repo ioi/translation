@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django import forms
 from .models import *
-
+from django.shortcuts import render
 
 class UserCreationForm(forms.ModelForm):
     class Meta:
@@ -17,24 +17,44 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+# class MyModelAdmin(admin.ModelAdmin):
+#     def get_urls(self):
+#         urls = super(MyModelAdmin, self).get_urls()
+#         my_urls = urls('',
+#             (r'^send_email/$', self.my_view)
+#         )
+#         return my_urls + urls
+
 
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
     list_display = ("username",)
     ordering = ("username",)
+    actions = ['send_EMAIL']
 
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'first_name', 'last_name','language','country','rtl')}),
+        (None, {'fields': ('username', 'email','password', 'first_name', 'last_name','language','country','rtl')}),
         )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password', 'first_name', 'last_name','language','country', 'is_superuser', 'is_staff', 'is_active', 'rtl')}
+            'fields': ('username', 'email','password', 'first_name', 'last_name','language','country', 'is_superuser', 'is_staff', 'is_active', 'rtl')}
             ),
         )
 
     filter_horizontal = ()
+
+    def send_EMAIL(self, request, queryset):
+        from django.core.mail import send_mail
+        for i in queryset:
+            if i.email:
+                send_mail('Subject here', 'Here is the message.', 'milad.ameri73@gmail.com',[i.email], fail_silently=False)
+            else:
+                self.message_user(request, "Mail sent successfully ")
+    send_EMAIL.short_description = "Send an email to selected users"
+
+
 
 admin.site.register(Task)
 admin.site.register(Translation)

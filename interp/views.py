@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView, View,FormView
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login, logout
@@ -7,10 +7,36 @@ from django.http import HttpResponseRedirect, HttpResponse
 from .models import *
 import markdown,pdfkit
 import json
-import os
-import codecs
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+# Here Comes Mixins
+
+class AdminCheckMixin(LoginRequiredMixin,object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(AdminCheckMixin, self).dispatch(request, *args, **kwargs)
+
 # Create your views here.
-class Home(View):
+class FirstPage(View):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            return redirect(to=reverse('task'))
+
+        if request.user.is_authenticated():
+            return redirect(to=reverse('home'))
+        else:
+            return render(request, 'home.html')
+
+class Home(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         print('i am here')
         task = Task.objects.all()
@@ -23,7 +49,7 @@ class Home(View):
         return render(request, 'questions.html', context={'translations': translations, 'language':str(user.language.name + '-' + user.country.name)})
 
 
-class Questions(View):
+class Questions(LoginRequiredMixin,View):
     def get(self,request,id):
         user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
@@ -37,7 +63,7 @@ class Questions(View):
         else :
             return render(request,'editor-eng.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id, 'language':str(user.language.name + '-' + user.country.name)})
 
-class SaveQuestion(View):
+class SaveQuestion(LoginRequiredMixin,View):
     def post(self,request):
         user = User.objects.get(username=request.user)
         id = request.POST['id']
@@ -64,15 +90,6 @@ class SaveQuestion(View):
         return HttpResponse("done")
 
 
-class FirstPage(View):
-    def get(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            return redirect(to=reverse('task'))
-
-        if request.user.is_authenticated():
-            return redirect(to=reverse('home'))
-        else:
-            return render(request, 'home.html')
 
 class Login(View):
     def post(self, request):
@@ -88,7 +105,7 @@ class Login(View):
         return render(request, 'home.html', {'login_error': True})
 
 
-class Setting(View):
+class Setting(LoginRequiredMixin,View):
     def post(self, request):
         print (request.user.username)
         user = User.objects.get(username=request.user.username)
@@ -100,12 +117,12 @@ class Setting(View):
         return redirect(to=reverse('home'))
 
 
-class Logout(View):
+class Logout(LoginRequiredMixin,View):
     def get(self, request):
         logout(request)
         return redirect(request=request, to=reverse('firstpage'))
 
-class Tasks(View):
+class Tasks(LoginRequiredMixin,View):
     def get(self,request):
         print('i am here')
         ques = Task.objects.all()
@@ -121,13 +138,13 @@ class Tasks(View):
         task.save()
         return redirect(to=reverse('task'))
 
-class EditTask(View):
+class EditTask(AdminCheckMixin,View):
     def get(self,request,id):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user.username)
         return render(request,'editor-task.html', context={'task' : task.text , 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
 
-class SaveTask(View):
+class SaveTask(AdminCheckMixin,View):
     def post(self,request):
         id = request.POST['id']
         content = request.POST['content']
@@ -223,7 +240,7 @@ class PrintPDf(View):
         return response
 
 
-class Versions(View):
+class Versions(LoginRequiredMixin,View):
     def get(self,request,id):
         user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
@@ -242,7 +259,7 @@ class Versions(View):
             v.append((item.id,item.date_time))
         return render(request,'versions.html', context={'versions' : v , 'versionParticles':vp ,'translation' : trans.text, 'quesId':trans.id})
 
-class GetVersion(View):
+class GetVersion(LoginRequiredMixin,View):
     def post(self,request):
         print('in get version ')
         id = request.POST['id']
@@ -250,7 +267,7 @@ class GetVersion(View):
         print(version.text)
         return HttpResponse(version.text)
 
-class GetVersionParticle(View):
+class GetVersionParticle(LoginRequiredMixin,View):
     def post(self,request):
         print('in get version particle ')
         id = request.POST['id']
@@ -258,7 +275,7 @@ class GetVersionParticle(View):
         print(version.text)
         return HttpResponse(version.text)
 
-class SaveVersionParticle(View):
+class SaveVersionParticle(LoginRequiredMixin,View):
     def post(self,request):
         print('in save version particle')
         id = request.POST['id']
@@ -283,3 +300,4 @@ class Notifications(View):
 class Test(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'test.html')
+

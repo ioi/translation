@@ -14,7 +14,8 @@ class User(User):
     rtl = models.BooleanField(default=False)
     language = models.ForeignKey('Language')
     country = models.ForeignKey('Country')
-
+    font = models.CharField(max_length=255,default='')
+    raw_password = models.CharField(max_length=255)
     def __str__(self):
         return self.username
 
@@ -23,7 +24,7 @@ class Task(models.Model):
     title = models.CharField(max_length=255, blank=False)
     id = models.AutoField(primary_key=True)
     text = models.TextField()
-
+    is_published = models.BooleanField(default=False)
     def __str__(self):
         return "title : " + self.title + " id :" + str(self.id)
 
@@ -42,13 +43,14 @@ class Translation(models.Model):
 
 class Language(models.Model):
     name = models.CharField(max_length=255,primary_key=True)
-
+    abbreviation = models.CharField(max_length=255,default='')
+    rtl = models.BooleanField(default=False)
     def __str__(self):
         return self.name
 
 class Country(models.Model):
     name = models.CharField(max_length=255,primary_key=True)
-
+    abbreviation = models.CharField(max_length=255,default='')
     def __str__(self):
         return self.name
 
@@ -99,3 +101,5 @@ class Attachment(models.Model):
     upload = models.FileField(upload_to='uploads/')
     title = models.CharField(max_length=100)
     create_time = models.DateTimeField('Date Created')
+
+

@@ -15,7 +15,7 @@ class User(User):
     language = models.ForeignKey('Language')
     country = models.ForeignKey('Country')
     font = models.CharField(max_length=255,default='')
-    raw_password = models.CharField(max_length=255)
+    raw_password = models.CharField(max_length=255,default='')
     def __str__(self):
         return self.username
 

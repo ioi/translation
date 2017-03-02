@@ -38,14 +38,13 @@ class FirstPage(View):
 
 class Home(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
-        print('i am here')
         task = Task.objects.all()
         print(task)
         translations = []
         user = User.objects.get(username=request.user.username)
         for item in task:
-            translations.append((item.id, item.title))
-        print(translations)
+            if item.is_published == True:
+                translations.append((item.id, item.title))
         return render(request, 'questions.html', context={'translations': translations, 'language':str(user.language.name + '-' + user.country.name)})
 
 
@@ -68,7 +67,6 @@ class SaveQuestion(LoginRequiredMixin,View):
         user = User.objects.get(username=request.user)
         id = request.POST['id']
         content = request.POST['content']
-        print(len(content))
         task = Task.objects.get(id=id)
         try:
             ques = Translation.objects.get(user=user,task=task)
@@ -77,12 +75,8 @@ class SaveQuestion(LoginRequiredMixin,View):
         except:
             ques = Translation.objects.create(user = user, task = task, text=content)
             ques.save()
-        print('before retrieve')
-        print(len(ques.text))
-        print('after retrieve')
 
         q = Translation.objects.get(user=user,task=task)
-        print(len(q.text))
         print('in save question')
         version = Version.objects.create(translation=ques, text=content, date_time = datetime.datetime.now() )
         version.save()
@@ -96,7 +90,6 @@ class Login(View):
         username = request.POST.get('mail')
         password = request.POST.get('password')
         # @milad you should probably verify this, it's supposed to login the user
-        print("imm heeerreee")
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
@@ -124,7 +117,6 @@ class Logout(LoginRequiredMixin,View):
 
 class Tasks(LoginRequiredMixin,View):
     def get(self,request):
-        print('i am here')
         ques = Task.objects.all()
         questions = []
         for item in ques:
@@ -132,24 +124,46 @@ class Tasks(LoginRequiredMixin,View):
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language':str(user.language.name + '-' + user.country.name)})
 
-    def post(self,request):
-        print(request.POST['title'])
-        task = Task.objects.create(text = 'Write Your Question',title = request.POST['title'])
+
+    def post(self, request):
+        id = request.POST['id']
+        is_published = request.POST['is_published']
+        task = Task.objects.get(id=id)
+        task.is_published = is_published
+        task.save()
+        return HttpResponse("done")
+
+
+class AddTask(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'add-task.html')
+
+
+    def post(self, request):
+        title=request.POST['title']
+        content = request.POST['content']
+        is_published = request.POST['published']
+
+        task = Task.objects.create(text=content, title=title, is_published = is_published)
         task.save()
         return redirect(to=reverse('task'))
+
 
 class EditTask(AdminCheckMixin,View):
     def get(self,request,id):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user.username)
-        return render(request,'editor-task.html', context={'task' : task.text , 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
+        return render(request,'editor-task.html', context={'content' : task.text ,'title':task.title,'is_published':task.is_published, 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
 
 class SaveTask(AdminCheckMixin,View):
     def post(self,request):
         id = request.POST['id']
         content = request.POST['content']
+        is_published = request.POST['is_published']
+
         task = Task.objects.get(id=id)
         task.text = content
+        task.is_published = is_published
         task.save()
         return HttpResponse("done")
 

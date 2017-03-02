@@ -120,7 +120,7 @@ class Tasks(LoginRequiredMixin,View):
         ques = Task.objects.all()
         questions = []
         for item in ques:
-            questions.append((item.id, item.title))
+            questions.append((item.id, item.title,item.is_published))
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language':str(user.language.name + '-' + user.country.name)})
 

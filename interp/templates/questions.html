@@ -3,33 +3,27 @@
 
 {% block content %}
 
-<!-- List of uploaded documents -->
-<div class="container" style="width: 100%">
-    <div class="row col-md-12" style="float: left">
-        <div class="col-md-6" style="margin-top: 5%; float:left; position: relative">
-            {% if translations %}
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
                 <table class="table">
-                    <thead>
-                    <tr>
+                    <thead><tr>
                         <th>Main Question</th>
-                        <th>Version</th>
-                    </tr>
-                    </thead>
+                        <th>Translation Version</th>
+                    </tr></thead>
                     <tbody>
                     {% for question in translations %}
                         <tr>
                             <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
                             <td><a href="{% url 'versions' question.0 %}">Versions</a></td>
                         </tr>
-
                     {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
-                <p style="text-align: left">No documents.</p>
-            {% endif %}
+
+            </div>
         </div>
     </div>
-</div>
 
 {% endblock %}

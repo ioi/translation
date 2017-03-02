@@ -239,6 +239,12 @@ margin-top:40px;
 @media (max-width: 480px) { ... }
 
 
+
 .main-content {
-	padding-top: 50px;
+	padding-top: 100px;
+}
+.task-title {
+	padding-bottom: 15px;
+	margin-bottom: 15px;
+	border-bottom: solid thin #CCCCCC;
 }

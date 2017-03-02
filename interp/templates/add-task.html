@@ -1,0 +1,32 @@
+{% extends "task-info.html" %}
+
+{% block btn-content %}
+    <button class="btn btn-default" onclick="send_data(false)">Save</button>
+    <button class="btn btn-default" onclick="send_data(true)">Save And Publish</button>
+{% endblock %}
+
+{% block script-content %}
+
+    <script type="text/javascript">
+        function send_data(publishing) {
+            var mycontent = simplemde.value();
+            $.ajax({
+                url: "{% url 'addtask' %}",
+                data: {
+                    'title': $('#title').val(),
+                    'content': mycontent,
+                    'is_published' : publishing,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                },
+                complete: function () {
+                },
+                error: function (xhr, textStatus, thrownError) {
+                }
+            });
+            return false;
+        }
+    </script>
+{% endblock %}

@@ -1,42 +1,62 @@
-
-
 {% extends "base.html" %}
 
 {% block content %}
-<!-- List of uploaded documents -->
-<div class="container">
-    <div class="row col-md-12" style="float: left">
-        <div class="col-md-6" style="margin-top: 5%; float:left; position: relative">
-            {% if questions %}
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <a class="btn btn-default" href="{%  url 'addtask' %}">Add</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
                 <table class="table">
-                    <thead>
-                    <tr>
+                    <thead><tr>
                         <th>Main Question</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
+                        <th>Publish</th>
+                    </tr></thead>
                     <tbody>
                     {% for question in questions %}
                         <tr>
                             <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
-                            <td></td>
+                            <td><button onclick="changePublishing({{ question.0 }}, {{ question.2 }})">
+                                {% if question.2 == "false" %}Publish{% else %}Unpublish{% endif %}
+                            </button></td>
                         </tr>
-
                     {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
-                <p style="text-align: left">No documents.</p>
-            {% endif %}
-            <hr>
-            <h1>Create a New Task</h1>
-            <form action = "{% url 'task' %}" method = "post">
-                {% csrf_token %}
-                <input type="text" name="title" placeholder="Task Title" required = "required">
-                <input type="submit" name="Create Task" value="Create" />
-            </form>
+
+            </div>
         </div>
     </div>
-</div>
+
+    <script>
+
+        function changePublishing(questionId, publishing) {
+            $.ajax({
+                url: " {% url 'task' %}",
+                data: {
+                    'id': questionId,
+                    'is_published': !publishing,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+{#                    csrfmiddlewaretoken: '{{ csrf_token }}'#}
+                },
+                type: "POST",
+                success: function (response) {
+                },
+                complete: function () {
+                },
+                error: function (xhr, textStatus, thrownError) {
+                }
+            });
+        }
+
+    </script>
 
 {% endblock %}

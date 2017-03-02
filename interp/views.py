@@ -89,10 +89,19 @@ class Login(View):
     def post(self, request):
         username = request.POST.get('mail')
         password = request.POST.get('password')
+        remember_me = request.POST.get('remember_me')
         # @milad you should probably verify this, it's supposed to login the user
         user = authenticate(username=username, password=password)
+
         if user is not None:
+            if remember_me is None:
+                print('expired')
+                self.request.session.set_expiry(0)
+            else:
+                self.request.session.set_expiry(1209600)
+
             login(request, user)
+
             return redirect(to=reverse('firstpage'))
 
         return render(request, 'home.html', {'login_error': True})

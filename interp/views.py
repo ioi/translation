@@ -188,6 +188,10 @@ class SaveTask(AdminCheckMixin,View):
         id = request.POST['id']
         content = request.POST['content']
         is_published = request.POST['is_published']
+        if(is_published == 'false'):
+            is_published = False
+        else :
+            is_published = True
 
         task = Task.objects.get(id=id)
         task.text = content

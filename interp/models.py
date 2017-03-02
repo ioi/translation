@@ -11,7 +11,6 @@ from ws4redis.publisher import RedisPublisher
 
 class User(User):
     display_name = models.CharField(max_length=255)
-    rtl = models.BooleanField(default=False)
     language = models.ForeignKey('Language')
     country = models.ForeignKey('Country')
     font = models.CharField(max_length=255,default='')

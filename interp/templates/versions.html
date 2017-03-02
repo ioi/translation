@@ -2,164 +2,160 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script type="text/javascript" src="/static/js/marked.js"></script>
-<div class="row">
-    <button class="btn primary-btn" onclick="revert_version()" >Revert Version</button>
-</div>
-<div class="row">
-        <div class="col-md-2" >
-            {% if versions %}
+
+    <script type="text/javascript" src="/static/js/marked.js"></script>
+
+
+
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
                 <table class="table">
-                    <thead >
-                    <tr >
+                    <thead ><tr>
                         <th>Version</th>
                         <th>Date</th>
-                    </tr>
-                    </thead>
+                        <th>Revert</th>
+                    </tr></thead>
                     <tbody>
                     {% for version in versions %}
                         <tr class="version" id="{{ version.0 }}" style="cursor: pointer">
                             <td>{{ version.0 }}</td>
                             <td>{{ version.1 }}</td>
+                            <td><button class="btn btn-default" onclick="revert_version({{ version.0 }})" >Revert</button></td>
                         </tr>
                     {% endfor %}
                     {% for version in versionParticles %}
                         <tr class="versionparticle" id="{{ version.0 }}" style="cursor: pointer; background-color: yellow">
                             <td>{{ version.0 }}</td>
                             <td>{{ version.1 }}</td>
+                            <td><button class="btn btn-default" onclick="revert_particle_version({{ version.0 }})" >Revert</button></td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
-                <p style="text-align: left">No documents.</p>
-            {% endif %}
-        </div >
-        <div class="col-md-5" >
 
-            <div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
                 <div id="myversion" style="white-space: pre-wrap"></div>
+                <div id="original" style="display: none;">{{ translation }}</div>
+            </div>
+
             </div>
         </div>
-        <div class="col-md-5" style="border-left: 2px solid #ccc; white-space: pre-wrap">
-
-            <div >
-                <div id="original">{{ translation }}</div>
-            </div>
-        </div>
-
-</div>
+    </div>
 
 
+    <script type="text/javascript">
+        var cur_ver_text = '';
+        $(document).ready(function () {
+            var cont = $('#original').text();
+            $('#original').html(cont);
+            <!--console.log('im heere')-->
+        });
 
-        <script type="text/javascript">
-            var cur_ver_text = '';
-            $(document).ready(function () {
-                var cont = $('#original').text();
-                $('#original').html(cont);
-                <!--console.log('im heere')-->
+
+        function diff(response){
+            cur_ver_text = document.getElementById('original').textContent;
+            var diff = JsDiff.diffChars(cur_ver_text, response),
+                display = document.getElementById('myversion'),
+                fragment = document.createDocumentFragment();
+
+            diff.forEach(function(part){
+              color = part.added ? 'green' :
+                part.removed ? 'red' : 'grey';
+              span = document.createElement('span');
+              span.style.color = color;
+              span.appendChild(document
+                .createTextNode(part.value));
+              fragment.appendChild(span);
+            });
+            while (display.firstChild) {
+               display.removeChild(display.firstChild);
+            }
+            display.appendChild(fragment);
+        }
+
+
+        $('.version').on('click', function (event) {
+            $.ajax({
+                url: " {% url 'getVersion' %}",
+                data: {
+                    'id': $(this).attr('id'),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                    diff(response);
+                }
             });
 
-            function revert_version() {
-                var mycontent = cur_ver_text;
-                $.ajax({
-                    url: " {% url 'saveQuestion' %}",
-                    data: {
-                        'content': mycontent,
-                        'id': {{ quesId }},
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    type: "POST",
-                    success: function (response) {
-                        location.reload();
-                    },
-                    complete: function () {
-                    },
-                    error: function (xhr, textStatus, thrownError) {
-                    }
-                });
-                return false;
-            }
+        })
+        $('.versionparticle').on('click', function (event) {
+            $.ajax({
+                url: " {% url 'getVersionParticle' %}",
+                data: {
+                    'id': $(this).attr('id'),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                    diff(response);
+                },
+            });
 
-            $('.version').on('click', function (event) {
-                event.preventDefault();
-                console.log($(this).attr('id'));
-                var content = "";
-                $.ajax({
-                    url: " {% url 'getVersion' %}",
-                    data: {
-                        'id': $(this).attr('id'),
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    type: "POST",
-                    success: function (response) {
-                        cur_ver_text = document.getElementById('original').textContent;
-                        var diff = JsDiff.diffChars(cur_ver_text, response),
-                            display = document.getElementById('myversion'),
-                            fragment = document.createDocumentFragment();
+        })
 
-                        diff.forEach(function(part){
-                          color = part.added ? 'green' :
-                            part.removed ? 'red' : 'grey';
-                          span = document.createElement('span');
-                          span.style.color = color;
-                          span.appendChild(document
-                            .createTextNode(part.value));
-                          fragment.appendChild(span);
-                        });
-                        while (display.firstChild) {
-                           display.removeChild(display.firstChild);
-                        }
-                        display.appendChild(fragment);
 
-                    },
-                    complete: function () {
-                    },
-                    error: function (xhr, textStatus, thrownError) {
-                    }
-                });
+        function revert(content){
+            $.ajax({
+                url: " {% url 'saveQuestion' %}",
+                data: {
+                    'content': content,
+                    'id': {{ quesId }},
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                    location.reload();
+                },
+            });
+        }
 
-            })
-            $('.versionparticle').on('click', function (event) {
-                event.preventDefault();
-                console.log($(this).attr('id'));
-                var content = "";
-                $.ajax({
-                    url: " {% url 'getVersionParticle' %}",
-                    data: {
-                        'id': $(this).attr('id'),
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    },
-                    type: "POST",
-                    success: function (response) {
-                        cur_ver_text = document.getElementById('original').textContent;
-                        var diff = JsDiff.diffChars(cur_ver_text, response),
-                            display = document.getElementById('myversion'),
-                            fragment = document.createDocumentFragment();
+        function revert_version(id) {
+            $.ajax({
+                url: " {% url 'getVersion' %}",
+                data: {
+                    'id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                    revert(response);
+                }
+            });
+            return false;
+        }
+        function revert_particle_version(id) {
+            $.ajax({
+                url: " {% url 'getVersionParticle' %}",
+                data: {
+                    'id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                    revert(response);
+                },
+            });
+        }
 
-                        diff.forEach(function(part){
-                          color = part.added ? 'green' :
-                            part.removed ? 'red' : 'grey';
-                          span = document.createElement('span');
-                          span.style.color = color;
-                          span.appendChild(document
-                            .createTextNode(part.value));
-                          fragment.appendChild(span);
-                        });
-                        while (display.firstChild) {
-                           display.removeChild(display.firstChild);
-                        }
-                        display.appendChild(fragment);
-
-                    },
-                    complete: function () {
-                    },
-                    error: function (xhr, textStatus, thrownError) {
-                    }
-                });
-
-            })
-
-        </script>
+    </script>
 
 {% endblock %}

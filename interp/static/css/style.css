@@ -239,3 +239,6 @@ margin-top:40px;
 @media (max-width: 480px) { ... }
 
 
+.main-content {
+	padding-top: 50px;
+}

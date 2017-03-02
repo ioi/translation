@@ -57,7 +57,7 @@ class Questions(LoginRequiredMixin,View):
         except:
             trans = Translation.objects.create(user= user, task = task, language = user.language, text = task.text)
 
-        if user.rtl == True:
+        if user.language.rtl == True:
             return render(request,'editor-fa.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id,'language':str(user.language.name + '-' + user.country.name)})
         else :
             return render(request,'editor-eng.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id, 'language':str(user.language.name + '-' + user.country.name)})
@@ -112,9 +112,9 @@ class Setting(LoginRequiredMixin,View):
         print (request.user.username)
         user = User.objects.get(username=request.user.username)
         if (request.POST.get('rtl') == 'on'):
-            user.rtl = True
+            user.language.rtl = True
         else:
-            user.rtl = False
+            user.language.rtl = False
         user.save()
         return redirect(to=reverse('home'))
 
@@ -197,7 +197,7 @@ class SaveTask(AdminCheckMixin,View):
         task = Task.objects.get(id=id)
         task.text = content
         task.is_published = is_published
-        title = title
+        task.title = title
         task.save()
         return HttpResponse("done")
 

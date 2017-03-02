@@ -120,7 +120,12 @@ class Tasks(LoginRequiredMixin,View):
         ques = Task.objects.all()
         questions = []
         for item in ques:
-            questions.append((item.id, item.title,item.is_published))
+            if (item.is_published == False):
+                is_published = 'false'
+            else:
+                is_published = 'true'
+
+            questions.append((item.id, item.title,is_published))
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language':str(user.language.name + '-' + user.country.name)})
 
@@ -128,6 +133,11 @@ class Tasks(LoginRequiredMixin,View):
     def post(self, request):
         id = request.POST['id']
         is_published = request.POST['is_published']
+        if(is_published == 'false'):
+            is_published = False
+        else :
+            is_published = True
+
         task = Task.objects.get(id=id)
         task.is_published = is_published
         task.save()
@@ -142,7 +152,11 @@ class AddTask(LoginRequiredMixin, View):
     def post(self, request):
         title=request.POST['title']
         content = request.POST['content']
-        is_published = request.POST['published']
+        is_published = request.POST['is_published']
+        if(is_published == 'false'):
+            is_published = False
+        else :
+            is_published = True
 
         task = Task.objects.create(text=content, title=title, is_published = is_published)
         task.save()
@@ -153,7 +167,12 @@ class EditTask(AdminCheckMixin,View):
     def get(self,request,id):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user.username)
-        return render(request,'editor-task.html', context={'content' : task.text ,'title':task.title,'is_published':task.is_published, 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
+        if (task.is_published == False):
+            is_published = 'false'
+        else:
+            is_published = 'true'
+
+        return render(request,'editor-task.html', context={'content' : task.text ,'title':task.title,'is_published':is_published, 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
 
 class SaveTask(AdminCheckMixin,View):
     def post(self,request):

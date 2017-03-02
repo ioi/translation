@@ -55,7 +55,7 @@ class Questions(LoginRequiredMixin,View):
         try:
             trans = Translation.objects.get(user=user, task = task)
         except:
-            trans = Translation.objects.create(user= user, task = task, language = user.language)
+            trans = Translation.objects.create(user= user, task = task, language = user.language, text = task.text)
 
         if user.rtl == True:
             return render(request,'editor-fa.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id,'language':str(user.language.name + '-' + user.country.name)})

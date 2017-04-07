@@ -1,96 +1,31 @@
-{% extends "base.html" %}
+{% extends "editor.html" %}
 
-{% block content %}
+{% block translation_editor %}
 
-    <script type="text/javascript" src="/static/js/marked.js"></script>
-    <script src="/static/js/simplemde.min.js"></script>
-    <script type="text/javascript" src="/static/editor/libs.js"></script>
-    <script type="text/javascript" src="/static/editor/syntax.js"></script>
-    <script type="text/javascript" src="/static/editor/buttons.js"></script>
-    <script type="text/javascript" src="/static/editor/editor.js"></script>
-    <script type="text/javascript" src="/static/js/katex.js"></script>
-    <script type="text/javascript" src="/static/js/auto-render.min.js"></script>
-    <link rel="stylesheet" href="/static/css/simplemde.min.css">
-    <link type="text/css" rel="stylesheet" href="/static/editor/editor.css">
-    <link type="text/css" rel="stylesheet" href="/static/css/katex.css">
-    <div class="row">
-        <div class="col-md-6">
-{% comment %}
-            <form action="{% url 'generatepdf' %}" method="post" style="float: left;margin-right: 2%;margin-left: 37%">
-                {% csrf_token %}
-                <input class="btn" type="submit" name="GeneratePDF" value="PDF"/>
-                <input type="hidden" name="quesId" value="{{ quesId }}"/>
-                <input type="hidden" name="isAdmin" value="No"/>
-            </form>
-{% endcomment %}
-            <button class="btn" onclick="preview()" style="float: left;margin-right: 2%">Preview</button>
-            <button class="btn" onclick="send_data({{ quesId }})" style="float: left;margin-right: 2%">Save</button>
-        </div>
-        <div class="col-md-6">
-            <div id="q_opt" class="btn-group" data-toggle="buttons">
-                <label class="btn btn-default active" id="d_op_0">
-                    <input id="q_op_0" name="op" type="radio" value="0">
-                    Task Preview
-                </label>
-                <label class="btn btn-default" id="d_op_1">
-                    <input id="q_op_1" name="op" type="radio" value="1">
-                    Task Markdown
-                </label>
-                <label class="btn btn-default" id="d_op_2">
-                    <input id="q_op_2" name="op" type="radio" value="2">
-                    Online Preview
-                </label>
-            </div>
-        </div>
+    <div id="editor1">
+        <textarea id="editor" style="background: #f5f5f5; padding: 10px;">{{ trans }}</textarea>
     </div>
-    <div class="row" style="background:#e7e7e7">
-        <div id="original1" class="col-md-6"
-             style="border-right: 2px solid #ccc; padding-top:20px; padding-bottom: 20px">
-            <textarea id="original" style="background: #f5f5f5; padding: 10px;">{{ trans }}</textarea>
-        </div>
-        <div id="katexTemp1" class="col-md-6" style="border-right: 2px solid #ccc; padding-top:20px;display: none;padding-bottom: 20px">
-            <div id="katexTemp" style="background: #f5f5f5; padding: 10px; white-space: pre-line;">
-            </div>
-        </div>
 
-        <div class="col-md-6" style="border-left: 2px solid #ccc;padding-bottom: 20px">
-            <div id="trans"
-                 style="white-space: pre-line; background: #f5f5f5; padding: 10px; margin-top: 2.5%">{{ task }}</div>
-        </div>
-    </div>
 
 
     <script type="text/javascript">
+
         document.online_prev = false;
         function online_preview() {
             if (document.online_prev == true) {
                 var mycontent = simplemde.value();
-                $('#trans').html(marked(mycontent));
-                renderMathInElement(document.getElementById("trans"));
+                $('#original').html(marked(mycontent));
+                renderMathInElement(document.getElementById("original"));
 
             }
 
         }
 
-
-        marked.setOptions({
-            renderer: new marked.Renderer(),
-            gfm: true,
-            tables: true,
-            breaks: false,
-            pedantic: false,
-            sanitize: false,
-            smartLists: true,
-            smartypants: false
-        });
         var simplemde = new SimpleMDE({
-            element: document.getElementById("original")[0],
+            element: document.getElementById("editor")[0],
             status: false,
             toolbar: false
         });
-
-
-        var page = -1; // -1 means not rendered and +1 means rendered
 
         function send_data(quesId) {
             var mycontent = simplemde.value();
@@ -112,31 +47,22 @@
             return false;
         }
 
-        $(document).ready(function () {
-            var cont = $('#trans').text();
-            $('#trans').html(marked(cont));
-            $('#myVar').html(cont);
-            renderMathInElement(document.getElementById("original"));
-
-
-        });
+        var rendered = false;
         function preview() {
-            if (page == -1) {
+            if (!rendered) {
                 var mycontent = simplemde.value();
                 $('#katexTemp').html(marked(mycontent));
                 renderMathInElement(document.getElementById("katexTemp1"));
-                $('#original1').hide();
+                $('#editor1').hide();
                 $('#katexTemp1').show();
                 $('#myVarTrans').html(mycontent);
 
 
-            }
-            else {
-                $('#original1').show();
+            }else {
+                $('#editor1').show();
                 $('#katexTemp1').hide();
             }
-            page = -1 * page;
-
+            rendered = !rendered;
         }
 
         function save_version_particle() {
@@ -159,34 +85,30 @@
             return false;
 
         }
-        setInterval(save_version_particle, 30000)
+        setInterval(save_version_particle, 30000);
 
         $(document).on('change', 'input:radio[id^="q_op_"]', function (event) {
             if ($('#q_op_0').is(':checked')) {
                 document.online_prev = false;
                 window.setInterval(online_preview, 100000);
 
-                $('#trans').html(marked($('#myVar').text()));
-                renderMathInElement(document.getElementById("trans"));
+                $('#original').html(marked($('#myVar').text()));
+                renderMathInElement(document.getElementById("original"));
 
-            }
-            else if ($('#q_op_1').is(':checked')) {
+            }else if ($('#q_op_1').is(':checked')) {
                 document.online_prev = false;
                 window.setInterval(online_preview, 100000);
 
-                $('#trans').html($('#myVar').text());
-            }
-            else if ($('#q_op_2').is(':checked')) {
+                $('#original').html($('#myVar').text());
+
+            }else if ($('#q_op_2').is(':checked')) {
                 document.online_prev = true;
                 online_preview();
                 window.setInterval(online_preview, 1000)
-
-
             }
-
         });
 
     </script>
-    <input type="hidden" id="myVar" name="variable" value="{{ variable }}"/>
-    <input type="hidden" id="myVarTrans" name="variable" value="{{ variable }}"/>
+
+
 {% endblock %}

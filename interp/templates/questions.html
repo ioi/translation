@@ -3,20 +3,28 @@
 
 {% block content %}
 
+    <link rel="stylesheet" href="/static/css/question.css">
+
     <div class="col-sm-12">
         <div class="panel panel-default">
             <div class="panel-body">
 
-                <table class="table">
+                <table class="table table-center">
                     <thead><tr>
                         <th>Main Question</th>
                         <th>Translation Version</th>
+                        <th>Is Editing?</th>
+                        <th>Last Save</th>
+                        <th>Task Status</th>
                     </tr></thead>
                     <tbody>
                     {% for question in translations %}
                         <tr>
                             <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
                             <td><a href="{% url 'versions' question.0 %}">Versions</a></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>

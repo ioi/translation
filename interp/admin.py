@@ -34,12 +34,12 @@ class CustomUserAdmin(UserAdmin):
     actions = ['send_EMAIL']
 
     fieldsets = (
-        (None, {'fields': ('username', 'email','password', 'first_name', 'last_name','language','country','rtl')}),
+        (None, {'fields': ('username', 'email','password', 'first_name', 'last_name','language','country')}),
         )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email','password', 'first_name', 'last_name','language','country', 'is_superuser', 'is_staff', 'is_active', 'rtl')}
+            'fields': ('username', 'email','password', 'first_name', 'last_name','language','country', 'is_superuser', 'is_staff', 'is_active')}
             ),
         )
 

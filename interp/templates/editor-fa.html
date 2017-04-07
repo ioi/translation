@@ -25,8 +25,6 @@
 
         function send_data(quesId) {
             var mycontent = $('#moratab').text();
-            console.log(mycontent.length);
-            console.log('im heeree');
             $.ajax({
                 url: " {% url 'saveQuestion' %}",
                 data: {
@@ -45,9 +43,9 @@
             return false;
         }
 
-        var rendered = false;
-        function preview() {
-            if (!rendered) {
+        function changeEditorPreview(){
+            var preview = document.getElementById("editor-checkbox").checked;
+            if (preview) {
                 var mycontent = $('#moratab').text();
                 $('#katexTemp').html(marked(mycontent));
                 renderMathInElement(document.getElementById("katexTemp1"));
@@ -59,8 +57,43 @@
                 $('#moratab1').show();
                 $('#katexTemp1').hide();
             }
-            rendered = !rendered;
         }
+
+        var original_markdown = false;
+        function changeOriginal(markdown){
+            if(markdown){
+                document.online_prev = false;
+                window.setInterval(online_preview,100000);
+                $('#original').css("direction","ltr");
+                $('#original').html($('#myVar').text());
+
+            }else{
+                document.online_prev = false;
+                window.setInterval(online_preview,100000);
+                $('#original').css("direction","ltr");
+                $('#original').html(marked($('#myVar').text()));
+                renderMathInElement(document.getElementById("original"));
+            }
+        }
+
+        function changeOriginalPreview(){
+            var markdown = document.getElementById("original-checkbox").checked;
+            original_markdown = markdown;
+            changeOriginal(markdown);
+        }
+
+        function changeInteractive() {
+            var interative = document.getElementById("interactive-checkbox").checked;
+            if (interative) {
+                document.online_prev = true;
+                online_preview();
+                window.setInterval(online_preview,1000);
+
+            }else{
+                changeOriginal(original_markdown);
+            }
+        }
+
 
         function save_version_particle() {
             var mycontent = $('#moratab').text();
@@ -84,29 +117,6 @@
         }
         window.setInterval(save_version_particle,30000);
         window.setInterval(online_preview,100000);
-
-        $(document).on('change', 'input:radio[id^="q_op_"]', function (event) {
-            if ($('#q_op_0').is(':checked')) {
-                document.online_prev = false;
-                window.setInterval(online_preview,100000);
-
-                $('#original').css("direction","ltr");
-                $('#original').html(marked($('#myVar').text()));
-                renderMathInElement(document.getElementById("original"));
-
-            }else if ($('#q_op_1').is(':checked')){
-                document.online_prev = false;
-                window.setInterval(online_preview,100000);
-
-                $('#original').css("direction","ltr");
-                $('#original').html($('#myVar').text());
-
-            }else if ($('#q_op_2').is(':checked')) {
-                document.online_prev = true;
-                online_preview();
-                window.setInterval(online_preview,1000);
-            }
-        });
 
     </script>
 

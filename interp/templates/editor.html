@@ -20,6 +20,8 @@
         <div class="panel panel-default panel-btn">
             <div class="panel-body">
                 <button class="btn btn-default" onclick="send_data({{ quesId }})">Save</button>
+                <button class="btn btn-default">PDF</button>
+                <input type="checkbox" id="interactive-checkbox" onchange="changeInteractive()"> Interactive
             </div>
         </div>
     </div>
@@ -28,7 +30,7 @@
     <div class="col-sm-6">
         <div class="panel panel-default panel-btn">
             <div class="panel-body">
-                <button class="btn btn-default" onclick="preview()">Preview</button>
+                <input type="checkbox" id="editor-checkbox" onchange="changeEditorPreview()"> Preview
             </div>
         </div>
 
@@ -49,10 +51,7 @@
     <div class="col-sm-6">
         <div class="panel panel-default panel-btn">
             <div class="panel-body">
-                <input id="q_op_0" name="op" type="radio" value="0"> Preview
-                <input id="q_op_1" name="op" type="radio" value="1"> Markdown
-
-                <input id="q_op_2" name="op" type="radio" value="2"> Interactive
+                <input type="checkbox" id="original-checkbox" onchange="changeOriginalPreview()"> Markdown
             </div>
         </div>
 

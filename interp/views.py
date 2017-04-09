@@ -57,10 +57,9 @@ class Questions(LoginRequiredMixin,View):
         except:
             trans = Translation.objects.create(user= user, task = task, language = user.language, text = task.text)
 
-        if user.language.rtl == True:
-            return render(request,'editor-fa.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id,'language':str(user.language.name + '-' + user.country.name)})
-        else :
-            return render(request,'editor-eng.html', context={'trans' : trans.text , 'task' : task.text , 'quesId':id, 'language':str(user.language.name + '-' + user.country.name)})
+        return render(request, 'editor.html',
+                      context={'trans': trans.text, 'task': task.text, 'rtl': user.language.rtl, 'quesId': id,
+                               'language': str(user.language.name + '-' + user.country.name)})
 
 class SaveQuestion(LoginRequiredMixin,View):
     def post(self,request):

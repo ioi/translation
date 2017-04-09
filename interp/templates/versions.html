@@ -57,25 +57,14 @@
         $(document).ready(function () {
             var cont = $('#original').text();
             $('#original').html(cont);
-            <!--console.log('im heere')-->
         });
 
 
         function diff(response){
             cur_ver_text = document.getElementById('original').textContent;
-            var diff = JsDiff.diffChars(cur_ver_text, response),
-                display = document.getElementById('myversion'),
-                fragment = document.createDocumentFragment();
+            var fragment = diff_markdown(cur_ver_text, response),
+                display = document.getElementById('myversion');
 
-            diff.forEach(function(part){
-              color = part.added ? 'green' :
-                part.removed ? 'red' : 'grey';
-              span = document.createElement('span');
-              span.style.color = color;
-              span.appendChild(document
-                .createTextNode(part.value));
-              fragment.appendChild(span);
-            });
             while (display.firstChild) {
                display.removeChild(display.firstChild);
             }

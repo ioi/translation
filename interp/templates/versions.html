@@ -60,15 +60,10 @@
         });
 
 
-        function diff(response){
-            cur_ver_text = document.getElementById('original').textContent;
-            var fragment = diff_markdown(cur_ver_text, response),
-                display = document.getElementById('myversion');
-
-            while (display.firstChild) {
-               display.removeChild(display.firstChild);
-            }
-            display.appendChild(fragment);
+        function diff(text){
+            var last_version = document.getElementById('original').textContent;
+            var target_element = document.getElementById('myversion');
+            DiffUtil.appendDiffFragmentToElement(last_version, text, target_element);
         }
 
 

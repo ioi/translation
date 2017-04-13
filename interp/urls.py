@@ -2,7 +2,7 @@ from django.conf import settings
 __author__ = 'MiladDK'
 
 from django.conf.urls import url
-from .views import *
+from .g import *
 from django.conf.urls.static import static
 
 
@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^getverspar/$', GetVersionParticle.as_view(), name='getVersionParticle'),
 
     url(r'^versions/(?P<id>[\w]*)/$', Versions.as_view(), name='versions'),
+    url(r'^task_versions/(?P<id>[\w]*)/$', TaskVersions.as_view(), name='versions'),
     url(r'^questions/(?P<id>[\w]*)/$',Questions.as_view(), name='question'),
     url(r'^setting/$', Setting.as_view(), name='setting'),
     url(r'^$', FirstPage.as_view(), name='firstpage'),

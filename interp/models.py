@@ -11,6 +11,8 @@ from django.utils import timezone
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 
+from interp.utils import add_notification_to_users_cache
+
 
 class User(User):
     display_name = models.CharField(max_length=255)
@@ -18,8 +20,12 @@ class User(User):
     country = models.ForeignKey('Country')
     font = models.CharField(max_length=255,default='')
     raw_password = models.CharField(max_length=255,default='')
+
     def __str__(self):
         return self.username
+    @staticmethod
+    def get_translators():
+        return User.objects.filter(is_staff=False)
 
 
 class ContentVersion(models.Model):
@@ -119,9 +125,11 @@ class Notification(models.Model):
     pub_date = models.DateTimeField('date published')
 
 
-def send_notif(sender, instance, *args, **kwargs):
-    message = RedisMessage("%s^%s"%(instance.title, instance.description))
-    RedisPublisher(facility='notifications', broadcast=True).publish_message(message)
+def send_notif(sender, instance, created, *args, **kwargs):
+    if created:
+        add_notification_to_users_cache(User.get_translators(), instance)
+        message = RedisMessage("%s^%s"%(instance.title, instance.description))
+        RedisPublisher(facility='notifications', broadcast=True).publish_message(message)
 
 
 post_save.connect(send_notif, sender=Notification)

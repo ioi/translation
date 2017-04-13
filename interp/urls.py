@@ -2,7 +2,7 @@ from django.conf import settings
 __author__ = 'MiladDK'
 
 from django.conf.urls import url
-from .g import *
+from .views import *
 from django.conf.urls.static import static
 
 

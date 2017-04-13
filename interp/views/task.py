@@ -25,7 +25,6 @@ class FirstPage(View):
 class Home(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         task = Task.objects.all()
-        print(task)
         translations = []
         user = User.objects.get(username=request.user.username)
         for item in task:
@@ -77,8 +76,9 @@ class AddTask(LoginRequiredMixin, View):
         else :
             is_published = True
 
-        task = Task.objects.create(text=content, title=title, is_published = is_published)
+        task = Task.objects.create(title=title, is_published = is_published)
         task.save()
+        task.add_version(content)
         return redirect(to=reverse('task'))
 
 
@@ -91,12 +91,13 @@ class EditTask(AdminCheckMixin,View):
         else:
             is_published = 'true'
 
-        return render(request,'editor-task.html', context={'content' : task.text ,'title':task.title,'is_published':is_published, 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
+        return render(request,'editor-task.html', context={'content' : task.get_latest_text() ,'title':task.title,'is_published':is_published, 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
 
 class SaveTask(AdminCheckMixin,View):
     def post(self,request):
         id = request.POST['id']
         content = request.POST['content']
+        print(content)
         is_published = request.POST['is_published']
         title = request.POST['title']
         if(is_published == 'false'):
@@ -105,8 +106,8 @@ class SaveTask(AdminCheckMixin,View):
             is_published = True
 
         task = Task.objects.get(id=id)
-        task.text = content
         task.is_published = is_published
         task.title = title
         task.save()
+        task.add_version(content)
         return HttpResponse("done")

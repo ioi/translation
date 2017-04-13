@@ -25,9 +25,9 @@ urlpatterns = [
     url(r'^questions/(?P<id>[\w]*)/$',Questions.as_view(), name='question'),
     url(r'^setting/$', Setting.as_view(), name='setting'),
     url(r'^$', FirstPage.as_view(), name='firstpage'),
-    url(r'^pdf/$', GeneratePDf.as_view(), name='generatepdf'),
-    url(r'^printpdf/$', PrintPDf.as_view(), name='printpdf'),
+    # url(r'^pdf/$', GeneratePDf.as_view(), name='generatepdf'),
+    # url(r'^printpdf/$', PrintPDf.as_view(), name='printpdf'),
 
     url(r'^notifications/$', Notifications.as_view(), name='notifications'),
-    
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

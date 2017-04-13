@@ -59,7 +59,7 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(Task)
 admin.site.register(Translation)
 admin.site.register(User, CustomUserAdmin)
-admin.site.register(Version)
+# admin.site.register(Version)
 admin.site.register(Language)
 admin.site.register(Country)
 admin.site.register(VersionParticle)

@@ -152,6 +152,7 @@ function saveVersion() {
         type: "POST",
         success: function (response) {
             updateSyncTime();
+            ToastrUtil.success('Successfully Saved ...');
         },
         complete: function () {
         },

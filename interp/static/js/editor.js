@@ -52,11 +52,16 @@ $(document).ready(function(){
         task_text = $("#right_text_box").html();
         translation_text = currentTranslationText();
 
+        $('#interactive-checkbox').prop("checked", false);
+        $('#editor-checkbox').prop("checked", false);
+        $('#original-checkbox').prop("checked", false);
+        updateInteractive();
+        updateTranslationTextBox();
+        updateTaskTextBox();
+
         toggleDiv(left_plain_text_box_id);
 
         window.setInterval(saveVersionParticle,60*1000)
-        changeOnlinePreview(true);
-
 });
 
 function currentTranslationText(){

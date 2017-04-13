@@ -9,7 +9,7 @@ function DiffUtil(){
      */
     DiffUtil.getDiffFragment = function(original, changed){
 
-        var diff = JsDiff.diffChars(original, changed),
+        var diff = JsDiff.diffWords(original, changed, {newlineIsToken:true}),
             fragment = document.createDocumentFragment();
 
         diff.forEach(function(part){

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ws4redis',
     'interp',
+    'wkhtmltopdf',
 ]
 
 WEBSOCKET_URL = '/ws3/'
@@ -77,7 +78,10 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'IOI.wsgi.application'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-WKHTMLTOPDF_CMD = '/path/to/wkhtmltopdf'
+
+WKHTMLTOPDF_CMD_OPTIONS = {
+'quiet':True,
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -142,3 +146,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'interp/static/')

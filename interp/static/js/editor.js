@@ -108,6 +108,17 @@ function updateTaskTextBox(){
     }
 }
 
+function updateDiffTextBox(){
+    if($("#diff-checkbox").is(":checked")) {
+        $('#diff-selectbox').prop("disabled", false);
+        var selected_for_diff = $("#diff-selectbox").val();
+        var diff_fragment = DiffUtil.getDiffFragment(last_task_version_text, selected_for_diff);
+        $('#right_text_box').html(diff_fragment);
+    }else{
+        $('#diff-selectbox').prop("disabled", true);
+        updateTaskTextBox()
+    }
+}
 
 
 function updateInteractive() {
@@ -200,7 +211,6 @@ function saveVersionParticle() {
 }
 
 function getTaskVersions() {
-
     $.ajax({
         url: task_version_url,
         data: {
@@ -218,16 +228,3 @@ function getTaskVersions() {
     });
     return false;
 }
-
-function updateDiffTextBox(){
-    if($("#diff-checkbox").is(":checked")) {
-        $('#diff-selectbox').prop("disabled", false);
-        var selected_for_diff = $("#diff-selectbox").val();
-        var diff_fragment = DiffUtil.getDiffFragment(last_task_version_text, selected_for_diff);
-        $('#right_text_box').html(diff_fragment);
-    }else{
-        $('#diff-selectbox').prop("disabled", true);
-        updateTaskTextBox()
-    }
-}
-

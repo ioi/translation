@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from interp.utils import AdminCheckMixin
 from interp.models import Task, User
@@ -115,11 +115,6 @@ class SaveTask(AdminCheckMixin,View):
 
 class TaskVersions(LoginRequiredMixin,View):
     def get(self,request,id):
-        user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
-        v = []
-        versions = task.versions.all()
-        for item in versions:
-            v.append((item.id,item.create_time))
-
-        return render(request,'versions.html', context={'versions' : v, 'task' : task.get_latest_text()})
+        versions_values = task.versions.all().values('text','create_time')
+        return JsonResponse(dict(versions=list(versions_values)))

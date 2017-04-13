@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^questions/(?P<id>[\w]*)/$',Questions.as_view(), name='question'),
     url(r'^setting/$', Setting.as_view(), name='setting'),
     url(r'^$', FirstPage.as_view(), name='firstpage'),
-    url(r'^get_pdf/$', GeneratePDF.as_view()),
+    url(r'^get_pdf/$', GeneratePDF.as_view(), name='getpdf'),
 
     url(r'^notifications/$', Notifications.as_view(), name='notifications'),
 

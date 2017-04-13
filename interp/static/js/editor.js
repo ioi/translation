@@ -3,11 +3,14 @@ var ques_id;
 var version_particle_url;
 var csrf_token;
 var save_question_url;
+var task_version_url;
 var latest_translation_text;
 var online_prev;
 var simplemde;
 var left_plain_text_box_id;
 var rtl;
+var task_versions;
+var last_task_version_text;
 
 function getDirectionStr(is_rtl){
     if(is_rtl)
@@ -55,6 +58,8 @@ $(document).ready(function(){
         $('#interactive-checkbox').prop("checked", false);
         $('#editor-checkbox').prop("checked", false);
         $('#original-checkbox').prop("checked", false);
+        $('#diff-checkbox').prop("checked", false);
+        $('#diff-selectbox').prop("disabled", true);
         updateInteractive();
         updateTranslationTextBox();
         updateTaskTextBox();
@@ -62,6 +67,7 @@ $(document).ready(function(){
         toggleDiv(left_plain_text_box_id);
 
         window.setInterval(saveVersionParticle,60*1000)
+        getTaskVersions();
 });
 
 function currentTranslationText(){
@@ -94,8 +100,11 @@ function updateTranslationTextBox(){
 function updateTaskTextBox(){
     if($("#original-checkbox").is(":checked")){
         $('#right_text_box').html(task_text)
+        $('#diff_material').show()
     }else{
         renderMarkdown('right_text_box', task_text)
+        $('#diff-checkbox').prop("checked", false);
+        $('#diff_material').hide()
     }
 }
 
@@ -106,10 +115,15 @@ function updateInteractive() {
         changeOnlinePreview(true);
         $('#editor-checkbox').prop("disabled", true);
         $('#original-checkbox').prop("disabled", true);
+
+        $('#diff-checkbox').prop("checked", false);
+        $('#diff_material').hide()
     }
     else {
         $('#editor-checkbox').prop("disabled", false);
         $('#original-checkbox').prop("disabled", false);
+
+        $('#diff_material').show()
 
         changeOnlinePreview(false);
         updateTaskTextBox();
@@ -183,5 +197,37 @@ function saveVersionParticle() {
         }
     });
     return false;
+}
+
+function getTaskVersions() {
+
+    $.ajax({
+        url: task_version_url,
+        data: {
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "GET",
+        success: function (response) {
+            task_versions = response.versions;
+            var options = $("#diff-selectbox");
+            $.each(task_versions, function() {
+                options.append($("<option />").val(this.text).text(this.create_time));
+                last_task_version_text = this.text;
+            });
+        }
+    });
+    return false;
+}
+
+function updateDiffTextBox(){
+    if($("#diff-checkbox").is(":checked")) {
+        $('#diff-selectbox').prop("disabled", false);
+        var selected_for_diff = $("#diff-selectbox").val();
+        var diff_fragment = DiffUtil.getDiffFragment(last_task_version_text, selected_for_diff);
+        $('#right_text_box').html(diff_fragment);
+    }else{
+        $('#diff-selectbox').prop("disabled", true);
+        updateTaskTextBox()
+    }
 }
 

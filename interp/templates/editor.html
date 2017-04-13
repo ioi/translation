@@ -57,6 +57,11 @@
         <div class="panel panel-default panel-btn">
             <div class="panel-body">
                 <input type="checkbox" id="original-checkbox" onchange="updateTaskTextBox()"> Markdown
+
+                <span id="diff_material">
+                    <input type="checkbox" id="diff-checkbox" onchange="updateDiffTextBox()"> Diff
+                    <select class="form-control" id="diff-selectbox" onchange="updateDiffTextBox()"></select>
+                </span>
             </div>
         </div>
 
@@ -71,6 +76,7 @@
         ques_id = {{quesId}};
         version_particle_url = " {% url 'saveVersionParticle' %}";
         save_question_url = "{% url 'saveQuestion' %}";
+        task_version_url = "{% url 'taskVersions' id=quesId %}";
         csrf_token = "{{csrf_token}}";
         rtl = '{{rtl}}' == 'True';
     </script>

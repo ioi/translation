@@ -10,6 +10,13 @@ from django.http import HttpResponse
 
 from wkhtmltopdf.views import PDFTemplateView
 
+class Home(LoginRequiredMixin,View):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(username=request.user.username)
+        tasks = Task.objects.filter(is_published=True).values_list('id', 'title')
+        return render(request, 'questions.html', context={'tasks': tasks, 'language': user.credentials()})
+
+
 class Questions(LoginRequiredMixin,View):
     def get(self,request,id):
         user = User.objects.get(username=request.user)

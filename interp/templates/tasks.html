@@ -24,8 +24,8 @@
                     {% for question in questions %}
                         <tr>
                             <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
-                            <td><button onclick="changePublishing({{ question.0 }}, {{ question.2 }})">
-                                {% if question.2 == "false" %}Publish{% else %}Unpublish{% endif %}
+                            <td id="td_{{ question.0 }}"><button  onclick="changePublishing({{ question.0 }}, '{{ question.2 }}')">
+                                {% if question.2 %}UnPublish{% else %}Publish{% endif %}
                             </button></td>
                         </tr>
                     {% endfor %}
@@ -43,12 +43,16 @@
                 url: " {% url 'task' %}",
                 data: {
                     'id': questionId,
-                    'is_published': !publishing,
+                    'is_published': publishing == 'False',
                     csrfmiddlewaretoken: '{{ csrf_token }}'
 {#                    csrfmiddlewaretoken: '{{ csrf_token }}'#}
                 },
                 type: "POST",
                 success: function (response) {
+                if (publishing == 'False')
+                    $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'True\')"> UnPublish </button>');
+                else
+                    $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'False\')"> Publish </button>');
                 },
                 complete: function () {
                 },

@@ -92,12 +92,12 @@
 {% block script_panel %}
 
 {% endblock %}
-<script src="{% static 'js/ws4redis.js' %}" type="text/javascript"></script>
+<!--<script src="{% static 'js/ws4redis.js' %}" type="text/javascript"></script>-->
 <script type="text/javascript" src="/static/js/notification.js"></script>
 
 <script>
-    websocket_url = "{{ WEBSOCKET_URI }}";
-    redis_heartbeat = "{{WS4REDIS_HEARTBEAT }}";
+//    websocket_url = "{{ WEBSOCKET_URI }}";
+//    redis_heartbeat = "{{WS4REDIS_HEARTBEAT }}";
     notification_url = "{% url 'notifications' %}";
     csrf_token = "{{csrf_token}}"
 </script>

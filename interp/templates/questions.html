@@ -18,7 +18,7 @@
                         <th>Task Status</th>
                     </tr></thead>
                     <tbody>
-                    {% for question in translations %}
+                    {% for question in tasks %}
                         <tr>
                             <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
                             <td><a href="{% url 'versions' question.0 %}">Versions</a></td>

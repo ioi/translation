@@ -8,44 +8,11 @@ from interp.utils import AdminCheckMixin
 from interp.models import Task, User
 
 
-
-# Here Comes Mixins
-
-# Create your views here.
-class FirstPage(View):
-    def get(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            return redirect(to=reverse('task'))
-
-        if request.user.is_authenticated():
-            return redirect(to=reverse('home'))
-        else:
-            return render(request, 'home.html')
-
-class Home(LoginRequiredMixin,View):
-    def get(self, request, *args, **kwargs):
-        task = Task.objects.all()
-        translations = []
-        user = User.objects.get(username=request.user.username)
-        for item in task:
-            if item.is_published == True:
-                translations.append((item.id, item.title))
-        return render(request, 'questions.html', context={'translations': translations, 'language':str(user.language.name + '-' + user.country.name)})
-
-
-class Tasks(LoginRequiredMixin,View):
+class Tasks(AdminCheckMixin,View):
     def get(self,request):
-        ques = Task.objects.all()
-        questions = []
-        for item in ques:
-            if (item.is_published == False):
-                is_published = 'false'
-            else:
-                is_published = 'true'
-
-            questions.append((item.id, item.title,is_published))
+        questions = Task.objects.values_list('id', 'title', 'is_published')
         user = User.objects.get(username=request.user.username)
-        return render(request, 'tasks.html', context={'questions': questions,'language':str(user.language.name + '-' + user.country.name)})
+        return render(request, 'tasks.html', context={'questions': questions,'language': user.credentials()})
 
 
     def post(self, request):

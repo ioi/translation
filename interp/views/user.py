@@ -7,6 +7,16 @@ from django.shortcuts import render
 
 from interp.models import User
 
+class FirstPage(View):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            return redirect(to=reverse('task'))
+
+        if request.user.is_authenticated():
+            return redirect(to=reverse('home'))
+        else:
+            return render(request, 'login.html')
+
 class Login(View):
     def post(self, request):
         username = request.POST.get('mail')
@@ -17,7 +27,6 @@ class Login(View):
 
         if user is not None:
             if remember_me is None:
-                print('expired')
                 self.request.session.set_expiry(0)
             else:
                 self.request.session.set_expiry(1209600)
@@ -26,7 +35,7 @@ class Login(View):
 
             return redirect(to=reverse('firstpage'))
 
-        return render(request, 'home.html', {'login_error': True})
+        return render(request, 'login.html', {'login_error': True})
 
 
 class Setting(LoginRequiredMixin,View):

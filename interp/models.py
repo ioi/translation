@@ -23,6 +23,10 @@ class User(User):
 
     def __str__(self):
         return self.username
+
+    def credentials(self):
+        return self.language.name + '-' + self.country.name
+
     @staticmethod
     def get_translators():
         return User.objects.filter(is_staff=False)

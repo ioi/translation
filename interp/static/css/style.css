@@ -260,3 +260,40 @@ margin-top:40px;
 	height: 25px;
 	padding: 0px 6px;
 }
+
+.notif-dropdown-menu li {
+	float: left;
+	border-bottom: solid thin #eeeeee;
+	margin-bottom: 5px;
+	width: 100%;
+}
+.notif-dropdown-menu li.notif-unread {
+	background-color: #CCCCCC;
+}
+.notif-dropdown-menu li:last-child {
+	border-bottom: none;
+}
+.notif-dropdown-menu li a {
+	float: left;
+	width: 100%;
+	cursor: pointer;
+}
+.notif-dropdown-menu li a span.notif-title {
+	width: 100%;
+	float: left;
+	font-weight: bold;
+}
+.notif-dropdown-menu li a span.notif-description {
+	width: 100%;
+	float: left;
+	font-size: 11px;
+}
+.notif-badge {
+	width: 20px;
+	height: 20px;
+	background-color: red;
+	color: white;
+	position: absolute;
+	text-align: center;
+	border-radius: 4px;
+}

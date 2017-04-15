@@ -6,7 +6,7 @@ from django.views.generic import View
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from interp.models import User, Task, Translation, ContentVersion, VersionParticle
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -35,12 +35,13 @@ class Questions(LoginRequiredMixin,View):
 
 class SaveQuestion(LoginRequiredMixin,View):
     def post(self,request):
-        user = User.objects.get(username=request.user)
         id = request.POST['id']
         content = request.POST['content']
         task = Task.objects.get(id=id)
+        user = User.objects.get(username=request.user)
         translation = Translation.objects.get(user=user,task=task)
-        print('in save question')
+        if user != translation.user:
+            return HttpResponseForbidden()
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()
         return HttpResponse("done")
@@ -68,21 +69,23 @@ class Versions(LoginRequiredMixin,View):
 
 
 class GetVersion(LoginRequiredMixin,View):
-    def post(self,request):
-        print('in get version ')
-        id = request.POST['id']
+    def get(self,request):
+        id = request.GET['id']
         version = ContentVersion.objects.get(id=id)
-        print(version.text)
+        user = User.objects.get(username=request.user.username)
+        if version.content_type.model != 'translation' or version.content_object.user != user:
+            return HttpResponseBadRequest()
         return HttpResponse(version.text)
 
 
 class GetVersionParticle(LoginRequiredMixin,View):
-    def post(self,request):
-        print('in get version particle ')
-        id = request.POST['id']
-        version = VersionParticle.objects.get(id=id)
-        print(version.text)
-        return HttpResponse(version.text)
+    def get(self,request):
+        id = request.GET['id']
+        version_particle = VersionParticle.objects.get(id=id)
+        user = User.objects.get(username=request.user.username)
+        if version_particle.translate.user != user:
+            return HttpResponseForbidden()
+        return HttpResponse(version_particle.text)
 
 
 class SaveVersionParticle(LoginRequiredMixin,View):
@@ -90,9 +93,10 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         id = request.POST['id']
         content = request.POST['content']
         task = Task.objects.get(id=id)
-        print(request.user)
         user = User.objects.get(username=request.user.username)
         translation = Translation.objects.get(user=user, task=task)
+        if user != translation.user:
+            return HttpResponseForbidden()
         if translation.get_latest_text().strip() == content.strip():
             return HttpResponse("Not Modified")
         versionParticle = VersionParticle.objects.create(translation=translation, text=content, date_time=timezone.now())

@@ -1,11 +1,12 @@
 
 from django.views.generic import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from interp.models import Notification
 from interp.utils import get_all_notifs, read_this_notif, read_all_notifs
 
-class Notifications(View):
+class Notifications(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         return JsonResponse(dict(notifications=get_all_notifs(request.user)))

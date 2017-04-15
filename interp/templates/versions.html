@@ -74,7 +74,7 @@
                     'id': $(this).attr('id'),
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-                type: "POST",
+                type: "GET",
                 success: function (response) {
                     diff(response);
                 }
@@ -88,7 +88,7 @@
                     'id': $(this).attr('id'),
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
-                type: "POST",
+                type: "GET",
                 success: function (response) {
                     diff(response);
                 },

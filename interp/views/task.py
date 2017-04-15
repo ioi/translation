@@ -16,37 +16,9 @@ class Tasks(AdminCheckMixin,View):
 
 
     def post(self, request):
-        id = request.POST['id']
-        is_published = request.POST['is_published']
-        if(is_published == 'false'):
-            is_published = False
-        else :
-            is_published = True
-
-        task = Task.objects.get(id=id)
-        task.is_published = is_published
-        task.save()
-        return HttpResponse("done")
-
-
-class AddTask(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'add-task.html')
-
-
-    def post(self, request):
-        title=request.POST['title']
-        content = request.POST['content']
-        is_published = request.POST['is_published']
-        if(is_published == 'false'):
-            is_published = False
-        else :
-            is_published = True
-
-        task = Task.objects.create(title=title, is_published = is_published)
-        task.save()
-        task.add_version(content)
-        return redirect(to=reverse('task'))
+        title = request.POST['title']
+        new_task = Task.objects.create(title=title)
+        return redirect(to= reverse('edittask',kwargs = {'id': new_task.id}))
 
 
 class EditTask(AdminCheckMixin,View):

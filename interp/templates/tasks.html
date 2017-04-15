@@ -5,7 +5,13 @@
     <div class="col-sm-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <a class="btn btn-default" href="{%  url 'addtask' %}">Add</a>
+                <form action="{%  url 'task' %}" method="post">
+                    {% csrf_token %}
+                    <label for="task_title">Title: </label>
+                    <input id="task_title" type="text" name="title">
+                    <input type="submit" value="New Task">
+                </form>
+
             </div>
         </div>
     </div>

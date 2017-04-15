@@ -10,7 +10,6 @@ urlpatterns = [
 
     url(r'home/$', Home.as_view(), name='home'),
     url(r'^login/$', Login.as_view(), name='login'),
-    url(r'^addtask/$', AddTask.as_view(), name='addtask'),
     url(r'^task/$', Tasks.as_view(), name='task'),
 
     url(r'^edittask/(?P<id>[\w]*)/$', EditTask.as_view(), name='edittask'),

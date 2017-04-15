@@ -24,6 +24,10 @@
                 data: data,
                 type: "POST",
                 success: function (response) {
+                if(publishing)
+                    ToastrUtil.success('Successfully Saved and Published...');
+                else
+                    ToastrUtil.success('Successfully Saved ...');
                 },
                 complete: function () {
                 },

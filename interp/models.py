@@ -71,7 +71,12 @@ class Translation(models.Model):
 
     def get_latest_text(self):
         latest_version = self.versions.order_by('-create_time').first()
+        latest_version_particle = self.versionparticle_set.order_by('-date_time').first()
+        if latest_version_particle:
+            return latest_version_particle.text
         if latest_version:
+            if latest_version_particle and latest_version_particle.date_time > latest_version.create_time:
+                return latest_version_particle.text
             return latest_version.text
         return ''
 

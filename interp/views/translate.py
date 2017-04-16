@@ -1,4 +1,3 @@
-import json
 import markdown
 from django.utils import timezone
 
@@ -104,7 +103,7 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         return HttpResponse("done")
 
 
-class GeneratePDF(LoginRequiredMixin, PDFTemplateView):
+class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf_template.html'
     cmd_options = {
@@ -119,7 +118,7 @@ class GeneratePDF(LoginRequiredMixin, PDFTemplateView):
 
     def get_context_data(self, **kwargs):
         md = markdown.Markdown(extensions=['mdx_math'])
-        context = super(GeneratePDF, self).get_context_data(**kwargs)
+        context = super(GetTranslatePDF, self).get_context_data(**kwargs)
         object_type = self.request.GET['object_type']
         task_id = self.request.GET['id']
 
@@ -128,22 +127,14 @@ class GeneratePDF(LoginRequiredMixin, PDFTemplateView):
         if task is None:
             # TODO
             return None
-        content = ''
-        if object_type == 'translation':
-            trans = Translation.objects.get(user=user, task=task)
-            if trans is None:
-                # TODO
-                return None
-            self.filename = "%s-%s" % (task.title, trans.language)
-            content = trans.get_latest_text()
-            context['direction'] = 'rtl' if trans.language.rtl else 'ltr'
-        elif object_type == 'task':
-            self.filename = "%s-%s" % (task.title, 'original')
-            content = task.get_latest_text()
-            context['direction'] = 'ltr'
-        else:
+
+        trans = Translation.objects.get(user=user, task=task)
+        if trans is None:
             # TODO
             return None
 
+        self.filename = "%s-%s" % (task.title, trans.language)
+        content = trans.get_latest_text()
+        context['direction'] = 'rtl' if trans.language.rtl else 'ltr'
         context['content'] = md.convert(content)
         return context

@@ -123,6 +123,7 @@ function updateDiffTextBox(){
 
 function updateInteractive() {
     if ($("#interactive-checkbox").is(":checked")) {
+        $('#options_panel').hide()
         changeOnlinePreview(true);
         $('#editor-checkbox').prop("disabled", true);
         $('#original-checkbox').prop("disabled", true);
@@ -131,6 +132,7 @@ function updateInteractive() {
         $('#diff_material').hide()
     }
     else {
+        $('#options_panel').show()
         $('#editor-checkbox').prop("disabled", false);
         $('#original-checkbox').prop("disabled", false);
 

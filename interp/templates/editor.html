@@ -17,43 +17,28 @@
     <link type="text/css" rel="stylesheet" href="/static/css/katex.css">
 
 
-    <div class="col-sm-12">
-        <div class="panel panel-default panel-btn">
-            <div class="panel-body">
-                <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
-                <a href="{% url 'getpdf'%}?object_type=translation&id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-                <input type="checkbox" id="interactive-checkbox" onchange="updateInteractive()"> Interactive
-            </div>
-        </div>
-    </div>
-
-
-    <div class="col-sm-6">
-        <div class="panel panel-default panel-btn">
-            <div class="panel-body">
-                <input type="checkbox" id="editor-checkbox" onchange="updateTranslationTextBox()"> Preview
-            </div>
-        </div>
-
-        <div class="panel panel-default panel-btn">
-            <div class="panel-body">
-
-                <div id="left_text_box_container">
-                {% if rtl %}
-                        <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
-                {% else %}
-                        <div id="left_ltr_plain_text_box">
-                            <textarea style="background: #f5f5f5; padding: 10px;">{{ trans }}</textarea>
-                        </div>
-                {% endif %}
-
-                    <div id="left_rendered_text_box" style="background: #f5f5f5; padding: 10px; white-space: pre-line;"></div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default panel-btn">
+                <div class="panel-body">
+                    <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
+                    <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
+                    <input type="checkbox" id="interactive-checkbox" onchange="updateInteractive()"> Interactive
+                    <a href="{% url 'gettaskpdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i> Task PDF</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-sm-6">
+    <div class="row" id="options_panel">
+        <div class="col-sm-6">
+            <div class="panel panel-default panel-btn">
+                <div class="panel-body">
+                    <input type="checkbox" id="editor-checkbox" onchange="updateTranslationTextBox()"> Preview
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
         <div class="panel panel-default panel-btn">
             <div class="panel-body">
                 <input type="checkbox" id="original-checkbox" onchange="updateTaskTextBox()"> Markdown
@@ -64,14 +49,38 @@
                 </span>
             </div>
         </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
 
-        <div class="panel panel-default panel-btn">
-            <div class="panel-body">
-                <div id="right_text_box" style="white-space: pre-line; background: #f5f5f5; padding: 10px; margin-top: 2.5%">{{ task }}</div>
+            <div class="panel panel-default panel-btn">
+                <div class="panel-body">
+
+                    <div id="left_text_box_container">
+                    {% if rtl %}
+                            <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
+                    {% else %}
+                            <div id="left_ltr_plain_text_box">
+                                <textarea style="background: #f5f5f5; padding: 10px;">{{ trans }}</textarea>
+                            </div>
+                    {% endif %}
+
+                        <div id="left_rendered_text_box" style="background: #f5f5f5; padding: 10px; white-space: pre-line;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+
+            <div class="panel panel-default panel-btn">
+                <div class="panel-body">
+                    <div id="right_text_box" style="white-space: pre-line; background: #f5f5f5; padding: 10px; margin-top: 2.5%">{{ task }}</div>
+                </div>
             </div>
         </div>
     </div>
-
     <script type="text/javascript">
         ques_id = {{quesId}};
         version_particle_url = " {% url 'saveVersionParticle' %}";

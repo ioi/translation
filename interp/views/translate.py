@@ -104,7 +104,7 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         return HttpResponse("done")
 
 
-class GeneratePDF(PDFTemplateView):
+class GeneratePDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf_template.html'
     cmd_options = {
@@ -120,26 +120,24 @@ class GeneratePDF(PDFTemplateView):
     def get_context_data(self, **kwargs):
         md = markdown.Markdown(extensions=['mdx_math'])
         context = super(GeneratePDF, self).get_context_data(**kwargs)
-
         object_type = self.request.GET['object_type']
-        object_id = self.request.GET['id']
-        content = ''
+        task_id = self.request.GET['id']
 
+        user = User.objects.get(username=self.request.user.username)
+        task = Task.objects.filter(id=task_id).first()
+        if task is None:
+            # TODO
+            return None
+        content = ''
         if object_type == 'translation':
-            trans = Translation.objects.filter(id=object_id).first()
+            trans = Translation.objects.get(user=user, task=task)
             if trans is None:
                 # TODO
                 return None
-
-            self.filename = "%s-%s" % (trans.task.title, trans.language)
+            self.filename = "%s-%s" % (task.title, trans.language)
             content = trans.get_latest_text()
             context['direction'] = 'rtl' if trans.language.rtl else 'ltr'
         elif object_type == 'task':
-            task = Task.objects.filter(id=object_id).first()
-            if task is None:
-                # TODO
-                return None
-
             self.filename = "%s-%s" % (task.title, 'original')
             content = task.get_latest_text()
             context['direction'] = 'ltr'

@@ -119,7 +119,6 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
     def get_context_data(self, **kwargs):
         md = markdown.Markdown(extensions=['mdx_math'])
         context = super(GetTranslatePDF, self).get_context_data(**kwargs)
-        object_type = self.request.GET['object_type']
         task_id = self.request.GET['id']
 
         user = User.objects.get(username=self.request.user.username)

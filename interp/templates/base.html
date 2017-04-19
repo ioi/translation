@@ -43,7 +43,9 @@
         </div>
 
 
+
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            {% comment %}
             <ul class="nav navbar-nav">
                 {% for question in translations %}
                     <li class="dropdown">
@@ -59,7 +61,7 @@
                     </li>
                 {% endfor %}
             </ul>
-
+            {% endcomment %}
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <span class="notif-badge" id="notif-badge"></span>
@@ -71,7 +73,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">{{ user.username }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">{{ language }}</a></li>
+                        <li><a href="#"></a></li>
                         <li><a href="#">Setting</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="{% url 'logout' %}">Logout</a></li>

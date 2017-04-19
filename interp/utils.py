@@ -33,7 +33,14 @@ def get_user_read_notifs_cache_key(user):
     return "RN-%d" % user.id
 
 
-def get_all_notifs(user):
+def update_user_cache(user, all_notifications):
+    if cache.get(get_user_read_notifs_cache_key(user)) is None and\
+            cache.get(get_user_unread_notifs_cache_key(user)) is None:
+        add_all_notifs_to_user_cache(user, all_notifications)
+
+
+def get_all_notifs(user, all_notifications):
+    update_user_cache(user, all_notifications)
     all_notifs = []
     for read_notif in get_all_read_notifs(user):
         read_notif['read'] = True
@@ -53,6 +60,18 @@ def get_all_read_notifs(user):
     all_read_notifs = cache.get(get_user_read_notifs_cache_key(user))
     return all_read_notifs if all_read_notifs else []
 
+def add_all_notifs_to_user_cache(user, notifications):
+    all_notif_items = []
+    for notif in notifications:
+        notif_dict = json.loads(serializers.serialize('json', [notif, ]))[0]
+        notif_item = notif_dict['fields']
+        notif_item['id'] = notif_dict['pk']
+        all_notif_items.append(notif_item)
+    unread_notifs = cache.get(get_user_unread_notifs_cache_key(user))
+    if unread_notifs is None:
+        unread_notifs = []
+    unread_notifs += all_notif_items
+    cache.set(get_user_unread_notifs_cache_key(user), unread_notifs)
 
 def add_notif_item_to_user_cache(user, notif_item):
     unread_notifs = cache.get(get_user_unread_notifs_cache_key(user))

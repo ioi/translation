@@ -11,6 +11,7 @@ var left_plain_text_box_id;
 var rtl;
 var task_versions;
 var last_task_version_text;
+var last_version_particle_text;
 
 function getDirectionStr(is_rtl){
     if(is_rtl)
@@ -191,7 +192,9 @@ function saveVersion() {
 }
 
 function saveVersionParticle() {
-
+    current_trans_text = currentTranslationText();
+    if (last_version_particle_text == current_trans_text)
+        return;
     $.ajax({
         url: version_particle_url,
         data: {
@@ -201,6 +204,7 @@ function saveVersionParticle() {
         },
         type: "POST",
         success: function (response) {
+            last_version_particle_text = current_trans_text;
             updateSyncTime();
         },
         complete: function () {

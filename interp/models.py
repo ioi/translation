@@ -137,8 +137,9 @@ class Notification(models.Model):
 def send_notif(sender, instance, created, *args, **kwargs):
     if created:
         add_notification_to_users_cache(User.get_translators(), instance)
-        message = RedisMessage("%s^%s"%(instance.title, instance.description))
-        RedisPublisher(facility='notifications', broadcast=True).publish_message(message)
+        # Redis Messages
+        # message = RedisMessage("%s^%s"%(instance.title, instance.description))
+        # RedisPublisher(facility='notifications', broadcast=True).publish_message(message)
 
 
 post_save.connect(send_notif, sender=Notification)

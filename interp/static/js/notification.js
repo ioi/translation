@@ -5,21 +5,21 @@ var csrf_token,
 
 
 $(document).ready(function(){
-    initialRedis();
+//    initialRedis();
     getNotifications();
 
 });
 
-function initialRedis(){
-    var ws4redis = WS4Redis({
-       uri: websocket_url + 'notifications?subscribe-broadcast&publish-broadcast&echo',
-       heartbeat_msg: redis_heartbeat,
-       // receive a message though the Websocket from the server
-       receive_message: function (msg) {
-           getNotifications();
-       }
-   });
-}
+//function initialRedis(){
+//    var ws4redis = WS4Redis({
+//       uri: websocket_url + 'notifications?subscribe-broadcast&publish-broadcast&echo',
+//       heartbeat_msg: redis_heartbeat,
+//       // receive a message though the Websocket from the server
+//       receive_message: function (msg) {
+//           getNotifications();
+//       }
+//   });
+//}
 
 function getNotifications() {
     $.ajax({

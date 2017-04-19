@@ -9,7 +9,8 @@ from interp.utils import get_all_notifs, read_this_notif, read_all_notifs
 class Notifications(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        return JsonResponse(dict(notifications=get_all_notifs(request.user)))
+        all_notifications = Notification.objects.all()
+        return JsonResponse(dict(notifications=get_all_notifs(request.user, all_notifications)))
 
     def post(self, request, *args, **kwargs):
         if 'id' in request.POST:

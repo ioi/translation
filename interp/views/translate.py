@@ -82,7 +82,7 @@ class GetVersionParticle(LoginRequiredMixin,View):
         id = request.GET['id']
         version_particle = VersionParticle.objects.get(id=id)
         user = User.objects.get(username=request.user.username)
-        if version_particle.translate.user != user:
+        if version_particle.translation.user != user:
             return HttpResponseForbidden()
         return HttpResponse(version_particle.text)
 
@@ -98,8 +98,12 @@ class SaveVersionParticle(LoginRequiredMixin,View):
             return HttpResponseForbidden()
         if translation.get_latest_text().strip() == content.strip():
             return HttpResponse("Not Modified")
-        versionParticle = VersionParticle.objects.create(translation=translation, text=content, date_time=timezone.now())
-        versionParticle.save()
+        last_version_particle = translation.versionparticle_set.order_by('-date_time').first()
+        if last_version_particle:
+            last_version_particle.text = content
+            last_version_particle.save()
+        else:
+            last_version_particle = VersionParticle.objects.create(translation=translation, text=content, date_time=timezone.now())
         return HttpResponse("done")
 
 class GetTranslatePreview(LoginRequiredMixin,View):

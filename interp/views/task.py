@@ -67,7 +67,7 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         'margin-bottom': '0.75in',
         'margin-left': '0.75in',
         'zoom': 15,
-        'javascript-delay': 3000,
+        'javascript-delay': 500,
     }
 
     def get_context_data(self, **kwargs):

@@ -4,21 +4,41 @@
 {% load static %}
 <html>
 <head>
-<title>MathJax TeX Test Page</title>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="/static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/marked.js"></script>
+    <script type="text/javascript" src="/static/js/katex.js"></script>
+    <script type="text/javascript" src="/static/js/auto-render.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="/static/css/katex.css">
 
-<script type="text/javascript" async
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-    <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
-</script>
 </head>
 <body>
-<div>
 
-</div>
-<div style="direction:{{direction}}">
-    {{content |safe}}
-</div>
+    <div id="left_ltr_plain_text_box" style="display: none">{{content}}</div>
+    <div id="rendered_content" style="direction:{{direction}}">
+
+        </div>
 </body>
+
+<script>
+
+    $(document).ready(function(){
+        marked.setOptions({
+            renderer: new marked.Renderer(),
+            gfm: true,
+            tables: true,
+            breaks: false,
+            pedantic: false,
+            sanitize: false,
+            smartLists: true,
+            smartypants: false
+        });
+
+        text = $('#left_ltr_plain_text_box').html();
+        $('#rendered_content').html(marked(text));
+        renderMathInElement(document.getElementById('rendered_content'));
+    });
+</script>
 </html>

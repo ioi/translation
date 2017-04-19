@@ -82,5 +82,6 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         self.filename = "%s-%s" % (task.title, 'original')
         content = task.get_latest_text()
         context['direction'] = 'ltr'
-        context['content'] = md.convert(content)
+        context['content'] = content
+        context['title'] = self.filename
         return context

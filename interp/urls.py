@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^setting/$', Setting.as_view(), name='setting'),
     url(r'^$', FirstPage.as_view(), name='firstpage'),
     url(r'^get_trans_pdf/$', GetTranslatePDF.as_view(), name='gettranspdf'),
+    url(r'^get_trans_preview/$', GetTranslatePreview.as_view(), name='gettranspreview'),
     url(r'^get_task_pdf/$', GetTaskPDF.as_view(), name='gettaskpdf'),
 
     url(r'^notifications/$', Notifications.as_view(), name='notifications'),

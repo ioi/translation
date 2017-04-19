@@ -102,6 +102,17 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         versionParticle.save()
         return HttpResponse("done")
 
+class GetTranslatePreview(LoginRequiredMixin,View):
+    def get(self,request):
+        task_id = self.request.GET['id']
+        task = Task.objects.get(id=task_id)
+        user = User.objects.get(username=request.user.username)
+        translation = Translation.objects.get(user=user, task=task)
+        # TODO check if it's available
+        direction = 'rtl' if translation.language.rtl else 'ltr'
+        return render(request, 'pdf_template.html', context={'content': translation.get_latest_text(),\
+                    'direction': direction, 'title': "%s-%s" % (task.title, translation.language)})
+
 
 class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
@@ -113,11 +124,10 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         'margin-bottom': '0.75in',
         'margin-left': '0.75in',
         'zoom': 15,
-        'javascript-delay': 3000,
+        'javascript-delay': 500,
     }
 
     def get_context_data(self, **kwargs):
-        md = markdown.Markdown(extensions=['mdx_math'])
         context = super(GetTranslatePDF, self).get_context_data(**kwargs)
         task_id = self.request.GET['id']
 
@@ -135,5 +145,6 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         self.filename = "%s-%s" % (task.title, trans.language)
         content = trans.get_latest_text()
         context['direction'] = 'rtl' if trans.language.rtl else 'ltr'
-        context['content'] = md.convert(content)
+        context['content'] = content
+        context['title'] = self.filename
         return context

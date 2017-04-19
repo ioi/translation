@@ -6,6 +6,7 @@ var csrf_token,
 
 $(document).ready(function(){
 //    initialRedis();
+    window.setInterval(getNotifications,5*60*1000)
     getNotifications();
 
 });
@@ -42,13 +43,17 @@ function getNotifications() {
             $.each(notifications, function() {
                 var title_span = $("<span class='notif-title'></span>").text(this.title);
                 var description_span = $("<span class='notif-description'></span>").text(this.description);
-                var container = $('<a></a>').attr('onclick', 'readNotification('+this.id+')');
+                var container = $('<a></a>');
                 var item = $("<li></li>");
 
                 container.append(title_span);
                 container.append(description_span);
+                if(!this.read){
+                    container.attr('onclick', 'readNotification('+this.id+')')
+                    item.addClass('notif-unread');
+                }
                 item.append(container);
-                if(!this.read)item.addClass('notif-unread');
+
                 dropdown.append(item);
 
                 if(!this.read)unread_count++;
@@ -59,9 +64,10 @@ function getNotifications() {
             var item = $("<li></li>");
             item.append(container);
             dropdown.append(item);
-
-            if(unread_count != 0)
+            if(unread_count != 0){
                 $('#notif-badge').text(unread_count);
+                $('#notif-badge').show();
+            }
             else
                 $('#notif-badge').hide();
         }
@@ -77,6 +83,7 @@ function readNotification(id){
         },
         type: "POST",
         success: function (response) {
+            // TODO: This should be more eficient
             getNotifications();
         }
     });
@@ -91,6 +98,7 @@ function readAllNotification(){
         },
         type: "POST",
         success: function (response) {
+            // TODO: This should be more eficient
             getNotifications();
         }
     });

@@ -30,9 +30,18 @@
                     {% for question in questions %}
                         <tr>
                             <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
-                            <td id="td_{{ question.0 }}"><button  onclick="changePublishing({{ question.0 }}, '{{ question.2 }}')">
-                                {% if question.2 %}UnPublish{% else %}Publish{% endif %}
-                            </button></td>
+                            <td id="td_{{ question.0 }}">
+                                {% if question.2 == False or question.3  %}
+                                    <button  onclick="publishLastVersion({{ question.0 }})">
+                                        Publish Latest Version
+                                    </button>
+                                {% endif %}
+                                {% if question.2 %}
+                                    <button  onclick="unpublishTask({{ question.0 }})">
+                                        Unpublish Task
+                                    </button>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -44,22 +53,51 @@
 
     <script>
 
-        function changePublishing(questionId, publishing) {
+        function publishLastVersion(questionId) {
             $.ajax({
-                url: " {% url 'task' %}",
+                url: " {% url 'publishtask' %}",
                 data: {
                     'id': questionId,
-                    'is_published': publishing == 'False',
                     csrfmiddlewaretoken: '{{ csrf_token }}'
-{#                    csrfmiddlewaretoken: '{{ csrf_token }}'#}
                 },
                 type: "POST",
                 success: function (response) {
-                if (publishing == 'False')
-                    $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'True\')"> UnPublish </button>');
-                else
-                    $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'False\')"> Publish </button>');
+                    location.reload();
+                    // TODO: should be more asynchron :(
+                    /*if (publishing == 'False')
+                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'True\')"> UnPublish </button>');
+                    else
+                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'False\')"> Publish </button>');
+
+                    */
+                    }
+                ,
+                complete: function () {
                 },
+                error: function (xhr, textStatus, thrownError) {
+                }
+            });
+        }
+        function unpublishTask(questionId) {
+            alert("SSS");
+            $.ajax({
+                url: " {% url 'publishtask' %}",
+                data: {
+                    'id': questionId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "DELETE",
+                success: function (response) {
+                    location.reload();
+                    // TODO: should be more asynchron :(
+                    /*if (publishing == 'False')
+                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'True\')"> UnPublish </button>');
+                    else
+                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'False\')"> Publish </button>');
+
+                    */
+                    }
+                ,
                 complete: function () {
                 },
                 error: function (xhr, textStatus, thrownError) {

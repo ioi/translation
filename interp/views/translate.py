@@ -20,7 +20,7 @@ class Questions(LoginRequiredMixin,View):
     def get(self,request,id):
         user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
-        task_text = task.get_latest_text()
+        task_text = task.get_published_text()
         try:
             trans = Translation.objects.get(user=user, task=task)
         except:

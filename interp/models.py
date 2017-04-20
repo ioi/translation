@@ -37,7 +37,10 @@ class ContentVersion(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     text = models.TextField()
+    change_log = models.CharField(max_length=255, blank=True)
+    published = models.BooleanField(default=False)
     create_time = models.DateTimeField(default=timezone.now())
+
 
 class Task(models.Model):
     title = models.CharField(max_length=255, blank=False)
@@ -45,14 +48,20 @@ class Task(models.Model):
     is_published = models.BooleanField(default=False)
     versions = GenericRelation(ContentVersion)
 
-    def add_version(self, text):
-        return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now())
+    def add_version(self, text, change_log="", published=False):
+        return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(), change_log=change_log, published=published)
 
     def get_latest_text(self):
         latest_version = self.versions.order_by('-create_time').first()
         if latest_version:
             return latest_version.text
         return ''
+
+    def get_published_text(self):
+        latest_published_version = self.versions.filter(published=True).order_by('-create_time').first()
+        if latest_published_version:
+            return latest_published_version.text
+        return None
 
     def __str__(self):
         return "title : " + self.title + " id :" + str(self.id)

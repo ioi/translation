@@ -1,21 +1,34 @@
 {% extends "task-info.html" %}
 
 {% block btn-content %}
-    <button class="btn btn-default" onclick="send_data({{ taskId }}, false)">Save</button>
-    <button class="btn btn-default" onclick="send_data({{ taskId }}, true)">Save And Publish</button>
+    <button class="btn btn-default" onclick="send_data({{ taskId }})">Save</button>
+
+    <hr>
+    <label for="change_log">Change Log: </label>
+    <input id="change_log" type="text" name="change_log">
+    <button class="btn btn-default" onclick="publishLastVersion({{ taskId }})">Publish Last Version</button>
+
 {% endblock %}
 
 {% block script-content %}
 
     <script type="text/javascript">
-        function send_data(quesId, publishing) {
+        var last_saved_content;
+        $(document).ready(function(){
+            last_saved_content = simplemde.value();
+        });
+        function send_data(quesId) {
             var mycontent = simplemde.value();
-            console.log(mycontent);
+            if(mycontent == last_saved_content){
+                // TODO: Beautify this alert
+                alert("There is no change");
+                return;
+            }
+
             var data = {
                 'title': document.getElementById('title').value,
                 'content': mycontent,
                 'id': quesId,
-                'is_published': publishing,
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             };
 
@@ -24,17 +37,48 @@
                 data: data,
                 type: "POST",
                 success: function (response) {
-                if(publishing)
-                    ToastrUtil.success('Successfully Saved and Published...');
-                else
+                    last_saved_content = mycontent;
                     ToastrUtil.success('Successfully Saved ...');
+                },
+                complete: function () {
+                },
+                error: function (xhr, textStatus, thrownError) {
+                // TODO: should raise Error toastr
+                }
+            });
+            return false;
+        }
+        function publishLastVersion(questionId) {
+            var mycontent = simplemde.value();
+            if(mycontent != last_saved_content){
+                // TODO: Beautify this alert
+                alert("There is some change you should save");
+                return;
+            }
+            var change_log = $.trim($('#change_log').val());
+            if(change_log == ""){
+                // TODO: Beautify this alert
+                alert("Change Log can't be empty");
+                return;
+            }
+            $.ajax({
+                url: " {% url 'publishtask' %}",
+                data: {
+                    'id': questionId,
+                    'is_published': 'True',
+                    'change_log': change_log,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                type: "POST",
+                success: function (response) {
+                    $('#change_log').val("");
+                    ToastrUtil.success('Successfully Published...');
                 },
                 complete: function () {
                 },
                 error: function (xhr, textStatus, thrownError) {
                 }
             });
-            return false;
         }
     </script>
 {% endblock %}

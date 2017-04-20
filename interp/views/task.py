@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
 from interp.utils import AdminCheckMixin
 from interp.models import Task, User
@@ -13,7 +13,14 @@ from wkhtmltopdf.views import PDFTemplateView
 
 class Tasks(AdminCheckMixin,View):
     def get(self,request):
-        questions = Task.objects.values_list('id', 'title', 'is_published')
+        # questions = Task.objects.values_list('id', 'title', 'is_published')
+        # TODO: need refactor (find can_publish_last_version by query)
+        questions = []
+        for task in Task.objects.all():
+            if task.is_published:
+                can_publsh_last_version = not task.versions.order_by('-create_time').first().published
+                questions.append( (task.id, task.title, task.is_published, can_publsh_last_version))
+
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language': user.credentials()})
 
@@ -33,28 +40,50 @@ class EditTask(AdminCheckMixin,View):
         else:
             is_published = 'true'
 
-        return render(request,'editor-task.html', context={'content' : task.get_latest_text() ,'title':task.title,'is_published':is_published, 'taskId':id,'language':str(user.language.name + '-' + user.country.name)})
+        return render(request,'editor-task.html', context={'content' : task.get_latest_text(), 'title':task.title, 'is_published':is_published, 'taskId':id, 'language':str(user.language.name + '-' + user.country.name)})
 
 class SaveTask(AdminCheckMixin,View):
     def post(self,request):
         id = request.POST['id']
         content = request.POST['content']
-        print(content)
-        is_published = request.POST['is_published']
         title = request.POST['title']
         task = Task.objects.get(id=id)
-        if(is_published == 'true'):
-            task.is_published = True
         task.title = title
         task.save()
         task.add_version(content)
         return HttpResponse("done")
 
+class PublishTask(AdminCheckMixin,View):
+    def post(self, request):
+        id = request.POST['id']
+        change_log = request.POST.get('change_log', "")
+        task = Task.objects.get(id=id)
+        # TODO: Need refactor
+        last_version = task.versions.order_by('-create_time').first()
+        if last_version is None:
+            HttpResponseBadRequest("There is no version")
+        last_version.published = True
+        last_version.change_log = change_log
+        last_version.save()
+
+        task.is_published = True
+        task.save()
+        return HttpResponse("Task has been published!")
+
+    def delete(self, request):
+        # TODO: doesn't work :(
+        id = request.DELETE['id']
+        task = Task.objects.get(id=id)
+        task.is_published = False
+        task.save()
+        return HttpResponse("Task has been unpublished!")
+
 
 class TaskVersions(LoginRequiredMixin,View):
     def get(self,request,id):
+        only_published = request.GET.get('published', False)
         task = Task.objects.get(id=id)
-        versions_values = task.versions.all().values('text','create_time')
+        versions_values = task.versions.filter(published=only_published).values('text','create_time','change_log')
         return JsonResponse(dict(versions=list(versions_values)))
 
 class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):

@@ -81,9 +81,12 @@ class PublishTask(AdminCheckMixin,View):
 
 class TaskVersions(LoginRequiredMixin,View):
     def get(self,request,id):
-        only_published = request.GET.get('published', False)
+        published_raw = request.GET.get('published', 'false')
+        published = True
+        if published_raw == 'false':
+            published = False
         task = Task.objects.get(id=id)
-        versions_values = task.versions.filter(published=only_published).values('text','create_time','change_log')
+        versions_values = task.versions.filter(published=published).values('text','create_time','change_log')
         return JsonResponse(dict(versions=list(versions_values)))
 
 class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):

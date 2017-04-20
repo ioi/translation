@@ -220,6 +220,7 @@ function getTaskVersions() {
     $.ajax({
         url: task_version_url,
         data: {
+            published: true,
             csrfmiddlewaretoken: csrf_token
         },
         type: "GET",

@@ -23,7 +23,7 @@
                 <div class="panel-body">
                     <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
                     <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-
+                    <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-print fa-lg"></i></a>
                     <button id="interactive-btn" class="btn btn-default"
                             onclick="updateInteractive()"
                             data-toggle="tooltip" data-placement="top" title="Change Interactive">

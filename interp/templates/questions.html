@@ -21,7 +21,7 @@
                         {% for question in tasks %}
                             <tr>
                                 <td>
-                                    {% if question.3 %}
+                                    {% if question.3 or question.2 %}
                                      {{ question.1 }}
                                     {% else %}
                                          <a href="{% url 'question' question.0 %}">

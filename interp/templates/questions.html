@@ -5,31 +5,35 @@
 
     <link rel="stylesheet" href="/static/css/question.css">
 
-    <div class="col-sm-12">
-        <div class="panel panel-default">
-            <div class="panel-body">
+    <div class="container">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
 
-                <table class="table table-center">
-                    <thead><tr>
-                        <th>Main Question</th>
-                        <th>Translation Version</th>
-                        <th>Is Editing?</th>
-                        <th>Last Save</th>
-                        <th>Task Status</th>
-                    </tr></thead>
-                    <tbody>
-                    {% for question in tasks %}
-                        <tr>
-                            <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
-                            <td><a href="{% url 'versions' question.0 %}">Versions</a></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                    <table class="table table-center">
+                        <thead><tr>
+                            <th>Main Question</th>
+                            <th>Translation Version</th>
+                            <th></th>
+                            <th>Is Editing?</th>
+                            <th>Last Save</th>
+                            <th>Task Status</th>
+                        </tr></thead>
+                        <tbody>
+                        {% for question in tasks %}
+                            <tr>
+                                <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
+                                <td><a href="{% url 'versions' question.0 %}">Versions</a></td>
+                                <td><a href="{% url 'gettaskpdf'%}?id={{question.0}}">Task PDF</a></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
+                </div>
             </div>
         </div>
     </div>

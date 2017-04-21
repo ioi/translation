@@ -13,6 +13,11 @@ var task_versions;
 var last_task_version_text;
 var last_version_particle_text;
 
+
+var interactive_checkbox;
+var markdown_checkbox;
+var diff_checkbox;
+
 function getDirectionStr(is_rtl){
     if(is_rtl)
         return 'rtl'
@@ -56,20 +61,22 @@ $(document).ready(function(){
         task_text = $("#right_text_box").html();
         translation_text = currentTranslationText();
 
-        $('#interactive-checkbox').prop("checked", false);
-        $('#editor-checkbox').prop("checked", false);
-        $('#original-checkbox').prop("checked", false);
-        $('#diff-checkbox').prop("checked", false);
-        $('#diff-selectbox').prop("disabled", true);
-        updateInteractive();
-        updateTranslationTextBox();
-        updateTaskTextBox();
 
-        toggleDiv(left_plain_text_box_id);
+        interactive_checkbox = false;
+        markdown_checkbox = false;
+        diff_checkbox = false;
+        updateInteractive();
 
         window.setInterval(saveVersionParticle,60*1000)
         getTaskVersions();
 });
+
+function changeActive(id, active){
+    if(active)
+        $(id).addClass('active');
+    else
+        $(id).removeClass('active');
+}
 
 function currentTranslationText(){
     if (rtl)
@@ -89,59 +96,62 @@ function updateSyncTime(){
 }
 
 
-function updateTranslationTextBox(){
-    if ($("#editor-checkbox").is(":checked")) {
+function updateInteractive() {
+    interactive_checkbox = !interactive_checkbox;
+    changeOnlinePreview(interactive_checkbox);
+    changeActive('#interactive-btn', interactive_checkbox);
+
+    if(interactive_checkbox){
+        markdown_checkbox = false;
+        diff_checkbox = false;
+        $('#markdown-btn').hide();
+        $('#diff-btn').hide();
+        $('#diff-selectbox').hide();
+        changeActive('#diff-btn', diff_checkbox);
+        changeActive('#markdown-btn', markdown_checkbox);
+    }else{
+        $('#markdown-btn').show();
+        updateMarkdown();
+    }
+}
+
+function updateMarkdown(){
+    markdown_checkbox = !markdown_checkbox;
+    changeActive('#markdown-btn', markdown_checkbox);
+
+    if(markdown_checkbox){
+        toggleDiv(left_plain_text_box_id);
+        $('#right_text_box').html(task_text);
+        $('#diff-btn').show();
+    }else{
+        renderMarkdown('right_text_box', task_text);
         renderMarkdown('left_rendered_text_box', currentTranslationText())
         toggleDiv('left_rendered_text_box');
-    }else {
-        toggleDiv(left_plain_text_box_id);
+
+        diff_checkbox = false;
+        changeActive('#diff-btn', diff_checkbox);
+        $('#diff-btn').hide();
+        $('#diff-selectbox').hide();
     }
 }
 
-function updateTaskTextBox(){
-    if($("#original-checkbox").is(":checked")){
-        $('#right_text_box').html(task_text)
-        $('#diff_material').show()
+function updateDiff(){
+    diff_checkbox = !diff_checkbox;
+    changeActive('#diff-btn', diff_checkbox);
+
+    if(diff_checkbox) {
+        $('#diff-selectbox').show();
+        updateVersion();
     }else{
-        renderMarkdown('right_text_box', task_text)
-        $('#diff-checkbox').prop("checked", false);
-        $('#diff_material').hide()
+        $('#diff-selectbox').hide();
+        $('#right_text_box').html(task_text);
     }
 }
 
-function updateDiffTextBox(){
-    if($("#diff-checkbox").is(":checked")) {
-        $('#diff-selectbox').prop("disabled", false);
-        var selected_for_diff = $("#diff-selectbox").val();
-        var diff_fragment = DiffUtil.getDiffFragment(last_task_version_text, selected_for_diff);
-        $('#right_text_box').html(diff_fragment);
-    }else{
-        $('#diff-selectbox').prop("disabled", true);
-        updateTaskTextBox()
-    }
-}
-
-
-function updateInteractive() {
-    if ($("#interactive-checkbox").is(":checked")) {
-        $('#options_panel').hide()
-        changeOnlinePreview(true);
-        $('#editor-checkbox').prop("disabled", true);
-        $('#original-checkbox').prop("disabled", true);
-
-        $('#diff-checkbox').prop("checked", false);
-        $('#diff_material').hide()
-    }
-    else {
-        $('#options_panel').show()
-        $('#editor-checkbox').prop("disabled", false);
-        $('#original-checkbox').prop("disabled", false);
-
-        $('#diff_material').show()
-
-        changeOnlinePreview(false);
-        updateTaskTextBox();
-    }
+function updateVersion(){
+    var selected_for_diff = $("#diff-selectbox").val();
+    var diff_fragment = DiffUtil.getDiffFragment(last_task_version_text, selected_for_diff);
+    $('#right_text_box').html(diff_fragment);
 }
 
 function changeOnlinePreview(is_enable){

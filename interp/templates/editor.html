@@ -18,69 +18,64 @@
 
 
     <div class="row">
-        <div class="col-sm-12">
-            <div class="panel panel-default panel-btn">
+        <div class="col-sm-12" id="btn-container">
+            <div class="panel panel-default">
                 <div class="panel-body">
                     <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
                     <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-                    <input type="checkbox" id="interactive-checkbox" onchange="updateInteractive()"> Interactive
-                    <a href="{% url 'gettaskpdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i> Task PDF</a>
+
+                    <button id="interactive-btn" class="btn btn-default"
+                            onclick="updateInteractive()"
+                            data-toggle="tooltip" data-placement="top" title="Change Interactive">
+                        <i class="fa fa-btn fa-columns fa-lg"></i>
+                    </button>
+
+                    <button id="markdown-btn" class="btn btn-default"
+                            onclick="updateMarkdown()"
+                            data-toggle="tooltip" data-placement="top" title="Markdown vs. Preview">
+                        <i class="fa fa-btn fa-code fa-lg"></i>
+                    </button>
+
+                    <button id="diff-btn" class="btn btn-default"
+                            onclick="updateDiff()"
+                            data-toggle="tooltip" data-placement="top" title="Diff">
+                        <i class="fa fa-btn fa-git fa-lg"></i>
+                    </button>
+
+                    <select class="form-control pull-right" id="diff-selectbox" onchange="updateVersion()"></select>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row" id="options_panel">
-        <div class="col-sm-6">
-            <div class="panel panel-default panel-btn">
-                <div class="panel-body">
-                    <input type="checkbox" id="editor-checkbox" onchange="updateTranslationTextBox()"> Preview
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
-        <div class="panel panel-default panel-btn">
-            <div class="panel-body">
-                <input type="checkbox" id="original-checkbox" onchange="updateTaskTextBox()"> Markdown
-
-                <span id="diff_material">
-                    <input type="checkbox" id="diff-checkbox" onchange="updateDiffTextBox()"> Diff
-                    <select class="form-control" id="diff-selectbox" onchange="updateDiffTextBox()"></select>
-                </span>
-            </div>
-        </div>
-        </div>
-    </div>
     <div class="row">
-        <div class="col-sm-6">
-
-            <div class="panel panel-default panel-btn">
+        <div class="col-sm-6" id="left-container">
+            <div class="panel panel-default">
                 <div class="panel-body">
-
                     <div id="left_text_box_container">
-                    {% if rtl %}
-                            <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
-                    {% else %}
+                        {% if rtl %}
+                            <div id="left_rtl_plain_text_box" class="text-container" style="white-space: pre-wrap">{{ trans }}</div>
+                        {% else %}
                             <div id="left_ltr_plain_text_box">
-                                <textarea style="background: #f5f5f5; padding: 10px;">{{ trans }}</textarea>
+                                <textarea class="text-container">{{ trans }}</textarea>
                             </div>
-                    {% endif %}
+                        {% endif %}
 
-                        <div id="left_rendered_text_box" style="background: #f5f5f5; padding: 10px; white-space: pre-line;"></div>
+                        <div id="left_rendered_text_box" class="text-container" style="white-space: pre-line;"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-sm-6">
-
-            <div class="panel panel-default panel-btn">
+        <div class="col-sm-6" id="right-container">
+            <div class="panel panel-default">
                 <div class="panel-body">
-                    <div id="right_text_box" style="white-space: pre-line; background: #f5f5f5; padding: 10px; margin-top: 2.5%">{{ task }}</div>
+                    <div id="right_text_box" class="text-container" style="white-space: pre-line;">{{ task }}</div>
                 </div>
             </div>
         </div>
     </div>
+
     <script type="text/javascript">
         ques_id = {{quesId}};
         version_particle_url = " {% url 'saveVersionParticle' %}";

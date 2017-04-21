@@ -4,31 +4,32 @@
 {% block content %}
 
     <script type="text/javascript" src="/static/js/marked.js"></script>
+    <script type="text/javascript" src="/static/js/versions.js"></script>
 
 
 
-    <div class="col-sm-6">
+    <div class="col-sm-4">
         <div class="panel panel-default">
             <div class="panel-body">
 
                 <table class="table">
-                    <thead ><tr>
-                        <th>Version</th>
-                        <th>Date</th>
-                        <th>Revert</th>
-                    </tr></thead>
+                    <thead><tr><td colspan="4">
+                        <button class="btn btn-default" onclick="diff()">Diff</button>
+                    </td></tr></thead>
                     <tbody>
                     {% for version in versions %}
-                        <tr class="version" id="{{ version.0 }}" style="cursor: pointer">
-                            <td>{{ version.0 }}</td>
+                        <tr class="version" style="cursor: pointer">
+                            <td><input type="checkbox" id="{{ version.0 }}" onchange="changeCheckbox({{ version.0 }})"></td>
                             <td>{{ version.1 }}</td>
+                            <td><button class="btn btn-default" onclick="view_version({{ version.0 }})" >View</button></td>
                             <td><button class="btn btn-default" onclick="revert_version({{ version.0 }})" >Revert</button></td>
                         </tr>
                     {% endfor %}
                     {% for version in versionParticles %}
-                        <tr class="versionparticle" id="{{ version.0 }}" style="cursor: pointer; background-color: yellow">
-                            <td>{{ version.0 }}</td>
+                        <tr class="versionparticle" style="cursor: pointer; background-color: yellow">
+                            <td><input type="checkbox" id="particle-{{ version.0 }}"></td>
                             <td>{{ version.1 }}</td>
+                            <td><button class="btn btn-default" onclick="view_particle_version({{ version.0 }})" >View</button></td>
                             <td><button class="btn btn-default" onclick="revert_particle_version({{ version.0 }})" >Revert</button></td>
                         </tr>
                     {% endfor %}
@@ -39,11 +40,11 @@
         </div>
     </div>
 
-    <div class="col-sm-6">
+    <div class="col-sm-8" id="right-container">
         <div class="panel panel-default">
             <div class="panel-body">
 
-                <div id="myversion" style="white-space: pre-wrap"></div>
+                <div id="myversion" class="text-container" style="white-space: pre-wrap"></div>
                 <div id="original" style="display: none;">{{ translation }}</div>
             </div>
 
@@ -52,94 +53,13 @@
     </div>
 
 
+
     <script type="text/javascript">
-        var cur_ver_text = '';
-        $(document).ready(function () {
-            var cont = $('#original').text();
-            $('#original').html(cont);
-        });
-
-
-        function diff(text){
-            var last_version = document.getElementById('original').textContent;
-            var target_element = document.getElementById('myversion');
-            DiffUtil.appendDiffFragmentToElement(last_version, text, target_element);
-        }
-
-
-        $('.version').on('click', function (event) {
-            $.ajax({
-                url: " {% url 'getVersion' %}",
-                data: {
-                    'id': $(this).attr('id'),
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                type: "GET",
-                success: function (response) {
-                    diff(response);
-                }
-            });
-
-        })
-        $('.versionparticle').on('click', function (event) {
-            $.ajax({
-                url: " {% url 'getVersionParticle' %}",
-                data: {
-                    'id': $(this).attr('id'),
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                type: "GET",
-                success: function (response) {
-                    diff(response);
-                },
-            });
-
-        })
-
-
-        function revert(content){
-            $.ajax({
-                url: " {% url 'saveQuestion' %}",
-                data: {
-                    'content': content,
-                    'id': {{ quesId }},
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                type: "POST",
-                success: function (response) {
-                    location.reload();
-                },
-            });
-        }
-
-        function revert_version(id) {
-            $.ajax({
-                url: " {% url 'getVersion' %}",
-                data: {
-                    'id': id,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                type: "POST",
-                success: function (response) {
-                    revert(response);
-                }
-            });
-            return false;
-        }
-        function revert_particle_version(id) {
-            $.ajax({
-                url: " {% url 'getVersionParticle' %}",
-                data: {
-                    'id': id,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                type: "POST",
-                success: function (response) {
-                    revert(response);
-                },
-            });
-        }
-
+        ques_id = {{quesId}};
+        version_url = "{% url 'getVersion' %}";
+        particle_version_url = "{% url 'getVersionParticle' %}";
+        save_question_url = " {% url 'saveQuestion' %}";
+        csrf_token = "{{csrf_token}}";
     </script>
 
 {% endblock %}

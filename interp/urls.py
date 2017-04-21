@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^saveques/$', SaveQuestion.as_view(), name='saveQuestion'),
     url(r'^saveverpart/$', SaveVersionParticle.as_view(), name='saveVersionParticle'),
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
+    url(r'^getvers/md/$', GetVersionMarkDown.as_view(), name='get_version_md'),
+    url(r'^getvers/pdf/$', GetVersionPDF.as_view(), name='get_version_pdf'),
     url(r'^getverspar/$', GetVersionParticle.as_view(), name='getVersionParticle'),
 
     url(r'^preview_translate/(?P<id>[\w]*)/$',TranslatePreview.as_view(), name='preview_translate'),

@@ -1,4 +1,6 @@
 import markdown
+from django.core.mail.message import EmailMultiAlternatives
+from django.http.response import HttpResponseRedirect
 
 from django.shortcuts import render, redirect
 from django.views.generic import View
@@ -99,7 +101,7 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',
         'margin-left': '0.75in',
-        'zoom': 15,
+        # 'zoom': 15,
         'javascript-delay': 500,
     }
 
@@ -118,3 +120,19 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         context['content'] = content
         context['title'] = self.filename
         return context
+
+
+class MailTaskPDF(GetTaskPDF):
+    def get(self, request, *args, **kwargs):
+        response = super(MailTaskPDF, self).get(request, *args, **kwargs)
+        response.render()
+
+        subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
+        text_content = 'Test'
+        html_content = '<p>This is an <strong>TEST</strong> message.</p>'
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.attach('file.pdf', response.content, 'application/pdf')
+        msg.send()
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])

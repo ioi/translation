@@ -11,3 +11,4 @@ websocket-client==0.35.0
 django-wkhtmltopdf
 python-markdown-math
 django-redis
+ipython

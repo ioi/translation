@@ -1,0 +1,43 @@
+.table-center * {
+    text-align: center;
+}
+
+.main-content {
+	padding: 71px 15px 0 15px;
+}
+
+.panel {
+	border-radius: 0;
+}
+
+.fa-btn {
+	cursor: pointer;
+}
+
+#diff-selectbox {
+	width: 20%;
+	font-size: 12px;
+	padding: 0px 6px;
+}
+
+.btn.active {
+	background-color: green !important;
+}
+
+.text-container {
+	background: #f5f5f5;
+	padding: 15px;
+}
+#btn-container > .panel {
+	margin-bottom: 0 !important;
+}
+#left-container{
+	padding-right: 0;
+}
+#right-container{
+	padding-left: 0;
+}
+#left-container .panel-body,
+#right-container .panel-body {
+	padding: 0;
+}

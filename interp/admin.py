@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django import forms
+from django.urls.base import reverse
 from .models import *
 from django.shortcuts import render
 
@@ -29,7 +30,7 @@ class UserCreationForm(forms.ModelForm):
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
-    list_display = ("username",)
+    list_display = ("username", "translate_versions")
     ordering = ("username",)
     actions = ['send_EMAIL']
 
@@ -45,6 +46,11 @@ class CustomUserAdmin(UserAdmin):
 
     filter_horizontal = ()
 
+    def translate_versions(self, obj):
+        return '<a href="%s">%s</a>' % (reverse('user_trans', kwargs={'username': obj.username}), 'Translations')
+
+    translate_versions.allow_tags = True
+
     def send_EMAIL(self, request, queryset):
         from django.core.mail import send_mail
         for i in queryset:
@@ -59,7 +65,6 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(Task)
 admin.site.register(Translation)
 admin.site.register(User, CustomUserAdmin)
-# admin.site.register(Version)
 admin.site.register(Language)
 admin.site.register(Country)
 admin.site.register(VersionParticle)

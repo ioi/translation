@@ -2,51 +2,53 @@
 
 {% block content %}
 
-    <div class="col-sm-12">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <form action="{%  url 'task' %}" method="post">
-                    {% csrf_token %}
-                    <label for="task_title">Title: </label>
-                    <input id="task_title" type="text" name="title">
-                    <input type="submit" value="New Task">
-                </form>
+    <div class="container">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form action="{%  url 'task' %}" method="post">
+                        {% csrf_token %}
+                        <label for="task_title">Title: </label>
+                        <input id="task_title" type="text" name="title">
+                        <input type="submit" value="New Task">
+                    </form>
 
+                </div>
             </div>
         </div>
-    </div>
 
 
-    <div class="col-sm-12">
-        <div class="panel panel-default">
-            <div class="panel-body">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
 
-                <table class="table">
-                    <thead><tr>
-                        <th>Main Question</th>
-                        <th>Publish</th>
-                    </tr></thead>
-                    <tbody>
-                    {% for question in questions %}
-                        <tr>
-                            <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
-                            <td id="td_{{ question.0 }}">
-                                {% if question.2 == False or question.3  %}
-                                    <button  onclick="publishLastVersion({{ question.0 }})">
-                                        Publish Latest Version
-                                    </button>
-                                {% endif %}
-                                {% if question.2 %}
-                                    <button  onclick="unpublishTask({{ question.0 }})">
-                                        Unpublish Task
-                                    </button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                    <table class="table">
+                        <thead><tr>
+                            <th>Main Question</th>
+                            <th>Publish</th>
+                        </tr></thead>
+                        <tbody>
+                        {% for question in questions %}
+                            <tr>
+                                <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
+                                <td id="td_{{ question.0 }}">
+                                    {% if question.2 == False or question.3  %}
+                                        <button  onclick="publishLastVersion({{ question.0 }})">
+                                            Publish Latest Version
+                                        </button>
+                                    {% endif %}
+                                    {% if question.2 %}
+                                        <button  onclick="unpublishTask({{ question.0 }})">
+                                            Unpublish Task
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
+                </div>
             </div>
         </div>
     </div>

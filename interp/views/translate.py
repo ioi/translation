@@ -14,12 +14,13 @@ from interp.utils import get_translate_edit_permission, can_save_translate, is_t
 class Home(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
-        tasks = Task.objects.filter(is_published=True).values_list('id', 'title')
+        # tasks = Task.objects.filter(is_published=True).values_list('id', 'title')
         tasks = []
         for task in Task.objects.filter(is_published=True):
             translation = Translation.objects.get(user=user, task=task)
             is_editing = translation and is_translate_in_editing(translation)
-            tasks.append((task.id, task.title, is_editing))
+            freeze = translation and translation.freeze
+            tasks.append((task.id, task.title, is_editing, freeze))
 
         return render(request, 'questions.html', context={'tasks': tasks, 'language': user.credentials()})
 
@@ -36,9 +37,12 @@ class Questions(LoginRequiredMixin,View):
         except:
             trans = Translation.objects.create(user=user, task=task, language=user.language)
             trans.add_version(task_text)
+        if trans.freeze:
+            return HttpResponseForbidden("This task is freezed")
         return render(request, 'editor.html',
                           context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                    'quesId': id, 'language': str(user.language.name + '-' + user.country.name)})
+
 
 class AccessTranslationEdit(LoginRequiredMixin, View):
     def post(selfs, request, id):
@@ -81,7 +85,7 @@ class SaveQuestion(LoginRequiredMixin,View):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
         translation = Translation.objects.get(user=user,task=task)
-        if user != translation.user or not can_save_translate(translation, edit_token):
+        if user != translation.user or not can_save_translate(translation, edit_token) or translation.freeze:
             return HttpResponseForbidden()
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()
@@ -137,7 +141,7 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         user = User.objects.get(username=request.user.username)
         edit_token = request.POST.get('edit_token', '')
         translation = Translation.objects.get(user=user, task=task)
-        if user != translation.user or not can_save_translate(translation, edit_token):
+        if user != translation.user or not can_save_translate(translation, edit_token) or translation.freeze:
             return HttpResponseForbidden()
         if translation.get_latest_text().strip() == content.strip():
             return HttpResponse("Not Modified")

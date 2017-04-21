@@ -9,6 +9,8 @@ from django.conf.urls.static import static
 urlpatterns = [
 
     url(r'home/$', Home.as_view(), name='home'),
+    url(r'user_trans/(?P<username>[\w]*)/$', UserTranslations.as_view(), name='user_trans'),
+    url(r'freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
     url(r'^login/$', Login.as_view(), name='login'),
     url(r'^task/$', Tasks.as_view(), name='task'),
 

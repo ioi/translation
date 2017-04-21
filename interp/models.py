@@ -71,6 +71,7 @@ class Translation(models.Model):
     id = models.AutoField(primary_key=True)
     language = models.ForeignKey('Language')
     versions = GenericRelation(ContentVersion)
+    freeze = models.BooleanField(default=False)
 
     def add_version(self, text):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now())

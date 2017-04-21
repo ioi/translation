@@ -14,20 +14,28 @@
                         <thead><tr>
                             <th>Main Question</th>
                             <th>Translation Version</th>
-                            <th></th>
+                            <th>PDF</th>
                             <th>Is Editing?</th>
                             <th>Last Save</th>
-                            <th>Task Status</th>
+                            <th>Translation Status</th>
                         </tr></thead>
                         <tbody>
                         {% for question in tasks %}
                             <tr>
-                                <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
+                                <td>
+                                    {% if question.3 %}
+                                     {{ question.1 }}
+                                    {% else %}
+                                         <a href="{% url 'question' question.0 %}">
+                                            {{ question.1 }}
+                                        </a>
+                                    {% endif %}
+                                </td>
                                 <td><a href="{% url 'versions' question.0 %}">Versions</a></td>
                                 <td><a href="{% url 'gettaskpdf'%}?id={{question.0}}">Task PDF</a></td>
                                 <td> {% if question.2 %} YES {% endif %}</td>
                                 <td></td>
-                                <td></td>
+                                <td>{{ question.3 | yesno:'Freeze,' }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

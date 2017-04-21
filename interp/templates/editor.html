@@ -55,8 +55,8 @@
                         {% if rtl %}
                             <div id="left_rtl_plain_text_box" class="text-container" style="white-space: pre-wrap">{{ trans }}</div>
                         {% else %}
-                            <div id="left_ltr_plain_text_box">
-                                <textarea class="text-container">{{ trans }}</textarea>
+                            <div>
+                                <textarea id="left_ltr_plain_text_box" class="text-container">{{ trans }}</textarea>
                             </div>
                         {% endif %}
 

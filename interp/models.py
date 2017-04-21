@@ -8,9 +8,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 
 from django.utils import timezone
 
-from ws4redis.redis_store import RedisMessage
-from ws4redis.publisher import RedisPublisher
-
 from interp.utils import add_notification_to_users_cache
 
 

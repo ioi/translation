@@ -3,11 +3,8 @@ moratab
 gunicorn==19.3.0
 psycopg2==2.6
 redis==2.10.3
-django-websocket-redis
 markdown
 pdfkit
-gevent==1.1b5
-greenlet==0.4.9
 requests==2.7.0
 six==1.10.0
 websocket-client==0.35.0

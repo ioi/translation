@@ -26,6 +26,49 @@ class AdminCheckMixin(LoginRequiredMixin,object):
         return super(AdminCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
+class StaffCheckMixin(LoginRequiredMixin, object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser or user.groups.filter(name="staff").exists()
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(StaffCheckMixin, self).dispatch(request, *args, **kwargs)
+
+class UserManagerCheckMixin(LoginRequiredMixin, object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser or user.groups.filter(name="user_manager").exists()
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(UserManagerCheckMixin, self).dispatch(request, *args, **kwargs)
+
+class ISCEditorCheckMixin(LoginRequiredMixin, object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser or user.groups.filter(name="ISC_editor").exists()
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(ISCEditorCheckMixin, self).dispatch(request, *args, **kwargs)
+
+
 # Cache Utils
 
 def get_user_unread_notifs_cache_key(user):

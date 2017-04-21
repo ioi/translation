@@ -47,7 +47,7 @@
     "fields": {
         "password": "pbkdf2_sha256$30000$Kg1ipJLMN2V3$fia2nq48jhh8GdYphrQ9hyCkc8oyH6whfTdh8P+PX6s=",
         "last_login": null,
-        "is_superuser": true,
+        "is_superuser": false,
         "username": "ISC_editor",
         "first_name": "",
         "last_name": "",

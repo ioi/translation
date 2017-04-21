@@ -8,12 +8,12 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
-from interp.utils import AdminCheckMixin
+from interp.utils import ISCEditorCheckMixin, AdminCheckMixin
 from interp.models import Task, User
 
 from wkhtmltopdf.views import PDFTemplateView
 
-class Tasks(AdminCheckMixin,View):
+class Tasks(ISCEditorCheckMixin,View):
     def get(self,request):
         # questions = Task.objects.values_list('id', 'title', 'is_published')
         # TODO: need refactor (find can_publish_last_version by query)
@@ -35,7 +35,7 @@ class Tasks(AdminCheckMixin,View):
         return redirect(to= reverse('edittask',kwargs = {'id': new_task.id}))
 
 
-class EditTask(AdminCheckMixin,View):
+class EditTask(ISCEditorCheckMixin,View):
     def get(self,request,id):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user.username)
@@ -46,7 +46,7 @@ class EditTask(AdminCheckMixin,View):
 
         return render(request,'editor-task.html', context={'content' : task.get_latest_text(), 'title':task.title, 'is_published':is_published, 'taskId':id, 'language':str(user.language.name + '-' + user.country.name)})
 
-class SaveTask(AdminCheckMixin,View):
+class SaveTask(ISCEditorCheckMixin,View):
     def post(self,request):
         id = request.POST['id']
         content = request.POST['content']
@@ -57,7 +57,7 @@ class SaveTask(AdminCheckMixin,View):
         task.add_version(content)
         return HttpResponse("done")
 
-class PublishTask(AdminCheckMixin,View):
+class PublishTask(ISCEditorCheckMixin,View):
     def post(self, request):
         id = request.POST['id']
         change_log = request.POST.get('change_log', "")

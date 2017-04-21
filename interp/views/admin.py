@@ -3,12 +3,11 @@ from django.urls.base import reverse
 from django.views.generic import View
 
 from interp.models import User, Task, Translation
-from interp.utils import AdminCheckMixin
+from interp.utils import StaffCheckMixin
 from django.http import HttpResponseNotFound, HttpResponse
 
 
-
-class UserTranslations(AdminCheckMixin,View):
+class UserTranslations(StaffCheckMixin, View):
     def get(self, request, username):
         user = User.objects.get(username=username)
         # tasks = Task.objects.filter(is_published=True).values_list('id', 'title')
@@ -23,7 +22,7 @@ class UserTranslations(AdminCheckMixin,View):
         return render(request, 'user_translates.html', context={'translations': translations, 'language': user.credentials()})
 
 
-class FreezeTranslation(AdminCheckMixin, View):
+class FreezeTranslation(StaffCheckMixin, View):
     def post(self, request, id):
         freeze = request.POST.get('freeze', False)
         trans = Translation.objects.filter(id=id).first()

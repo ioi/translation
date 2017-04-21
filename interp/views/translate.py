@@ -1,4 +1,7 @@
 import markdown
+from django.core.mail import send_mail
+from django.core.mail.message import EmailMessage, EmailMultiAlternatives
+from django.http.response import HttpResponseRedirect
 from django.utils import timezone
 
 from django.views.generic import View
@@ -17,7 +20,7 @@ class Home(LoginRequiredMixin,View):
         # tasks = Task.objects.filter(is_published=True).values_list('id', 'title')
         tasks = []
         for task in Task.objects.filter(is_published=True):
-            translation = Translation.objects.get(user=user, task=task)
+            translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             freeze = translation and translation.freeze
             tasks.append((task.id, task.title, is_editing, freeze))
@@ -174,7 +177,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',
         'margin-left': '0.75in',
-        'zoom': 15,
+        # 'zoom': 15,
         'javascript-delay': 500,
     }
 
@@ -188,7 +191,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
             # TODO
             return None
 
-        trans = Translation.objects.get(user=user, task=task)
+        trans = Translation.objects.filter(user=user, task=task).first()
         if trans is None:
             # TODO
             return None
@@ -199,3 +202,19 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         context['content'] = content
         context['title'] = self.filename
         return context
+
+
+class MailTranslatePDF(GetTranslatePDF):
+    def get(self, request, *args, **kwargs):
+        response = super(MailTranslatePDF, self).get(request, *args, **kwargs)
+        response.render()
+
+        subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
+        text_content = 'Test'
+        html_content = '<p>This is an <strong>TEST</strong> message.</p>'
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.attach('file.pdf', response.content, 'application/pdf')
+        msg.send()
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])

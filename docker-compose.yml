@@ -1,0 +1,45 @@
+web:
+  restart: always
+  build: ./
+  expose:
+    - "8000"
+  links:
+    - postgres:postgres
+    - redis:redis
+  volumes:
+    - /usr/src/app
+    - /usr/src/app/static
+  environment:
+    DB_USER: "$POSTGRES_USER"
+    DB_PASSWORD: "$POSTGRES_PASSWORD"
+    DB_NAME: "$POSTGRES_DB"
+
+nginx:
+  restart: always
+  build: ./nginx/
+  ports:
+    - "80:80"
+  volumes:
+    - /www/static
+  volumes_from:
+    - web
+  links:
+    - web:web
+
+postgres:
+  restart: always
+  image: postgres:9.6-alpine
+  ports:
+    - "5432:5432"
+  volumes:
+    - ioi_pgdata:/var/lib/postgresql/data/
+  environment:
+    POSTGRES_USER: "$POSTGRES_USER"
+    POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
+    POSTGRES_DB: "$POSTGRES_DB"
+
+redis:
+  restart: always
+  image: redis:3.2-alpine
+  ports:
+    - "6379:6379"

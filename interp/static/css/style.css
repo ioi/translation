@@ -241,8 +241,13 @@ margin-top:40px;
 
 
 .main-content {
-	padding-top: 100px;
+	padding: 71px 15px 0 15px;
 }
+
+.panel {
+	border-radius: 0;
+}
+
 .task-title {
 	padding-bottom: 15px;
 	margin-bottom: 15px;
@@ -254,10 +259,8 @@ margin-top:40px;
 }
 
 #diff-selectbox {
-	width: 50%;
-	float: right;
+	width: 20%;
 	font-size: 12px;
-	height: 25px;
 	padding: 0px 6px;
 }
 
@@ -296,4 +299,26 @@ margin-top:40px;
 	position: absolute;
 	text-align: center;
 	border-radius: 4px;
+}
+
+.btn.active {
+	background-color: green !important;
+}
+
+.text-container {
+	background: #f5f5f5;
+	padding: 15px;
+}
+#btn-container > .panel {
+	margin-bottom: 0 !important;
+}
+#left-container{
+	padding-right: 0;
+}
+#right-container{
+	padding-left: 0;
+}
+#left-container .panel-body,
+#right-container .panel-body {
+	padding: 0;
 }

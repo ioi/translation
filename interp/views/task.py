@@ -92,11 +92,11 @@ class TaskVersions(LoginRequiredMixin,View):
         versions_query = task.versions
         if published:
             versions_query = task.versions.filter(published=True)
-        versions_values = versions_query.values('text', 'create_time', 'change_log')
+        versions_values = versions_query.values('id', 'text', 'create_time', 'change_log')
         if request.is_ajax():
             return JsonResponse(dict(versions=list(versions_values)))
         else:
-            return render(request, 'task_versions.html', context={'task_title': task.title, 'versions': versions_values})
+            return render(request, 'task_versions.html', context={'task_title': task.title, 'versions': versions_values, 'quesId': id,})
 
 class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'

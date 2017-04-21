@@ -1,28 +1,29 @@
+
 {% extends "base.html" %}
 
 {% block content %}
 
-    <div class="row">
-        <div class="col-sm-12">
-            <strong> Title: </strong> {{ task_title }}
-        </div>
-    </div>
-    <div class="col-sm-12">
+    <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
+    <script type="text/javascript" src="/static/js/versions-task.js"></script>
+
+
+
+    <div class="col-sm-4">
         <div class="panel panel-default">
             <div class="panel-body">
 
                 <table class="table">
                     <thead><tr>
-                        <th>Publish Date</th>
-                        <th>Change Log</th>
-                        <th>PDF</th>
+                        <td><button class="btn btn-default" onclick="diff()">Diff</button></td>
+                        <td colspan="">{{ task_title }}</td>
                     </tr></thead>
                     <tbody>
                     {% for version in versions %}
-                        <tr>
-                            <td> {{ version.create_time }}</td>
-                            <td> {{ version.change_log }}</td>
-                            <td></td>
+                        <tr class="version" style="cursor: pointer">
+                            <td><input type="checkbox" id="{{ version.id }}" onchange="changeCheckbox({{ version.id }}, {{ version.id }})"></td>
+                            <td>{{ version.create_time }}</td>
+                            <td>{{ version.change_log }}</td>
+                            <td><button class="btn btn-default" onclick="view_version({{ version.id }})" >View</button></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -32,7 +33,17 @@
         </div>
     </div>
 
-    <script>
+    <div class="col-sm-8" id="right-container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="myversion" class="text-container" style="white-space: pre-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        task_version_url = "{% url 'taskVersions' id=quesId %}";
+        csrf_token = "{{csrf_token}}";
     </script>
 
 {% endblock %}

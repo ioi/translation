@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'IOI.wsgi.application'
+WSGI_APPLICATION = 'IOI.wsgi.application'
 # WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 WKHTMLTOPDF_CMD_OPTIONS = {

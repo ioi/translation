@@ -30,7 +30,7 @@ class UserCreationForm(forms.ModelForm):
 class CustomUserAdmin(UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
-    list_display = ("username", "translate_versions")
+    list_display = ("username", "translate_versions", "country", "language")
     ordering = ("username",)
     actions = ['send_EMAIL']
 

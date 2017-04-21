@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ws4redis',
     'interp',
     'wkhtmltopdf',
 ]
@@ -70,14 +69,13 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
-                'ws4redis.context_processors.default',
             ],
         },
     },
 ]
 
 # WSGI_APPLICATION = 'IOI.wsgi.application'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+# WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 WKHTMLTOPDF_CMD_OPTIONS = {
 'quiet':True,

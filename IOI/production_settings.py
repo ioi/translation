@@ -25,7 +25,7 @@ SECRET_KEY = 'jq5w*u%s@o&b5gf59qmuby*y1$xrm5cpcw5kbxb86vu@z^1gm9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = ['trans.ioi2017.org']
 
 
 # Application definition

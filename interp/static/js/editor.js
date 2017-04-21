@@ -41,10 +41,10 @@ $(document).ready(function(){
             left_plain_text_box_id = 'left_ltr_plain_text_box';
             $('#left_rendered_text_box').css('direction', 'ltr');
             simplemde = new SimpleMDE({
-            element: document.getElementById('left_ltr_plain_text_box')[0],
-            status: false,
-            toolbar: false
-        });
+                element: document.getElementById('left_ltr_plain_text_box')[0],
+                status: false,
+                toolbar: false
+            });
         }
 
         marked.setOptions({

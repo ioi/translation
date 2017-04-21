@@ -81,14 +81,20 @@ class PublishTask(AdminCheckMixin,View):
 
 
 class TaskVersions(LoginRequiredMixin,View):
-    def get(self,request,id):
-        published_raw = request.GET.get('published', 'false')
+    def get(self,request, id):
+        published_raw = request.GET.get('published', 'true')
         published = True
         if published_raw == 'false':
             published = False
         task = Task.objects.get(id=id)
-        versions_values = task.versions.filter(published=published).values('text','create_time','change_log')
-        return JsonResponse(dict(versions=list(versions_values)))
+        versions_query = task.versions
+        if published:
+            versions_query = task.versions.filter(published=True)
+        versions_values = versions_query.values('text', 'create_time', 'change_log')
+        if request.is_ajax():
+            return JsonResponse(dict(versions=list(versions_values)))
+        else:
+            return render(request, 'task_versions.html', context={'task_title': task.title, 'versions': versions_values})
 
 class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <strong> Title: </strong> {{ task_title }}
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <table class="table">
+                    <thead><tr>
+                        <th>Publish Date</th>
+                        <th>Change Log</th>
+                        <th>PDF</th>
+                    </tr></thead>
+                    <tbody>
+                    {% for version in versions %}
+                        <tr>
+                            <td> {{ version.create_time }}</td>
+                            <td> {{ version.change_log }}</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+    </script>
+
+{% endblock %}

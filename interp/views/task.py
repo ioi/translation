@@ -20,6 +20,8 @@ class Tasks(AdminCheckMixin,View):
             if task.is_published:
                 can_publsh_last_version = not task.versions.order_by('-create_time').first().published
                 questions.append( (task.id, task.title, task.is_published, can_publsh_last_version))
+            else:
+                questions.append((task.id, task.title, task.is_published, True))
 
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language': user.credentials()})
@@ -71,8 +73,7 @@ class PublishTask(AdminCheckMixin,View):
         return HttpResponse("Task has been published!")
 
     def delete(self, request):
-        # TODO: doesn't work :(
-        id = request.DELETE['id']
+        id = request.GET['id']
         task = Task.objects.get(id=id)
         task.is_published = False
         task.save()

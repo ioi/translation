@@ -1,5 +1,8 @@
 import json
 import logging
+import datetime
+import string
+import random
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -23,14 +26,47 @@ class AdminCheckMixin(LoginRequiredMixin,object):
         return super(AdminCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
-#Notifications Util
+# Cache Utils
 
 def get_user_unread_notifs_cache_key(user):
-    return "UN-%d" % user.id
+    return "NOTIF_UN-%d" % user.id
 
 
 def get_user_read_notifs_cache_key(user):
-    return "RN-%d" % user.id
+    return "NOTIF_RN-%d" % user.id
+
+
+def get_trans_edit_cache_key(translation):
+    return "TRANS_ET-%d" % translation.id
+
+
+# Translation Utils
+TRANSLATION_EDIT_TIME_OUT = 60
+
+
+def get_translate_edit_permission(translation, my_token=None):
+    edit_token = cache.get(get_trans_edit_cache_key(translation))
+    current_time = datetime.datetime.now()
+    if edit_token is None \
+            or edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) < current_time \
+            or edit_token[0] == my_token:
+        new_edit_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        cache.set(get_trans_edit_cache_key(translation), (new_edit_key, current_time))
+        return True, new_edit_key
+    return False, ""
+
+
+def can_save_translate(translation, my_token):
+    edit_token = cache.get(get_trans_edit_cache_key(translation))
+    return edit_token and my_token == edit_token[0]
+
+
+def is_translate_in_editing(translation):
+    current_time = datetime.datetime.now()
+    edit_token = cache.get(get_trans_edit_cache_key(translation))
+    return edit_token and edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) > current_time
+
+# Notifications Util
 
 
 def update_user_cache(user, all_notifications):

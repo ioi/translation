@@ -1,9 +1,8 @@
 var task_text, translation_text;
 var ques_id;
-var version_particle_url;
+var version_particle_url, save_question_url , task_version_url, access_edit_translate_url, preview_url;
 var csrf_token;
-var save_question_url;
-var task_version_url;
+
 var latest_translation_text;
 var online_prev;
 var simplemde;
@@ -31,6 +30,7 @@ function toggleDiv(id){
 
 $(document).ready(function(){
 
+        getEditTranslateAccess();
         if (rtl){
             left_plain_text_box_id = 'left_rtl_plain_text_box';
             $('#' + left_plain_text_box_id).moratab($('#'+left_plain_text_box_id).text(), {strings: {help: ''}});
@@ -67,7 +67,8 @@ $(document).ready(function(){
         diff_checkbox = false;
         updateInteractive();
 
-        window.setInterval(saveVersionParticle,60*1000)
+        window.setInterval(saveVersionParticle, 60*1000)
+        window.setInterval(getEditTranslateAccess, 45*1000)
         getTaskVersions();
 });
 
@@ -180,15 +181,19 @@ function onlinePreview() {
 }
 
 function saveVersion() {
+    current_trans_text = currentTranslationText();
+    var edit_token = sessionStorage.getItem('edit_translate_token')
     $.ajax({
         url: save_question_url,
         data: {
             'content': currentTranslationText(),
+             edit_token: edit_token,
             'id': ques_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
         success: function (response) {
+            last_version_particle_text = current_trans_text;
             updateSyncTime();
             ToastrUtil.success('Successfully Saved ...');
         },
@@ -203,6 +208,7 @@ function saveVersion() {
 
 function saveVersionParticle() {
     current_trans_text = currentTranslationText();
+    var edit_token = sessionStorage.getItem('edit_translate_token')
     if (last_version_particle_text == current_trans_text)
         return;
     $.ajax({
@@ -210,6 +216,7 @@ function saveVersionParticle() {
         data: {
             'content': currentTranslationText(),
             'id': ques_id,
+            edit_token: edit_token,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
@@ -244,4 +251,32 @@ function getTaskVersions() {
         }
     });
     return false;
+}
+
+function getEditTranslateAccess() {
+    var edit_token = sessionStorage.getItem('edit_translate_token')
+    $.ajax({
+        url: access_edit_translate_url,
+        data: {
+            id: ques_id,
+            edit_token: edit_token,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+            console.log(response);
+            if (response.can_edit == false)
+            {
+                alert("ERROR");
+                // TODO: Should be more user friendly
+                window.location.replace(preview_url)
+            }
+            sessionStorage.setItem('edit_translate_token', response.edit_token)
+        },
+        error: function (xhr, textStatus, thrownError) {
+            alert("ERROR");
+            // TODO: Should be more user friendly
+            window.location.replace(preview_url)
+        }
+    });
 }

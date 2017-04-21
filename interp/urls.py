@@ -21,6 +21,9 @@ urlpatterns = [
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
     url(r'^getverspar/$', GetVersionParticle.as_view(), name='getVersionParticle'),
 
+    url(r'^preview_translate/(?P<id>[\w]*)/$',TranslatePreview.as_view(), name='preview_translate'),
+    url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
+
     url(r'^versions/(?P<id>[\w]*)/$', Versions.as_view(), name='versions'),
     url(r'^task_versions/(?P<id>[\w]*)/$', TaskVersions.as_view(), name='taskVersions'),
     url(r'^questions/(?P<id>[\w]*)/$',Questions.as_view(), name='question'),

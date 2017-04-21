@@ -78,7 +78,9 @@
 
     <script type="text/javascript">
         ques_id = {{quesId}};
-        version_particle_url = " {% url 'saveVersionParticle' %}";
+        version_particle_url = "{% url 'saveVersionParticle' %}";
+        access_edit_translate_url = "{% url 'access_edit_translate' id=quesId %}";
+        preview_url = "{% url 'preview_translate' id=quesId%}";
         save_question_url = "{% url 'saveQuestion' %}";
         task_version_url = "{% url 'taskVersions' id=quesId %}";
         csrf_token = "{{csrf_token}}";

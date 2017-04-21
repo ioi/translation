@@ -25,7 +25,7 @@
                                 <td><a href="{% url 'question' question.0 %}">{{ question.1 }}</a></td>
                                 <td><a href="{% url 'versions' question.0 %}">Versions</a></td>
                                 <td><a href="{% url 'gettaskpdf'%}?id={{question.0}}">Task PDF</a></td>
-                                <td></td>
+                                <td> {% if question.2 %} YES {% endif %}</td>
                                 <td></td>
                                 <td></td>
                             </tr>

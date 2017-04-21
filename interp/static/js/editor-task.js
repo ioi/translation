@@ -41,14 +41,14 @@ function send_data() {
     $.ajax({
         url: save_task_url,
         data: {
-            'title': $('#task-title').value(),
+            'title': $('#task-title').val(),
             'content': simplemde.value(),
             'id': task_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
         success: function (response) {
-            last_saved_content = mycontent;
+            last_saved_content = simplemde.value();
             ToastrUtil.success('Saved ...');
         }
     });

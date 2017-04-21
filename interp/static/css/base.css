@@ -38,6 +38,7 @@
 	padding-left: 0;
 }
 #left-container .panel-body,
-#right-container .panel-body {
+#right-container .panel-body,
+#middle-container .panel-body{
 	padding: 0;
 }

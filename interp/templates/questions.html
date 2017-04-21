@@ -19,12 +19,9 @@
                         {% for question in tasks %}
                             <tr>
                                 <td>
-                                    {% if question.3 or question.2 %}
-                                     {{ question.1 }}
-                                    {% else %}
-                                         <a href="{% url 'question' question.0 %}">
-                                            {{ question.1 }}
-                                        </a>
+                                    {% if question.3 %} {{ question.1 }}
+                                    {% elif question.2 %} <a href="{% url 'preview_translate' question.0 %}">{{ question.1 }}</a>
+                                    {% else %} <a href="{% url 'question' question.0 %}">{{ question.1 }}</a>
                                     {% endif %}
                                 </td>
                                 <td><a href="{% url 'versions' question.0 %}">Translation Versions</a></td>

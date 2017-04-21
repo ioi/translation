@@ -31,6 +31,7 @@ function toggleDiv(id){
 $(document).ready(function(){
 
         getEditTranslateAccess();
+
         if (rtl){
             left_plain_text_box_id = 'left_rtl_plain_text_box';
             $('#' + left_plain_text_box_id).moratab($('#'+left_plain_text_box_id).text(), {strings: {help: ''}});
@@ -41,7 +42,7 @@ $(document).ready(function(){
             left_plain_text_box_id = 'left_ltr_plain_text_box';
             $('#left_rendered_text_box').css('direction', 'ltr');
             simplemde = new SimpleMDE({
-                element: document.getElementById('left_ltr_plain_text_box')[0],
+                element: document.getElementById('left_ltr_plain_text_box'),
                 status: false,
                 toolbar: false
             });
@@ -254,6 +255,7 @@ function getTaskVersions() {
 }
 
 function getEditTranslateAccess() {
+    //TODO remove lag for transition to preview_url
     var edit_token = sessionStorage.getItem('edit_translate_token')
     $.ajax({
         url: access_edit_translate_url,
@@ -264,18 +266,12 @@ function getEditTranslateAccess() {
         },
         type: "POST",
         success: function (response) {
-            console.log(response);
-            if (response.can_edit == false)
-            {
-                alert("ERROR");
-                // TODO: Should be more user friendly
+            if (response.can_edit == false){
                 window.location.replace(preview_url)
             }
             sessionStorage.setItem('edit_translate_token', response.edit_token)
         },
-        error: function (xhr, textStatus, thrownError) {
-            alert("ERROR");
-            // TODO: Should be more user friendly
+        error: function () {
             window.location.replace(preview_url)
         }
     });

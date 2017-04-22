@@ -18,6 +18,4 @@ RUN pip install -r requirements.txt
 COPY . /usr/src/app
 COPY ./IOI/production_settings.py /usr/src/app/IOI/settings.py
 
-RUN mkdir logs
-
 CMD ["./docker-entrypoint.sh"]

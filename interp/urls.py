@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'home/$', Home.as_view(), name='home'),
     url(r'user_trans/(?P<username>[\w]*)/$', UserTranslations.as_view(), name='user_trans'),
     url(r'freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
+    url(r'unleash_trans_edit_token/(?P<id>[\w]*)/$', UnleashEditTranslationTokenq.as_view(), name='unleash_trans_token'),
     url(r'^login/$', Login.as_view(), name='login'),
     url(r'^task/$', Tasks.as_view(), name='task'),
 

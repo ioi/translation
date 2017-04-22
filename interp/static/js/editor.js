@@ -69,7 +69,7 @@ $(document).ready(function(){
         updateInteractive();
 
         window.setInterval(saveVersionParticle, 60*1000)
-        window.setInterval(getEditTranslateAccess, 45*1000)
+//        window.setInterval(getEditTranslateAccess, 45*1000)
         getTaskVersions();
 });
 
@@ -194,6 +194,10 @@ function saveVersion() {
         },
         type: "POST",
         success: function (response) {
+            if (response.can_edit == false){
+                window.location.replace(preview_url)
+            }
+            sessionStorage.setItem('edit_translate_token', response.edit_token)
             last_version_particle_text = current_trans_text;
             updateSyncTime();
             ToastrUtil.success('Successfully Saved ...');
@@ -222,6 +226,10 @@ function saveVersionParticle() {
         },
         type: "POST",
         success: function (response) {
+            if (response.can_edit == false){
+                window.location.replace(preview_url)
+            }
+            sessionStorage.setItem('edit_translate_token', response.edit_token)
             last_version_particle_text = current_trans_text;
             updateSyncTime();
         },

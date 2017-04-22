@@ -24,6 +24,7 @@
                             <th>PDF</th>
                             <th>MarkDown</th>
                             <th>Freeze</th>
+                            <th>is Editing</th>
                         </tr></thead>
                         <tbody>
                         {% for trans in translations %}
@@ -40,8 +41,18 @@
                                             <input type="submit" value="{% if trans.4 %} UnFreeze {% else %} Freeze {%endif%}" />
                                         </form>
                                     </td>
+                                    <td>
+                                        {% if trans.5 %}
+                                        <form method="post" action="{% url 'unleash_trans_token' id=trans.3 %}">
+                                            {% csrf_token %}
+                                            <input type="submit" value="Unleash Token" />
+                                        </form>
+                                        {% endif %}
+
+                                    </td>
                                 {% else %}
                                     <td>None</td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>

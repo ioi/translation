@@ -11,6 +11,7 @@ from django.core import serializers
 
 logger = logging.getLogger(__name__)
 
+
 class AdminCheckMixin(LoginRequiredMixin,object):
     user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
 
@@ -84,7 +85,7 @@ def get_trans_edit_cache_key(translation):
 
 
 # Translation Utils
-TRANSLATION_EDIT_TIME_OUT = 60
+TRANSLATION_EDIT_TIME_OUT = 120
 
 
 def get_translate_edit_permission(translation, my_token=None):
@@ -108,6 +109,10 @@ def is_translate_in_editing(translation):
     current_time = datetime.datetime.now()
     edit_token = cache.get(get_trans_edit_cache_key(translation))
     return edit_token and edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) > current_time
+
+
+def unleash_edit_translation_token(translation):
+    cache.set(get_trans_edit_cache_key(translation), None)
 
 # Notifications Util
 

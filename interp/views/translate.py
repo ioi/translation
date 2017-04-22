@@ -14,6 +14,7 @@ from wkhtmltopdf.views import PDFTemplateView
 
 from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing
 
+
 class Home(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
@@ -52,7 +53,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
-        if task.is_published == False:
+        if not task.is_published:
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
         if user != translation.user:
@@ -89,10 +90,11 @@ class SaveQuestion(LoginRequiredMixin,View):
         user = User.objects.get(username=request.user)
         translation = Translation.objects.get(user=user,task=task)
         if user != translation.user or not can_save_translate(translation, edit_token) or translation.freeze:
-            return HttpResponseForbidden()
+            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()
-        return HttpResponse("done")
+        can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
+        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
 
 class Versions(LoginRequiredMixin,View):
@@ -145,16 +147,17 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         edit_token = request.POST.get('edit_token', '')
         translation = Translation.objects.get(user=user, task=task)
         if user != translation.user or not can_save_translate(translation, edit_token) or translation.freeze:
-            return HttpResponseForbidden()
+            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         if translation.get_latest_text().strip() == content.strip():
-            return HttpResponse("Not Modified")
+            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'Not Modified'})
         last_version_particle = translation.versionparticle_set.order_by('-date_time').first()
         if last_version_particle:
             last_version_particle.text = content
             last_version_particle.save()
         else:
             last_version_particle = VersionParticle.objects.create(translation=translation, text=content, date_time=timezone.now())
-        return HttpResponse("done")
+        can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
+        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
 class GetTranslatePreview(LoginRequiredMixin,View):
     def get(self,request):

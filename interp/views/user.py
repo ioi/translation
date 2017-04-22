@@ -7,9 +7,12 @@ from django.shortcuts import render
 
 from interp.models import User
 
+
 class FirstPage(View):
     def get(self, request, *args, **kwargs):
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.groups.filter(name="staff").exists():
+            return redirect(to=reverse('admin:index'))
+        if request.user.groups.filter(name="ISC_editor"):
             return redirect(to=reverse('task'))
 
         if request.user.is_authenticated():

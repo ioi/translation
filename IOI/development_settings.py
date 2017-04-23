@@ -165,9 +165,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 
 
 
-EMAIL_HOST_USER = 'milad.ameri73@gmail.com'
+EMAIL_HOST_USER = ''
 #Must generate specific password for your app in [gmail settings][1]
-EMAIL_HOST_PASSWORD = 'milad26061373milad'
+EMAIL_HOST_PASSWORD = ''
 
 EMAIL_PORT = 587
 #This did the trick

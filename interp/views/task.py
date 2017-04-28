@@ -106,9 +106,8 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',
         'margin-left': '0.75in',
-        'footer-center': '[page]/[topage]',
         'footer-spacing': 3,
-        # 'zoom': 15,
+        'zoom': 15,
         'javascript-delay': 500,
     }
 
@@ -129,6 +128,8 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         context['task_title'] = task.title
         context['country'] = "ISC"
         context['language'] = "en"
+        context['contest'] = task.contest
+        self.cmd_options['footer-center'] = '%s [page] / [topage]' % task.title
         return context
 
 

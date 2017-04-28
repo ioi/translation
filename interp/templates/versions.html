@@ -22,7 +22,7 @@
                             <td><input type="checkbox" id="{{ version.0 }}" onchange="changeCheckbox({{ version.0 }})"></td>
                             <td>{{ version.1 }}</td>
                             <td><button class="btn btn-default" onclick="view_version({{ version.0 }})" >View</button></td>
-                            <td><button class="btn btn-default" onclick="revert_version({{ version.0 }})" >Revert</button></td>
+                            <td><button class="btn btn-default" onclick="revert({{ version.0 }})" >Revert</button></td>
                         </tr>
                     {% endfor %}
                     {% for version in versionParticles %}
@@ -30,7 +30,7 @@
                             <td><input type="checkbox" id="particle-{{ version.0 }}"></td>
                             <td>{{ version.1 }}</td>
                             <td><button class="btn btn-default" onclick="view_particle_version({{ version.0 }})" >View</button></td>
-                            <td><button class="btn btn-default" onclick="revert_particle_version({{ version.0 }})" >Revert</button></td>
+                            
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -56,6 +56,7 @@
 
     <script type="text/javascript">
         ques_id = {{quesId}};
+        checkout_version_url = "{% url 'checkoutversion' %}";
         version_url = "{% url 'getVersion' %}";
         csrf_token = "{{csrf_token}}";
     </script>

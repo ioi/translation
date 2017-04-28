@@ -12,8 +12,8 @@ class VersionDownloadMixin(object):
         return self.file_format
 
     def get_version(self):
-        task_id = self.request.GET['id']
-        content_version = ContentVersion.objects.filter(id=task_id).first()
+        version_id = self.request.GET['id']
+        content_version = ContentVersion.objects.filter(id=version_id).first()
         return content_version
 
     def get_filename(self):

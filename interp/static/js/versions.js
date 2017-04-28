@@ -1,6 +1,6 @@
 var version_url,
     particle_version_url,
-    save_question_url,
+    checkout_version_url,
     csrf_token,
     ques_id;
 
@@ -77,12 +77,11 @@ function view_particle_version(id){
 };
 
 
-function revert(content){
+function revert(version_id){
     $.ajax({
-        url: save_question_url,
+        url: checkout_version_url,
         data: {
-            'content': content,
-            'id': ques_id,
+            'id': version_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
@@ -92,30 +91,3 @@ function revert(content){
     });
 }
 
-function revert_version(id) {
-    $.ajax({
-        url: version_url,
-        data: {
-            'id': id,
-            csrfmiddlewaretoken: csrf_token
-        },
-        type: "POST",
-        success: function (response) {
-            revert(response);
-        }
-    });
-    return false;
-}
-function revert_particle_version(id) {
-    $.ajax({
-        url: particle_version_url,
-        data: {
-            'id': id,
-            csrfmiddlewaretoken: csrf_token
-        },
-        type: "POST",
-        success: function (response) {
-            revert(response);
-        },
-    });
-}

@@ -113,6 +113,19 @@ class SaveQuestion(LoginRequiredMixin,View):
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
 
+class CheckoutVersion(LoginRequiredMixin,View):
+    def post(self,request):
+        version_id = self.request.POST['id']
+        content_version = ContentVersion.objects.filter(id=version_id).first()
+        user = User.objects.get(username=request.user)
+        translation = content_version.content_object
+        if user != translation.user or translation.freeze:
+            return JsonResponse({'error': 'forbidden'})
+        translation.add_version(content_version.text)
+        VersionParticle.objects.filter(translation=translation).delete()
+        return JsonResponse({'message': 'Done'})
+
+
 class Versions(LoginRequiredMixin,View):
     def get(self,request,id):
         user = User.objects.get(username=request.user)
@@ -174,6 +187,7 @@ class SaveVersionParticle(LoginRequiredMixin,View):
             last_version_particle = VersionParticle.objects.create(translation=translation, text=content, date_time=timezone.now())
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
+
 
 class GetTranslatePreview(LoginRequiredMixin,View):
     def get(self,request):

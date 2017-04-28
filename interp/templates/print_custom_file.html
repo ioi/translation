@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+   <form action="{% url 'printcustomfile'%}" method="post" enctype="multipart/form-data">
+       {% csrf_token %}
+      {{ form }}
+      <input type="submit">
+    </form>
+
+{% endblock %}

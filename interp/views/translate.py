@@ -13,6 +13,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from wkhtmltopdf.views import PDFTemplateView
 
 from interp.models import FlatPage
+from interp.forms import UploadFileForm
 from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER
 
 
@@ -254,6 +255,30 @@ class MailTranslatePDF(GetTranslatePDF):
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
         msg.attach('file.pdf', response.content, 'application/pdf')
+        msg.send()
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+class PrintCustomFile(LoginRequiredMixin, View):
+    def get(self, request):
+        form = UploadFileForm()
+        return render(request, 'print_custom_file.html', {'form': form})
+
+    def post(self, request):
+        form = UploadFileForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return HttpResponseBadRequest("You should attach a file")
+        pdf_file = request.FILES['pdf_file']
+        if not pdf_file:
+            return HttpResponseBadRequest("You should attach a file")
+        pdf_file = pdf_file.read()
+        subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
+        text_content = 'Test'
+        html_content = '<p>This is an <strong>TEST</strong> message.</p>'
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.attach('file.pdf', pdf_file, 'application/pdf')
         msg.send()
 
         return HttpResponseRedirect(request.META['HTTP_REFERER'])

@@ -51,28 +51,24 @@ class SaveTask(ISCEditorCheckMixin,View):
         id = request.POST['id']
         content = request.POST['content']
         title = request.POST['title']
+        change_log = request.POST.get('change_log', "")
+        publish_raw = request.GET.get('publish', 'false')
+        publish = False
+        if publish_raw == 'true':
+            publish = True
         task = Task.objects.get(id=id)
         task.title = title
         task.save()
-        task.add_version(content)
+        task.add_version(content, change_log, publish)
         return HttpResponse("done")
 
-class PublishTask(ISCEditorCheckMixin,View):
+class EnableTask(ISCEditorCheckMixin,View):
     def post(self, request):
         id = request.POST['id']
-        change_log = request.POST.get('change_log', "")
         task = Task.objects.get(id=id)
-        # TODO: Need refactor
-        last_version = task.versions.order_by('-create_time').first()
-        if last_version is None:
-            HttpResponseBadRequest("There is no version")
-        last_version.published = True
-        last_version.change_log = change_log
-        last_version.save()
-
         task.is_published = True
         task.save()
-        return HttpResponse("Task has been published!")
+        return HttpResponse("Task has been unpublished!")
 
     def delete(self, request):
         id = request.GET['id']

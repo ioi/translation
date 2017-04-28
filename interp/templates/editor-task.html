@@ -26,8 +26,8 @@
                         <input class="form-control" value="{{ title }}" placeholder="Question Title" id="task-title">
                     </div>
                     <div class="col-sm-6">
-                        <button class="btn btn-default" onclick="send_data()">Save</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Publish Last Version</button>
+                        <button class="btn btn-default" onclick="saveOrPublish(false)">Save</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Save And Publish</button>
 
                         <!-- Modal -->
                         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -38,7 +38,7 @@
                               </div>
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="publishLastVersion()">Publish</button>
+                                <button type="button" class="btn btn-primary" onclick="saveOrPublish(true)">Save and Publish</button>
                               </div>
                             </div>
                           </div>
@@ -73,7 +73,6 @@
     <script type="text/javascript">
         task_id = {{taskId}};
         save_task_url = "{% url 'savetask' %}";
-        publish_task_url = " {% url 'publishtask' %}";
         csrf_token = "{{csrf_token}}";
     </script>
 

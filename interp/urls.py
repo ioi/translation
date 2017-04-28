@@ -17,7 +17,7 @@ urlpatterns = [
 
     url(r'^edittask/(?P<id>[\w]*)/$', EditTask.as_view(), name='edittask'),
     url(r'^savetask/$', SaveTask.as_view(), name='savetask'),
-    url(r'^publishtask/$', PublishTask.as_view(), name='publishtask'),
+    url(r'^enabletask/$', EnableTask.as_view(), name='enabletask'),
     url(r'^logout/$',Logout.as_view(), name='logout'),
     url(r'^saveques/$', SaveQuestion.as_view(), name='saveQuestion'),
     url(r'^saveverpart/$', SaveVersionParticle.as_view(), name='saveVersionParticle'),

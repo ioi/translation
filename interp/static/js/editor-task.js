@@ -37,41 +37,29 @@ function online_preview() {
     renderMathInElement(document.getElementById("task-preview"));
 }
 
-function send_data() {
+function saveOrPublish(publish) {
     $.ajax({
         url: save_task_url,
         data: {
             'title': $('#task-title').val(),
             'content': simplemde.value(),
             'id': task_id,
-            csrfmiddlewaretoken: csrf_token
-        },
-        type: "POST",
-        success: function (response) {
-            last_saved_content = simplemde.value();
-            ToastrUtil.success('Saved ...');
-        }
-    });
-    return false;
-}
-
-function publishLastVersion() {
-    //TODO required change_log_note
-    $.ajax({
-        url: publish_task_url,
-        data: {
-            'id': task_id,
-            'is_published': 'True',
+            'publish': publish,
             'change_log': $('#change-log').val(),
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
         success: function (response) {
-            $('#change_log').val("");
-            $('#myModal').modal('toggle');
-            ToastrUtil.success('Published...');
+            last_saved_content = simplemde.value();
+            if(publish)
+                ToastrUtil.success('Saved and Published ...');
+            else
+                ToastrUtil.success('Saved ...');
         }
     });
-}/**
+    return false;
+}
+
+/**
  * Created by ali on 4/21/17.
  */

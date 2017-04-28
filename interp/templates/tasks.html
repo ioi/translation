@@ -32,14 +32,13 @@
                             <tr>
                                 <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
                                 <td id="td_{{ question.0 }}">
-                                    {% if question.2 == False or question.3  %}
-                                        <button  onclick="publishLastVersion({{ question.0 }})">
-                                            Publish Latest Version
+                                    {% if question.2 == False %}
+                                        <button  onclick="enableTask({{ question.0 }})">
+                                            Enable Task
                                         </button>
-                                    {% endif %}
-                                    {% if question.2 %}
-                                        <button  onclick="unpublishTask({{ question.0 }})">
-                                            Unpublish Task
+                                    {% else %}
+                                        <button  onclick="disableTask({{ question.0 }})">
+                                            Disable Task
                                         </button>
                                     {% endif %}
                                 </td>
@@ -59,9 +58,9 @@
           var parts = value.split("; " + name + "=");
           if (parts.length == 2) return parts.pop().split(";").shift();
         }
-        function publishLastVersion(questionId) {
+        function enableTask(questionId) {
             $.ajax({
-                url: " {% url 'publishtask' %}",
+                url: " {% url 'enabletask' %}",
                 data: {
                     'id': questionId,
                     csrfmiddlewaretoken: getCookie("csrftoken")
@@ -84,9 +83,13 @@
                 }
             });
         }
-        function unpublishTask(questionId) {
+        function disableTask(questionId) {
             $.ajax({
-                url: " {% url 'publishtask' %}" + '?' + $.param({"id": questionId}),
+                url: " {% url 'enabletask' %}" + '?' + $.param({"id": questionId}),
+                data: {
+                    'id': questionId,
+                },
+
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
                 },

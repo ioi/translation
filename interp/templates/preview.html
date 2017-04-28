@@ -16,7 +16,19 @@
     <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
     <script type="text/javascript" src="/static/js/preview.js"></script>
 
+    {% if text_font_base64  %}
 
+        <style>
+        @font-face {
+            font-family: 'OpenSans';
+            src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
+        }
+
+        body {
+            font-family: 'OpenSans';
+        }
+        </style>
+    {% endif %}
 
 
     <div class="col-sm-6 col-sm-offset-3" id="middle-container">

@@ -49,6 +49,7 @@ class Questions(LoginRequiredMixin,View):
             return HttpResponseForbidden("This task is freezed")
         return render(request, 'editor.html',
                           context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
+                                   'text_font_base64': user.text_font_base64,
                                    'quesId': id, 'language': str(user.language.name + '-' + user.country.name)})
 
 
@@ -95,6 +96,7 @@ class TranslatePreview(LoginRequiredMixin,View):
         return render(request, 'preview.html',
                           context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                    'quesId': id,
+                                   'text_font_base64': user.text_font_base64,
                                    'language': str(user.language.name + '-' + user.country.name)})
 
 
@@ -240,6 +242,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         context['country'] = trans.user.country.name
         context['language'] = trans.user.language.name
         context['contest'] = trans.task.contest
+        context['text_font_base64'] = user.text_font_base64
         self.cmd_options['footer-center'] = '%s [page] / [topage]' % trans.task.title
         return context
 

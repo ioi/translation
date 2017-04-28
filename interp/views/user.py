@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.http.response import HttpResponseRedirect
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -45,14 +46,11 @@ class Login(View):
 
 class Setting(LoginRequiredMixin,View):
     def post(self, request):
-        print (request.user.username)
+        text_font_base64 = request.POST.get('text_font_base64', '')
         user = User.objects.get(username=request.user.username)
-        if (request.POST.get('rtl') == 'on'):
-            user.language.rtl = True
-        else:
-            user.language.rtl = False
+        user.text_font_base64 = text_font_base64
         user.save()
-        return redirect(to=reverse('home'))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 class Logout(LoginRequiredMixin,View):

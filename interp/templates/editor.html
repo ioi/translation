@@ -15,7 +15,19 @@
     <script type="text/javascript" src="/static/libs/markdown/katex.js"></script>
     <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
     <script type="text/javascript" src="/static/js/editor.js"></script>
+    {% if text_font_base64  %}
 
+        <style>
+        @font-face {
+            font-family: 'OpenSans';
+            src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
+        }
+
+        body {
+            font-family: 'OpenSans';
+        }
+        </style>
+    {% endif %}
     <div class="row">
         <div class="col-sm-12" id="btn-container">
             <div class="panel panel-default">
@@ -46,7 +58,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-sm-6" id="left-container">
             <div class="panel panel-default">

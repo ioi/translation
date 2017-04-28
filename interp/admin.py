@@ -35,7 +35,7 @@ class CustomUserAdmin(UserAdmin):
     actions = ['send_EMAIL']
 
     fieldsets = (
-        (None, {'fields': ('username', 'email','password', 'first_name', 'last_name','language','country')}),
+        (None, {'fields': ('username', 'text_font_base64', 'email','password', 'first_name', 'last_name','language','country')}),
         )
     add_fieldsets = (
         (None, {

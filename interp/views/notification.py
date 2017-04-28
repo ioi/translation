@@ -1,4 +1,4 @@
-
+from django.shortcuts import render
 from django.views.generic import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,7 +10,11 @@ class Notifications(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         all_notifications = Notification.objects.all()
-        return JsonResponse(dict(notifications=get_all_notifs(request.user, all_notifications)))
+        if request.is_ajax():
+            return JsonResponse(dict(notifications=get_all_notifs(request.user, all_notifications)))
+        else:
+            return render(request, 'notifications.html',
+                          context={'notifications': all_notifications})
 
     def post(self, request, *args, **kwargs):
         if 'id' in request.POST:

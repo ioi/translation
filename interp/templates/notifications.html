@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <table class="table">
+                        <thead><tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                        </tr></thead>
+                        <tbody>
+                        {% for notif in notifications %}
+                            <tr>
+                                <td>{{notif.title}}</td>
+                                <td>{{notif.description}}</td>
+                                <td>{{notif.pub_date}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

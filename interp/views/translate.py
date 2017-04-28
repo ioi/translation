@@ -12,6 +12,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 
 from wkhtmltopdf.views import PDFTemplateView
 
+from interp.models import FlatPage
 from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER
 
 
@@ -20,13 +21,15 @@ class Home(LoginRequiredMixin,View):
         user = User.objects.get(username=request.user.username)
         # tasks = Task.objects.filter(is_published=True).values_list('id', 'title')
         tasks = []
+        home_flat_page = FlatPage.objects.filter(slug="home").first()
+        home_content = home_flat_page.content if home_flat_page else ''
         for task in Task.objects.filter(is_published=True):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             freeze = translation and translation.freeze
             tasks.append((task.id, task.title, is_editing, freeze, CONTEST_ORDER[task.contest]))
 
-        return render(request, 'questions.html', context={'tasks': tasks, 'language': user.credentials()})
+        return render(request, 'questions.html', context={'tasks': tasks, 'home_content': home_content, 'language': user.credentials()})
 
 
 class Questions(LoginRequiredMixin,View):

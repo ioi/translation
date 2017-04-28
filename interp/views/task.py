@@ -13,6 +13,7 @@ from interp.models import Task, User
 
 from wkhtmltopdf.views import PDFTemplateView
 
+
 class Tasks(ISCEditorCheckMixin,View):
     def get(self,request):
         # questions = Task.objects.values_list('id', 'title', 'is_published')

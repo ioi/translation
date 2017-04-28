@@ -152,9 +152,13 @@ def send_notif(sender, instance, created, *args, **kwargs):
 
 post_save.connect(send_notif, sender=Notification)
 
+
 class Attachment(models.Model):
     upload = models.FileField(upload_to='uploads/')
     title = models.CharField(max_length=100)
     create_time = models.DateTimeField('Date Created')
 
 
+class FlatPage(models.Model):
+    slug = models.CharField(max_length=100, db_index=True)
+    content = models.TextField(default=None)

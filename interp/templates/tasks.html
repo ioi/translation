@@ -10,6 +10,12 @@
                         {% csrf_token %}
                         <label for="task_title">Title: </label>
                         <input id="task_title" type="text" name="title">
+                        <select name="contest">
+                             <option value="Practice">Practice</option>
+                             <option value="Day 1">Day 1</option>
+                             <option value="Day 2">Day 2</option>
+
+                        </select>
                         <input type="submit" value="New Task">
                     </form>
 
@@ -25,18 +31,22 @@
                     <table class="table">
                         <thead><tr>
                             <th>Main Question</th>
+                            <th>Contest</th>
                             <th>Publish</th>
                         </tr></thead>
                         <tbody>
                         {% for question in questions %}
                             <tr>
                                 <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
+                                <td>{{question.4}}</td>
                                 <td id="td_{{ question.0 }}">
-                                    {% if question.2 == False %}
+                                    {% if question.2 == False and can_enable %}
+
                                         <button  onclick="enableTask({{ question.0 }})">
                                             Enable Task
                                         </button>
-                                    {% else %}
+                                    {% endif %}
+                                    {% if question.2%}
                                         <button  onclick="disableTask({{ question.0 }})">
                                             Disable Task
                                         </button>

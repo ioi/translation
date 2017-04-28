@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 
 from wkhtmltopdf.views import PDFTemplateView
 
-from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing
+from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER
 
 
 class Home(LoginRequiredMixin,View):
@@ -24,7 +24,7 @@ class Home(LoginRequiredMixin,View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             freeze = translation and translation.freeze
-            tasks.append((task.id, task.title, is_editing, freeze))
+            tasks.append((task.id, task.title, is_editing, freeze, CONTEST_ORDER[task.contest]))
 
         return render(request, 'questions.html', context={'tasks': tasks, 'language': user.credentials()})
 

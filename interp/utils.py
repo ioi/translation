@@ -70,6 +70,11 @@ class ISCEditorCheckMixin(LoginRequiredMixin, object):
         return super(ISCEditorCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
+# Task Contest Util
+
+
+CONTEST_ORDER ={'Day 2': 0, 'Day 1': 1, 'Practice': 2}
+
 # Cache Utils
 
 def get_user_unread_notifs_cache_key(user):

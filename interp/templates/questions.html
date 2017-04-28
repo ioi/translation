@@ -11,6 +11,7 @@
                     <table class="table table-center">
                         <thead><tr>
                             <th>Main Question</th>
+                            <th>ORDER</th>
                             <th colspan="3"></th>
                             <th>Is Editing?</th>
                             <th>Translation Status</th>
@@ -23,6 +24,9 @@
                                     {% elif question.2 %} <a href="{% url 'preview_translate' question.0 %}">{{ question.1 }}</a>
                                     {% else %} <a href="{% url 'question' question.0 %}">{{ question.1 }}</a>
                                     {% endif %}
+                                </td>
+                                <td>
+                                    {{ question.4 }}
                                 </td>
                                 <td><a href="{% url 'versions' question.0 %}">Translation Versions</a></td>
                                 <td><a href="{% url 'gettaskpdf'%}?id={{question.0}}">Task PDF</a></td>

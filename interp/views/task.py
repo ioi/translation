@@ -20,10 +20,10 @@ class Tasks(ISCEditorCheckMixin,View):
         questions = []
         for task in Task.objects.all():
             if task.is_published:
-                can_publsh_last_version = not task.versions.order_by('-create_time').first().published
-                questions.append( (task.id, task.title, task.is_published, can_publsh_last_version))
+                can_enable_task = task.versions.order_by('-create_time').first()
+                questions.append( (task.id, task.title, task.is_published, can_enable_task, task.contest))
             else:
-                questions.append((task.id, task.title, task.is_published, True))
+                questions.append((task.id, task.title, task.is_published, True, task.contest))
 
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language': user.credentials()})
@@ -31,7 +31,8 @@ class Tasks(ISCEditorCheckMixin,View):
 
     def post(self, request):
         title = request.POST['title']
-        new_task = Task.objects.create(title=title)
+        contest = request.POST['contest']
+        new_task = Task.objects.create(title=title, contest=contest)
         return redirect(to= reverse('edittask',kwargs = {'id': new_task.id}))
 
 
@@ -61,6 +62,7 @@ class SaveTask(ISCEditorCheckMixin,View):
         task.save()
         task.add_version(content, change_log, publish)
         return HttpResponse("done")
+
 
 class EnableTask(ISCEditorCheckMixin,View):
     def post(self, request):

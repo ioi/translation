@@ -62,6 +62,19 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
 
+class CheckTranslationEditAccess(LoginRequiredMixin, View):
+    def post(selfs, request, id):
+        edit_token = request.POST.get('edit_token', '')
+        task = Task.objects.get(id=id)
+        user = User.objects.get(username=request.user)
+        if not task.is_published:
+            return HttpResponseBadRequest("There is no published task")
+        translation = Translation.objects.get(user=user, task=task)
+        if user != translation.user:
+            return HttpResponseForbidden()
+        return JsonResponse({'is_editing': can_save_translate(translation, edit_token)})
+
+
 class TranslatePreview(LoginRequiredMixin,View):
     def get(self,request,id):
         user = User.objects.get(username=request.user)

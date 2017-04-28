@@ -225,6 +225,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         context['task_title'] = trans.task.title
         context['country'] = trans.user.country.name
         context['language'] = trans.user.language.name
+        context['contest'] = trans.task.contest
         return context
 
 

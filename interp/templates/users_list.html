@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <table class="table">
+                        <thead><tr>
+                            <th>Username</th>
+                            <th>Country</th>
+                            <th>Language</th>
+                            <th>RTL</th>
+                        </tr></thead>
+                        <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username}}</a></td>
+                                <td>{{user.country}}</td>
+                                <td>{{user.language}}</td>
+                                <td>{{user.language.rtl}}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

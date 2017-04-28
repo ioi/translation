@@ -89,8 +89,7 @@ class SaveQuestion(LoginRequiredMixin,View):
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
         translation = Translation.objects.get(user=user,task=task)
-        can_edit = is_translate_in_editing(translation) and can_save_translate(translation, edit_token)
-        if user != translation.user or not can_edit or translation.freeze:
+        if user != translation.user or not can_save_translate(translation, edit_token) or translation.freeze:
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()
@@ -147,8 +146,7 @@ class SaveVersionParticle(LoginRequiredMixin,View):
         user = User.objects.get(username=request.user.username)
         edit_token = request.POST.get('edit_token', '')
         translation = Translation.objects.get(user=user, task=task)
-        can_edit = is_translate_in_editing(translation) and can_save_translate(translation, edit_token)
-        if user != translation.user or not can_edit or translation.freeze:
+        if user != translation.user or not can_save_translate(translation, edit_token) or translation.freeze:
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         if translation.get_latest_text().strip() == content.strip():
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'Not Modified'})

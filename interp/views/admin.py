@@ -20,8 +20,13 @@ class UserTranslations(StaffCheckMixin, View):
                 translations.append((task.id, task.title, True, translation.id, translation.freeze, is_editing ))
             else:
                 translations.append((task.id, task.title, False, 'None', False, False))
-        print(translations)
         return render(request, 'user_translates.html', context={'translations': translations, 'language': user.credentials()})
+
+
+class UsersList(StaffCheckMixin, View):
+    def get(self, request):
+        users = User.objects.filter(is_staff=False)
+        return render(request, 'users_list.html', context={'users': users})
 
 
 class FreezeTranslation(StaffCheckMixin, View):

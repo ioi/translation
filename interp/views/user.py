@@ -10,9 +10,11 @@ from interp.models import User
 
 class FirstPage(View):
     def get(self, request, *args, **kwargs):
-        if request.user.is_superuser or request.user.groups.filter(name="staff").exists():
+        if request.user.is_superuser:
             return redirect(to=reverse('admin:index'))
-        if request.user.groups.filter(name="ISC_editor"):
+        if request.user.groups.filter(name="staff").exists():
+            return redirect(to=reverse('users_list'))
+        if request.user.groups.filter(name="ISC_editor").exists():
             return redirect(to=reverse('task'))
 
         if request.user.is_authenticated():

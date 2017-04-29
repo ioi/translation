@@ -2,10 +2,6 @@
     text-align: center;
 }
 
-.main-content {
-	padding: 71px 15px 0 15px;
-}
-
 .panel {
 	border-radius: 0;
 }
@@ -41,4 +37,45 @@
 #right-container .panel-body,
 #middle-container .panel-body{
 	padding: 0;
+}
+
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.panel {
+  margin: 0;
+  border-radius: 0;
+}
+
+
+.editor-panel
+{
+	height: 800px;
+	width: 100%;
+	margin: 0px;
+	border: 1px solid #ddd;
+	border-top: 0px;
+}
+
+.edit-pane
+{
+	float: left;
+	width:50%;
+	border-right: 1px solid #ddd;
+}
+
+.preview-pane
+{
+	margin: 0 0 0 50%;
+	min-height: 100%;
+	padding: 15px;
+	border-left: 1px solid #ddd;
+	background-color: #f5f5f5;
+}
+
+div.CodeMirror
+{
+  border: 0px;
 }

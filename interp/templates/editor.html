@@ -58,31 +58,19 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-6" id="left-container">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div id="left_text_box_container">
-                        {% if rtl %}
-                            <div id="left_rtl_plain_text_box" class="text-container" style="white-space: pre-wrap">{{ trans }}</div>
-                        {% else %}
-                            <div>
-                                <textarea id="left_ltr_plain_text_box" class="text-container">{{ trans }}</textarea>
-                            </div>
-                        {% endif %}
 
-                        <div id="left_rendered_text_box" class="text-container" style="white-space: pre-line;"></div>
-                    </div>
-                </div>
+    <div class="row editor-panel">
+        <div class="edit-pane">
+            <div  id="left_text_box_container">
+              {% if rtl %}
+                  <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
+              {% else %}
+                  <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
+              {% endif %}
             </div>
         </div>
-
-        <div class="col-sm-6" id="right-container">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div id="right_text_box" class="text-container" style="white-space: pre-line;">{{ task }}</div>
-                </div>
-            </div>
+        <div class="preview-pane">
+            <div id="right_text_box">{{ task }}</div>
         </div>
     </div>
 

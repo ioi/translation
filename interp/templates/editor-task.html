@@ -23,56 +23,54 @@
                 <div class="panel-body">
 
                     <div class="col-sm-6">
-                        <input class="form-control" value="{{ title }}" placeholder="Question Title" id="task-title">
+                        <div class="input-group">
+                          <span class="input-group-addon">Task</span>
+                          <input id="task-title" type="text" class="form-control" value="{{ title }}" placeholder="Task Name">
+                        </div>
+                        <!--label class="control-label col-sm-2" for="task-title">Task:</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" id="task-title" value="{{ title }}" placeholder="Task Name">
+                        </div-->
                     </div>
                     <div class="col-sm-6">
-                        <button class="btn btn-default" onclick="saveOrPublish(false)">Save</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Save And Publish</button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                          <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                              <div class="modal-body">
-                                  <textarea class="form-control" id="change-log" placeholder="Change Log Note" rows="12"></textarea>
-                              </div>
-                              <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary" onclick="saveOrPublish(true)">Save and Publish</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        <button class="btn btn-default" onclick="send_data()">Save</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Publish</button>
                     </div>
 
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-body">
+                              <textarea class="form-control" id="change-log" placeholder="Change Log Note" rows="12"></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="publishLastVersion()">Publish</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-sm-6" id="left-container">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <textarea id="task-markdown">{{ content }}</textarea>
-                </div>
+    <div class="row editor-panel">
+        <div class="edit-pane">
+            <div  id="left_text_box_container">
+              <textarea id="left_ltr_plain_text_box">{{ content }}</textarea>
             </div>
         </div>
-
-        <div class="col-sm-6" id="right-container">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div id="task-preview" class="text-container"></div>
-                </div>
-            </div>
+        <div class="preview-pane">
+            <div id="task-preview">{{ content }}</div>
         </div>
     </div>
-
-
 
     <script type="text/javascript">
         task_id = {{taskId}};
         save_task_url = "{% url 'savetask' %}";
+        publish_task_url = " {% url 'publishtask' %}";
         csrf_token = "{{csrf_token}}";
     </script>
 

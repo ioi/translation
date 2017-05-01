@@ -183,7 +183,7 @@ function onlinePreview() {
 
 function saveVersion() {
     current_trans_text = currentTranslationText();
-    var edit_token = sessionStorage.getItem('edit_translate_token')
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
         url: save_question_url,
         data: {
@@ -197,7 +197,7 @@ function saveVersion() {
 //            if (response.can_edit == false){
 //                window.location.replace(preview_url)
 //            }
-//            sessionStorage.setItem('edit_translate_token', response.edit_token)
+//            sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
             last_version_particle_text = current_trans_text;
             updateSyncTime();
             ToastrUtil.success('Successfully Saved ...');
@@ -213,7 +213,7 @@ function saveVersion() {
 
 function saveVersionParticle() {
     current_trans_text = currentTranslationText();
-    var edit_token = sessionStorage.getItem('edit_translate_token')
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     if (last_version_particle_text == current_trans_text)
         return;
     $.ajax({
@@ -229,7 +229,7 @@ function saveVersionParticle() {
 //            if (response.can_edit == false){
 //                window.location.replace(preview_url)
 //            }
-//            sessionStorage.setItem('edit_translate_token', response.edit_token)
+//            sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
             last_version_particle_text = current_trans_text;
             updateSyncTime();
         },
@@ -264,7 +264,7 @@ function getTaskVersions() {
 
 function getEditTranslateAccess() {
     //TODO remove lag for transition to preview_url
-    var edit_token = sessionStorage.getItem('edit_translate_token')
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
         url: access_edit_translate_url,
         data: {
@@ -277,7 +277,7 @@ function getEditTranslateAccess() {
             if (response.can_edit == false){
                 window.location.replace(preview_url)
             }
-            sessionStorage.setItem('edit_translate_token', response.edit_token)
+            sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
         },
         error: function () {
             window.location.replace(preview_url)

@@ -70,15 +70,18 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
-
+#TODO
 class UnleashEditTranslationToken(LoginRequiredMixin, View):
     def post(self, request, id):
         user = User.objects.get(username=request.user)
         trans = Translation.objects.filter(id=id).first()
+        edit_token = request.POST.get('edit_token', '')
         if trans is None:
             return HttpResponseNotFound("There is no task")
-        if not (user.is_superuser or user.groups.filter(name="staff").exists() or trans.user == user):
+        if not (user.is_superuser or user.groups.filter(name="staff").exists() or (
+                trans.user == user and can_save_translate(trans, edit_token))):
             return HttpResponseForbidden("You don't have acccess")
+
         unleash_edit_translation_token(trans)
         return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
 

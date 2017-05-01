@@ -1,11 +1,12 @@
 import markdown
 from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponseNotFound
+from django.urls.base import reverse
 from django.utils import timezone
 
 from django.views.generic import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from interp.models import User, Task, Translation, ContentVersion, VersionParticle
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
@@ -14,7 +15,8 @@ from wkhtmltopdf.views import PDFTemplateView
 
 from interp.models import FlatPage
 from interp.forms import UploadFileForm
-from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER
+from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER, \
+    unleash_edit_translation_token
 
 
 class Home(LoginRequiredMixin,View):
@@ -24,13 +26,15 @@ class Home(LoginRequiredMixin,View):
         tasks = []
         home_flat_page = FlatPage.objects.filter(slug="home").first()
         home_content = home_flat_page.content if home_flat_page else ''
+        tasks_by_contest = [[],[],[]]
         for task in Task.objects.filter(is_published=True):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             freeze = translation and translation.freeze
-            tasks.append((task.id, task.title, is_editing, freeze, CONTEST_ORDER[task.contest]))
+            tasks_by_contest[CONTEST_ORDER.get(task.contest,0)].append((task.id, task.title, is_editing, freeze))
+            tasks.append((task.id, task.title, is_editing, freeze))
 
-        return render(request, 'questions.html', context={'tasks': tasks, 'home_content': home_content, 'language': user.credentials()})
+        return render(request, 'questions.html', context={'tasks2': tasks, 'tasks_by_contest': tasks_by_contest, 'home_content': home_content, 'language': user.credentials()})
 
 
 class Questions(LoginRequiredMixin,View):
@@ -66,6 +70,17 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
+
+class UnleashEditTranslationToken(LoginRequiredMixin, View):
+    def post(self, request, id):
+        user = User.objects.get(username=request.user)
+        trans = Translation.objects.filter(id=id).first()
+        if trans is None:
+            return HttpResponseNotFound("There is no task")
+        if not (user.is_superuser or user.groups.filter(name="staff").exists() or trans.user == user):
+            return HttpResponseForbidden("You don't have acccess")
+        unleash_edit_translation_token(trans)
+        return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
 
 class CheckTranslationEditAccess(LoginRequiredMixin, View):
     def post(selfs, request, id):

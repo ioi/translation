@@ -1,41 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-  <div class="body container">
-    <h2>Day 1</h2>
-    <table class="table table-hover sortable">
-      <thead><tr>
-        <th>No</th>
-        <th width="15%">Task</th>
-        <th width="15%">Edit</th>
-        <th>Translation</th>
-        <th>ISC Version</th>
-      </tr></thead>
-      <tbody>
-      {% for question in tasks %}
-        <tr>
-          <td> {{ question.0 }} </td>
-          <td> {{ question.1 }} </td>
-          <td> {% if question.2 %} Is editing
-            {% else %}<a href="{% url 'question' question.0 %}">Edit</a>{% endif %}
-          </td>
-          <td>
-            <a href="{% url 'versions' question.0 %}" title="Markdown" class="btn btn-default"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-            <a href="{% url 'versions' question.0 %}" title="History" class="btn btn-default"><i class="fa fa-btns fa-history fa-lg"></i></a>
-            <a href="{% url 'gettranspdf'%}?id={{quesId}}" title="PDF" class="btn btn-default"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-            <a href="{% url 'mailtranspdf'%}?id={{quesId}}" title="Print" class="btn btn-default"><i class="fa fa-btns fa-print fa-lg"></i></a>
-          </td>
-          <td>
-            <a href="{% url 'taskVersions' question.0 %}" title="Markdown" class="btn btn-default"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-            <a href="{% url 'taskVersions' question.0 %}" title="History" class="btn btn-default"><i class="fa fa-btns fa-history fa-lg"></i></a>
-            <a href="{% url 'gettranspdf'%}?id={{quesId}}" title="PDF" class="btn btn-default"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-            <a href="{% url 'mailtranspdf'%}?id={{quesId}}" title="Print" class="btn btn-default"><i class="fa fa-btns fa-print fa-lg"></i></a>
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<div class="body container">
+       {{ home_content | safe }}
+</div>
+{% for tasks in tasks_by_contest %}
+  {% if tasks|length != 0 %}
+    <div class="body container">
+      <h2>
+        {% if 0 == forloop.counter0 %}
+          Day 2
+        {% elif 1 == forloop.counter0 %}
+          Day 1
+        {% else %}
+          Practice
+        {% endif %}
+      </h2>
+      <table class="table table-hover sortable">
+        <thead><tr>
+          <th>No</th>
+          <th width="15%">Task</th>
+          <th width="15%">Edit</th>
+          <th>Translation</th>
+          <th>ISC Version</th>
+        </tr></thead>
+        <tbody>
+        {% for question in tasks %}
+          <tr>
+            <td> {{ question.0 }} </td>
+            <td> {{ question.1 }} </td>
+            <td> {% if question.2 %} Is editing
+              {% else %}<a href="{% url 'question' question.0 %}">Edit</a>{% endif %}
+            </td>
+            <td>
+              <a href="{% url 'get_version_md'%}?type=translation&id={{question.0}}" title="Markdown" class="btn btn-default"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+              <a href="{% url 'versions' question.0 %}" title="History" class="btn btn-default"><i class="fa fa-btns fa-history fa-lg"></i></a>
+              <a href="{% url 'get_version_pdf'%}?type=translation&id={{question.0}}" title="PDF" class="btn btn-default"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+              <a href="{% url 'mailtranspdf'%}?id={{quesId}}" title="Print" class="btn btn-default"><i class="fa fa-btns fa-print fa-lg"></i></a>
+            </td>
+            <td>
+              <a href="{% url 'get_version_md'%}?type=task&id={{question.0}}" title="Markdown" class="btn btn-default"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+              <a href="{% url 'taskVersions' question.0 %}" title="History" class="btn btn-default"><i class="fa fa-btns fa-history fa-lg"></i></a>
+              <a href="{% url 'get_version_pdf'%}?type=task&id={{question.0}}" title="PDF" class="btn btn-default"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+              <a href="{% url 'mailtranspdf'%}?id={{quesId}}" title="Print" class="btn btn-default"><i class="fa fa-btns fa-print fa-lg"></i></a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endfor %}
 
 {% endblock %}

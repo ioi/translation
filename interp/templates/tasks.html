@@ -40,7 +40,7 @@
                                 <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
                                 <td>{{question.4}}</td>
                                 <td id="td_{{ question.0 }}">
-                                    {% if question.2 == False and can_enable %}
+                                    {% if not question.2 and question.3 %}
 
                                         <button  onclick="enableTask({{ question.0 }})">
                                             Enable Task

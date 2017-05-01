@@ -21,10 +21,10 @@ class Tasks(ISCEditorCheckMixin,View):
         questions = []
         for task in Task.objects.all():
             if task.is_published:
-                can_enable_task = task.versions.order_by('-create_time').first()
-                questions.append( (task.id, task.title, task.is_published, can_enable_task, task.contest))
+                questions.append( (task.id, task.title, task.is_published, False, task.contest))
             else:
-                questions.append((task.id, task.title, task.is_published, True, task.contest))
+                can_enable_task = task.versions.filter(published=True).first() is not None
+                questions.append((task.id, task.title, task.is_published, can_enable_task, task.contest))
 
         user = User.objects.get(username=request.user.username)
         return render(request, 'tasks.html', context={'questions': questions,'language': user.credentials()})
@@ -54,7 +54,7 @@ class SaveTask(ISCEditorCheckMixin,View):
         content = request.POST['content']
         title = request.POST['title']
         change_log = request.POST.get('change_log', "")
-        publish_raw = request.GET.get('publish', 'false')
+        publish_raw = request.POST.get('publish', 'false')
         publish = False
         if publish_raw == 'true':
             publish = True
@@ -83,14 +83,19 @@ class EnableTask(ISCEditorCheckMixin,View):
 
 class TaskVersions(LoginRequiredMixin,View):
     def get(self,request, id):
-        published_raw = request.GET.get('published', 'true')
+        # TODO
+        # published_raw = request.GET.get('published', 'false')
+        # published = False
+        # if published_raw == 'true':
+        #     published = True
+        user = User.objects.get(username=request.user.username)
         published = True
-        if published_raw == 'false':
+        if user.is_superuser or user.groups.filter(name="ISC_editor").exists():
             published = False
         task = Task.objects.get(id=id)
-        versions_query = task.versions
+        versions_query = task.versions.order_by('-create_time')
         if published:
-            versions_query = task.versions.filter(published=True)
+            versions_query = versions_query.filter(published=True)
         versions_values = versions_query.values('id', 'text', 'create_time', 'change_log')
         if request.is_ajax():
             return JsonResponse(dict(versions=list(versions_values)))

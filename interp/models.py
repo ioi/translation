@@ -38,6 +38,13 @@ class ContentVersion(models.Model):
     published = models.BooleanField(default=False)
     create_time = models.DateTimeField(default=timezone.now())
 
+    def can_view_by(self, user):
+        if self.content_type.model == 'translation' and self.content_object.user != user:
+            return False
+        if self.content_type.model == 'task' and self.content_object.is_published == False:
+            return False
+        return True
+
 
 class Task(models.Model):
     title = models.CharField(max_length=255, blank=False)
@@ -59,6 +66,12 @@ class Task(models.Model):
         latest_published_version = self.versions.filter(published=True).order_by('-create_time').first()
         if latest_published_version:
             return latest_published_version.text
+        return None
+
+    def get_latest_change_time(self):
+        latest_published_version = self.versions.filter(published=True).order_by('-create_time').first()
+        if latest_published_version:
+            return latest_published_version.create_time
         return None
 
     def __str__(self):
@@ -87,6 +100,17 @@ class Translation(models.Model):
                 return latest_version_particle.text
             return latest_version.text
         return ''
+
+    def get_latest_change_time(self):
+        latest_version = self.versions.order_by('-create_time').first()
+        latest_version_particle = self.versionparticle_set.order_by('-date_time').first()
+        if latest_version_particle:
+            return latest_version_particle.date_time
+        if latest_version:
+            if latest_version_particle and latest_version_particle.date_time > latest_version.create_time:
+                return latest_version_particle.date_time
+            return latest_version.create_time
+        return None
 
     def __str__(self):
         return "Title : "+ self.title + " id : " + str(self.id)

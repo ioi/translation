@@ -6,17 +6,11 @@
        {{ home_content | safe }}
 </div>
 {% endif %}
-{% for tasks in tasks_by_contest %}
-  {% if tasks|length != 0 %}
+{% for contest_tasks in tasks_lists %}
+
     <div class="body container">
       <h2>
-        {% if 0 == forloop.counter0 %}
-          Day 2
-        {% elif 1 == forloop.counter0 %}
-          Day 1
-        {% else %}
-          Practice
-        {% endif %}
+        {{contest_tasks.0}}
       </h2>
       <table class="table table-hover sortable">
         <thead><tr>
@@ -27,7 +21,7 @@
           <th>ISC Version</th>
         </tr></thead>
         <tbody>
-        {% for question in tasks %}
+        {% for question in contest_tasks.1 %}
           <tr>
             <td> {{ forloop.counter }} </td>
             <td> {{ question.1 }} </td>
@@ -52,7 +46,7 @@
         </tbody>
       </table>
     </div>
-  {% endif %}
+
 {% endfor %}
 
 {% endblock %}

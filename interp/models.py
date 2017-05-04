@@ -46,12 +46,23 @@ class ContentVersion(models.Model):
         return True
 
 
+class Contest(models.Model):
+    title = models.CharField(max_length=100, blank=False)
+    order = models.IntegerField()
+
+    def __repr__(self):
+        return "%d-%s" % (self.order, self.title)
+
+    def __str__(self):
+        return "%d-%s" % (self.order, self.title)
+
+
 class Task(models.Model):
     title = models.CharField(max_length=255, blank=False)
     id = models.AutoField(primary_key=True)
     is_published = models.BooleanField(default=False)
     versions = GenericRelation(ContentVersion)
-    contest = models.CharField(max_length=255, default="Day 1")
+    contest = models.ForeignKey('Contest', default=None)
 
     def add_version(self, text, change_log="", published=False):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(), change_log=change_log, published=published)

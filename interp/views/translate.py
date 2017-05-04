@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.views.generic import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from interp.models import User, Task, Translation, ContentVersion, VersionParticle
+from interp.models import User, Task, Translation, ContentVersion, VersionParticle, Contest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 
 from wkhtmltopdf.views import PDFTemplateView
@@ -26,14 +26,15 @@ class Home(LoginRequiredMixin,View):
         tasks = []
         home_flat_page = FlatPage.objects.filter(slug="home").first()
         home_content = home_flat_page.content if home_flat_page else ''
-        tasks_by_contest = [[],[],[]]
+        tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.filter(is_published=True):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             freeze = translation and translation.freeze
-            tasks_by_contest[CONTEST_ORDER.get(task.contest,0)].append((task.id, task.title, is_editing, freeze))
+            tasks_by_contest[task.contest].append((task.id, task.title, is_editing, freeze))
             tasks.append((task.id, task.title, is_editing, freeze))
-        return render(request, 'questions.html', context={'tasks2': tasks, 'tasks_by_contest': tasks_by_contest, 'home_content': home_content, 'language': user.credentials()})
+        tasks_lists = [(c.title, tasks_by_contest[c]) for c in Contest.objects.order_by('order') if len(tasks_by_contest[c]) > 0]
+        return render(request, 'questions.html', context={'tasks2': tasks, 'tasks_lists': tasks_lists, 'home_content': home_content, 'language': user.credentials()})
 
 
 class Questions(LoginRequiredMixin,View):

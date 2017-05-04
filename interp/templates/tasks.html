@@ -11,9 +11,9 @@
                         <label for="task_title">Title: </label>
                         <input id="task_title" type="text" name="title">
                         <select name="contest">
-                             <option value="Practice">Practice</option>
-                             <option value="Day 1">Day 1</option>
-                             <option value="Day 2">Day 2</option>
+                             {% for contest in contests %}
+                             <option value="{{contest.id}}">{{contest.title}}</option>
+                             {% endfor %}
 
                         </select>
                         <input type="submit" value="New Task">

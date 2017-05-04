@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
 from interp.utils import ISCEditorCheckMixin, AdminCheckMixin
-from interp.models import Task, User
+from interp.models import Task, User, Contest
 
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -27,12 +27,14 @@ class Tasks(ISCEditorCheckMixin,View):
                 questions.append((task.id, task.title, task.is_published, can_enable_task, task.contest))
 
         user = User.objects.get(username=request.user.username)
-        return render(request, 'tasks.html', context={'questions': questions,'language': user.credentials()})
+        contests = Contest.objects.order_by('order')
+        return render(request, 'tasks.html', context={'questions': questions, 'contests': contests, 'language': user.credentials()})
 
 
     def post(self, request):
         title = request.POST['title']
-        contest = request.POST['contest']
+        contest_id = request.POST['contest']
+        contest = Contest.objects.filter(id=contest_id).first()
         new_task = Task.objects.create(title=title, contest=contest)
         return redirect(to= reverse('edittask',kwargs = {'id': new_task.id}))
 

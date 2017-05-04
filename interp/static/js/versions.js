@@ -2,7 +2,8 @@ var version_url,
     particle_version_url,
     checkout_version_url,
     csrf_token,
-    ques_id;
+    ques_id,
+    version_to_revert_id;
 
 $(document).ready(function () {
     var cont = $('#original').text();
@@ -11,6 +12,8 @@ $(document).ready(function () {
 });
 
 function diff(id1, id2){
+
+    $('#version-' + id1).addClass('active').siblings().removeClass('active');
 
     if(!id2){
         view_version(id1);
@@ -61,3 +64,20 @@ function view_particle_version(id){
     });
 
 };
+
+function revert(version_id){
+    version_to_revert_id = version_id;
+}
+function revert_confirm(){
+    $.ajax({
+        url: checkout_version_url,
+        data: {
+            'id': version_to_revert_id,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+            location.reload();
+        },
+    });
+}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<br><br>
+    <div class="container">
+        <div class="col-sm-12">
+            <form action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
+               {% csrf_token %}
+              {{ form }}
+              <input type="submit">
+            </form>
+            </div>
+        </div>
+
+
+{% endblock %}

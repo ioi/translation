@@ -24,18 +24,22 @@
 	background: #f5f5f5;
 	padding: 15px;
 }
+
 #btn-container > .panel {
 	margin-bottom: 0 !important;
 }
-#left-container{
+
+#left-container {
 	padding-right: 0;
 }
-#right-container{
+
+#right-container {
 	padding-left: 0;
 }
+
 #left-container .panel-body,
 #right-container .panel-body,
-#middle-container .panel-body{
+#middle-container .panel-body {
 	padding: 0;
 }
 
@@ -50,8 +54,7 @@
 }
 
 
-.editor-panel
-{
+.editor-panel {
 	height: 800px;
 	width: 100%;
 	margin: 0px;
@@ -59,15 +62,13 @@
 	border-top: 0px;
 }
 
-.edit-pane
-{
+.edit-pane {
 	float: left;
 	width:50%;
 	border-right: 1px solid #ddd;
 }
 
-.preview-pane
-{
+.preview-pane {
 	margin: 0 0 0 50%;
 	min-height: 100%;
 	padding: 15px;
@@ -75,7 +76,15 @@
 	background-color: #f5f5f5;
 }
 
-div.CodeMirror
-{
+div.CodeMirror {
   border: 0px;
+}
+
+div.flatpage {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+span.notif-badge {
+  font-size: 14px;
 }

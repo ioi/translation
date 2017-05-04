@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="body container">
+{% if home_content %}
+<div class="body container flatpage">
        {{ home_content | safe }}
 </div>
+{% endif %}
 {% for tasks in tasks_by_contest %}
   {% if tasks|length != 0 %}
     <div class="body container">
@@ -27,7 +29,7 @@
         <tbody>
         {% for question in tasks %}
           <tr>
-            <td> {{ question.0 }} </td>
+            <td> {{ forloop.counter }} </td>
             <td> {{ question.1 }} </td>
             <td>
               {% if question.2 %} Is editing

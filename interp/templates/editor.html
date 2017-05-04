@@ -2,90 +2,89 @@
 
 {% block content %}
 
-    <link rel="stylesheet" href="/static/libs/markdown/simplemde.min.css">
-    <link rel="stylesheet" href="/static/libs/markdown/editor.css">
-    <link rel="stylesheet" href="/static/libs/markdown/katex.css">
+  <link rel="stylesheet" href="/static/libs/markdown/simplemde.min.css">
+  <link rel="stylesheet" href="/static/libs/markdown/editor.css">
+  <link rel="stylesheet" href="/static/libs/markdown/katex.css">
 
-    <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/simplemde.min.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/libs.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/syntax.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/buttons.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/editor.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/katex.js"></script>
-    <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
-    <script type="text/javascript" src="/static/js/editor.js"></script>
-    {% if text_font_base64  %}
+  <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/simplemde.min.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/libs.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/syntax.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/buttons.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/editor.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/katex.js"></script>
+  <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
+  <script type="text/javascript" src="/static/js/editor.js"></script>
+  {% if text_font_base64  %}
 
-        <style>
-        @font-face {
-            font-family: 'OpenSans';
-            src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
-        }
+    <style>
+    @font-face {
+      font-family: 'OpenSans';
+      src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
+    }
 
-        body {
-            font-family: 'OpenSans';
-        }
-        </style>
-    {% endif %}
-    <div class="row">
-        <div class="col-sm-12" id="btn-container">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
-                    <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-                    <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-print fa-lg"></i></a>
-                    <button id="interactive-btn" class="btn btn-default"
-                            onclick="updateInteractive()"
-                            data-toggle="tooltip" data-placement="top" title="Change Interactive">
-                        <i class="fa fa-btn fa-columns fa-lg"></i>
-                    </button>
+    body {
+      font-family: 'OpenSans';
+    }
+    </style>
+  {% endif %}
+  <div class="row">
+    <div class="col-sm-12" id="btn-container">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
+          <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
+          <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-print fa-lg"></i></a>
+          <button id="interactive-btn" class="btn btn-default"
+              onclick="updateInteractive()"
+              data-toggle="tooltip" data-placement="top" title="Change Interactive">
+            <i class="fa fa-btn fa-columns fa-lg"></i>
+          </button>
 
-                    <button id="markdown-btn" class="btn btn-default"
-                            onclick="updateMarkdown()"
-                            data-toggle="tooltip" data-placement="top" title="Markdown vs. Preview">
-                        <i class="fa fa-btn fa-code fa-lg"></i>
-                    </button>
+          <button id="markdown-btn" class="btn btn-default"
+              onclick="updateMarkdown()"
+              data-toggle="tooltip" data-placement="top" title="Markdown vs. Preview">
+            <i class="fa fa-btn fa-code fa-lg"></i>
+          </button>
 
-                    <button id="diff-btn" class="btn btn-default"
-                            onclick="updateDiff()"
-                            data-toggle="tooltip" data-placement="top" title="Diff">
-                        <i class="fa fa-btn fa-git fa-lg"></i>
-                    </button>
+          <button id="diff-btn" class="btn btn-default"
+              onclick="updateDiff()"
+              data-toggle="tooltip" data-placement="top" title="Diff">
+            <i class="fa fa-btn fa-git fa-lg"></i>
+          </button>
 
-                    <select class="form-control pull-right" id="diff-selectbox" onchange="updateVersion()"></select>
-                </div>
-            </div>
+          <select class="form-control pull-right" id="diff-selectbox" onchange="updateVersion()"></select>
         </div>
+      </div>
     </div>
+  </div>
 
-    <div class="row editor-panel">
-        <div class="edit-pane">
-            <div  id="left_text_box_container" onkeydown="checkIfCanChange()">
-              {% if rtl %}
-                  <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
-              {% else %}
-                  <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
-              {% endif %}
-            </div>
-        </div>
-        <div class="preview-pane">
-            <div id="right_text_box">{{ task }}</div>
-        </div>
+  <div class="row editor-panel">
+    <div class="edit-pane">
+      <div  id="left_text_box_container" onkeydown="checkIfCanChange()">
+        {% if rtl %}
+          <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
+        {% else %}
+          <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
+        {% endif %}
+      </div>
     </div>
+    <div class="preview-pane">
+      <div id="right_text_box">{{ task }}</div>
+    </div>
+  </div>
 
-    <script type="text/javascript">
-        ques_id = {{quesId}};
-        version_particle_url = "{% url 'saveVersionParticle' %}";
-        access_edit_translate_url = "{% url 'access_edit_translate' id=quesId %}";
-        unleash_trans_token_url = "{% url 'unleash_trans_token' id=quesId %}";
-        preview_url = "{% url 'preview_translate' id=quesId%}";
-        save_question_url = "{% url 'saveQuestion' %}";
-        task_version_url = "{% url 'taskVersions' id=quesId %}";
-        csrf_token = "{{csrf_token}}";
-        rtl = '{{rtl}}' == 'True';
+  <script type="text/javascript">
+      ques_id = {{quesId}};
+      version_particle_url = "{% url 'saveVersionParticle' %}";
+      access_edit_translate_url = "{% url 'access_edit_translate' id=quesId %}";
+      unleash_trans_token_url = "{% url 'unleash_trans_token' id=quesId %}";
+      preview_url = "{% url 'preview_translate' id=quesId%}";
+      save_question_url = "{% url 'saveQuestion' %}";
+      task_version_url = "{% url 'taskVersions' id=quesId %}";
+      csrf_token = "{{csrf_token}}";
+      rtl = '{{rtl}}' == 'True';
 
-    </script>
-
+  </script>
 
 {% endblock %}

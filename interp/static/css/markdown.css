@@ -50,16 +50,17 @@
 	direction:ltr;
 	background:#eee;
 	padding:10px 20px;
-	font-family:"Courier New",monospace;
 	letter-spacing:-1px;
 	margin-bottom:10px;
 	word-wrap:break-all;
 }
 .preview-pane code {
 	direction:ltr;
-	font-family:"Courier New",monospace;
 	letter-spacing:-1px;
 	word-wrap:break-all;
+	color: #666;
+	background-color: transparent;
+	padding: 0;
 }
 .preview-pane strong {
 	font-weight:bold;

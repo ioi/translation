@@ -61,7 +61,7 @@
              aria-expanded="false">{{ user.username }} <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="#"></a></li>
-            <li><a href="#">Setting</a></li>
+            <li><a href="{% url 'settings'%}">Setting</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
           </ul>

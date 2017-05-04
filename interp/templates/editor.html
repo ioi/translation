@@ -19,12 +19,12 @@
 
     <style>
     @font-face {
-      font-family: 'OpenSans';
+      font-family: 'CustomTextFont';
       src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
     }
 
-    body {
-      font-family: 'OpenSans';
+    #editor_panel {
+      font-family: 'CustomTextFont';
     }
     </style>
   {% endif %}
@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <div class="row editor-panel">
+  <div id="editor_panel" class="row editor-panel">
     <div class="edit-pane">
       <div  id="left_text_box_container" onkeydown="checkIfCanChange()">
         {% if rtl %}

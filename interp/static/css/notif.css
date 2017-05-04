@@ -1,5 +1,5 @@
 .notif-dropdown-menu {
-	width: 200px;
+	width: 300px;
 	max-height: 450px;
 	overflow-y: auto;
 }
@@ -46,7 +46,7 @@
 	background-color: transparent;
 }
 .notif-dropdown-menu li.see-all {
-	margin-bottom: 10px;
+	margin-bottom: 0px;
 }
 .notif-dropdown-menu li.see-all a {
 	font-size: 11px;

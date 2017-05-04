@@ -35,7 +35,6 @@ function getNotifications() {
             var dropdown = $("#notification-dropdown");
             var seeAll = $("#see-all");
             dropdown.empty();
-            dropdown.append(seeAll);
             
             /**
              * add li element for each notification
@@ -61,6 +60,7 @@ function getNotifications() {
                 if(!this.read)unread_count++;
             });
 
+            dropdown.append(seeAll);
             if(unread_count != 0){
                 $('#notif-badge').text(unread_count);
                 $('#notif-badge').show();

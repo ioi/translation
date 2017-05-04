@@ -53,7 +53,9 @@
         <li class="dropdown">
           <span class="notif-badge" id="notif-badge" style="display: none"></span>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>
-          <ul class="dropdown-menu notif-dropdown-menu" id="notification-dropdown"></ul>
+          <ul class="dropdown-menu notif-dropdown-menu" id="notification-dropdown">
+              <li id="see-all" class="see-all"><a href="{% url 'notifications' %}">see all notifications</a></li>
+          </ul>
         </li>
 
         <li class="dropdown">

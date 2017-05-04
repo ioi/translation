@@ -33,8 +33,10 @@ function getNotifications() {
             var unread_count = 0;
             var notifications = response.notifications;
             var dropdown = $("#notification-dropdown");
+            var seeAll = $("#see-all");
             dropdown.empty();
-
+            dropdown.append(seeAll);
+            
             /**
              * add li element for each notification
              * apply suitable class based on read or unread
@@ -59,11 +61,6 @@ function getNotifications() {
                 if(!this.read)unread_count++;
             });
 
-            /** add read all button */
-            var container = $('<a></a>').attr('onclick', 'readAllNotification()').text('Read All');
-            var item = $("<li></li>");
-            item.append(container);
-            dropdown.append(item);
             if(unread_count != 0){
                 $('#notif-badge').text(unread_count);
                 $('#notif-badge').show();

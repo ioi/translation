@@ -37,7 +37,7 @@ function online_preview() {
     renderMathInElement(document.getElementById("task-preview"));
 }
 
-function saveOrPublish(publish) {
+function save(publish) {
     $.ajax({
         url: save_task_url,
         data: {
@@ -51,10 +51,11 @@ function saveOrPublish(publish) {
         type: "POST",
         success: function (response) {
             last_saved_content = simplemde.value();
-            if(publish)
-                ToastrUtil.success('Saved and Published ...');
+            $('#saveModal').modal('hide');
+            if (publish)
+                ToastrUtil.success('Saved and Published...');
             else
-                ToastrUtil.success('Saved ...');
+                ToastrUtil.success('Saved...');
         }
     });
     return false;

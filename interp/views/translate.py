@@ -33,7 +33,6 @@ class Home(LoginRequiredMixin,View):
             freeze = translation and translation.freeze
             tasks_by_contest[CONTEST_ORDER.get(task.contest,0)].append((task.id, task.title, is_editing, freeze))
             tasks.append((task.id, task.title, is_editing, freeze))
-
         return render(request, 'questions.html', context={'tasks2': tasks, 'tasks_by_contest': tasks_by_contest, 'home_content': home_content, 'language': user.credentials()})
 
 
@@ -70,20 +69,22 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
+
 #TODO
 class UnleashEditTranslationToken(LoginRequiredMixin, View):
     def post(self, request, id):
         user = User.objects.get(username=request.user)
-        trans = Translation.objects.filter(id=id).first()
+        task = Task.objects.get(id=id)
+        trans = Translation.objects.get(user=user, task=task)
         edit_token = request.POST.get('edit_token', '')
         if trans is None:
             return HttpResponseNotFound("There is no task")
         if not (user.is_superuser or user.groups.filter(name="staff").exists() or (
                 trans.user == user and can_save_translate(trans, edit_token))):
             return HttpResponseForbidden("You don't have acccess")
-
         unleash_edit_translation_token(trans)
         return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
+
 
 class CheckTranslationEditAccess(LoginRequiredMixin, View):
     def post(selfs, request, id):
@@ -130,8 +131,7 @@ class SaveQuestion(LoginRequiredMixin,View):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()
-        can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
-        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
+        return JsonResponse({'success': True})
 
 
 class CheckoutVersion(LoginRequiredMixin,View):
@@ -206,8 +206,7 @@ class SaveVersionParticle(LoginRequiredMixin,View):
             last_version_particle.save()
         else:
             last_version_particle = VersionParticle.objects.create(translation=translation, text=content, date_time=timezone.now())
-        can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
-        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
+        return JsonResponse({'success': True})
 
 
 class GetTranslatePreview(LoginRequiredMixin,View):

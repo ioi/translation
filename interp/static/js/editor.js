@@ -1,8 +1,9 @@
 var task_text, translation_text;
 var ques_id;
-var version_particle_url, save_question_url , task_version_url, access_edit_translate_url, preview_url;
+var version_particle_url, save_question_url , task_version_url, access_edit_translate_url,
+        preview_url, unleash_trans_token_url;
 var csrf_token;
-
+var last_time_get_edit_token;
 var latest_translation_text;
 var online_prev;
 var simplemde;
@@ -11,7 +12,7 @@ var rtl;
 var task_versions;
 var last_task_version_text;
 var last_version_particle_text;
-
+var update_token_interval = 60 * 1000;
 
 var interactive_checkbox;
 var markdown_checkbox;
@@ -68,7 +69,8 @@ $(document).ready(function(){
         diff_checkbox = false;
         updateInteractive();
 
-        window.setInterval(saveVersionParticle, 60*1000)
+        last_version_particle_text = currentTranslationText();
+        window.setInterval(saveVersionParticle, update_token_interval)
 //        window.setInterval(getEditTranslateAccess, 10*60*1000)
         getTaskVersions();
 });
@@ -182,6 +184,7 @@ function onlinePreview() {
 }
 
 function saveVersion() {
+    getEditTranslateAccess();
     current_trans_text = currentTranslationText();
     var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
@@ -194,9 +197,10 @@ function saveVersion() {
         },
         type: "POST",
         success: function (response) {
-//            if (response.can_edit == false){
-//                window.location.replace(preview_url)
-//            }
+            if (response.can_edit == false){
+                window.location.replace(preview_url)
+            }
+//            last_time_get_edit_token = new Date();
 //            sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
             last_version_particle_text = current_trans_text;
             updateSyncTime();
@@ -213,9 +217,10 @@ function saveVersion() {
 
 function saveVersionParticle() {
     current_trans_text = currentTranslationText();
-    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     if (last_version_particle_text == current_trans_text)
         return;
+    getEditTranslateAccess();
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
         url: version_particle_url,
         data: {
@@ -226,10 +231,9 @@ function saveVersionParticle() {
         },
         type: "POST",
         success: function (response) {
-//            if (response.can_edit == false){
-//                window.location.replace(preview_url)
-//            }
-//            sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
+            if (response.can_edit == false){
+                window.location.replace(preview_url)
+            }
             last_version_particle_text = current_trans_text;
             updateSyncTime();
         },
@@ -266,6 +270,7 @@ function getEditTranslateAccess() {
     //TODO remove lag for transition to preview_url
     var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
+        async: false,
         url: access_edit_translate_url,
         data: {
             id: ques_id,
@@ -277,10 +282,35 @@ function getEditTranslateAccess() {
             if (response.can_edit == false){
                 window.location.replace(preview_url)
             }
+            last_time_get_edit_token = new Date();
             sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
         },
         error: function () {
             window.location.replace(preview_url)
         }
     });
+}
+
+window.onbeforeunload = function (e) {
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
+    $.ajax({
+        async: false,
+        url: unleash_trans_token_url,
+        data: {
+            id: ques_id,
+            edit_token: edit_token,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+        },
+        error: function () {
+        }
+    });
+};
+
+function checkIfCanChange(){
+    current_date = new Date();
+    if ((current_date - last_time_get_edit_token) >  update_token_interval)
+        getEditTranslateAccess();
 }

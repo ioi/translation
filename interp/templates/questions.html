@@ -29,7 +29,8 @@
           <tr>
             <td> {{ question.0 }} </td>
             <td> {{ question.1 }} </td>
-            <td> {% if question.2 %} Is editing
+            <td>
+              {% if question.2 %} Is editing
               {% else %}<a href="{% url 'question' question.0 %}">Edit</a>{% endif %}
             </td>
             <td>

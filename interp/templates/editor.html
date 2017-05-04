@@ -61,7 +61,7 @@
 
     <div class="row editor-panel">
         <div class="edit-pane">
-            <div  id="left_text_box_container">
+            <div  id="left_text_box_container" onkeydown="checkIfCanChange()">
               {% if rtl %}
                   <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
               {% else %}
@@ -78,11 +78,13 @@
         ques_id = {{quesId}};
         version_particle_url = "{% url 'saveVersionParticle' %}";
         access_edit_translate_url = "{% url 'access_edit_translate' id=quesId %}";
+        unleash_trans_token_url = "{% url 'unleash_trans_token' id=quesId %}";
         preview_url = "{% url 'preview_translate' id=quesId%}";
         save_question_url = "{% url 'saveQuestion' %}";
         task_version_url = "{% url 'taskVersions' id=quesId %}";
         csrf_token = "{{csrf_token}}";
         rtl = '{{rtl}}' == 'True';
+
     </script>
 
 

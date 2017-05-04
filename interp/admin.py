@@ -61,6 +61,7 @@ class CustomUserAdmin(UserAdmin):
     send_EMAIL.short_description = "Send an email to selected users"
 
 
+admin.site.register(Contest)
 admin.site.register(FlatPage)
 admin.site.register(Task)
 admin.site.register(Translation)

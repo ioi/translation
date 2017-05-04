@@ -19,20 +19,19 @@
 
     <style>
     @font-face {
-      font-family: 'OpenSans';
+      font-family: 'CustomTextFont';
       src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
     }
 
-    body {
-      font-family: 'OpenSans';
+    #editor_panel {
+      font-family: 'CustomTextFont';
     }
     </style>
   {% endif %}
+
   <div class="row">
-    <div class="col-sm-12" id="btn-container">
-      <div class="panel panel-default">
-        <div class="panel-body">
-            <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
+    <div class="btn-container">
+        <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
             <a href="{% url 'versions' quesId %}" title="History" class="btn btn-default"><i class="fa fa-btns fa-history fa-lg"></i></a>
             <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
             <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-print fa-lg"></i></a>
@@ -42,24 +41,22 @@
                 <button type="button" id="isc-preview-btn" class="btn btn-default" onclick="onIscPreviewClick()">ISC Preview</button>
                 <button type="button" id="isc-markdown-btn" class="btn btn-default" onclick="onIscMarkdownClick()">ISC Markdown</button>
             </div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <div class="row editor-panel">
-    <div class="edit-pane">
-      <div  id="left_text_box_container" onkeydown="checkIfCanChange()">
-        {% if rtl %}
-          <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
-        {% else %}
-          <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
-        {% endif %}
+  <div class="row">
+      <div class="col-sm-6 edit-pane" style="padding: 0;">
+        <div id="left_text_box_container" onkeydown="checkIfCanChange()">
+          {% if rtl %}
+            <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
+          {% else %}
+            <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
+          {% endif %}
+        </div>
       </div>
-    </div>
-    <div class="preview-pane">
-      <div id="right_text_box">{{ task }}</div>
-    </div>
+      <div class="col-sm-6 preview-pane">
+        <div id="right_text_box">{{ task }}</div>
+      </div>
   </div>
 
   <script type="text/javascript">

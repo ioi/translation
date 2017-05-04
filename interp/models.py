@@ -12,17 +12,17 @@ from interp.utils import add_notification_to_users_cache
 
 
 class User(User):
-    display_name = models.CharField(max_length=255)
     language = models.ForeignKey('Language')
     country = models.ForeignKey('Country')
     text_font_base64 = models.TextField(default='')
+    digit_font_base64 = models.TextField(default='')
     raw_password = models.CharField(max_length=255,default='')
 
     def __str__(self):
         return self.username
 
     def credentials(self):
-        return self.language.name + '-' + self.country.name
+        return self.country.name + '_' + self.language.name
 
     @staticmethod
     def get_translators():
@@ -34,27 +34,39 @@ class ContentVersion(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     text = models.TextField()
-    change_log = models.CharField(max_length=255, blank=True)
-    published = models.BooleanField(default=False)
+    release_note = models.CharField(max_length=255, blank=True)
+    released = models.BooleanField(default=False)
     create_time = models.DateTimeField(default=timezone.now())
 
     def can_view_by(self, user):
         if self.content_type.model == 'translation' and self.content_object.user != user:
             return False
-        if self.content_type.model == 'task' and self.content_object.is_published == False:
+        if self.content_type.model == 'task' and self.content_object.enabled == False:
             return False
         return True
 
 
+class Contest(models.Model):
+    title = models.CharField(max_length=100, blank=False)
+    order = models.IntegerField()
+
+    def __repr__(self):
+        return "%d-%s" % (self.order, self.title)
+
+    def __str__(self):
+        return "%d-%s" % (self.order, self.title)
+
+
 class Task(models.Model):
     title = models.CharField(max_length=255, blank=False)
-    id = models.AutoField(primary_key=True)
-    is_published = models.BooleanField(default=False)
+    enabled = models.BooleanField(default=False)
     versions = GenericRelation(ContentVersion)
-    contest = models.CharField(max_length=255, default="Day 1")
+    contest = models.ForeignKey('Contest', default=None)
+    uploaded_file = models.FileField(upload_to='uploads/')
 
-    def add_version(self, text, change_log="", published=False):
-        return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(), change_log=change_log, published=published)
+    def add_version(self, text, release_note="", released=False):
+        return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),
+                                             release_note=release_note, released=released)
 
     def get_latest_text(self):
         latest_version = self.versions.order_by('-create_time').first()
@@ -63,52 +75,49 @@ class Task(models.Model):
         return ''
 
     def get_published_text(self):
-        latest_published_version = self.versions.filter(published=True).order_by('-create_time').first()
+        latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
         if latest_published_version:
             return latest_published_version.text
         return None
 
     def get_latest_change_time(self):
-        latest_published_version = self.versions.filter(published=True).order_by('-create_time').first()
+        latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
         if latest_published_version:
             return latest_published_version.create_time
         return None
 
     def __str__(self):
-        return "title : " + self.title + " id :" + str(self.id)
+        return "title : " + str(self.title) + " id :" + str(self.id)
 
 
 class Translation(models.Model):
-    title = models.CharField(max_length=255, blank=False)
     user = models.ForeignKey('User')
     task = models.ForeignKey('Task', default=0)
-    id = models.AutoField(primary_key=True)
-    language = models.ForeignKey('Language')
     versions = GenericRelation(ContentVersion)
-    freeze = models.BooleanField(default=False)
+    freezed = models.BooleanField(default=False)
 
     def add_version(self, text):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now())
 
     def get_latest_text(self):
         latest_version = self.versions.order_by('-create_time').first()
-        latest_version_particle = self.versionparticle_set.order_by('-date_time').first()
+        latest_version_particle = self.versionparticle_set.order_by('-create_time').first()
         if latest_version_particle:
             return latest_version_particle.text
         if latest_version:
-            if latest_version_particle and latest_version_particle.date_time > latest_version.create_time:
+            if latest_version_particle and latest_version_particle.create_time > latest_version.create_time:
                 return latest_version_particle.text
             return latest_version.text
         return ''
 
     def get_latest_change_time(self):
         latest_version = self.versions.order_by('-create_time').first()
-        latest_version_particle = self.versionparticle_set.order_by('-date_time').first()
+        latest_version_particle = self.versionparticle_set.order_by('-create_time').first()
         if latest_version_particle:
-            return latest_version_particle.date_time
+            return latest_version_particle.create_time
         if latest_version:
-            if latest_version_particle and latest_version_particle.date_time > latest_version.create_time:
-                return latest_version_particle.date_time
+            if latest_version_particle and latest_version_particle.create_time > latest_version.create_time:
+                return latest_version_particle.create_time
             return latest_version.create_time
         return None
 
@@ -118,32 +127,25 @@ class Translation(models.Model):
 
 class Language(models.Model):
     name = models.CharField(max_length=255,primary_key=True)
-    abbreviation = models.CharField(max_length=255,default='')
+    code = models.CharField(max_length=255,default='')
     rtl = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
+
 
 class Country(models.Model):
     name = models.CharField(max_length=255,primary_key=True)
-    abbreviation = models.CharField(max_length=255,default='')
+    code = models.CharField(max_length=255,default='')
+
     def __str__(self):
         return self.name
 
 
-# class Version(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     translation = models.ForeignKey('Translation')
-#     text = models.TextField()
-#     date_time = models.DateTimeField(default=datetime.datetime.now())
-#
-#     def __str__(self):
-#         return "id : " + str(self.id) + " Translation : " + self.translation.title
-
 class VersionParticle(models.Model):
-    id = models.AutoField(primary_key=True)
     translation = models.ForeignKey('Translation')
     text = models.TextField(default=None)
-    date_time = models.DateTimeField(default=timezone.now())
+    create_time = models.DateTimeField(default=timezone.now())
 
     def __str__(self):
         return "id : " + str(self.id) + " Translation : " + self.translation.title
@@ -163,7 +165,7 @@ class VersionParticle(models.Model):
 class Notification(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300)
-    pub_date = models.DateTimeField('date published')
+    create_time = models.DateTimeField()
 
 
 def send_notif(sender, instance, created, *args, **kwargs):
@@ -178,11 +180,11 @@ post_save.connect(send_notif, sender=Notification)
 
 
 class Attachment(models.Model):
-    upload = models.FileField(upload_to='uploads/')
+    uploaded_file = models.FileField(upload_to='uploads/')
     title = models.CharField(max_length=100)
     create_time = models.DateTimeField('Date Created')
 
 
 class FlatPage(models.Model):
-    slug = models.CharField(max_length=100, db_index=True)
+    slug = models.CharField(max_length=100, primary_key=True)
     content = models.TextField(default=None)

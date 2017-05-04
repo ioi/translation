@@ -158,14 +158,14 @@ class Versions(LoginRequiredMixin,View):
 
         v = []
         vp = []
-        versions = trans.versions.all()
-        version_particles = VersionParticle.objects.filter(translation=trans).order_by('date_time')
+        versions = trans.versions.all().order_by('-create_time')
+        version_particles = VersionParticle.objects.filter(translation=trans).order_by('-date_time')
         for item in version_particles:
             vp.append((item.id,item.date_time))
         for item in versions:
             v.append((item.id,item.create_time))
 
-        return render(request,'versions.html', context={'versions' : v , 'versionParticles':vp ,'translation' : trans.get_latest_text(), 'quesId':trans.id})
+        return render(request,'versions.html', context={'versions' : v , 'versionParticles':vp ,'translation' : trans.get_latest_text(), 'quesId':trans.id, 'taskTitle': task.title})
 
 
 class GetVersion(LoginRequiredMixin,View):

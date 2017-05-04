@@ -1,5 +1,6 @@
 
 {% extends "base.html" %}
+{% load list_filter %}
 
 {% block content %}
 
@@ -12,19 +13,22 @@
         <div class="panel panel-default">
             <div class="panel-body">
 
-                <table class="table">
+                <table class="table table-version">
                     <thead><tr>
-                        <td><button class="btn btn-default" onclick="diff()">Diff</button></td>
-                        <td colspan="">{{ task_title }}</td>
+                        <td colspan="2">{{ task_title }}</td>
                     </tr></thead>
                     <tbody>
                     {% for version in versions %}
-                        <tr class="version" style="cursor: pointer">
-                            <td><input type="checkbox" id="{{ version.id }}" onchange="changeCheckbox({{ version.id }}, {{ version.id }})"></td>
-                            <td>{{ version.create_time }}</td>
+                        {% with next_element=versions|next:forloop.counter0 %}
+                        {% with previous_element=versions|previous:forloop.counter0 %}
+
+                        <tr onclick="diff({{ version.id }},{{ next_element.id }})">
+                            <td>{{ version.create_time | date:"M j, H:i" }}</td>
                             <td>{{ version.change_log }}</td>
-                            <td><button class="btn btn-default" onclick="view_version({{ version.id }})" >View</button></td>
                         </tr>
+
+                        {% endwith %}
+                        {% endwith %}
                     {% endfor %}
                     </tbody>
                 </table>

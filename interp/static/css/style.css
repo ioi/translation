@@ -29,3 +29,12 @@ h1{font-size:50px; font-weight: 200; color: #555; margin-bottom: 20px;}
 h2{font-size: 30px; font-weight: 300; color:#444; margin: 30px 0}
 h3{font-size: 20px; font-weight: 400; margin: 20px 0;}
 h4{font-size:18px; font-weight: 400}
+
+.table-version thead tr td{
+	font-size: 18px;
+	font-weight: 700;
+	text-align: center;
+}
+.table-version tbody tr {
+	cursor: pointer;
+}

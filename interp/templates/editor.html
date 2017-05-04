@@ -28,50 +28,47 @@
     }
     </style>
   {% endif %}
+
   <div class="row">
-    <div class="col-sm-12" id="btn-container">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
-          <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-          <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-print fa-lg"></i></a>
-          <button id="interactive-btn" class="btn btn-default"
-              onclick="updateInteractive()"
-              data-toggle="tooltip" data-placement="top" title="Change Interactive">
-            <i class="fa fa-btn fa-columns fa-lg"></i>
-          </button>
+    <div class="btn-container">
+        <button class="btn btn-default" onclick="saveVersion()"><i class="fa fa-btn fa-save fa-lg"></i></button>
+        <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
+        <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default"><i class="fa fa-btn fa-print fa-lg"></i></a>
+        <button id="interactive-btn" class="btn btn-default"
+            onclick="updateInteractive()"
+            data-toggle="tooltip" data-placement="top" title="Change Interactive">
+          <i class="fa fa-btn fa-columns fa-lg"></i>
+        </button>
 
-          <button id="markdown-btn" class="btn btn-default"
-              onclick="updateMarkdown()"
-              data-toggle="tooltip" data-placement="top" title="Markdown vs. Preview">
-            <i class="fa fa-btn fa-code fa-lg"></i>
-          </button>
+        <button id="markdown-btn" class="btn btn-default"
+            onclick="updateMarkdown()"
+            data-toggle="tooltip" data-placement="top" title="Markdown vs. Preview">
+          <i class="fa fa-btn fa-code fa-lg"></i>
+        </button>
 
-          <button id="diff-btn" class="btn btn-default"
-              onclick="updateDiff()"
-              data-toggle="tooltip" data-placement="top" title="Diff">
-            <i class="fa fa-btn fa-git fa-lg"></i>
-          </button>
+        <button id="diff-btn" class="btn btn-default"
+            onclick="updateDiff()"
+            data-toggle="tooltip" data-placement="top" title="Diff">
+          <i class="fa fa-btn fa-git fa-lg"></i>
+        </button>
 
-          <select class="form-control pull-right" id="diff-selectbox" onchange="updateVersion()"></select>
-        </div>
-      </div>
+        <select class="form-control pull-right" id="diff-selectbox" onchange="updateVersion()"></select>
     </div>
   </div>
 
-  <div id="editor_panel" class="row editor-panel">
-    <div class="edit-pane">
-      <div  id="left_text_box_container" onkeydown="checkIfCanChange()">
-        {% if rtl %}
-          <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
-        {% else %}
-          <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
-        {% endif %}
+  <div class="row">
+      <div class="col-sm-6 edit-pane" style="padding: 0;">
+        <div id="left_text_box_container" onkeydown="checkIfCanChange()">
+          {% if rtl %}
+            <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
+          {% else %}
+            <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea>
+          {% endif %}
+        </div>
       </div>
-    </div>
-    <div class="preview-pane">
-      <div id="right_text_box">{{ task }}</div>
-    </div>
+      <div class="col-sm-6 preview-pane">
+        <div id="right_text_box">{{ task }}</div>
+      </div>
   </div>
 
   <script type="text/javascript">

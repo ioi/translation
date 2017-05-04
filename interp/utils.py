@@ -107,13 +107,13 @@ def get_translate_edit_permission(translation, my_token=None):
 
 def can_save_translate(translation, my_token):
     edit_token = cache.get(get_trans_edit_cache_key(translation))
-    return edit_token and my_token == edit_token[0]
+    return (edit_token is None) or my_token == edit_token[0]
 
 
 def is_translate_in_editing(translation):
     current_time = datetime.datetime.now()
     edit_token = cache.get(get_trans_edit_cache_key(translation))
-    return edit_token and edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) > current_time
+    return (edit_token is not None) and (edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) > current_time)
 
 
 def unleash_edit_translation_token(translation):

@@ -24,7 +24,7 @@ function diff(id1, id2){
             first_version = response;
             get_version(id2, function (res) {
                 second_version = res;
-                var diff_fragment = DiffUtil.getDiffFragment(first_version, second_version);
+                var diff_fragment = DiffUtil.getDiffFragment(second_version, first_version);
                 $('#myversion').html(diff_fragment);
             });
         });

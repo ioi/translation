@@ -18,7 +18,7 @@ function diff(id1, id2){
     if(!text2){
         view_version(text1)
     }else {
-        var diff_fragment = DiffUtil.getDiffFragment(text1, text2);
+        var diff_fragment = DiffUtil.getDiffFragment(text2, text1);
         $('#myversion').html(diff_fragment);
     }
 

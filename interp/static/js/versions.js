@@ -2,44 +2,33 @@ var version_url,
     particle_version_url,
     checkout_version_url,
     csrf_token,
-    ques_id;
-
-var selected_versions;
+    ques_id,
+    version_to_revert_id;
 
 $(document).ready(function () {
     var cont = $('#original').text();
     $('#original').html(cont);
 
-    selected_versions = [];
 });
 
+function diff(id1, id2){
 
-function changeCheckbox(id) {
-    var index = selected_versions.indexOf(id);
-    if(index == -1){
-        if(selected_versions.length == 2){
-            var temp = selected_versions[0];
-            $('#'+temp).prop('checked', false);
-            selected_versions.splice(0, 1);
-        }
-        selected_versions.push(id);
-    }else{
-        selected_versions.splice(index, 1);
-    }
-}
+    $('#version-' + id1).addClass('active').siblings().removeClass('active');
 
-function diff(){
-
-    var first_version;
-    var second_version;
-    get_version(selected_versions[0], function (response) {
-        first_version = response;
-        get_version(selected_versions[1], function (res) {
-            second_version = res;
-            var diff_fragment = DiffUtil.getDiffFragment(first_version, second_version);
-            $('#myversion').html(diff_fragment);
+    if(!id2){
+        view_version(id1);
+    }else {
+        var first_version;
+        var second_version;
+        get_version(id1, function (response) {
+            first_version = response;
+            get_version(id2, function (res) {
+                second_version = res;
+                var diff_fragment = DiffUtil.getDiffFragment(second_version, first_version);
+                $('#myversion').html(diff_fragment);
+            });
         });
-    });
+    }
 }
 
 
@@ -76,12 +65,14 @@ function view_particle_version(id){
 
 };
 
-
 function revert(version_id){
+    version_to_revert_id = version_id;
+}
+function revert_confirm(){
     $.ajax({
         url: checkout_version_url,
         data: {
-            'id': version_id,
+            'id': version_to_revert_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
@@ -90,4 +81,3 @@ function revert(version_id){
         },
     });
 }
-

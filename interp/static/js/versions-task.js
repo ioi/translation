@@ -1,46 +1,31 @@
-var selected_versions,
-    task_version_url,
+var task_version_url,
     csrf_token,
     task_versions;
 
 $(document).ready(function () {
-
     getVersions();
-    selected_versions = [];
 });
 
 
-function changeCheckbox(id) {
-    var index = selected_versions.indexOf(id);
-    if(index == -1){
-        if(selected_versions.length == 2){
-            var temp = selected_versions[0];
-            $('#'+temp).prop('checked', false);
-            selected_versions.splice(0, 1);
-        }
-        selected_versions.push(id);
-    }else{
-        selected_versions.splice(index, 1);
+function diff(id1, id2){
+    var text1, text2;
+    $.each(task_versions, function(index, version) {
+        if(version.id == id1)
+            text1 = version.text;
+        if(version.id == id2)
+            text2 = version.text;
+    });
+    if(!text2){
+        view_version(text1)
+    }else {
+        var diff_fragment = DiffUtil.getDiffFragment(text2, text1);
+        $('#myversion').html(diff_fragment);
     }
+
 }
 
-function diff(){
-    var f,s;
-    $.each(task_versions, function(index, version) {
-        if(version.id == selected_versions[0])
-            f = version.text;
-        if(version.id == selected_versions[1])
-            s = version.text;
-    });
-    var diff_fragment = DiffUtil.getDiffFragment(f, s);
-    $('#myversion').html(diff_fragment);
-}
-
-function view_version(id){
-    $.each(task_versions, function(index, version) {
-        if(version.id == id)
-            $('#myversion').html(version.text);
-    });
+function view_version(text){
+    $('#myversion').html(text);
 };
 
 

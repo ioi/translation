@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="stylesheet" href="/static/css/notif.css">
   <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/markdown.css">
 
 
   <script type="text/javascript" src="/static/libs/jquery/jquery-3.1.1.min.js"></script>
@@ -53,7 +54,9 @@
         <li class="dropdown">
           <span class="notif-badge" id="notif-badge" style="display: none"></span>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>
-          <ul class="dropdown-menu notif-dropdown-menu" id="notification-dropdown"></ul>
+          <ul class="dropdown-menu notif-dropdown-menu" id="notification-dropdown">
+              <li id="see-all" class="see-all"><a href="{% url 'notifications' %}">Notifications history</a></li>
+          </ul>
         </li>
 
         <li class="dropdown">
@@ -72,7 +75,7 @@
   </div>
 </nav>
 
-<div class="main-content">
+<div class="main-content container-fluid">
   {% block content %}{% endblock %}
 </div>
 
@@ -93,6 +96,12 @@
     r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
     a.appendChild(r);
   })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+
+  $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+      $('[data-toggle="modal"]').tooltip();
+  });
+
 </script>
 <script>
   notification_url = "{% url 'notifications' %}";

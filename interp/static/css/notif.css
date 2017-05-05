@@ -5,12 +5,11 @@
 }
 .notif-dropdown-menu li {
 	float: left;
-	border-bottom: solid thin #eeeeee;
-	margin-bottom: 5px;
+	border-bottom: 1px solid #eee;
 	width: 100%;
 }
 .notif-dropdown-menu li.notif-unread {
-	background-color: #CCCCCC;
+	background-color: #ccc;
 }
 .notif-dropdown-menu li:last-child {
 	border-bottom: none;
@@ -41,7 +40,6 @@
 	border-radius: 4px;
 }
 
-
 .notif-dropdown-menu li.see-all a:hover {
 	background-color: transparent;
 }
@@ -50,5 +48,5 @@
 }
 .notif-dropdown-menu li.see-all a {
 	font-size: 11px;
-	color: #1a0dab;
+	color: gray;
 }

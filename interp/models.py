@@ -34,8 +34,8 @@ class ContentVersion(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     text = models.TextField()
-    release_note = models.CharField(max_length=255, blank=True)
     released = models.BooleanField(default=False)
+    release_note = models.CharField(max_length=255, blank=True)
     create_time = models.DateTimeField(default=timezone.now())
 
     def can_view_by(self, user):
@@ -62,7 +62,7 @@ class Task(models.Model):
     enabled = models.BooleanField(default=False)
     versions = GenericRelation(ContentVersion)
     contest = models.ForeignKey('Contest', default=None)
-    uploaded_file = models.FileField(upload_to='uploads/')
+    uploaded_file = models.FileField(upload_to='uploads/', blank=True)
 
     def add_version(self, text, release_note="", released=False):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),

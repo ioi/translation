@@ -81,20 +81,22 @@ function activeBtn(id){
     $('#preview-btn').removeClass('btn-active');
     $('#isc-preview-btn').removeClass('btn-active');
     $('#isc-markdown-btn').removeClass('btn-active');
-    $(id).addClass('btn-active')
+    $(id).addClass('btn-active');
 }
 
 function onPreviewClick(){
     current_text = currentTranslationText();
     renderMarkdown('right_text_box', current_text);
     $('#right_text_box').css('direction', getDirectionStr(rtl));
-    previewInterval = setInterval(onlinePreview,100);
+    $('#right_text_box').css('whiteSpace', 'normal');
+    previewInterval = setInterval(onlinePreview, 100);
     activeBtn('#preview-btn');
 }
 
 function onIscMarkdownClick(){
     $('#right_text_box').html(task_text);
     $('#right_text_box').css('direction', 'ltr');
+    $('#right_text_box').css('whiteSpace', 'pre-wrap');
     clearInterval(previewInterval);
     activeBtn('#isc-markdown-btn');
 }
@@ -102,6 +104,7 @@ function onIscMarkdownClick(){
 function onIscPreviewClick(){
     renderMarkdown('right_text_box', task_text);
     $('#right_text_box').css('direction', 'ltr');
+    $('#right_text_box').css('whiteSpace', 'normal');
     clearInterval(previewInterval);
     activeBtn('#isc-preview-btn');
 }

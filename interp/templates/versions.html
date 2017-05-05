@@ -9,11 +9,11 @@
 
 
 
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <div class="panel panel-default">
             <div class="panel-body">
 
-                <table class="table table-version">
+                <table class="table table-version table-hover">
                     <thead><tr><td colspan="2">
                         {{ taskTitle }}
                     </td></tr></thead>
@@ -26,7 +26,7 @@
                         <tr id="version-{{ version.0 }}" onclick="diff({{ version.0 }},{{ next_element.0 }})">
                             <td>{{ version.1 | date:"M j, H:i"}}</td>
                             <td>
-                                <a href="{% url 'get_version_md'%}?id={{version.0}}" class="btn btn-default" target="_blank" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                <a href="{% url 'get_version_md'%}?id={{version.0}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
                                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.0 }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
                             </td>
                         </tr>
@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <div class="col-sm-9" id="right-container">
+    <div class="col-sm-8" id="right-container">
         <div class="panel panel-default">
             <div class="panel-body">
 

@@ -26,8 +26,8 @@
                         <tr id="version-{{ version.0 }}" onclick="diff({{ version.0 }},{{ next_element.0 }})">
                             <td>{{ version.1 | date:"M j, H:i"}}</td>
                             <td>
-                                <a href="{% url 'get_version_md'%}?id={{version.0}}" title="Markdown" class="btn btn-default" target="_blank"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" title="Revert" onclick="revert({{ version.0 }})"><i class="fa fa-btn fa-undo fa-lg"></i></button>
+                                <a href="{% url 'get_version_md'%}?id={{version.0}}" class="btn btn-default" target="_blank" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.0 }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
                             </td>
                         </tr>
 

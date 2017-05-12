@@ -106,7 +106,7 @@ function getListVersions() {
                 view_particle_version(list_version_particles[0][0]);
             }else if(list_versions[0]){
                 if(list_versions[1])
-                    diff(list_versions[0][0], task_versions[1][0]);
+                    diff(list_versions[0][0], list_versions[1][0]);
                 else
                     view_version(list_versions[0][0])
             }

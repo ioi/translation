@@ -3,11 +3,13 @@ var version_url,
     checkout_version_url,
     csrf_token,
     ques_id,
-    version_to_revert_id;
+    version_to_revert_id,
+    list_version_url;
 
 $(document).ready(function () {
     var cont = $('#original').text();
     $('#original').html(cont);
+    getListVersions();
 
 });
 
@@ -59,7 +61,13 @@ function view_particle_version(id){
         },
         type: "GET",
         success: function (response) {
-            $('#myversion').html(response);
+            $('#particle-version-0').addClass('active').siblings().removeClass('active');
+
+            get_version(list_versions[0][0], function (res) {
+                second_version = res;
+                var diff_fragment = DiffUtil.getDiffFragment(res, response);
+                $('#myversion').html(diff_fragment);
+            });
         }
     });
 
@@ -80,4 +88,29 @@ function revert_confirm(){
             location.reload();
         },
     });
+}
+
+function getListVersions() {
+    $.ajax({
+        url: list_version_url,
+        data: {
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "GET",
+        success: function (response) {
+            list_versions = response.versions;
+            list_version_particles = response.version_particles;
+
+            // onclick first row
+            if(list_version_particles && list_version_particles.length){
+                view_particle_version(list_version_particles[0][0]);
+            }else if(list_versions[0]){
+                if(list_versions[1])
+                    diff(list_versions[0][0], task_versions[1][0]);
+                else
+                    view_version(list_versions[0][0])
+            }
+        }
+    });
+    return false;
 }

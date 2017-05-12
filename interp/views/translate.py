@@ -175,9 +175,12 @@ class Versions(LoginRequiredMixin,View):
         for item in versions:
             v.append((item.id,item.create_time))
 
-        return render(request, 'versions.html',
+        if request.is_ajax():
+            return JsonResponse(dict(versions=list(v), version_particles=list(vp)))
+        else:
+            return render(request, 'versions.html',
                       context={'versions': v, 'versionParticles': vp, 'translation': trans.get_latest_text(),
-                               'quesId': trans.id, 'taskTitle': task.title})
+                               'quesId': trans.id, 'taskTitle': task.title, 'contest_slug': contest_slug})
 
 
 class GetVersion(LoginRequiredMixin,View):

@@ -39,6 +39,14 @@ function getVersions() {
         type: "GET",
         success: function (response) {
             task_versions = response.versions;
+
+            // onclick first row
+            if(task_versions[0]){
+                if(task_versions[1])
+                    diff(task_versions[0].id, task_versions[1].id)
+                else
+                    view_version(task_versions[0].text)
+            }
         }
     });
     return false;

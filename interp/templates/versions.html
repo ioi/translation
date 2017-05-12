@@ -18,8 +18,14 @@
                         {{ taskTitle }}
                     </td></tr></thead>
                     <tbody>
-                    {% for version in versions %}
+                    {% for version in versionParticles %}
+                        <tr id="particle-version-0" onclick="view_particle_version({{ version.0 }})">
+                            <td>{{ version.1 | date:"M j, H:i"}} (auto saved)</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
 
+                    {% for version in versions %}
                         {% with next_element=versions|next:forloop.counter0 %}
                         {% with previous_element=versions|previous:forloop.counter0 %}
 
@@ -34,13 +40,6 @@
                         {% endwith %}
                         {% endwith %}
                     {% endfor %}
-{#                    {% for version in versionParticles %}#}
-{#                        <tr class="versionparticle">#}
-{#                            <td><input type="checkbox" id="particle-{{ version.0 }}"></td>#}
-{#                            <td>{{ version.1 }}</td>#}
-{#                            <td><button class="btn btn-default" onclick="view_particle_version({{ version.0 }})" >View</button></td>#}
-{#                        </tr>#}
-{#                    {% endfor %}#}
                     </tbody>
                 </table>
 
@@ -79,10 +78,12 @@
 
 
     <script type="text/javascript">
+        particle_version_url = {% url 'getVersionParticle' %};
         ques_id = {{quesId}};
         checkout_version_url = "{% url 'checkoutversion' %}";
         version_url = "{% url 'getVersion' %}";
         csrf_token = "{{csrf_token}}";
+        list_version_url = "{% url 'versions' contest_slug=contest_slug task_title=taskTitle %}";
     </script>
 
 {% endblock %}

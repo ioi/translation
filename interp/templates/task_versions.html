@@ -24,7 +24,7 @@
 
                         <tr onclick="diff({{ version.id }},{{ next_element.id }})">
                             <td>{{ version.create_time | date:"M j, H:i" }}</td>
-                            <td>{{ version.change_log }}</td>
+                            <td>{{ version.release_note }}</td>
                         </tr>
 
                         {% endwith %}

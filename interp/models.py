@@ -49,6 +49,7 @@ class ContentVersion(models.Model):
 class Contest(models.Model):
     title = models.CharField(max_length=100, blank=False)
     order = models.IntegerField()
+    slug = models.CharField(max_length=10, blank=False, unique=True)
 
     def __repr__(self):
         return "%d-%s" % (self.order, self.title)

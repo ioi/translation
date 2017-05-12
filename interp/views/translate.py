@@ -33,16 +33,19 @@ class Home(LoginRequiredMixin,View):
             freezed = translation and translation.freezed
             tasks_by_contest[task.contest].append((task.id, task.title, is_editing, freezed))
             tasks.append((task.id, task.title, is_editing, freezed))
-        tasks_lists = [(c.title, tasks_by_contest[c]) for c in Contest.objects.order_by('order') if
+        tasks_lists = [(c.title, c.slug, tasks_by_contest[c]) for c in Contest.objects.order_by('-order') if
                            len(tasks_by_contest[c]) > 0]
         return render(request, 'questions.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
                                                           'language': user.credentials()})
 
 
 class Questions(LoginRequiredMixin,View):
-    def get(self,request,id):
+    def get(self,request, contest_slug, task_title):
         user = User.objects.get(username=request.user)
-        task = Task.objects.get(id=id)
+        contest = Contest.objects.filter(slug=contest_slug).first()
+        if not contest:
+            return HttpResponseNotFound("There is no contest")
+        task = Task.objects.get(title=task_title, contest=contest)
         if not task.enabled:
             return HttpResponseBadRequest("There is no published task")
         task_text = task.get_published_text()
@@ -56,7 +59,7 @@ class Questions(LoginRequiredMixin,View):
         return render(request, 'editor.html',
                           context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                    'text_font_base64': user.text_font_base64,
-                                   'quesId': id, 'language': user.credentials()})
+                                   'quesId': task.id, 'language': user.credentials()})
 
 
 class AccessTranslationEdit(LoginRequiredMixin, View):
@@ -151,9 +154,12 @@ class CheckoutVersion(LoginRequiredMixin,View):
 
 
 class Versions(LoginRequiredMixin,View):
-    def get(self,request,id):
+    def get(self,request, contest_slug, task_title):
         user = User.objects.get(username=request.user)
-        task = Task.objects.get(id=id)
+        contest = Contest.objects.filter(slug=contest_slug).first()
+        if not contest:
+            return HttpResponseNotFound("There is no contest")
+        task = Task.objects.get(title=task_title, contest=contest)
         try:
             trans = Translation.objects.get(user=user,task=task)
         except:
@@ -257,7 +263,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
             # TODO
             return None
 
-        self.filename = "%s-%s" % (task.title, trans.user.language)
+        self.filename = "%s-%s.pdf" % (task.title, trans.user.language)
         content = trans.get_latest_text()
         context['direction'] = 'rtl' if trans.user.language.rtl else 'ltr'
         context['content'] = content

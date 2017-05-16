@@ -194,7 +194,7 @@ function getEditTranslateAccess() {
     });
 }
 
-window.onbeforeunload = function (e) {
+releasToken = function (e) {
     var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
         async: false,
@@ -217,3 +217,8 @@ function checkIfCanChange(){
     if ((current_date - last_time_get_edit_token) >  update_token_interval)
         getEditTranslateAccess();
 }
+
+window.onbeforeunload =  function(){
+    saveVersionParticle();
+    releasToken();
+};

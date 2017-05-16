@@ -8,6 +8,7 @@ $(document).ready(function () {
 
 
 function diff(id1, id2){
+    $('#version-' + id1).addClass('active').siblings().removeClass('active');
     var text1, text2;
     $.each(task_versions, function(index, version) {
         if(version.id == id1)

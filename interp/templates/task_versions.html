@@ -22,7 +22,7 @@
                         {% with next_element=versions|next:forloop.counter0 %}
                         {% with previous_element=versions|previous:forloop.counter0 %}
 
-                        <tr onclick="diff({{ version.id }},{{ next_element.id }})">
+                        <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
                             <td>{{ version.create_time | date:"M j, H:i" }}</td>
                             <td>{{ version.release_note }}</td>
                         </tr>

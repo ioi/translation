@@ -32,7 +32,7 @@ class Home(LoginRequiredMixin,View):
             tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'is_editing': is_editing, 'freezed': freezed})
         tasks_lists = [{'title': c.title,'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in Contest.objects.order_by('-order') if
                            len(tasks_by_contest[c]) > 0]
-        return render(request, 'questions.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
+        return render(request, 'translates.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
                                                           'language': user.credentials()})
 
 

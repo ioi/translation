@@ -7,12 +7,14 @@ web:
     - postgres:postgres
     - redis:redis
   volumes:
-    - /usr/src/app
+    - .:/usr/src/app
     - /usr/src/app/static
   environment:
     DB_USER: "$POSTGRES_USER"
     DB_PASSWORD: "$POSTGRES_PASSWORD"
     DB_NAME: "$POSTGRES_DB"
+    EMAIL_HOST_USER: "$EMAIL_HOST_USER"
+    EMAIL_HOST_PASSWORD: "$EMAIL_HOST_PASSWORD"
 
 nginx:
   restart: always

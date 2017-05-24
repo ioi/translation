@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'jq5w*u%s@o&b5gf59qmuby*y1$xrm5cpcw5kbxb86vu@z^1gm9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['trans.ioi2017.org']
 
 
 # Application definition
@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ws4redis',
     'interp',
     'wkhtmltopdf',
 ]
@@ -70,14 +69,13 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
-                'ws4redis.context_processors.default',
             ],
         },
     },
 ]
 
-# WSGI_APPLICATION = 'IOI.wsgi.application'
-WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+WSGI_APPLICATION = 'IOI.wsgi.application'
+# WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 WKHTMLTOPDF_CMD_OPTIONS = {
 'quiet':True,
@@ -88,17 +86,19 @@ WKHTMLTOPDF_CMD_OPTIONS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': 'postgres',
+        'PORT': '5432',
     }
 }
-
-
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": "redis://redis:6379/1",
         'TIMEOUT': None,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -127,6 +127,25 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -146,9 +165,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 
 
 
-EMAIL_HOST_USER = 'milad.ameri73@gmail.com'
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 #Must generate specific password for your app in [gmail settings][1]
-EMAIL_HOST_PASSWORD = 'milad26061373milad'
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 
 EMAIL_PORT = 587
 #This did the trick
@@ -160,4 +179,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")

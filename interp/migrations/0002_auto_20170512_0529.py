@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contest',
             name='slug',
-            field=models.CharField(default=django.utils.timezone.now, max_length=10),
+            field=models.CharField(default='a', max_length=10),
             preserve_default=False,
         ),
         migrations.AlterField(

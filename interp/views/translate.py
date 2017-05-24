@@ -22,8 +22,6 @@ from interp.utils import get_translate_edit_permission, can_save_translate, is_t
 class Home(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
-        # tasks = Task.objects.filter(enabled=True).values_list('id', 'title')
-        tasks = []
         home_flat_page = FlatPage.objects.filter(slug="home").first()
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
@@ -31,11 +29,10 @@ class Home(LoginRequiredMixin,View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             freezed = translation and translation.freezed
-            tasks_by_contest[task.contest].append((task.id, task.title, is_editing, freezed))
-            tasks.append((task.id, task.title, is_editing, freezed))
-        tasks_lists = [(c.title, c.slug, tasks_by_contest[c]) for c in Contest.objects.order_by('-order') if
+            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'is_editing': is_editing, 'freezed': freezed})
+        tasks_lists = [{'title': c.title,'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in Contest.objects.order_by('-order') if
                            len(tasks_by_contest[c]) > 0]
-        return render(request, 'questions.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
+        return render(request, 'translates.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
                                                           'language': user.credentials()})
 
 

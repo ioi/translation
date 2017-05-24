@@ -10,7 +10,7 @@
 
     <div class="body container">
       <h2>
-        {{contest_tasks.0}}
+        {{contest_tasks.title}}
       </h2>
       <table class="table table-hover">
         <thead><tr>
@@ -21,25 +21,25 @@
           <th>ISC Version</th>
         </tr></thead>
         <tbody>
-        {% for question in contest_tasks.2 %}
+        {% for task in contest_tasks.tasks %}
           <tr>
             <td> {{ forloop.counter }} </td>
-            <td> {{ question.1 }} </td>
+            <td> {{ task.title }} </td>
             <td>
-              {% if question.2 %} Is editing
-              {% else %}<a href="{% url 'question' contest_slug=contest_tasks.1 task_title=question.1 %}">Edit</a>{% endif %}
+              {% if task.is_editing %} Is editing
+              {% else %}<a href="{% url 'question' contest_slug=contest_tasks.slug task_title=task.title %}">Edit</a>{% endif %}
             </td>
             <td>
-              <a href="{% url 'get_version_md'%}?type=translation&id={{question.0}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-              <a href="{% url 'versions' contest_slug=contest_tasks.1 task_title=question.1 %}" class="btn btn-default" data-toggle="tooltip" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-              <a href="{% url 'gettranspdf'%}?id={{question.0}}" class="btn btn-default" data-toggle="tooltip" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-              <a href="{% url 'mailtranspdf'%}?id={{question.0}}" class="btn btn-default" data-toggle="tooltip" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
+              <a href="{% url 'get_version_md'%}?type=translation&id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+              <a href="{% url 'versions' contest_slug=contest_tasks.slug task_title=task.title %}" class="btn btn-default" data-toggle="tooltip" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+              <a href="{% url 'gettranspdf'%}?id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+              <a href="{% url 'mailtranspdf'%}?id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
             </td>
             <td>
-              <a href="{% url 'get_version_md'%}?type=task&id={{question.0}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-              <a href="{% url 'taskVersions' question.0 %}" class="btn btn-default" data-toggle="tooltip" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-              <a href="{% url 'get_version_pdf'%}?type=task&id={{question.0}}" class="btn btn-default" data-toggle="tooltip" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-              <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default" data-toggle="tooltip" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
+              <a href="{% url 'get_version_md'%}?type=task&id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+              <a href="{% url 'taskVersions' task.id %}" class="btn btn-default" data-toggle="tooltip" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+              <a href="{% url 'get_version_pdf'%}?type=task&id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+              <a href="{% url 'mailtranspdf'%}?id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
             </td>
           </tr>
         {% endfor %}

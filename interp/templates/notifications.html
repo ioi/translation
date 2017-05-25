@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load tz %}
+{% load timezone_filter %}
 
 {% block content %}
 
@@ -20,7 +20,7 @@
                             <tr>
                                 <td width="20%">{{notif.title}}</td>
                                 <td width="60%">{{notif.description}}</td>
-                                <td width="20%">{{notif.create_time | date:'M j, H:i'}}</td>
+                                <td width="20%">{{notif.create_time | ioi_timezone}}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

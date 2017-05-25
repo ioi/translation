@@ -1,6 +1,7 @@
 
 {% extends "base.html" %}
 {% load list_filter %}
+{% load timezone_filter %}
 
 {% block content %}
 
@@ -23,7 +24,7 @@
                         {% with previous_element=versions|previous:forloop.counter0 %}
 
                         <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
-                            <td>{{ version.create_time | date:"M j, H:i" }}</td>
+                            <td>{{ version.create_time | ioi_timezone }}</td>
                             <td>{{ version.release_note }}</td>
                             <td><a href="{% url 'trans_md' contest_slug=contest_slug task_title=task_title%}?ver={{version.id}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a></td>
                         </tr>

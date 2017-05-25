@@ -12,3 +12,4 @@ django-wkhtmltopdf
 python-markdown-math
 django-redis
 ipython
+pytz

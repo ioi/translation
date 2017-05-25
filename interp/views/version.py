@@ -113,5 +113,5 @@ class GetVersionMarkDown(VersionDownloadMixin, LoginRequiredMixin, View):
         #     HttpResponseForbidden()
 
         content = self.get_version_text()
-        response = HttpResponse(content, content_type='text/markdown; charset=UTF-8')
+        response = HttpResponse(content, content_type='text/plain; charset=UTF-8')
         return response

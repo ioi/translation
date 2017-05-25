@@ -6,9 +6,11 @@ $(document).ready(function () {
     getVersions();
 });
 
+function selectVersion(id){
+    $(id).addClass('active').siblings().removeClass('active');
+}
 
 function diff(id1, id2){
-    $('#version-' + id1).addClass('active').siblings().removeClass('active');
     var text1, text2;
     $.each(task_versions, function(index, version) {
         if(version.id == id1)
@@ -17,15 +19,17 @@ function diff(id1, id2){
             text2 = version.text;
     });
     if(!text2){
-        view_version(text1)
+        view_version(text1, id1)
     }else {
         var diff_fragment = DiffUtil.getDiffFragment(text2, text1);
         $('#myversion').html(diff_fragment);
+        selectVersion('#version-' + id1);
     }
 
 }
 
-function view_version(text){
+function view_version(text, id){
+    selectVersion('#version-' + id);
     $('#myversion').html(text);
 };
 
@@ -44,9 +48,9 @@ function getVersions() {
             // onclick first row
             if(task_versions[0]){
                 if(task_versions[1])
-                    diff(task_versions[0].id, task_versions[1].id)
+                    diff(task_versions[0].id, task_versions[1].id);
                 else
-                    view_version(task_versions[0].text)
+                    view_version(task_versions[0].text, task_versions[0].id);
             }
         }
     });

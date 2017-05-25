@@ -22,7 +22,7 @@ class Tasks(ISCEditorCheckMixin, View):
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.all():
             can_enable_task = (not task.enabled) and (task.versions.filter(released=True).first() is not None)
-            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task})
+            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task, 'contest_slug': task.contest.slug})
 
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if

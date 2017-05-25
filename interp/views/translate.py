@@ -113,7 +113,7 @@ class GetTranslatePreview(LoginRequiredMixin,View):
 class TranslationMarkdown(LoginRequiredMixin,View):
     def get(self, request, contest_slug, task_title):
         user = User.objects.get(username=request.user)
-        version_id = request.GET.get('id')
+        version_id = request.GET.get('ver')
         if version_id:
             content_version = ContentVersion.objects.filter(id=version_id).first()
             if not content_version.can_view_by(user):

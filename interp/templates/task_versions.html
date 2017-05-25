@@ -25,7 +25,7 @@
                         <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
                             <td>{{ version.create_time | date:"M j, H:i" }}</td>
                             <td>{{ version.release_note }}</td>
-                            <td><a href="{% url 'get_version_md'%}?type=task&id={{version.id}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a></td>
+                            <td><a href="{% url 'trans_md' contest_slug=contest_slug task_title=task_title%}?ver={{version.id}}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a></td>
                         </tr>
 
                         {% endwith %}
@@ -47,7 +47,7 @@
     </div>
 
     <script type="text/javascript">
-        task_version_url = "{% url 'taskVersions' id=quesId %}";
+        task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_title=task_title%}";
         csrf_token = "{{csrf_token}}";
     </script>
 

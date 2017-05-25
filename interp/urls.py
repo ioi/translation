@@ -22,19 +22,20 @@ urlpatterns = [
         GetTranslatePreview.as_view(), name='gettranspreview'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/md$', TranslationMarkdown.as_view(), name='trans_md'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/pdf$', TranslationPDF.as_view(), name='trans_pdf'),
-    url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/revesions$', Versions.as_view(), name='versions'),
+    url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/revisions$', Versions.as_view(), name='versions'),
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
 
     url(r'^getverspar/$', GetVersionParticle.as_view(), name='getVersionParticle'),
     url(r'^preview_translate/(?P<id>[\w]*)/$', TranslatePreview.as_view(), name='preview_translate'),
     url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
     url(r'^check_is_editing/(?P<id>[\w]*)/$', CheckTranslationEditAccess.as_view(), name='check_edit_translate'),
-    url(r'^versions/(?P<id>[\w]*)/$', Versions.as_view(), name='versions'),
-    
+
     url(r'^tasks/$', Tasks.as_view(), name='task'),
-    url(r'^task/(?P<id>[\w]*)/$', EditTask.as_view(), name='edittask'),
-    url(r'^task_versions/(?P<id>[\w]*)/$', TaskVersions.as_view(), name='taskVersions'),
-    url(r'^savetask/$', SaveTask.as_view(), name='savetask') ,
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/$', EditTask.as_view(), name='edittask'),
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/save$', SaveTask.as_view(), name='savetask') ,
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/revisions$', TaskVersions.as_view(), name='task_versions'),
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/md$', TaskMarkdown.as_view(), name='task_md'),
+    # url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/pdf$', TranslationPDF.as_view(), name='trans_pdf'),
     url(r'^enabletask/$', EnableTask.as_view(), name='enabletask'),
 
     url(r'^users/$', UsersList.as_view(), name='users_list'),

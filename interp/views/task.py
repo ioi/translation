@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
-from interp.utils import ISCEditorCheckMixin, AdminCheckMixin
-from interp.models import Task, User, Contest, Translation
+from interp.utils import ISCEditorCheckMixin, AdminCheckMixin, get_task_by_contest_and_title
+from interp.models import Task, User, Contest, Translation, ContentVersion
 
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -21,7 +21,8 @@ class Tasks(ISCEditorCheckMixin, View):
         tasks = []
         for task in Task.objects.all():
             can_enable_task = (not task.enabled) and (task.versions.filter(released=True).first() is not None)
-            tasks.append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task, 'contest': task.contest.title})
+            tasks.append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task,
+                          'contest': task.contest.title, 'contest_slug': task.contest.slug})
 
         user = User.objects.get(username=request.user.username)
         contests = Contest.objects.order_by('order')
@@ -37,22 +38,19 @@ class Tasks(ISCEditorCheckMixin, View):
 
 
 class EditTask(ISCEditorCheckMixin, View):
-    def get(self, request, id):
-        task = Task.objects.get(id=id)
-        user = User.objects.get(username=request.user.username)
-        if not task.enabled:
-            enabled = 'false'
-        else:
-            enabled = 'true'
-
+    def get(self, request, contest_slug, task_title):
+        user = User.objects.get(username=request.user)
+        contest = Contest.objects.filter(slug=contest_slug).first()
+        if not contest:
+            return HttpResponseBadRequest("There is no contest")
+        task = Task.objects.get(title=task_title, contest=contest)
         return render(request, 'editor-task.html',
-                      context={'content': task.get_latest_text(), 'title': task.title, 'is_published': enabled,
-                               'taskId': id, 'language': user.credentials()})
+                      context={'content': task.get_latest_text(), 'title': task.title, 'contest_slug': contest_slug,
+                               'language': user.credentials()})
 
 
 class SaveTask(ISCEditorCheckMixin, View):
-    def post(self, request):
-        id = request.POST['id']
+    def post(self, request, contest_slug, task_title):
         content = request.POST['content']
         title = request.POST['title']
         release_note = request.POST.get('change_log', "")
@@ -60,31 +58,30 @@ class SaveTask(ISCEditorCheckMixin, View):
         released = False
         if publish_raw == 'true':
             released = True
-        task = Task.objects.get(id=id)
+        task = Task.objects.get(title=task_title, contest__slug=contest_slug)
         task.title = title
         task.save()
         task.add_version(content, release_note, released)
         return HttpResponse("done")
 
 
-class EnableTask(ISCEditorCheckMixin, View):
-    def post(self, request):
-        id = request.POST['id']
-        task = Task.objects.get(id=id)
-        task.enabled = True
-        task.save()
-        return HttpResponse("Task has been unpublished!")
-
-    def delete(self, request):
-        id = request.GET['id']
-        task = Task.objects.get(id=id)
-        task.enabled = False
-        task.save()
-        return HttpResponse("Task has been unpublished!")
+class TaskMarkdown(LoginRequiredMixin,View):
+    def get(self, request, contest_slug, task_title):
+        user = User.objects.get(username=request.user)
+        version_id = request.GET.get('ver')
+        if version_id:
+            content_version = ContentVersion.objects.filter(id=version_id).first()
+            if not content_version.can_view_by(user):
+                return None
+            content = content_version.text
+        else:
+            task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+            content = task.get_published_text()
+        return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
 
 class TaskVersions(LoginRequiredMixin, View):
-    def get(self, request, id):
+    def get(self, request, contest_slug, task_title):
         # TODO
         # published_raw = request.GET.get('published', 'false')
         # published = False
@@ -94,7 +91,7 @@ class TaskVersions(LoginRequiredMixin, View):
         released = True
         if user.is_superuser or user.groups.filter(name="editor").exists():
             released = False
-        task = Task.objects.get(id=id)
+        task = Task.objects.get(title=task_title, contest__slug=contest_slug)
         versions_query = task.versions.order_by('-create_time')
         if released:
             versions_query = versions_query.filter(released=True)
@@ -103,7 +100,24 @@ class TaskVersions(LoginRequiredMixin, View):
             return JsonResponse(dict(versions=list(versions_values)))
         else:
             return render(request, 'task_versions.html',
-                          context={'task_title': task.title, 'versions': versions_values, 'quesId': id,})
+                          context={'task_title': task.title, 'contest_slug': contest_slug, 'versions': versions_values})
+
+
+class EnableTask(ISCEditorCheckMixin, View):
+    def post(self, request):
+        id = request.POST['id']
+        task = Task.objects.get(id=id)
+        task.enabled = True
+        task.save()
+        return HttpResponse("Task has been published!")
+
+    def delete(self, request):
+        id = request.GET['id']
+        task = Task.objects.get(id=id)
+        task.enabled = False
+        task.save()
+        return HttpResponse("Task has been unpublished!")
+
 
 
 class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):

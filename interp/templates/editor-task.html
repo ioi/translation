@@ -57,8 +57,7 @@
   </div>
 
   <script type="text/javascript">
-    task_id = {{taskId}};
-    save_task_url = "{% url 'savetask' %}";
+    save_task_url = "{% url 'savetask' contest_slug=contest_slug task_title=title %}";
     csrf_token = "{{csrf_token}}";
   </script>
 

@@ -37,7 +37,7 @@
                         <tbody>
                         {% for task in tasks %}
                             <tr>
-                                <td><a href="{% url 'edittask' task.id %}">{{ task.title }}</a></td>
+                                <td><a href="{% url 'edittask' contest_slug=task.contest_slug task_title=task.title %}">{{ task.title }}</a></td>
                                 <td>{{task.contest}}</td>
                                 <td id="td_{{ task.id }}">
                                     {% if not task.enabled and task.can_enable %}

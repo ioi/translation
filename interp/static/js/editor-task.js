@@ -1,7 +1,6 @@
 var simplemde,
     last_saved_content,
     csrf_token,
-    task_id,
     save_task_url,
     publish_task_url,
     spellChecking;
@@ -69,7 +68,6 @@ function save(publish) {
         data: {
             'title': $('#task-title').text(),
             'content': simplemde.value(),
-            'id': task_id,
             'publish': publish,
             'change_log': $('#change-log').val(),
             csrfmiddlewaretoken: csrf_token

@@ -35,19 +35,19 @@
                             <th>Publish</th>
                         </tr></thead>
                         <tbody>
-                        {% for question in questions %}
+                        {% for task in tasks %}
                             <tr>
-                                <td><a href="{% url 'edittask' question.0 %}">{{ question.1 }}</a></td>
-                                <td>{{question.4}}</td>
-                                <td id="td_{{ question.0 }}">
-                                    {% if not question.2 and question.3 %}
+                                <td><a href="{% url 'edittask' task.id %}">{{ task.title }}</a></td>
+                                <td>{{task.contest}}</td>
+                                <td id="td_{{ task.id }}">
+                                    {% if not task.enabled and task.can_enable %}
 
-                                        <button  onclick="enableTask({{ question.0 }})">
+                                        <button  onclick="enableTask({{ task.id }})">
                                             Enable Task
                                         </button>
                                     {% endif %}
-                                    {% if question.2%}
-                                        <button  onclick="disableTask({{ question.0 }})">
+                                    {% if task.enabled%}
+                                        <button  onclick="disableTask({{ task.id }})">
                                             Disable Task
                                         </button>
                                     {% endif %}

@@ -18,18 +18,15 @@ class Tasks(ISCEditorCheckMixin, View):
     def get(self, request):
         # questions = Task.objects.values_list('id', 'title', 'enabled')
         # TODO: need refactor (find can_publish_last_version by query)
-        questions = []
+        tasks = []
         for task in Task.objects.all():
-            if task.enabled:
-                questions.append((task.id, task.title, task.enabled, False, task.contest))
-            else:
-                can_enable_task = task.versions.filter(released=True).first() is not None
-                questions.append((task.id, task.title, task.enabled, can_enable_task, task.contest))
+            can_enable_task = (not task.enabled) and (task.versions.filter(released=True).first() is not None)
+            tasks.append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task, 'contest': task.contest.title})
 
         user = User.objects.get(username=request.user.username)
         contests = Contest.objects.order_by('order')
         return render(request, 'tasks.html',
-                      context={'questions': questions, 'contests': contests, 'language': user.credentials()})
+                      context={'tasks': tasks, 'contests': contests, 'language': user.credentials()})
 
     def post(self, request):
         title = request.POST['title']

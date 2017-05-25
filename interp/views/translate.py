@@ -16,7 +16,8 @@ from wkhtmltopdf.views import PDFTemplateView
 from interp.models import FlatPage
 from interp.forms import UploadFileForm
 from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER, \
-    unleash_edit_translation_token
+    unleash_edit_translation_token, get_task_by_contest_and_title, get_trans_by_user_and_task, \
+    can_user_change_translation
 
 
 class Home(LoginRequiredMixin,View):
@@ -36,27 +37,147 @@ class Home(LoginRequiredMixin,View):
                                                           'language': user.credentials()})
 
 
-class Questions(LoginRequiredMixin,View):
+class Translations(LoginRequiredMixin,View):
     def get(self,request, contest_slug, task_title):
         user = User.objects.get(username=request.user)
-        contest = Contest.objects.filter(slug=contest_slug).first()
-        if not contest:
-            return HttpResponseNotFound("There is no contest")
-        task = Task.objects.get(title=task_title, contest=contest)
-        if not task.enabled:
-            return HttpResponseBadRequest("There is no published task")
-        task_text = task.get_published_text()
         try:
-            trans = Translation.objects.get(user=user, task=task)
-        except:
-            trans = Translation.objects.create(user=user, task=task)
-            trans.add_version(task_text)
+            task = get_task_by_contest_and_title(contest_slug, task_title)
+        except Exception as e:
+            return HttpResponseBadRequest(e.message)
+        trans = get_trans_by_user_and_task(user, task)
         if trans.freezed:
             return HttpResponseForbidden("This task is freezed")
+        task_text = task.get_published_text()
         return render(request, 'editor.html',
-                          context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
-                                   'text_font_base64': user.text_font_base64,
-                                   'quesId': task.id, 'language': user.credentials()})
+                      context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
+                               'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
+                               'task_title': task_title,
+                               'quesId': task.id, 'language': user.credentials()})
+
+
+class SaveTranslation(LoginRequiredMixin, View):
+    def post(self,request, contest_slug, task_title):
+        user = User.objects.get(username=request.user)
+        try:
+            task = get_task_by_contest_and_title(contest_slug, task_title)
+        except Exception as e:
+            return HttpResponseBadRequest(e.message)
+        translation = get_trans_by_user_and_task(user, task)
+        content = request.POST['content']
+        edit_token = request.POST.get('edit_token', '')
+        if not can_user_change_translation(user, translation, edit_token):
+            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
+        translation.add_version(content)
+        VersionParticle.objects.filter(translation=translation).delete()
+        return JsonResponse({'success': True})
+
+
+class SaveVersionParticle(LoginRequiredMixin,View):
+    def post(self,request, contest_slug, task_title):
+        user = User.objects.get(username=request.user)
+        try:
+            task = get_task_by_contest_and_title(contest_slug, task_title)
+        except Exception as e:
+            return HttpResponseBadRequest(e.message)
+        translation = get_trans_by_user_and_task(user, task)
+        content = request.POST['content']
+        edit_token = request.POST.get('edit_token', '')
+        if not can_user_change_translation(user, translation, edit_token):
+            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
+        if translation.get_latest_text().strip() == content.strip():
+            return JsonResponse({'can_edit': True, 'edit_token': edit_token, 'error': 'Not Modified'})
+        last_version_particle = translation.versionparticle_set.order_by('-create_time').first()
+        if last_version_particle:
+            last_version_particle.text = content
+            last_version_particle.save()
+        else:
+            last_version_particle = VersionParticle.objects.create(translation=translation, text=content,                                                           create_time=timezone.now())
+        return JsonResponse({'success': True})
+
+
+class GetTranslatePreview(LoginRequiredMixin,View):
+    def get(self,request, contest_slug, task_title):
+        user = User.objects.get(username=request.user)
+        try:
+            task = get_task_by_contest_and_title(contest_slug, task_title)
+        except Exception as e:
+            return HttpResponseBadRequest(e.message)
+        translation = get_trans_by_user_and_task(user, task)
+        # TODO check if it's available
+        direction = 'rtl' if translation.user.language.rtl else 'ltr'
+        return render(request, 'pdf_template.html', context={'content': translation.get_latest_text(),\
+                    'direction': direction, 'title': "%s-%s" % (task.title, translation.user.language),\
+                                                             'text_font_base64': user.text_font_base64})
+
+
+class TranslationMarkdown(LoginRequiredMixin,View):
+    def get(self, request, contest_slug, task_title):
+        user = User.objects.get(username=request.user)
+        version_id = request.GET.get('id')
+        if version_id:
+            content_version = ContentVersion.objects.filter(id=version_id).first()
+            if not content_version.can_view_by(user):
+                return None
+            content = content_version.text
+        else:
+            try:
+                task = get_task_by_contest_and_title(contest_slug, task_title)
+            except Exception as e:
+                return HttpResponseBadRequest(e.message)
+            translation = get_trans_by_user_and_task(user, task)
+            content = translation.get_latest_text()
+
+        return HttpResponse(content, content_type='text/plain; charset=UTF-8')
+
+
+class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
+    filename = 'my_pdf.pdf'
+    template_name = 'pdf_template.html'
+    cmd_options = {
+        'page-size': 'Letter',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'footer-spacing': 3,
+        # 'zoom': 15,
+        'javascript-delay': 500,
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super(TranslationPDF, self).get_context_data(**kwargs)
+        user = User.objects.get(username=self.request.user)
+        version_id = self.request.GET.get('id')
+        contest_slug = kwargs['contest_slug']
+        task_title = kwargs['task_title']
+        try:
+            task = get_task_by_contest_and_title(contest_slug, task_title)
+        except Exception as e:
+            return HttpResponseBadRequest(e.message)
+        trans = get_trans_by_user_and_task(user, task)
+
+        if version_id:
+            content_version = ContentVersion.objects.filter(id=version_id).first()
+            if not content_version.can_view_by(user):
+                return None
+            content = content_version.text
+            file_name = "%s-%s-%d.pdf" % (task.title, trans.user.language, version_id)
+        else:
+            content = trans.get_latest_text()
+            file_name = "%s-%s.pdf" % (task.title, trans.user.language)
+
+        trans = get_trans_by_user_and_task(user, task)
+        self.filename = file_name
+        context['direction'] = 'rtl' if trans.user.language.rtl else 'ltr'
+        context['content'] = content
+        context['title'] = self.filename
+        context['task_title'] = trans.task.title
+        context['country'] = trans.user.country.name
+        context['language'] = trans.user.language.name
+        context['contest'] = trans.task.contest.title
+        context['text_font_base64'] = trans.user.text_font_base64
+        self.cmd_options['footer-center'] = '%s [page] / [topage]' % trans.task.title
+        return context
 
 
 class AccessTranslationEdit(LoginRequiredMixin, View):
@@ -122,20 +243,6 @@ class TranslatePreview(LoginRequiredMixin,View):
                                    'language': user.credentials()})
 
 
-class SaveQuestion(LoginRequiredMixin,View):
-    def post(self,request):
-        id = request.POST['id']
-        content = request.POST['content']
-        edit_token = request.POST.get('edit_token', '')
-        task = Task.objects.get(id=id)
-        user = User.objects.get(username=request.user)
-        translation = Translation.objects.get(user=user,task=task)
-        if user != translation.user or not can_save_translate(translation, edit_token) or translation.freezed:
-            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
-        translation.add_version(content)
-        VersionParticle.objects.filter(translation=translation).delete()
-        return JsonResponse({'success': True})
-
 
 class CheckoutVersion(LoginRequiredMixin,View):
     def post(self,request):
@@ -177,7 +284,7 @@ class Versions(LoginRequiredMixin,View):
         else:
             return render(request, 'versions.html',
                       context={'versions': v, 'versionParticles': vp, 'translation': trans.get_latest_text(),
-                               'quesId': trans.id, 'taskTitle': task.title, 'contest_slug': contest_slug})
+                               'quesId': trans.id, 'task_title': task.title, 'contest_slug': contest_slug})
 
 
 class GetVersion(LoginRequiredMixin,View):
@@ -199,42 +306,6 @@ class GetVersionParticle(LoginRequiredMixin,View):
             return HttpResponseForbidden()
         return HttpResponse(version_particle.text)
 
-
-class SaveVersionParticle(LoginRequiredMixin,View):
-    def post(self,request):
-        id = request.POST['id']
-        content = request.POST['content']
-        task = Task.objects.get(id=id)
-        user = User.objects.get(username=request.user.username)
-        edit_token = request.POST.get('edit_token', '')
-        translation = Translation.objects.get(user=user, task=task)
-        if user != translation.user or not can_save_translate(translation, edit_token) or translation.freezed:
-            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
-        if translation.get_latest_text().strip() == content.strip():
-            return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'Not Modified'})
-        last_version_particle = translation.versionparticle_set.order_by('-create_time').first()
-        if last_version_particle:
-            last_version_particle.text = content
-            last_version_particle.save()
-        else:
-            last_version_particle = VersionParticle.objects.create(translation=translation, text=content,
-                                                                   create_time=timezone.now())
-        return JsonResponse({'success': True})
-
-
-class GetTranslatePreview(LoginRequiredMixin,View):
-    def get(self,request):
-        task_id = self.request.GET['id']
-        task = Task.objects.get(id=task_id)
-        user = User.objects.get(username=request.user.username)
-        translation = Translation.objects.get(user=user, task=task)
-        # TODO check if it's available
-        direction = 'rtl' if translation.user.language.rtl else 'ltr'
-        return render(request, 'pdf_template.html', context={'content': translation.get_latest_text(),\
-                    'direction': direction, 'title': "%s-%s" % (task.title, translation.user.language),\
-                                                             'text_font_base64': user.text_font_base64})
-
-
 class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf_template.html'
@@ -251,6 +322,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(GetTranslatePDF, self).get_context_data(**kwargs)
+        print(kwargs)
         task_id = self.request.GET['id']
 
         user = User.objects.get(username=self.request.user.username)

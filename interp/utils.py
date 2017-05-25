@@ -62,6 +62,29 @@ class ISCEditorCheckMixin(LoginRequiredMixin, object):
 
 CONTEST_ORDER ={'Day 2': 0, 'Day 1': 1, 'Practice': 2}
 
+
+def get_task_by_contest_and_title(contest_slug, task_title):
+    from interp.models import Contest, Task
+    contest = Contest.objects.filter(slug=contest_slug).first()
+    if not contest:
+        raise Exception("There is no contest")
+    task = Task.objects.get(title=task_title, contest=contest)
+    if not task.enabled:
+        raise Exception("There is no published task")
+    return task
+
+
+def get_trans_by_user_and_task(user, task):
+    from interp.models import Translation
+    trans, created = Translation.objects.get_or_create(user=user, task=task)
+    if created:
+        trans.add_version(task.get_published_text())
+    return trans
+
+
+def can_user_change_translation(user, translation, edit_token):
+    return user == translation.user and can_save_translate(translation, edit_token) and not translation.freezed
+
 # Cache Utils
 
 def get_user_unread_notifs_cache_key(user):

@@ -34,7 +34,7 @@
             <button class="btn btn-default" onclick="saveVersion()" data-toggle="tooltip" data-placement="bottom" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
             <a href="{% url 'versions' quesId %}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
             <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-            <a href="{% url 'mailtranspdf'%}?id={{quesId}}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
+            <a href="{% url 'gettranspreview' contest_slug=contest_slug task_title=task_title%}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
 
             <div class="btn-group pull-right" role="group">
                 <button type="button" id="preview-btn" class="btn btn-default" onclick="onPreviewClick()">Preview</button>
@@ -75,11 +75,11 @@
 
   <script type="text/javascript">
       ques_id = {{quesId}};
-      version_particle_url = "{% url 'saveVersionParticle' %}";
+      version_particle_url = "{% url 'save_version_particle' contest_slug=contest_slug task_title=task_title %}";
       access_edit_translate_url = "{% url 'access_edit_translate' id=quesId %}";
       unleash_trans_token_url = "{% url 'unleash_trans_token' id=quesId %}";
       preview_url = "{% url 'preview_translate' id=quesId%}";
-      save_question_url = "{% url 'saveQuestion' %}";
+      save_question_url = "{% url 'save_translation' contest_slug=contest_slug task_title=task_title %}";
       task_version_url = "{% url 'taskVersions' id=quesId %}";
       csrf_token = "{{csrf_token}}";
       rtl = '{{rtl}}' == 'True';

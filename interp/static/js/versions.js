@@ -13,10 +13,11 @@ $(document).ready(function () {
 
 });
 
+function selectVersion(id){
+    $(id).addClass('active').siblings().removeClass('active');
+}
+
 function diff(id1, id2){
-
-    $('#version-' + id1).addClass('active').siblings().removeClass('active');
-
     if(!id2){
         view_version(id1);
     }else {
@@ -28,6 +29,7 @@ function diff(id1, id2){
                 second_version = res;
                 var diff_fragment = DiffUtil.getDiffFragment(second_version, first_version);
                 $('#myversion').html(diff_fragment);
+                selectVersion('#version-' + id1);
             });
         });
     }
@@ -48,6 +50,7 @@ function get_version(id, callback) {
 
 function view_version(id){
     get_version(id, function (response) {
+        selectVersion('#version-' + id);
         $('#myversion').html(response);
     });
 };
@@ -61,8 +64,7 @@ function view_particle_version(id){
         },
         type: "GET",
         success: function (response) {
-            $('#particle-version-0').addClass('active').siblings().removeClass('active');
-
+            selectVersion('#particle-version-0');
             get_version(list_versions[0][0], function (res) {
                 second_version = res;
                 var diff_fragment = DiffUtil.getDiffFragment(res, response);

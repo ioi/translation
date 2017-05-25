@@ -8,20 +8,19 @@
     <title>{{title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="/static/css/base.css">
   <link rel="stylesheet" href="/static/css/markdown.css">
     <link rel="stylesheet" href="/static/css/pdf.css">
 
     <link rel="stylesheet" href="/static/libs/markdown/katex.css">
-      {% if text_font_base64  %}
 
+      {% if text_font_base64 %}
         <style>
         @font-face {
           font-family: 'CustomTextFont';
           src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
         }
 
-        #editor_panel {
+        #rendered_content {
           font-family: 'CustomTextFont';
         }
         </style>

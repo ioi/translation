@@ -231,7 +231,8 @@ class GetTranslatePreview(LoginRequiredMixin,View):
         # TODO check if it's available
         direction = 'rtl' if translation.user.language.rtl else 'ltr'
         return render(request, 'pdf_template.html', context={'content': translation.get_latest_text(),\
-                    'direction': direction, 'title': "%s-%s" % (task.title, translation.user.language)})
+                    'direction': direction, 'title': "%s-%s" % (task.title, translation.user.language),\
+                                                             'text_font_base64': user.text_font_base64})
 
 
 class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):

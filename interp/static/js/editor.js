@@ -28,7 +28,8 @@ $(document).ready(function(){
         simplemde = new SimpleMDE({
             element: document.getElementById('left_ltr_plain_text_box'),
             status: false,
-            toolbar: false
+            toolbar: false,
+            spellChecker: false
         });
     }
 

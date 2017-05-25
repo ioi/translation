@@ -3,14 +3,16 @@ var simplemde,
     csrf_token,
     task_id,
     save_task_url,
-    publish_task_url;
+    publish_task_url,
+    spellChecking;
 
 $(document).ready(function(){
 
     simplemde = new SimpleMDE({
         element: document.getElementById("left_ltr_plain_text_box"),
         status: false,
-        toolbar: false
+        toolbar: false,
+        spellChecker: false
     });
 
     marked.setOptions({
@@ -24,11 +26,34 @@ $(document).ready(function(){
         smartypants: false
     });
 
-
+    spellChecking = false;
 
     last_saved_content = simplemde.value();
     window.setInterval(online_preview, 1000);
 });
+
+function onChangeSpellChecking(){
+    spellChecking = !spellChecking;
+    var value = simplemde.value();
+
+    /* reset simpleMDE container */
+    var element = document.getElementById("left_text_box_container");
+    while (element.firstChild) {
+       element.removeChild(element.firstChild);
+    }
+    var textarea = document.createElement('textarea');
+    textarea.setAttribute('id', 'left_ltr_plain_text_box');
+    element.appendChild(textarea);
+
+    /* new simpleMDE */
+    simplemde = new SimpleMDE({
+        element: document.getElementById("left_ltr_plain_text_box"),
+        status: false,
+        toolbar: false,
+        spellChecker: spellChecking,
+        initialValue: value
+    });
+}
 
 
 function online_preview() {
@@ -38,10 +63,11 @@ function online_preview() {
 }
 
 function save(publish) {
+    console.log($('#task-title').text());
     $.ajax({
         url: save_task_url,
         data: {
-            'title': $('#task-title').val(),
+            'title': $('#task-title').text(),
             'content': simplemde.value(),
             'id': task_id,
             'publish': publish,

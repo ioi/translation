@@ -62,7 +62,6 @@ function online_preview() {
 }
 
 function save(publish) {
-    console.log($('#task-title').text());
     $.ajax({
         url: save_task_url,
         data: {
@@ -84,6 +83,12 @@ function save(publish) {
     });
     return false;
 }
+
+window.onbeforeunload =  function(){
+    if(last_saved_content != simplemde.value())
+        return 'Leave without saving?';
+};
+
 
 /**
  * Created by ali on 4/21/17.

@@ -48,8 +48,8 @@ class EditTask(ISCEditorCheckMixin, View):
             return HttpResponseBadRequest("There is no contest")
         task = Task.objects.get(title=task_title, contest=contest)
         return render(request, 'editor-task.html',
-                      context={'content': task.get_latest_text(), 'title': task.title, 'contest_slug': contest_slug,
-                               'language': user.credentials()})
+                      context={'content': task.get_latest_text(), 'title': task.title, 'task_id': task.id,
+                               'contest_slug': contest_slug, 'language': user.credentials()})
 
 
 class SaveTask(ISCEditorCheckMixin, View):

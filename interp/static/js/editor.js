@@ -1,7 +1,7 @@
 var task_text, translation_text;
 var ques_id;
 var version_particle_url, save_question_url , task_version_url, access_edit_translate_url,
-        preview_url, unleash_trans_token_url;
+        preview_url, unleash_trans_token_url, home_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
@@ -125,10 +125,11 @@ function saveVersion() {
         type: "POST",
         success: function (response) {
             if (response.can_edit == false){
-                window.location.replace(preview_url)
+                handleAccessDenied();
+            }else{
+                last_version_particle_text = current_trans_text;
+                ToastrUtil.success('Successfully Saved ...');
             }
-            last_version_particle_text = current_trans_text;
-            ToastrUtil.success('Successfully Saved ...');
         },
         complete: function () {
         },
@@ -156,9 +157,10 @@ function saveVersionParticle() {
         type: "POST",
         success: function (response) {
             if (response.can_edit == false){
-                window.location.replace(preview_url)
+                handleAccessDenied();
+            }else{
+                last_version_particle_text = current_trans_text;
             }
-            last_version_particle_text = current_trans_text;
         },
         complete: function () {
         },
@@ -183,13 +185,14 @@ function getEditTranslateAccess() {
         type: "POST",
         success: function (response) {
             if (response.can_edit == false){
-                window.location.replace(preview_url)
+                handleAccessDenied();
+            }else{
+                last_time_get_edit_token = new Date();
+                sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
             }
-            last_time_get_edit_token = new Date();
-            sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
         },
         error: function () {
-            window.location.replace(preview_url)
+            handleAccessDenied();
         }
     });
 }
@@ -211,6 +214,11 @@ releasToken = function (e) {
         }
     });
 };
+
+function handleAccessDenied(){
+    $("#accessDeniedModal").modal({backdrop: "static", keyboard: false, show: true});
+    //window.location.replace(preview_url);
+}
 
 function checkIfCanChange(){
     current_date = new Date();

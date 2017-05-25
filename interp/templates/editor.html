@@ -59,6 +59,20 @@
       </div>
   </div>
 
+  <!-- Modal -->
+  <div class="modal fade" id="accessDeniedModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+            <h4>Another one is editing this task!</h4>
+        </div>
+        <div class="modal-footer">
+          <a href="{% url 'firstpage' %}" class="btn btn-primary">Return to home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="text/javascript">
       ques_id = {{quesId}};
       version_particle_url = "{% url 'saveVersionParticle' %}";

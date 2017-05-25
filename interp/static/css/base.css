@@ -90,3 +90,10 @@ span.notif-badge {
 .table>tbody>tr>th {
   vertical-align: middle;
 }
+
+
+/* persian markdown editor */
+#wmd-input {
+	background-color: #FFFFFF;
+	padding: 15px !important;
+}

@@ -19,7 +19,7 @@ function diff(id1, id2){
             text2 = version.text;
     });
     if(!text2){
-        view_version(text1, id)
+        view_version(text1, id1)
     }else {
         var diff_fragment = DiffUtil.getDiffFragment(text2, text1);
         $('#myversion').html(diff_fragment);

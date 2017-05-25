@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/save$', SaveTask.as_view(), name='savetask') ,
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/revisions$', TaskVersions.as_view(), name='task_versions'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/md$', TaskMarkdown.as_view(), name='task_md'),
-    # url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/pdf$', TranslationPDF.as_view(), name='trans_pdf'),
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/pdf$', TaskPDF.as_view(), name='task_pdf'),
     url(r'^enabletask/$', EnableTask.as_view(), name='enabletask'),
 
     url(r'^users/$', UsersList.as_view(), name='users_list'),

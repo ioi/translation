@@ -147,7 +147,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     def get_context_data(self, **kwargs):
         context = super(TranslationPDF, self).get_context_data(**kwargs)
         user = User.objects.get(username=self.request.user)
-        version_id = self.request.GET.get('id')
+        version_id = self.request.GET.get('ver')
         contest_slug = kwargs['contest_slug']
         task_title = kwargs['task_title']
         try:
@@ -241,7 +241,6 @@ class TranslatePreview(LoginRequiredMixin,View):
                                    'quesId': id,
                                    'text_font_base64': user.text_font_base64,
                                    'language': user.credentials()})
-
 
 
 class CheckoutVersion(LoginRequiredMixin,View):

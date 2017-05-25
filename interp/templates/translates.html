@@ -38,7 +38,7 @@
             <td>
               <a href="{% url 'task_md' contest_slug=contest_tasks.slug task_title=task.title%}" class="btn btn-default" data-toggle="tooltip" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
               <a href="{% url 'task_versions' contest_slug=contest_tasks.slug task_title=task.title %}" class="btn btn-default" data-toggle="tooltip" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-              <a href="{% url 'get_version_pdf'%}?type=task&id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+              <a href="{% url 'task_pdf' contest_slug=contest_tasks.slug task_title=task.title%}" class="btn btn-default" data-toggle="tooltip" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
               <a href="{% url 'mailtranspdf'%}?id={{task.id}}" class="btn btn-default" data-toggle="tooltip" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
             </td>
           </tr>

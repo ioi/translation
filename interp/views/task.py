@@ -19,15 +19,18 @@ class Tasks(ISCEditorCheckMixin, View):
         # questions = Task.objects.values_list('id', 'title', 'enabled')
         # TODO: need refactor (find can_publish_last_version by query)
         tasks = []
+        tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.all():
             can_enable_task = (not task.enabled) and (task.versions.filter(released=True).first() is not None)
-            tasks.append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task,
-                          'contest': task.contest.title, 'contest_slug': task.contest.slug})
+            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task})
 
+        tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
+                       Contest.objects.order_by('-order') if
+                       len(tasks_by_contest[c]) > 0]
         user = User.objects.get(username=request.user.username)
         contests = Contest.objects.order_by('order')
         return render(request, 'tasks.html',
-                      context={'tasks': tasks, 'contests': contests, 'language': user.credentials()})
+                      context={'tasks_lists': tasks_lists, 'contests': contests, 'language': user.credentials()})
 
     def post(self, request):
         title = request.POST['title']
@@ -78,6 +81,50 @@ class TaskMarkdown(LoginRequiredMixin,View):
             task = Task.objects.get(title=task_title, contest__slug=contest_slug)
             content = task.get_published_text()
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
+
+
+class TaskPDF(LoginRequiredMixin, PDFTemplateView):
+    filename = 'my_pdf.pdf'
+    template_name = 'pdf_template.html'
+    cmd_options = {
+        'page-size': 'Letter',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'footer-spacing': 3,
+        # 'zoom': 15,
+        'javascript-delay': 500,
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskPDF, self).get_context_data(**kwargs)
+        user = User.objects.get(username=self.request.user)
+        version_id = self.request.GET.get('ver')
+        contest_slug = kwargs['contest_slug']
+        task_title = kwargs['task_title']
+        task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+
+        if version_id:
+            content_version = ContentVersion.objects.filter(id=version_id).first()
+            if not content_version.can_view_by(user):
+                return None
+            content = content_version.text
+            file_name = "%s-%s-%d.pdf" % (task.title, "ISC", version_id)
+        else:
+            content = task.get_published_text()
+            file_name = "%s-%s.pdf" % (task.title, "ISC")
+
+        self.filename = file_name
+        context['direction'] = 'ltr'
+        context['content'] = content
+        context['title'] = self.filename
+        context['task_title'] = task.title
+        context['country'] = "ISC"
+        context['language'] = "en"
+        context['contest'] = task.contest.title
+        self.cmd_options['footer-center'] = '%s [page] / [topage]' % task.title
+        return context
 
 
 class TaskVersions(LoginRequiredMixin, View):

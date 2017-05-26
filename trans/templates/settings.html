@@ -7,6 +7,14 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <h2>Custom Font</h2>
+                    {% if text_font_name %}
+                    <h4>Current Font: </h4>
+                    {{text_font_name}}
+                    <div onclick='removeFont()' class="btn btn-default">
+                        <i class="fa fa-btn fa-remove fa-lg"></i>
+                    </div>
+                    <br>
+                    {% endif %}
                     <form action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ form }}
@@ -16,6 +24,33 @@
             </div>
         </div>
     </div>
+
+
+ <script>
+        function getCookie(name) {
+          var value = "; " + document.cookie;
+          var parts = value.split("; " + name + "=");
+          if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+        function removeFont() {
+            $.ajax({
+                url: " {% url 'settings' %}",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                },
+                type: "DELETE",
+                success: function (response) {
+                    location.reload();
+                    }
+                ,
+                complete: function () {
+                },
+                error: function (xhr, textStatus, thrownError) {
+                }
+            });
+        }
+
+    </script>
 
 
 {% endblock %}

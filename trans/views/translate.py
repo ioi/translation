@@ -26,12 +26,12 @@ class Home(LoginRequiredMixin, View):
         home_flat_page = FlatPage.objects.filter(slug="home").first()
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
-        for task in Task.objects.filter(enabled=True):
+        for task in Task.objects.filter(contest__enabled=True):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
-            freezed = translation and translation.freezed
+            frozen = translation and translation.frozen
             tasks_by_contest[task.contest].append(
-                {'id': task.id, 'title': task.title, 'is_editing': is_editing, 'freezed': freezed})
+                {'id': task.id, 'title': task.title, 'is_editing': is_editing, 'frozen': frozen})
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
@@ -47,8 +47,8 @@ class Translations(LoginRequiredMixin, View):
         except Exception as e:
             return HttpResponseBadRequest(e.message)
         trans = get_trans_by_user_and_task(user, task)
-        if trans.freezed:
-            return HttpResponseForbidden("This task is freezed")
+        if trans.frozen:
+            return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text()
         return render(request, 'editor.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
@@ -198,7 +198,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
-        if not task.enabled:
+        if not task.contest.enabled:
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
         if user != translation.user:
@@ -219,7 +219,7 @@ class FinishTranslate(LoginRequiredMixin, View):
         if not trans.user == user and can_save_translate(trans, edit_token):
             return HttpResponseForbidden("You don't have acccess")
         unleash_edit_translation_token(trans)
-        return JsonResponse("Done")
+        return JsonResponse({'message': "Done"})
 
 
 class CheckTranslationEditAccess(LoginRequiredMixin, View):
@@ -227,7 +227,7 @@ class CheckTranslationEditAccess(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
-        if not task.enabled:
+        if not task.contest.enabled:
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
         if user != translation.user:
@@ -239,7 +239,7 @@ class TranslatePreview(LoginRequiredMixin, View):
     def get(self, request, id):
         user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
-        if task.enabled == False:
+        if task.contest.enabled == False:
             return HttpResponseBadRequest("There is no published task")
         task_text = task.get_published_text()
         try:
@@ -261,7 +261,7 @@ class CheckoutVersion(LoginRequiredMixin, View):
         content_version = ContentVersion.objects.filter(id=version_id).first()
         user = User.objects.get(username=request.user)
         translation = content_version.content_object
-        if user != translation.user or translation.freezed:
+        if user != translation.user or translation.frozen:
             return JsonResponse({'error': 'forbidden'})
         translation.add_version(content_version.text)
         VersionParticle.objects.filter(translation=translation).delete()

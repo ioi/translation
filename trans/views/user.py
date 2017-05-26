@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http.response import HttpResponseRedirect, HttpResponseBadRequest
+from django.http.response import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -47,8 +47,9 @@ class Login(View):
 
 class Settings(LoginRequiredMixin,View):
     def get(self, request):
+        user = User.objects.get(username=request.user)
         form = UploadFileForm()
-        return render(request, 'settings.html', {'form': form})
+        return render(request, 'settings.html', {'form': form, 'text_font_name': user.text_font_name})
 
     def post(self, request):
         form = UploadFileForm(request.POST, request.FILES)
@@ -61,8 +62,16 @@ class Settings(LoginRequiredMixin,View):
         text_font_base64 = base64.b64encode(font_file.read())
         user = User.objects.get(username=request.user.username)
         user.text_font_base64 = text_font_base64
+        user.text_font_name = font_file.name
         user.save()
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    def delete(self, request):
+        user = User.objects.get(username=request.user)
+        user.text_font_base64 = ''
+        user.text_font_name = ''
+        user.save()
+        return JsonResponse({'message': "Done"})
 
 
 class Logout(LoginRequiredMixin,View):

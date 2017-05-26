@@ -5,6 +5,7 @@
   <link rel="stylesheet" href="/static/libs/markdown/simplemde.min.css">
   <link rel="stylesheet" href="/static/libs/markdown/editor.css">
   <link rel="stylesheet" href="/static/libs/markdown/katex.css">
+    <link rel="stylesheet" href="/user/font.css" type="text/css">
 
   <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
   <script type="text/javascript" src="/static/libs/markdown/simplemde.min.js"></script>
@@ -15,19 +16,6 @@
   <script type="text/javascript" src="/static/libs/markdown/katex.js"></script>
   <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
   <script type="text/javascript" src="/static/js/editor.js"></script>
-  {% if text_font_base64  %}
-
-    <style>
-    @font-face {
-      font-family: 'CustomTextFont';
-      src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
-    }
-
-    #editor_panel {
-      font-family: 'CustomTextFont';
-    }
-    </style>
-  {% endif %}
 
   <div class="row">
     <div class="btn-container">

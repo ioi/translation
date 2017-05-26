@@ -69,7 +69,7 @@ def get_task_by_contest_and_title(contest_slug, task_title):
     if not contest:
         raise Exception("There is no contest")
     task = Task.objects.get(title=task_title, contest=contest)
-    if not task.enabled:
+    if not task.contest.enabled:
         raise Exception("There is no published task")
     return task
 
@@ -83,7 +83,7 @@ def get_trans_by_user_and_task(user, task):
 
 
 def can_user_change_translation(user, translation, edit_token):
-    return user == translation.user and can_save_translate(translation, edit_token) and not translation.freezed
+    return user == translation.user and can_save_translate(translation, edit_token) and not translation.frozen
 
 # Cache Utils
 

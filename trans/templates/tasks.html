@@ -31,25 +31,23 @@
                     <th width="15%">Task</th>
                     <th width="15%">Edit</th>
                     <th>ISC Version</th>
-                    <th>Enable</th>
                 </tr></thead>
                 <tbody>
                 {% for task in contest_tasks.tasks %}
                     <tr>
                         <td>{{ task.title }}</td>
-                        <td><a href="{% url 'edittask' contest_slug=task.contest_slug task_title=task.title %}">Edit</a></td>
+                        <td>
+                            {% if task.frozen %}
+                                Frozen
+                            {% else %}
+                                <a href="{% url 'edittask' contest_slug=task.contest_slug task_title=task.title %}">Edit</a>
+                            {% endif %}
+                        </td>
                         <td>
                             <a href="{% url 'task_md' contest_slug=contest_tasks.slug task_title=task.title%}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
                             <a href="{% url 'task_versions' contest_slug=contest_tasks.slug task_title=task.title %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
                             <a href="{% url 'task_pdf' contest_slug=contest_tasks.slug task_title=task.title%}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                             <a href="{% url 'mailtaskpdf'%}?id={{task.id}}" class="btn btn-default" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
-                        </td>
-                        <td id="td_{{ task.id }}">
-                            {% if not task.enabled and task.can_enable %}
-                                <button  onclick="enableTask({{ task.id }})">Enable</button>
-                            {% elif task.enabled%}
-                                <button  onclick="disableTask({{ task.id }})">Disable</button>
-                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -58,68 +56,5 @@
         </div>
     </div>
     {% endfor %}
-
-
-    <script>
-        function getCookie(name) {
-          var value = "; " + document.cookie;
-          var parts = value.split("; " + name + "=");
-          if (parts.length == 2) return parts.pop().split(";").shift();
-        }
-        function enableTask(questionId) {
-            $.ajax({
-                url: " {% url 'enabletask' %}",
-                data: {
-                    'id': questionId,
-                    csrfmiddlewaretoken: getCookie("csrftoken")
-                },
-                type: "POST",
-                success: function (response) {
-                    location.reload();
-                    // TODO: should be more asynchron :(
-                    /*if (publishing == 'False')
-                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'True\')"> UnPublish </button>');
-                    else
-                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'False\')"> Publish </button>');
-
-                    */
-                    }
-                ,
-                complete: function () {
-                },
-                error: function (xhr, textStatus, thrownError) {
-                }
-            });
-        }
-        function disableTask(questionId) {
-            $.ajax({
-                url: " {% url 'enabletask' %}" + '?' + $.param({"id": questionId}),
-                data: {
-                    'id': questionId,
-                },
-
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-                },
-                type: "DELETE",
-                success: function (response) {
-                    location.reload();
-                    // TODO: should be more asynchron :(
-                    /*if (publishing == 'False')
-                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'True\')"> UnPublish </button>');
-                    else
-                        $('#td_' + questionId).html('<button onclick="changePublishing(' + questionId + ', \'False\')"> Publish </button>');
-
-                    */
-                    }
-                ,
-                complete: function () {
-                },
-                error: function (xhr, textStatus, thrownError) {
-                }
-            });
-        }
-
-    </script>
 
 {% endblock %}

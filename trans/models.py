@@ -15,8 +15,8 @@ class User(User):
     language = models.ForeignKey('Language')
     country = models.ForeignKey('Country')
     text_font_base64 = models.TextField(default='')
-    digit_font_base64 = models.TextField(default='')
-    raw_password = models.CharField(max_length=255,default='')
+    text_font_name = models.CharField(max_length=255, default='')
+    raw_password = models.CharField(max_length=255, default='')
 
     def __str__(self):
         return self.username
@@ -50,6 +50,7 @@ class Contest(models.Model):
     title = models.CharField(max_length=100, blank=False)
     order = models.IntegerField()
     slug = models.CharField(max_length=10, blank=False, unique=True)
+    enabled = models.BooleanField(default=False)
 
     def __repr__(self):
         return "%d-%s" % (self.order, self.title)
@@ -60,10 +61,11 @@ class Contest(models.Model):
 
 class Task(models.Model):
     title = models.CharField(max_length=255, blank=False)
-    enabled = models.BooleanField(default=False)
+    enabled = models.BooleanField(default=True)
     versions = GenericRelation(ContentVersion)
     contest = models.ForeignKey('Contest', default=None)
     uploaded_file = models.FileField(upload_to='uploads/', blank=True)
+    frozen = models.BooleanField(default=False)
 
     def add_version(self, text, release_note="", released=False):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),
@@ -95,7 +97,7 @@ class Translation(models.Model):
     user = models.ForeignKey('User')
     task = models.ForeignKey('Task', default=0)
     versions = GenericRelation(ContentVersion)
-    freezed = models.BooleanField(default=False)
+    frozen = models.BooleanField(default=False)
 
     def add_version(self, text):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now())

@@ -23,7 +23,7 @@ class VersionDownloadMixin(object):
         user = User.objects.get(username=self.request.user.username)
         if content_type_model:
             task = Task.objects.filter(id=id).first()
-            if task is None or task.enabled == False:
+            if task is None or task.contest.enabled == False:
                 return None
             if content_type_model == 'translation':
                 translation = Translation.objects.filter(user=user, task=task).first()
@@ -52,7 +52,7 @@ class VersionDownloadMixin(object):
         user = User.objects.get(username=self.request.user.username)
         if content_type_model:
             task = Task.objects.filter(id=id).first()
-            if task is None or task.enabled == False:
+            if task is None or task.contest.enabled == False:
                 return None
             if content_type_model == 'translation':
                 translation = Translation.objects.filter(user=user, task=task).first()

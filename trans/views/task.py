@@ -16,13 +16,11 @@ from wkhtmltopdf.views import PDFTemplateView
 
 class Tasks(ISCEditorCheckMixin, View):
     def get(self, request):
-        # questions = Task.objects.values_list('id', 'title', 'enabled')
         # TODO: need refactor (find can_publish_last_version by query)
         tasks = []
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.all():
-            can_enable_task = (not task.enabled) and (task.versions.filter(released=True).first() is not None)
-            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'enabled': task.enabled, 'can_enable': can_enable_task, 'contest_slug': task.contest.slug})
+            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'frozen': task.frozen, 'contest_slug': task.contest.slug})
 
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
@@ -47,6 +45,8 @@ class EditTask(ISCEditorCheckMixin, View):
         if not contest:
             return HttpResponseBadRequest("There is no contest")
         task = Task.objects.get(title=task_title, contest=contest)
+        if task.frozen:
+            return HttpResponseBadRequest("This task is Frozen")
         return render(request, 'editor-task.html',
                       context={'content': task.get_latest_text(), 'title': task.title, 'task_id': task.id,
                                'contest_slug': contest_slug, 'language': user.credentials()})
@@ -61,6 +61,8 @@ class SaveTask(ISCEditorCheckMixin, View):
         if publish_raw == 'true':
             released = True
         task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+        if task.frozen:
+            return HttpResponseBadRequest("This task is Frozen")
         task.add_version(content, release_note, released)
         return HttpResponse("done")
 
@@ -147,6 +149,7 @@ class TaskVersions(LoginRequiredMixin, View):
                           context={'task_title': task.title, 'contest_slug': contest_slug, 'versions': versions_values})
 
 
+#TODO: It's useless now
 class EnableTask(ISCEditorCheckMixin, View):
     def post(self, request):
         id = request.POST['id']
@@ -183,7 +186,7 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         context = super(GetTaskPDF, self).get_context_data(**kwargs)
         task_id = self.request.GET['id']
         task = Task.objects.filter(id=task_id).first()
-        if task is None or task.enabled is False:
+        if task is None or task.contest.enabled is False:
             # TODO
             return None
 

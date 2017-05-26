@@ -37,7 +37,7 @@ class Tasks(ISCEditorCheckMixin, View):
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
         new_task = Task.objects.create(title=title, contest=contest)
-        return redirect(to=reverse('edittask', kwargs={'id': new_task.id}))
+        return redirect(to=reverse('edittask', kwargs={'contest_slug': contest.slug, 'task_title': new_task.title}))
 
 
 class EditTask(ISCEditorCheckMixin, View):
@@ -55,15 +55,12 @@ class EditTask(ISCEditorCheckMixin, View):
 class SaveTask(ISCEditorCheckMixin, View):
     def post(self, request, contest_slug, task_title):
         content = request.POST['content']
-        title = request.POST['title']
         release_note = request.POST.get('change_log', "")
         publish_raw = request.POST.get('publish', 'false')
         released = False
         if publish_raw == 'true':
             released = True
         task = Task.objects.get(title=task_title, contest__slug=contest_slug)
-        task.title = title
-        task.save()
         task.add_version(content, release_note, released)
         return HttpResponse("done")
 

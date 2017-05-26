@@ -11,7 +11,7 @@ from django.utils.timezone import utc
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('interp', '0001_initial'),
+        ('trans', '0001_initial'),
     ]
 
     operations = [

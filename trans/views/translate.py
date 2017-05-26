@@ -8,14 +8,14 @@ from django.utils import timezone
 from django.views.generic import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from interp.models import User, Task, Translation, ContentVersion, VersionParticle, Contest
+from trans.models import User, Task, Translation, ContentVersion, VersionParticle, Contest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 
 from wkhtmltopdf.views import PDFTemplateView
 
-from interp.models import FlatPage
-from interp.forms import UploadFileForm
-from interp.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER, \
+from trans.models import FlatPage
+from trans.forms import UploadFileForm
+from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER, \
     unleash_edit_translation_token, get_task_by_contest_and_title, get_trans_by_user_and_task, \
     can_user_change_translation
 

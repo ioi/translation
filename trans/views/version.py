@@ -4,7 +4,7 @@ from django.http.response import HttpResponse, HttpResponseForbidden
 from django.views.generic.base import View
 from wkhtmltopdf.views import PDFTemplateView
 
-from interp.models import User, ContentVersion, Translation, Task
+from trans.models import User, ContentVersion, Translation, Task
 
 
 class VersionDownloadMixin(object):

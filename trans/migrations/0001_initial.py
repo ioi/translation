@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=255)),
                 ('enabled', models.BooleanField(default=False)),
                 ('uploaded_file', models.FileField(upload_to='uploads/')),
-                ('contest', models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='interp.Contest')),
+                ('contest', models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='trans.Contest')),
             ],
         ),
         migrations.CreateModel(
@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('freezed', models.BooleanField(default=False)),
-                ('task', models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, to='interp.Task')),
+                ('task', models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, to='trans.Task')),
             ],
         ),
         migrations.CreateModel(
@@ -105,8 +105,8 @@ class Migration(migrations.Migration):
                 ('text_font_base64', models.TextField(default='')),
                 ('digit_font_base64', models.TextField(default='')),
                 ('raw_password', models.CharField(default='', max_length=255)),
-                ('country', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='interp.Country')),
-                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='interp.Language')),
+                ('country', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='trans.Country')),
+                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='trans.Language')),
             ],
             options={
                 'verbose_name': 'user',
@@ -124,12 +124,12 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('text', models.TextField(default=None)),
                 ('create_time', models.DateTimeField(default=datetime.datetime(2017, 5, 4, 12, 33, 23, 169294, tzinfo=utc))),
-                ('translation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='interp.Translation')),
+                ('translation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='trans.Translation')),
             ],
         ),
         migrations.AddField(
             model_name='translation',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='interp.User'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='trans.User'),
         ),
     ]

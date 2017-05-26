@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
-from interp.utils import ISCEditorCheckMixin, AdminCheckMixin, get_task_by_contest_and_title
-from interp.models import Task, User, Contest, Translation, ContentVersion
+from trans.utils import ISCEditorCheckMixin, AdminCheckMixin, get_task_by_contest_and_title
+from trans.models import Task, User, Contest, Translation, ContentVersion
 
 from wkhtmltopdf.views import PDFTemplateView
 

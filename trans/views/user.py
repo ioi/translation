@@ -5,9 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
-from interp.forms import UploadFileForm
+from trans.forms import UploadFileForm
 
-from interp.models import User
+from trans.models import User
 
 
 class FirstPage(View):

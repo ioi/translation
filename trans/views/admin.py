@@ -4,8 +4,8 @@ from django.views.generic import View
 
 from django.http import HttpResponseNotFound, HttpResponse
 
-from interp.models import User, Task, Translation
-from interp.utils import StaffCheckMixin, is_translate_in_editing, unleash_edit_translation_token
+from trans.models import User, Task, Translation
+from trans.utils import StaffCheckMixin, is_translate_in_editing, unleash_edit_translation_token
 
 
 class UserTranslations(StaffCheckMixin, View):

@@ -16,10 +16,10 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-from interp.views.user import FirstPage
+from trans.views.user import FirstPage
 
 urlpatterns = [
     url(r'^admin/login/$', FirstPage.as_view()),
     url(r'^admin/', admin.site.urls),
-    url(r'^' , include('interp.urls')),
+    url(r'^' , include('trans.urls')),
 ]

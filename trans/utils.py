@@ -64,7 +64,7 @@ CONTEST_ORDER ={'Day 2': 0, 'Day 1': 1, 'Practice': 2}
 
 
 def get_task_by_contest_and_title(contest_slug, task_title):
-    from interp.models import Contest, Task
+    from trans.models import Contest, Task
     contest = Contest.objects.filter(slug=contest_slug).first()
     if not contest:
         raise Exception("There is no contest")
@@ -75,7 +75,7 @@ def get_task_by_contest_and_title(contest_slug, task_title):
 
 
 def get_trans_by_user_and_task(user, task):
-    from interp.models import Translation
+    from trans.models import Translation
     trans, created = Translation.objects.get_or_create(user=user, task=task)
     if created:
         trans.add_version(task.get_published_text())

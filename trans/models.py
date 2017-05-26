@@ -8,7 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 
 from django.utils import timezone
 
-from interp.utils import add_notification_to_users_cache
+from trans.utils import add_notification_to_users_cache
 
 
 class User(User):

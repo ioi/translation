@@ -7,7 +7,7 @@ from django.db import migrations
 
 def update_slugs(apps, schema_editor):
     import random
-    ContestModel = apps.get_model("interp", "Contest")
+    ContestModel = apps.get_model("trans", "Contest")
 
     for instance in ContestModel.objects.all():
         instance.slug = '%s_%s' % (instance.title.lower().replace(" ", ""), instance.id)
@@ -16,7 +16,7 @@ def update_slugs(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('interp', '0002_auto_20170512_0529'),
+        ('trans', '0002_auto_20170512_0529'),
     ]
 
     operations = [

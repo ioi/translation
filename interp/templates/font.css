@@ -1,0 +1,10 @@
+
+
+@font-face {
+  font-family: 'CustomTextFont';
+  src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
+}
+
+#rendered_content  {
+  font-family: 'CustomTextFont';
+}

@@ -62,15 +62,18 @@
 	float: left;
 	width: 50%;
 	border: 1px solid #ddd;
-  min-height: 800px;
+	min-height: 800px;
+	background-color: #FFFFFF;
 }
 
 .preview-pane {
 	border: 1px solid #ddd;
 	background-color: #f6f6f6;
-  border-left: 0px;
-  min-height: 800px;
-  padding: 15px;
+	border-left: 0px;
+	min-height: 800px;
+	padding: 15px;
+	width: 50%;
+	float: right;
 }
 
 div.CodeMirror {

@@ -31,10 +31,10 @@
 
   <div class="row">
     <div class="btn-container">
-            <button class="btn btn-default" onclick="saveVersion()" data-toggle="tooltip" data-placement="bottom" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
-            <a href="{% url 'versions' quesId %}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-            <a href="{% url 'gettranspdf'%}?id={{quesId}}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-            <a href="{% url 'gettranspreview' contest_slug=contest_slug task_title=task_title%}" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
+            <button class="btn btn-default" onclick="saveVersion()" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
+            <a href="{% url 'versions' contest_slug=contest_slug task_title=task_title %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+            <a href="{% url 'trans_pdf' contest_slug=contest_slug task_title=task_title %}" class="btn btn-default" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
+            <a href="{% url 'gettranspreview' contest_slug=contest_slug task_title=task_title%}" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
 
             <div class="btn-group pull-right" role="group">
                 <button type="button" id="preview-btn" class="btn btn-default" onclick="onPreviewClick()">Preview</button>
@@ -64,10 +64,10 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-body">
-            <h4>Another one is editing this task!</h4>
+            <h3>The task is being edited somewhere else!</h3>
         </div>
         <div class="modal-footer">
-          <a href="{% url 'firstpage' %}" class="btn btn-primary">Return to home</a>
+          <a href="{% url 'firstpage' %}" class="btn btn-primary">Return</a>
         </div>
       </div>
     </div>
@@ -80,7 +80,7 @@
       unleash_trans_token_url = "{% url 'unleash_trans_token' id=quesId %}";
       preview_url = "{% url 'preview_translate' id=quesId%}";
       save_question_url = "{% url 'save_translation' contest_slug=contest_slug task_title=task_title %}";
-      task_version_url = "{% url 'taskVersions' id=quesId %}";
+      task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_title=task_title  %}";
       csrf_token = "{{csrf_token}}";
       rtl = '{{rtl}}' == 'True';
 

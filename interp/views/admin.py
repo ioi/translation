@@ -5,7 +5,7 @@ from django.views.generic import View
 from django.http import HttpResponseNotFound, HttpResponse
 
 from interp.models import User, Task, Translation
-from interp.utils import StaffCheckMixin, is_translate_in_editing
+from interp.utils import StaffCheckMixin, is_translate_in_editing, unleash_edit_translation_token
 
 
 class UserTranslations(StaffCheckMixin, View):
@@ -38,3 +38,11 @@ class FreezeTranslation(StaffCheckMixin, View):
         trans.freezed = freezed
         trans.save()
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+
+class UnleashEditTranslationToken(StaffCheckMixin, View):
+    def post(self, request, id):
+        trans = Translation.objects.get(id=id)
+        if trans is None:
+            return HttpResponseNotFound("There is no task")
+        unleash_edit_translation_token(trans)
+        return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))

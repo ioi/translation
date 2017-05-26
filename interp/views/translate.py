@@ -208,7 +208,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
 
 
 # TODO
-class UnleashEditTranslationToken(LoginRequiredMixin, View):
+class FinishTranslate(LoginRequiredMixin, View):
     def post(self, request, id):
         user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
@@ -216,11 +216,10 @@ class UnleashEditTranslationToken(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         if trans is None:
             return HttpResponseNotFound("There is no task")
-        if not (user.is_superuser or user.groups.filter(name="staff").exists() or (
-                        trans.user == user and can_save_translate(trans, edit_token))):
+        if not trans.user == user and can_save_translate(trans, edit_token):
             return HttpResponseForbidden("You don't have acccess")
         unleash_edit_translation_token(trans)
-        return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
+        return JsonResponse("Done")
 
 
 class CheckTranslationEditAccess(LoginRequiredMixin, View):

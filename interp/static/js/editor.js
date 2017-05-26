@@ -1,7 +1,7 @@
 var task_text, translation_text;
 var ques_id;
 var version_particle_url, save_question_url , task_version_url, access_edit_translate_url,
-        preview_url, unleash_trans_token_url, home_url;
+        preview_url, finish_translation_url, home_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
@@ -202,7 +202,7 @@ releasToken = function (e) {
     var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
     $.ajax({
         async: false,
-        url: unleash_trans_token_url,
+        url: finish_translation_url,
         data: {
             id: ques_id,
             edit_token: edit_token,

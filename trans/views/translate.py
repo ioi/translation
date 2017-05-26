@@ -35,7 +35,7 @@ class Home(LoginRequiredMixin, View):
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
-        return render(request, 'translates.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
+        return render(request, 'translations.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
                                                            'language': user.credentials()})
 
 
@@ -50,7 +50,7 @@ class Translations(LoginRequiredMixin, View):
         if trans.frozen:
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text()
-        return render(request, 'editor.html',
+        return render(request, 'translation.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
                                'task_title': task_title,
@@ -108,7 +108,7 @@ class GetTranslatePreview(LoginRequiredMixin, View):
         translation = get_trans_by_user_and_task(user, task)
         # TODO check if it's available
         direction = 'rtl' if translation.user.language.rtl else 'ltr'
-        return render(request, 'pdf_template.html', context={'content': translation.get_latest_text(),
+        return render(request, 'pdf-template.html', context={'content': translation.get_latest_text(),
                                                              'direction': direction,
                                                              'task_title': "%s-%s" % (
                                                              task.title, translation.user.language),
@@ -145,7 +145,7 @@ class TranslationMarkdown(LoginRequiredMixin, View):
 
 class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
-    template_name = 'pdf_template.html'
+    template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -293,7 +293,7 @@ class Versions(LoginRequiredMixin, View):
         if request.is_ajax():
             return JsonResponse(dict(versions=list(v), version_particles=list(vp)))
         else:
-            return render(request, 'versions.html',
+            return render(request, 'revisions.html',
                           context={'versions': v, 'versionParticles': vp, 'translation': trans.get_latest_text(),
                                    'quesId': trans.id, 'task_title': task.title, 'contest_slug': contest_slug})
 
@@ -320,7 +320,7 @@ class GetVersionParticle(LoginRequiredMixin, View):
 
 class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
-    template_name = 'pdf_template.html'
+    template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -381,7 +381,7 @@ class MailTranslatePDF(GetTranslatePDF):
 class PrintCustomFile(LoginRequiredMixin, View):
     def get(self, request):
         form = UploadFileForm()
-        return render(request, 'print_custom_file.html', {'form': form})
+        return render(request, 'custom-print.html', {'form': form})
 
     def post(self, request):
         form = UploadFileForm(request.POST, request.FILES)

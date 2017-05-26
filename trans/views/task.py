@@ -47,7 +47,7 @@ class EditTask(ISCEditorCheckMixin, View):
         task = Task.objects.get(title=task_title, contest=contest)
         if task.frozen:
             return HttpResponseBadRequest("This task is Frozen")
-        return render(request, 'editor-task.html',
+        return render(request, 'task.html',
                       context={'content': task.get_latest_text(), 'title': task.title, 'task_id': task.id,
                                'contest_slug': contest_slug, 'language': user.credentials()})
 
@@ -84,7 +84,7 @@ class TaskMarkdown(LoginRequiredMixin,View):
 
 class TaskPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
-    template_name = 'pdf_template.html'
+    template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -145,7 +145,7 @@ class TaskVersions(LoginRequiredMixin, View):
         if request.is_ajax():
             return JsonResponse(dict(versions=list(versions_values)))
         else:
-            return render(request, 'task_versions.html',
+            return render(request, 'task-revisions.html',
                           context={'task_title': task.title, 'contest_slug': contest_slug, 'versions': versions_values})
 
 
@@ -169,7 +169,7 @@ class EnableTask(ISCEditorCheckMixin, View):
 
 class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
-    template_name = 'pdf_template.html'
+    template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',

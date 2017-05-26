@@ -91,5 +91,8 @@ ENV/
 # DB
 *.sqlite3
 
-#ide
+# ide
 *.idea
+
+# Mac
+.DS_Store

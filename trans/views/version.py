@@ -80,7 +80,7 @@ class VersionDownloadMixin(object):
 
 class GetVersionPDF(VersionDownloadMixin, LoginRequiredMixin, PDFTemplateView):
     file_format = 'pdf'
-    template_name = 'pdf_template.html'
+    template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',

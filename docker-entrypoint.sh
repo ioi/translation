@@ -9,4 +9,4 @@ echo "Migrating Models"
 python manage.py migrate
 
 echo "Starting Gunicorn"
-/usr/local/bin/gunicorn IOI_Translate.wsgi:application -w 1 -b :8000
+/usr/local/bin/gunicorn Translation.wsgi:application -w 1 -b :8000

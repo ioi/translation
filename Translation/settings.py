@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'IOI_Translate.urls'
+ROOT_URLCONF = 'Translation.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'IOI_Translate.wsgi.application'
+# WSGI_APPLICATION = 'Translation.wsgi.application'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 WKHTMLTOPDF_CMD_OPTIONS = {

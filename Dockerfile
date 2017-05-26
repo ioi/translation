@@ -16,6 +16,6 @@ RUN pip install -U pip
 RUN pip install -r requirements.txt
 
 #COPY . /usr/src/app
-#COPY ./IOI/production_settings.py /usr/src/app/IOI/settings.py
+#COPY ./IOI_Translate/production_settings.py /usr/src/app/IOI_Translate/settings.py
 
 CMD ["./docker-entrypoint.sh"]

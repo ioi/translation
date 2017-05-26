@@ -20,7 +20,7 @@ urlpatterns = [
         SaveVersionParticle.as_view(), name='save_version_particle'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/html/$',
         GetTranslatePreview.as_view(), name='gettranspreview'),
-    url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/md$', TranslationMarkdown.as_view(), name='trans_md'),
+    url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/markdown$', TranslationMarkdown.as_view(), name='trans_md'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/pdf$', TranslationPDF.as_view(), name='trans_pdf'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/revisions$', Versions.as_view(), name='versions'),
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
@@ -34,7 +34,7 @@ urlpatterns = [
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/$', EditTask.as_view(), name='edittask'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/save$', SaveTask.as_view(), name='savetask') ,
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/revisions$', TaskVersions.as_view(), name='task_versions'),
-    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/md$', TaskMarkdown.as_view(), name='task_md'),
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/markdown$$', TaskMarkdown.as_view(), name='task_md'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_title>[\w]*)/pdf$', TaskPDF.as_view(), name='task_pdf'),
     url(r'^enabletask/$', EnableTask.as_view(), name='enabletask'),
 

@@ -14,7 +14,6 @@
                              {% for contest in contests %}
                              <option value="{{contest.id}}">{{contest.title}}</option>
                              {% endfor %}
-
                         </select>
                         <input type="submit" value="New Task">
                     </form>
@@ -23,7 +22,7 @@
             </div>
         </div>
 
-    {% for contest_tasks in tasks_lists %}
+        {% for contest_tasks in tasks_lists %}
         <div class="body container">
             <h2>{{contest_tasks.title}}</h2>
             <table class="table table-hover">
@@ -54,7 +53,7 @@
                 </tbody>
             </table>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 
 {% endblock %}

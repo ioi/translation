@@ -1,56 +1,53 @@
-
 .markdown-body {
-  line-height: 1.5;
-  color: #333;
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  word-wrap: break-word;
+    line-height: 1.5;
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .markdown-body img {
-	display: block;
-	margin: 0 auto;
-	height: auto;
-	max-width: 100%;
+    display: block;
+    margin: 0 auto;
+    height: auto;
+    max-width: 100%;
 }
 
 .markdown-body table {
-	border-collapse: collapse;
-	border-spacing: 0;
-	border: 1px solid gray;
-	margin: 1.5em auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid gray;
+    margin: 1.5em auto;
 }
 
-.markdown-body table th,.markdown-body table td {
-	border: 1px solid #d6d6d6;
-	padding: .3em .6em;
-	vertical-align: middle;
+.markdown-body table th, .markdown-body table td {
+    border: 1px solid #d6d6d6;
+    padding: .3em .6em;
+    vertical-align: middle;
 }
 
 .markdown-body table th {
-	font-weight: bold;
-	color: #333;
-	background-color: #eee;
+    font-weight: bold;
+    color: #333;
+    background-color: #eee;
 }
 
 .markdown-body pre {
-	direction: ltr;
-	background-color: #eee;
-	padding: 10px 20px;
-	word-wrap: break-all;
+    direction: ltr;
+    background-color: #eee;
+    padding: 10px 20px;
+    word-wrap: break-all;
 }
 
 .markdown-body code {
-	word-wrap: break-all;
-	color: #666;
-	background-color: transparent;
-	padding: 0;
+    word-wrap: break-all;
+    color: #666;
+    background-color: transparent;
+    padding: 0;
 }
 
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3 {
-	font-family: Arial, serif;
-  font-weight: 500;
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+    font-family: Arial, serif;
+    font-weight: 500;
 }

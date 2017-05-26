@@ -10,19 +10,21 @@
                 <div class="panel-body">
 
                     <table class="table">
-                        <thead><tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Date</th>
-                        </tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                        {% for notif in notifications %}
+                            {% for notif in notifications %}
                             <tr>
                                 <td width="20%">{{notif.title}}</td>
                                 <td width="60%">{{notif.description}}</td>
                                 <td width="20%">{{notif.create_time | ioi_timezone}}</td>
                             </tr>
-                        {% endfor %}
+                            {% endfor %}
                         </tbody>
                     </table>
 
@@ -30,6 +32,5 @@
             </div>
         </div>
     </div>
-
 
 {% endblock %}

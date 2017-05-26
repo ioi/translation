@@ -1,55 +1,86 @@
 /*
 Global
 ============================= */
+
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);
 
-
 body {
-	font-family: Arial, serif;
-	color: #666;
-	font-size: 16px;
-	font-weight: 400;
-	  -webkit-font-smoothing: antialiased;
-     font-smoothing: antialiased;
+    font-family: Arial, serif;
+    color: #666;
+    font-size: 16px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
 }
 
 * {
-     text-shadow: 0 1px 1px rgba(255,255,255,.3);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, .3);
 }
 
-p{line-height: 24px}
-a{color:#0088cc;}
-a:hover{text-decoration: none;}
+p {
+    line-height: 24px
+}
 
+a {
+    color: #0088cc;
+}
 
+a:hover {
+    text-decoration: none;
+}
 
-h1, h2, h3, h4, h5, h6 { font-family: 'Source Sans Pro', arial, sans-serif; }
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Source Sans Pro', arial, sans-serif;
+}
 
-h1{font-size: 36px; font-weight: 200; color: #555; margin: 20px 0 30px;}
-h2{font-size: 30px; font-weight: 300; color: #444; margin: 30px 0}
-h3{font-size: 20px; font-weight: 400; margin: 20px 0;}
-h4{font-size: 18px; font-weight: 400}
+h1 {
+    font-size: 36px;
+    font-weight: 200;
+    color: #555;
+    margin: 20px 0 30px;
+}
 
-.table-version thead tr td{
-	font-size: 18px;
-	font-weight: 700;
-	text-align: center;
+h2 {
+    font-size: 30px;
+    font-weight: 300;
+    color: #444;
+    margin: 30px 0
+}
+
+h3 {
+    font-size: 20px;
+    font-weight: 400;
+    margin: 20px 0;
+}
+
+h4 {
+    font-size: 18px;
+    font-weight: 400
+}
+
+.table-version thead tr td {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
 }
 
 .table-version tbody tr {
-	cursor: pointer;
+    cursor: pointer;
 }
 
-.table-version tbody tr td:last-child{
-	text-align: right;
+.table-version tbody tr td:last-child {
+    text-align: right;
 }
 
-.table > tbody > tr.active > td, .table > tbody > tr.active > th, .table > tbody > tr > td.active, .table > tbody > tr > th.active, .table > tfoot > tr.active > td, .table > tfoot > tr.active > th, .table > tfoot > tr > td.active, .table > tfoot > tr > th.active, .table > thead > tr.active > td, .table > thead > tr.active > th, .table > thead > tr > td.active, .table > thead > tr > th.active {
+.table>tbody>tr.active>td, .table>tbody>tr.active>th, .table>tbody>tr>td.active,
+.table>tbody>tr>th.active, .table>tfoot>tr.active>td, .table>tfoot>tr.active>th,
+.table>tfoot>tr>td.active, .table>tfoot>tr>th.active, .table>thead>tr.active>td,
+.table>thead>tr.active>th, .table>thead>tr>td.active, .table>thead>tr>th.active {
     background-color: #ddd;
 }
 
 .btn-active {
-	background-color: #ddd;
+    background-color: #ddd;
 }
 
 .btn:focus {

@@ -5,53 +5,57 @@ body {
     text-align: justify;
 }
 
-.page-header
-{
-  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  padding-bottom: 10px;
-  border-bottom: hsl(0, 0, 45%) 1px solid;
+.page-header {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding-bottom: 10px;
+    border-bottom: hsl(0, 0, 45%) 1px solid;
 }
-.page-header .logo
-{
+
+.page-header .logo {
     display: inline-block;
     float: left;
     margin-right: 0px;
 }
-.page-header .logo img
-{
-      width: auto;
-      height: 100px;
-      margin: -16px -10px 0;
+
+.page-header .logo img {
+    width: auto;
+    height: 100px;
+    margin: -16px -10px 0;
 }
-.page-header .text
-{
+
+.page-header .text {
     display: inline-block;
     float: left;
     letter-spacing: -.05em;
     line-height: 1.1em;
 }
-.page-header .text h1{
-      font-weight: 700;
-      font-size: 1.1em;
-      margin: 0px 0px 3px
+
+.page-header .text h1 {
+    font-weight: 700;
+    font-size: 1.1em;
+    margin: 0px 0px 3px
 }
+
 .page-header .meta {
     display: inline-block;
     float: right;
     text-align: right;
     margin-top: 48px;
 }
-.page-header .meta h1{
-      font-family: "Courier New", monospace;
-      font-weight: bold;
-      font-size: 18px;
-      letter-spacing: -1px;
-      line-height: 24px;
+
+.page-header .meta h1 {
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 18px;
+    letter-spacing: -1px;
+    line-height: 24px;
 }
-.page-header .meta h2{
-      font-weight: 300;
-      font-size: 12px;
+
+.page-header .meta h2 {
+    font-weight: 300;
+    font-size: 12px;
 }
+
 .markdown-body code {
     color: #333;
 }

@@ -6,18 +6,14 @@
         <div class="col-sm-6 col-sm-offset-3">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <h2>Custom Font</h2>
-                    {% if text_font_name %}
-                    <h4>Current Font: </h4>
-                    {{text_font_name}}
+                    <h2>Custom Font</h2> {% if text_font_name %}
+                    <h4>Current Font: </h4> {{text_font_name}}
                     <div onclick='removeFont()' class="btn btn-default">
                         <i class="fa fa-btn fa-remove fa-lg"></i>
                     </div>
-                    <br>
-                    {% endif %}
+                    <br> {% endif %}
                     <form action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form }}
+                        {% csrf_token %} {{ form }}
                         <input type="submit">
                     </form>
                 </div>
@@ -25,8 +21,7 @@
         </div>
     </div>
 
-
- <script>
+    <script>
         function getCookie(name) {
           var value = "; " + document.cookie;
           var parts = value.split("; " + name + "=");

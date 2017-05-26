@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -7,60 +6,62 @@
 
     <div class="container">
         <div class="row">
-                    <div class="col-sm-12">
-                        <h2>
-                            {{language}}
-                        </h2>
-                    </div>
+            <div class="col-sm-12">
+                <h2>
+                    {{language}}
+                </h2>
+            </div>
         </div>
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-body">
 
                     <table class="table table-center">
-                        <thead><tr>
-                            <th>id</th>
-                            <th>Main Question</th>
-                            <th>PDF</th>
-                            <th>MarkDown</th>
-                            <th>Frozen</th>
-                            <th>is Editing</th>
-                        </tr></thead>
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>Main Question</th>
+                                <th>PDF</th>
+                                <th>MarkDown</th>
+                                <th>Frozen</th>
+                                <th>is Editing</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                        {% for trans in translations %}
+                            {% for trans in translations %}
                             <tr>
                                 <td>{{ trans.1 }}</td>
                                 {% if trans.2 %}
-                                    <td>{{ trans.3 }}  </td>
-                                    <td>MarkDown</td>
-                                    <td>PDF</td>
-                                    <td>
-                                        <form method="post" action="{% url 'freeze_trans' id=trans.3 %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="freeze" value="{{ trans.4|yesno:'False,True' }}" />
-                                            <input type="submit" value="{% if trans.4 %} Unfreeze {% else %} Freeze {%endif%}" />
-                                        </form>
-                                    </td>
-                                    <td>
-                                        {% if trans.5 %}
-                                        <form method="post" action="{% url 'unleash_trans_token' id=trans.3 %}">
-                                            {% csrf_token %}
-                                            <input type="submit" value="Unleash Token" />
-                                        </form>
-                                        {% endif %}
+                                <td>{{ trans.3 }} </td>
+                                <td>MarkDown</td>
+                                <td>PDF</td>
+                                <td>
+                                    <form method="post" action="{% url 'freeze_trans' id=trans.3 %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="freeze" value="{{ trans.4|yesno:'False,True' }}" />
+                                        <input type="submit" value="{% if trans.4 %} Unfreeze {% else %} Freeze {%endif%}" />
+                                    </form>
+                                </td>
+                                <td>
+                                    {% if trans.5 %}
+                                    <form method="post" action="{% url 'unleash_trans_token' id=trans.3 %}">
+                                        {% csrf_token %}
+                                        <input type="submit" value="Unleash Token" />
+                                    </form>
+                                    {% endif %}
 
-                                    </td>
+                                </td>
                                 {% else %}
-                                    <td>None</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                <td>None</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 {% endif %}
 
 
                             </tr>
-                        {% endfor %}
+                            {% endfor %}
                         </tbody>
                     </table>
 

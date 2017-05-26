@@ -2,93 +2,89 @@
 {% load staticfiles %}
 
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <title>IOI Translation System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <title>IOI Translation System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
 
-  <link rel="stylesheet" href="/static/libs/bootstrap/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/libs/toastr/toastr.min.css">
-  <link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/static/css/style.css">
-  <link rel="stylesheet" href="/static/css/notif.css">
-  <link rel="stylesheet" href="/static/css/base.css">
-  <link rel="stylesheet" href="/static/css/markdown.css">
+    <link rel="stylesheet" href="/static/libs/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/libs/toastr/toastr.min.css">
+    <link rel="stylesheet" href="/static/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/notif.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/markdown.css">
 
 
-  <script type="text/javascript" src="/static/libs/jquery/jquery-3.1.1.min.js"></script>
-  <script type="text/javascript" src="/static/libs/bootstrap/bootstrap.min.js"></script>
-  <script type="text/javascript" src="/static/libs/toastr/toastr.min.js"></script>
-  <script type="text/javascript" src="/static/libs/diff/diff.min.js"></script>
-  <script type="text/javascript" src="/static/libs/pdf/pdf.js"></script>
+    <script type="text/javascript" src="/static/libs/jquery/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/static/libs/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/libs/toastr/toastr.min.js"></script>
+    <script type="text/javascript" src="/static/libs/diff/diff.min.js"></script>
+    <script type="text/javascript" src="/static/libs/pdf/pdf.js"></script>
 
-  <script type="text/javascript" src="/static/js/notification.js"></script>
-  <script type="text/javascript" src="/static/js/diffUtil.js"></script>
-  <script type="text/javascript" src="/static/js/toastrUtil.js"></script>
-  <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript" src="/static/js/notification.js"></script>
+    <script type="text/javascript" src="/static/js/diffUtil.js"></script>
+    <script type="text/javascript" src="/static/js/toastrUtil.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
 
 </head>
 
 <body>
-
-
 <nav class="navbar navbar-inverse">
-  <div class="container container-fluid">
+    <div class="container container-fluid">
 
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-          data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'firstpage' %}">IOI Translation System</a>
+            <a class="navbar-brand" href="{% url 'firstpage' %}">IOI Translation System</a>
+        </div>
+
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <span class="notif-badge" id="notif-badge" style="display: none"></span>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>
+                    <ul class="dropdown-menu notif-dropdown-menu" id="notification-dropdown">
+                        <li id="see-all" class="see-all"><a href="{% url 'notifications' %}">Notifications history</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ user.username }} <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"></a></li>
+                        <li><a href="{% url 'settings'%}">Setting</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
     </div>
-
-
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <span class="notif-badge" id="notif-badge" style="display: none"></span>
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>
-          <ul class="dropdown-menu notif-dropdown-menu" id="notification-dropdown">
-              <li id="see-all" class="see-all"><a href="{% url 'notifications' %}">Notifications history</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false">{{ user.username }} <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#"></a></li>
-            <li><a href="{% url 'settings'%}">Setting</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-          </ul>
-        </li>
-      </ul>
-
-    </div>
-  </div>
 </nav>
 
 <div class="main-content container-fluid">
-  {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </div>
 
 </body>
-
 
 {% block script_panel %}
 
 {% endblock %}
 <script>
-  notification_url = "{% url 'notifications' %}";
-  csrf_token = "{{csrf_token}}"
+    notification_url = "{% url 'notifications' %}";
+    csrf_token = "{{csrf_token}}"
 </script>
 
 </html>

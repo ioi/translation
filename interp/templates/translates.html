@@ -23,7 +23,7 @@
                     <td> {{ task.title }} </td>
                     <td>
                         {% if task.is_editing %} Is editing
-                        {% elif task.freezed %} Freezed
+                        {% elif task.freezed %} Frozen
                         {% else %}<a href="{% url 'question' contest_slug=contest_tasks.slug task_title=task.title %}">Edit</a>{% endif %}
                     </td>
                     <td>

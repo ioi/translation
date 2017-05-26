@@ -38,7 +38,7 @@
                                         <form method="post" action="{% url 'freeze_trans' id=trans.3 %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="freeze" value="{{ trans.4|yesno:'False,True' }}" />
-                                            <input type="submit" value="{% if trans.4 %} UnFreeze {% else %} Freeze {%endif%}" />
+                                            <input type="submit" value="{% if trans.4 %} Unfreeze {% else %} Freeze {%endif%}" />
                                         </form>
                                     </td>
                                     <td>

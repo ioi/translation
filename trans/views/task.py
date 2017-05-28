@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
-from trans.utils import ISCEditorCheckMixin, AdminCheckMixin, get_task_by_contest_and_title
+from trans.utils import ISCEditorCheckMixin, AdminCheckMixin, get_task_by_contest_and_name
 from trans.models import Task, User, Contest, Translation, ContentVersion
 
 from wkhtmltopdf.views import PDFTemplateView
@@ -20,7 +20,7 @@ class Tasks(ISCEditorCheckMixin, View):
         tasks = []
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.all():
-            tasks_by_contest[task.contest].append({'id': task.id, 'title': task.title, 'frozen': task.frozen, 'contest_slug': task.contest.slug})
+            tasks_by_contest[task.contest].append({'id': task.id, 'name': task.name, 'frozen': task.frozen, 'contest_slug': task.contest.slug})
 
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
@@ -31,36 +31,36 @@ class Tasks(ISCEditorCheckMixin, View):
                       context={'tasks_lists': tasks_lists, 'contests': contests, 'language': user.credentials()})
 
     def post(self, request):
-        title = request.POST['title']
+        name = request.POST['name']
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
-        new_task = Task.objects.create(title=title, contest=contest)
-        return redirect(to=reverse('edittask', kwargs={'contest_slug': contest.slug, 'task_title': new_task.title}))
+        new_task = Task.objects.create(name=name, contest=contest)
+        return redirect(to=reverse('edittask', kwargs={'contest_slug': contest.slug, 'task_name': new_task.name}))
 
 
 class EditTask(ISCEditorCheckMixin, View):
-    def get(self, request, contest_slug, task_title):
+    def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
         contest = Contest.objects.filter(slug=contest_slug).first()
         if not contest:
             return HttpResponseBadRequest("There is no contest")
-        task = Task.objects.get(title=task_title, contest=contest)
+        task = Task.objects.get(name=task_name, contest=contest)
         if task.frozen:
             return HttpResponseBadRequest("This task is Frozen")
         return render(request, 'task.html',
-                      context={'content': task.get_latest_text(), 'title': task.title, 'task_id': task.id,
+                      context={'content': task.get_latest_text(), 'name': task.name, 'task_id': task.id,
                                'contest_slug': contest_slug, 'language': user.credentials()})
 
 
 class SaveTask(ISCEditorCheckMixin, View):
-    def post(self, request, contest_slug, task_title):
+    def post(self, request, contest_slug, task_name):
         content = request.POST['content']
         release_note = request.POST.get('change_log', "")
         publish_raw = request.POST.get('publish', 'false')
         released = False
         if publish_raw == 'true':
             released = True
-        task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+        task = Task.objects.get(name=task_name, contest__slug=contest_slug)
         if task.frozen:
             return HttpResponseBadRequest("This task is Frozen")
         task.add_version(content, release_note, released)
@@ -68,7 +68,7 @@ class SaveTask(ISCEditorCheckMixin, View):
 
 
 class TaskMarkdown(LoginRequiredMixin,View):
-    def get(self, request, contest_slug, task_title):
+    def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
         version_id = request.GET.get('ver')
         if version_id:
@@ -77,7 +77,7 @@ class TaskMarkdown(LoginRequiredMixin,View):
                 return None
             content = content_version.text
         else:
-            task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+            task = Task.objects.get(name=task_name, contest__slug=contest_slug)
             content = task.get_published_text()
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
@@ -101,33 +101,33 @@ class TaskPDF(LoginRequiredMixin, PDFTemplateView):
         user = User.objects.get(username=self.request.user)
         version_id = self.request.GET.get('ver')
         contest_slug = kwargs['contest_slug']
-        task_title = kwargs['task_title']
-        task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+        task_name = kwargs['task_name']
+        task = Task.objects.get(name=task_name, contest__slug=contest_slug)
 
         if version_id:
             content_version = ContentVersion.objects.filter(id=version_id).first()
             if not content_version.can_view_by(user):
                 return None
             content = content_version.text
-            file_name = "%s-%s-%d.pdf" % (task.title, "ISC", version_id)
+            file_name = "%s-%s-%d.pdf" % (task.name, "ISC", version_id)
         else:
             content = task.get_published_text()
-            file_name = "%s-%s.pdf" % (task.title, "ISC")
+            file_name = "%s-%s.pdf" % (task.name, "ISC")
 
         self.filename = file_name
         context['direction'] = 'ltr'
         context['content'] = content
         context['title'] = self.filename
-        context['task_title'] = task.title
+        context['task_name'] = task.name
         context['country'] = "ISC"
         context['language'] = "en"
         context['contest'] = task.contest.title
-        self.cmd_options['footer-center'] = '%s [page] / [topage]' % task.title
+        self.cmd_options['footer-center'] = '%s [page] / [topage]' % task.name
         return context
 
 
 class TaskVersions(LoginRequiredMixin, View):
-    def get(self, request, contest_slug, task_title):
+    def get(self, request, contest_slug, task_name):
         # TODO
         # published_raw = request.GET.get('published', 'false')
         # published = False
@@ -137,7 +137,7 @@ class TaskVersions(LoginRequiredMixin, View):
         released = True
         if user.is_superuser or user.groups.filter(name="editor").exists():
             released = False
-        task = Task.objects.get(title=task_title, contest__slug=contest_slug)
+        task = Task.objects.get(name=task_name, contest__slug=contest_slug)
         versions_query = task.versions.order_by('-create_time')
         if released:
             versions_query = versions_query.filter(released=True)
@@ -146,7 +146,7 @@ class TaskVersions(LoginRequiredMixin, View):
             return JsonResponse(dict(versions=list(versions_values)))
         else:
             return render(request, 'task-revisions.html',
-                          context={'task_title': task.title, 'contest_slug': contest_slug, 'versions': versions_values})
+                          context={'task_name': task.name, 'contest_slug': contest_slug, 'versions': versions_values})
 
 
 #TODO: It's useless now
@@ -186,20 +186,20 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
         context = super(GetTaskPDF, self).get_context_data(**kwargs)
         task_id = self.request.GET['id']
         task = Task.objects.filter(id=task_id).first()
-        if task is None or task.contest.enabled is False:
+        if task is None or task.contest.public is False:
             # TODO
             return None
 
-        self.filename = "%s-%s.pdf" % (task.title, 'original')
+        self.filename = "%s-%s.pdf" % (task.name, 'original')
         content = task.get_latest_text()
         context['direction'] = 'ltr'
         context['content'] = content
         context['title'] = self.filename
-        context['task_title'] = task.title
+        context['task_name'] = task.name
         context['country'] = "ISC"
         context['language'] = "en"
         context['contest'] = task.contest.title
-        self.cmd_options['footer-center'] = '%s [page] / [topage]' % task.title
+        self.cmd_options['footer-center'] = '%s [page] / [topage]' % task.name
         return context
 
 

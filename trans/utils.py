@@ -63,13 +63,13 @@ class ISCEditorCheckMixin(LoginRequiredMixin, object):
 CONTEST_ORDER ={'Day 2': 0, 'Day 1': 1, 'Practice': 2}
 
 
-def get_task_by_contest_and_title(contest_slug, task_title):
+def get_task_by_contest_and_name(contest_slug, task_name):
     from trans.models import Contest, Task
     contest = Contest.objects.filter(slug=contest_slug).first()
     if not contest:
         raise Exception("There is no contest")
-    task = Task.objects.get(title=task_title, contest=contest)
-    if not task.contest.enabled:
+    task = Task.objects.get(name=task_name, contest=contest)
+    if not task.contest.public:
         raise Exception("There is no published task")
     return task
 

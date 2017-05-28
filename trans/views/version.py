@@ -23,7 +23,7 @@ class VersionDownloadMixin(object):
         user = User.objects.get(username=self.request.user.username)
         if content_type_model:
             task = Task.objects.filter(id=id).first()
-            if task is None or task.contest.enabled == False:
+            if task is None or task.contest.public == False:
                 return None
             if content_type_model == 'translation':
                 translation = Translation.objects.filter(user=user, task=task).first()
@@ -52,16 +52,16 @@ class VersionDownloadMixin(object):
         user = User.objects.get(username=self.request.user.username)
         if content_type_model:
             task = Task.objects.filter(id=id).first()
-            if task is None or task.contest.enabled == False:
+            if task is None or task.contest.public == False:
                 return None
             if content_type_model == 'translation':
                 translation = Translation.objects.filter(user=user, task=task).first()
                 if translation is None or translation.user != user:
                     return None
                 return "%s-%s-%s.%s" % (
-                task.title, translation.user.language, translation.get_latest_change_time(), self.get_file_format())
+                task.name, translation.user.language, translation.get_latest_change_time(), self.get_file_format())
             elif content_type_model == 'task':
-                return "%s-%s-%s.%s" % (task.title, "ISC", task.get_latest_change_time(), self.get_file_format())
+                return "%s-%s-%s.%s" % (task.name, "ISC", task.get_latest_change_time(), self.get_file_format())
             else:
                 return None
 
@@ -70,7 +70,7 @@ class VersionDownloadMixin(object):
             return None
         if content_version.content_type.model == "translation":
             return "%s-%s-%s.%s" % (
-                content_version.content_object.task.title, content_version.content_object.user.language,
+                content_version.content_object.task.name, content_version.content_object.user.language,
                 content_version.content_object.get_latest_change_time(), self.get_file_format())
         else:
             return "%s-%s-%s.%s" % (

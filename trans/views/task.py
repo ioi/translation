@@ -32,6 +32,7 @@ class Tasks(ISCEditorCheckMixin, View):
 
     def post(self, request):
         name = request.POST['name']
+        name = name.replace(' ', '').replace('/','')
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
         new_task = Task.objects.create(name=name, contest=contest)

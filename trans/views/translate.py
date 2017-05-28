@@ -27,6 +27,8 @@ class Home(LoginRequiredMixin, View):
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.filter(contest__public=True):
+            if not task.is_published():
+                continue
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.frozen
@@ -47,7 +49,7 @@ class Translations(LoginRequiredMixin, View):
         except Exception as e:
             return HttpResponseBadRequest(e.message)
         trans = get_trans_by_user_and_task(user, task)
-        if trans.frozen:
+        if trans.frozen or not task.is_published():
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text()
         return render(request, 'translation.html',
@@ -67,7 +69,7 @@ class SaveTranslation(LoginRequiredMixin, View):
         translation = get_trans_by_user_and_task(user, task)
         content = request.POST['content']
         edit_token = request.POST.get('edit_token', '')
-        if not can_user_change_translation(user, translation, edit_token):
+        if not can_user_change_translation(user, translation, edit_token) or not task.is_published():
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()

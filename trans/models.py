@@ -81,6 +81,9 @@ class Task(models.Model):
             return latest_published_version.text
         return None
 
+    def is_published(self):
+        return self.versions.filter(released=True).order_by('-create_time').exists()
+
     def get_latest_change_time(self):
         latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
         if latest_published_version:

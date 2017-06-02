@@ -2,33 +2,32 @@
 
 {% block content %}
 
-    <div class="container">
+    <!-- <div class="container">
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <form action="{%  url 'task' %}" method="post">
                         {% csrf_token %}
-                        <label for="task_name">Title: </label>
-                        <input id="task_name" type="text" name="name">
-                        <select name="contest">
+                        <label for="task_name">Task Name: </label>
+                        <input id="task_name" class="form-control" type="text" name="name" style="width:200px; display:inline-block;">
+                        <select class="form-control" name="contest" style="width:100px; display:inline-block;" >
                              {% for contest in contests %}
                              <option value="{{contest.id}}">{{contest.title}}</option>
                              {% endfor %}
                         </select>
-                        <input type="submit" value="New Task">
+                        <input type="submit" class="btn btn-primary" value="Add Task">
                     </form>
-
                 </div>
             </div>
-        </div>
+        </div> -->
 
         {% for contest_tasks in tasks_lists %}
-        <div class="body container">
+        <div class="body container col-sm-8 col-sm-offset-2">
             <h2>{{contest_tasks.title}}</h2>
             <table class="table table-hover">
                 <thead><tr>
-                    <th width="15%">Task</th>
-                    <th width="15%">Edit</th>
+                    <th width="25%">Task</th>
+                    <th width="25%">Edit</th>
                     <th>ISC Version</th>
                 </tr></thead>
                 <tbody>

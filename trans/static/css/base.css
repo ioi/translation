@@ -6,6 +6,10 @@
     border-radius: 0;
 }
 
+.main-content {
+    margin-bottom: 100px;
+}
+
 .fa-btn {
     cursor: pointer;
 }

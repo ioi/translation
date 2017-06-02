@@ -2,18 +2,18 @@
 
 {% block content %}
 {% if home_content %}
-<div class="body container flatpage">
-       {{ home_content | safe }}
-</div>
+    <div class="body container flatpage col-sm-10 col-sm-offset-1">
+        {{ home_content | safe }}
+    </div>
 {% endif %}
 {% for contest_tasks in tasks_lists %}
 
-    <div class="body container">
+    <div class="body container col-sm-10 col-sm-offset-1">
         <h2>{{contest_tasks.title}}</h2>
         <table class="table table-hover">
             <thead><tr>
                 <th width="20%">Task</th>
-                <th width="15%">Edit</th>
+                <th width="20%">Edit</th>
                 <th>Translation</th>
                 <th>ISC Version</th>
             </tr></thead>

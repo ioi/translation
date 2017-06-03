@@ -47,7 +47,7 @@ class EditTask(ISCEditorCheckMixin, View):
             return HttpResponseBadRequest("There is no contest")
         task = Task.objects.get(name=task_name, contest=contest)
         if task.frozen:
-            return HttpResponseBadRequest("This task is Frozen")
+            return HttpResponseBadRequest("The task is frozen")
         return render(request, 'task.html',
                       context={'content': task.get_latest_text(), 'name': task.name, 'task_id': task.id,
                                'contest_slug': contest_slug, 'language': user.credentials()})
@@ -56,15 +56,15 @@ class EditTask(ISCEditorCheckMixin, View):
 class SaveTask(ISCEditorCheckMixin, View):
     def post(self, request, contest_slug, task_name):
         content = request.POST['content']
-        release_note = request.POST.get('change_log', "")
-        publish_raw = request.POST.get('publish', 'false')
-        released = False
-        if publish_raw == 'true':
-            released = True
+        release_note = request.POST.get('release_note', '')
+        publish = request.POST.get('publish', 'false')
         task = Task.objects.get(name=task_name, contest__slug=contest_slug)
         if task.frozen:
-            return HttpResponseBadRequest("This task is Frozen")
-        task.add_version(content, release_note, released)
+            return HttpResponseBadRequest("The task is frozen")
+        if publish == 'true':
+            task.publish_latest(release_note)
+        else:
+            task.add_version(content)
         return HttpResponse("done")
 
 

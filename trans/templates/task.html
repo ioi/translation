@@ -22,18 +22,19 @@
 
             <button class="btn btn-default" onclick="save(false)" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
             <button class="btn btn-default" data-toggle="modal" data-target="#saveModal" title="Publish"><i class="fa fa-btn fa-upload fa-lg"></i></button>
-
+            &nbsp; 
             <a href="{% url 'task_versions' contest_slug=contest_slug task_name=name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
             <a href="{% url 'task_pdf' contest_slug=contest_slug task_name=name%}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
             <a href="{% url 'mailtaskpdf'%}?id={{task_id}}" class="btn btn-default" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
 
             &nbsp;
-            <input type="checkbox" onchange="onChangeSpellChecking()"> check spelling
+            <input id="spell-checking" type="checkbox" onchange="onChangeSpellChecking()"> 
+            <label for="spell-checking" style="font-weight: normal;">check spelling</label>
         </div>
     </div>
 
     <div class="row editor-panel">
-        <div class="col-sm-6 edit-pane">
+        <div class="col-sm-6 edit-pane" style="padding: 0;">
             <div id="left_text_box_container">
                 <textarea id="left_ltr_plain_text_box">{{ content }}</textarea>
             </div>
@@ -44,18 +45,25 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="saveModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="saveModal" role="dialog">
+        <div class="modal-dialog">
             <div class="modal-content">
+                <div class="modal-header">
+                    <!-- <h4 class="modal-title">Publish the Latest Saved Version</h4> -->
+                    <h4 class="modal-title">Publish</h4>
+                </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="change-log">Release Note:</label>
-                        <input type="text" class="form-control" id="change-log">
+                        <label for="release-note">Release Note:</label>
+                        <input type="text" class="form-control" id="release-note" required data-modalfocus>
+                        <span class="help-block">
+                            This applies to the latest saved revision.
+                        </span>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="save(true)">Save and Publish</button>
+                    <button type="button" class="btn btn-primary" onclick="return save(true)">Publish</button>
                 </div>
             </div>
         </div>

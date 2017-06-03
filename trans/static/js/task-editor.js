@@ -62,13 +62,17 @@ function online_preview() {
 }
 
 function save(publish) {
+    var note = $('#release-note').val();
+    if (publish & note == '') {
+        alert('Release note is empty.');
+        return false;
+    }
     $.ajax({
         url: save_task_url,
         data: {
-            'title': $('#task-title').text(),
             'content': simplemde.value(),
             'publish': publish,
-            'change_log': $('#change-log').val(),
+            'release_note': note,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
@@ -76,7 +80,7 @@ function save(publish) {
             last_saved_content = simplemde.value();
             $('#saveModal').modal('hide');
             if (publish)
-                ToastrUtil.success('Saved and Published...');
+                ToastrUtil.success('Task Published...');
             else
                 ToastrUtil.success('Saved...');
         }

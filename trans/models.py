@@ -69,6 +69,13 @@ class Task(models.Model):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),
                                              release_note=release_note, released=released)
 
+    def publish_latest(self, release_note):
+        latest_version = self.versions.order_by('-create_time').first()
+        if not latest_version:
+            return None
+        query_set = self.versions.filter(id=latest_version.id)
+        return query_set.update(release_note=release_note, released=True, create_time=timezone.now())
+
     def get_latest_text(self):
         latest_version = self.versions.order_by('-create_time').first()
         if latest_version:
@@ -82,7 +89,7 @@ class Task(models.Model):
         return None
 
     def is_published(self):
-        return self.versions.filter(released=True).order_by('-create_time').exists()
+        return self.versions.filter(released=True).exists()
 
     def get_latest_change_time(self):
         latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()

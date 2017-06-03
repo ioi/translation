@@ -13,3 +13,4 @@ python-markdown-math
 django-redis
 ipython
 pytz
+django-websocket-redis

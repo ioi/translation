@@ -35,7 +35,7 @@ function getNotifications() {
             var dropdown = $("#notification-dropdown");
             var seeAll = $("#see-all");
             dropdown.empty();
-            
+
             /**
              * add li element for each notification
              * apply suitable class based on read or unread
@@ -49,8 +49,8 @@ function getNotifications() {
 
                 container.append(title_span);
                 container.append(description_span);
-                if(!this.read){
-                    container.attr('onclick', 'readNotification('+this.id+')')
+                if (!this.read) {
+                    container.attr('onclick', 'readNotification(' + this.id + ')')
                     item.addClass('notif-unread');
                 }
                 item.append(container);

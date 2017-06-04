@@ -4,6 +4,19 @@ Global
 
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);
 
+/*
+IRAN Sans-serif fonts are used in this project under the license: LVGZC
+For more information about the font license please visit www.fontiran.com
+*/
+@font-face {
+	font-family: IransSans;
+	font-style: normal;
+	font-weight: normal;
+	src: url('/static/fonts/IranSans/IRANSansWeb.eot');
+	src: url('/static/fonts/IranSans/IRANSansWeb.woff2') format('woff2'),
+		 url('/static/fonts/IranSans/IRANSansWeb.ttf') format('truetype');
+}
+
 body {
     font-family: Arial, serif;
     color: #666;
@@ -33,7 +46,7 @@ h1 {
     font-size: 36px;
     font-weight: 200;
     color: #555;
-    margin: 40px 0 30px;
+    margin: 60px 0 30px;
 }
 
 h2 {
@@ -68,19 +81,12 @@ h4 {
     text-align: right;
 }
 
-.table>tbody>tr.active>td, .table>tbody>tr.active>th, .table>tbody>tr>td.active,
-.table>tbody>tr>th.active, .table>tfoot>tr.active>td, .table>tfoot>tr.active>th,
-.table>tfoot>tr>td.active, .table>tfoot>tr>th.active, .table>thead>tr.active>td,
-.table>thead>tr.active>th, .table>thead>tr>td.active, .table>thead>tr>th.active {
-    background-color: #ddd;
+.btn:focus {
+    outline: none !important;
 }
 
 .btn-active {
     background-color: #ddd;
-}
-
-.btn:focus {
-    outline: none !important;
 }
 
 .table th {
@@ -91,4 +97,8 @@ h4 {
 
 .modal-header {
     background-color: #f5f5f5;
+}
+
+#left_rtl_plain_text_box .editor-content {
+    font-family: IranSans, Tahoma, Arial;
 }

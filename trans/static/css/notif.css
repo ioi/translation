@@ -10,8 +10,9 @@
     width: 100%;
 }
 
-.notif-dropdown-menu li.notif-unread {
-    background-color: #ccc;
+.notif-dropdown-menu li.notif-unread,
+.notif-dropdown-menu li.notif-unread>a:hover {
+    background-color: #ddd;
 }
 
 .notif-dropdown-menu li:last-child {
@@ -52,7 +53,7 @@
 }
 
 .notif-dropdown-menu li.see-all {
-    margin-bottom: 0px;
+    margin-top: 3px;
 }
 
 .notif-dropdown-menu li.see-all a {

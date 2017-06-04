@@ -45,8 +45,6 @@ class ContentVersion(models.Model):
     def can_view_by(self, user):
         if self.content_type.model == 'translation' and self.content_object.user != user:
             return False
-        if self.content_type.model == 'task' and self.content_object.enabled == False:
-            return False
         return True
 
 

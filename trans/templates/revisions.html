@@ -10,57 +10,58 @@
 
 
 
-    <div class="col-sm-4">
-        <div class="panel panel-default">
-            <div class="panel-body">
+    <div class="container">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
 
-                <table class="table table-version table-hover">
-                    <thead><tr><td colspan="2">
-                        {{ taskTitle }}
-                    </td></tr></thead>
-                    <tbody>
-                    {% for version in versionParticles %}
-                        <tr id="particle-version-0" onclick="view_particle_version({{ version.0 }})">
-                            <td>{{ version.1 | ioi_timezone}} (auto saved)</td>
-                            <td></td>
-                        </tr>
-                    {% endfor %}
+                    <table class="table table-version table-hover">
+                        <thead><tr><td colspan="2">
+                            {{ taskTitle }}
+                        </td></tr></thead>
+                        <tbody>
+                        {% for version in versionParticles %}
+                            <tr id="particle-version-0" onclick="view_particle_version({{ version.0 }})">
+                                <td>{{ version.1 | ioi_timezone}} (auto saved)</td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
 
-                    {% for version in versions %}
-                        {% with next_element=versions|next:forloop.counter0 %}
-                        {% with previous_element=versions|previous:forloop.counter0 %}
+                        {% for version in versions %}
+                            {% with next_element=versions|next:forloop.counter0 %}
+                            {% with previous_element=versions|previous:forloop.counter0 %}
 
-                        <tr id="version-{{ version.0 }}" onclick="diff({{ version.0 }},{{ next_element.0 }})">
-                            <td>{{ version.1 | ioi_timezone}}</td>
-                            <td>
-                                <a href="{% url 'trans_md' contest_slug=contest_slug task_name=task_name%}?ver={{version.0}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.0 }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
-                            </td>
-                        </tr>
+                            <tr id="version-{{ version.0 }}" onclick="diff({{ version.0 }},{{ next_element.0 }})">
+                                <td>{{ version.1 | ioi_timezone}}</td>
+                                <td style="white-space: nowrap">
+                                    <a href="{% url 'trans_md' contest_slug=contest_slug task_name=task_name%}?ver={{version.0}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.0 }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
+                                </td>
+                            </tr>
 
-                        {% endwith %}
-                        {% endwith %}
-                    {% endfor %}
-                    </tbody>
-                </table>
+                            {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-sm-8" id="right-container">
-        <div class="panel panel-default">
-            <div class="panel-body">
+        <div class="col-sm-8" id="right-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
 
-                <div id="myversion" class="text-container" style="white-space: pre-wrap"></div>
-                <div id="original" style="display: none;">{{ translation }}</div>
-            </div>
+                    <div id="myversion" class="text-container" style="white-space: pre-wrap"></div>
+                    <div id="original" style="display: none;">{{ translation }}</div>
+                </div>
 
+                </div>
             </div>
         </div>
+
     </div>
-
-
 
     <!-- Modal -->
     <div class="modal fade" id="saveModal" tabindex="-1" role="dialog">

@@ -48,7 +48,7 @@ urlpatterns = [
 
     url(r'^get_trans_pdf/$', GetTranslatePDF.as_view(), name='gettranspdf'),
     url(r'^mail_trans_pdf/$', MailTranslatePDF.as_view(), name='mailtranspdf'),
-    url(r'^custom-print/$', PrintCustomFile.as_view(), name='printcustomfile'),
+    url(r'^print/$', PrintCustomFile.as_view(), name='printcustomfile'),
 
     url(r'^get_task_pdf/$', GetTaskPDF.as_view(), name='gettaskpdf'),
     url(r'^mail_task_pdf/$', MailTaskPDF.as_view(), name='mailtaskpdf'),

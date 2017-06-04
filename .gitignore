@@ -96,3 +96,6 @@ ENV/
 
 # Mac
 .DS_Store
+
+# media
+media/

@@ -9,40 +9,42 @@
     <script type="text/javascript" src="/static/js/versions-task.js"></script>
 
 
+    <div class="container">
 
-    <div class="col-sm-4">
-        <div class="panel panel-default">
-            <div class="panel-body">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
 
-                <table class="table table-version">
-                    <thead><tr>
-                        <td colspan="3">{{ task_name }}</td>
-                    </tr></thead>
-                    <tbody>
-                    {% for version in versions %}
-                        {% with next_element=versions|next:forloop.counter0 %}
-                        {% with previous_element=versions|previous:forloop.counter0 %}
+                    <table class="table table-version table-hover">
+                        <thead><tr>
+                            <td colspan="3">{{ task_name }}</td>
+                        </tr></thead>
+                        <tbody>
+                        {% for version in versions %}
+                            {% with next_element=versions|next:forloop.counter0 %}
+                            {% with previous_element=versions|previous:forloop.counter0 %}
 
-                        <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
-                            <td>{{ version.create_time | ioi_timezone }}</td>
-                            <td>{{ version.release_note }}</td>
-                            <td><a href="{% url 'trans_md' contest_slug=contest_slug task_name=task_name%}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a></td>
-                        </tr>
+                            <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
+                                <td>{{ version.create_time | ioi_timezone }}</td>
+                                <td>{{ version.release_note }}</td>
+                                <td><a href="{% url 'task_md' contest_slug=contest_slug task_name=task_name%}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a></td>
+                            </tr>
 
-                        {% endwith %}
-                        {% endwith %}
-                    {% endfor %}
-                    </tbody>
-                </table>
+                            {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
 
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-sm-8" id="right-container">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div id="myversion" class="text-container" style="white-space: pre-wrap"></div>
+        <div class="col-sm-8" id="right-container">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="myversion" class="text-container" style="white-space: pre-wrap"></div>
+                </div>
             </div>
         </div>
     </div>

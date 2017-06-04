@@ -79,7 +79,10 @@ class TaskMarkdown(LoginRequiredMixin,View):
             content = content_version.text
         else:
             task = Task.objects.get(name=task_name, contest__slug=contest_slug)
-            content = task.get_published_text()
+            if user.is_staff:
+                content = task.get_latest_text()
+            else:
+                content = task.get_published_text()
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
 
@@ -112,7 +115,10 @@ class TaskPDF(LoginRequiredMixin, PDFTemplateView):
             content = content_version.text
             file_name = "%s-%s-%d.pdf" % (task.name, "ISC", version_id)
         else:
-            content = task.get_published_text()
+            if user.is_staff:
+                content = task.get_latest_text()
+            else:
+                content = task.get_published_text()
             file_name = "%s-%s.pdf" % (task.name, "ISC")
 
         self.filename = file_name

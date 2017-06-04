@@ -30,6 +30,8 @@ class User(User):
     def get_translators():
         return User.objects.filter(is_staff=False)
 
+    def is_editor(self):
+        return self.groups.filter(name="editor").exists() or self.is_superuser
 
 class ContentVersion(models.Model):
     content_type = models.ForeignKey(ContentType)

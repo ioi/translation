@@ -55,7 +55,8 @@ urlpatterns = [
     url(r'^getvers/md/$', GetVersionMarkDown.as_view(), name='get_version_md'),
     url(r'^getvers/pdf/$', GetVersionPDF.as_view(), name='get_version_pdf'),
 
-    url(r'^notifications/$', Notifications.as_view(), name='notifications'),
+    url(r'^notifications/$', ReadNotifications.as_view(), name='notifications'),
+    url(r'^send_notification/$', SendNotification.as_view(), name='send_notif'),
     url(r'^user/font.css', UserFont.as_view(), name='userfontcss')
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \

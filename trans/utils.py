@@ -12,51 +12,6 @@ from django.core import serializers
 logger = logging.getLogger(__name__)
 
 
-class AdminCheckMixin(LoginRequiredMixin,object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
-    def check_user(self, user):
-        return user.is_superuser
-
-    def user_check_failed(self, request, *args, **kwargs):
-        return redirect(self.user_check_failure_path)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.check_user(request.user):
-            return self.user_check_failed(request, *args, **kwargs)
-        return super(AdminCheckMixin, self).dispatch(request, *args, **kwargs)
-
-
-class StaffCheckMixin(LoginRequiredMixin, object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
-    def check_user(self, user):
-        return user.is_superuser or user.groups.filter(name="staff").exists()
-
-    def user_check_failed(self, request, *args, **kwargs):
-        return redirect(self.user_check_failure_path)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.check_user(request.user):
-            return self.user_check_failed(request, *args, **kwargs)
-        return super(StaffCheckMixin, self).dispatch(request, *args, **kwargs)
-
-
-class ISCEditorCheckMixin(LoginRequiredMixin, object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
-    def check_user(self, user):
-        return user.is_superuser or user.groups.filter(name="editor").exists()
-
-    def user_check_failed(self, request, *args, **kwargs):
-        return redirect(self.user_check_failure_path)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.check_user(request.user):
-            return self.user_check_failed(request, *args, **kwargs)
-        return super(ISCEditorCheckMixin, self).dispatch(request, *args, **kwargs)
-
-
 # Task Contest Util
 
 
@@ -176,17 +131,38 @@ def add_notif_item_to_user_cache(user, notif_item):
     unread_notifs = cache.get(get_user_unread_notifs_cache_key(user))
     if unread_notifs is None:
         unread_notifs = []
-    unread_notifs.append(notif_item)
+    unread_notifs.insert(0, notif_item)
     cache.set(get_user_unread_notifs_cache_key(user), unread_notifs)
 
 
-def add_notification_to_users_cache(translators, notif):
+def add_notification_to_users_cache(users, notif):
     notif_dict = json.loads(serializers.serialize('json', [ notif, ]))[0]
     notif_item = notif_dict['fields']
     notif_item['id'] = notif_dict['pk']
-    for user in translators:
+    for user in users:
         add_notif_item_to_user_cache(user, notif_item)
 
+
+def remove_notification_in_user(user, notif):
+    unread_notifs = cache.get(get_user_unread_notifs_cache_key(user))
+    if unread_notifs and len(unread_notifs) > 0:
+        for un_notif in unread_notifs:
+            if un_notif['id'] == notif.id:
+                unread_notifs.remove(un_notif)
+                cache.set(get_user_unread_notifs_cache_key(user), unread_notifs)
+                break
+    read_notifs = cache.get(get_user_read_notifs_cache_key(user))
+    if read_notifs and len(read_notifs) > 0:
+        for read_notif in read_notifs:
+            if read_notif['id'] == notif.id:
+                read_notifs.remove(read_notif)
+                cache.set(get_user_read_notifs_cache_key(user), read_notifs)
+                break
+
+
+def remove_notification(users, notif):
+    for user in users:
+        remove_notification_in_user(user, notif)
 
 def read_all_notifs(user):
     cache.set(get_user_read_notifs_cache_key(user), get_all_unread_notifs(user) + get_all_read_notifs(user))

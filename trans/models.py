@@ -1,4 +1,6 @@
-from django.db.models.signals import post_save
+import datetime
+
+from django.db.models.signals import post_save, post_delete
 from django.core.mail import EmailMessage
 from django.dispatch import receiver
 from django.contrib.auth.models import User
@@ -8,7 +10,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 
 from django.utils import timezone
 
-from trans.utils import add_notification_to_users_cache
+from trans.utils import add_notification_to_users_cache, remove_notification
 
 
 class User(User):
@@ -176,18 +178,26 @@ class VersionParticle(models.Model):
 class Notification(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300)
-    create_time = models.DateTimeField()
+    create_time = models.DateTimeField(default=datetime.datetime.now())
+
+    def __str__(self):
+        return "%s-%s" % (self.title, self.description)
 
 
 def send_notif(sender, instance, created, *args, **kwargs):
     if created:
-        add_notification_to_users_cache(User.get_translators(), instance)
+        add_notification_to_users_cache(User.objects.all(), instance)
         # Redis Messages
         # message = RedisMessage("%s^%s"%(instance.title, instance.description))
         # RedisPublisher(facility='notifications', broadcast=True).publish_message(message)
 
 
+def remove_notif(sender, instance, *args, **kwargs):
+    remove_notification(User.objects.all(), instance)
+
+
 post_save.connect(send_notif, sender=Notification)
+post_delete.connect(remove_notif, sender=Notification)
 
 
 class Attachment(models.Model):

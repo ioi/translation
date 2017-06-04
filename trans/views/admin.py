@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls.base import reverse
 from django.views.generic import View
@@ -5,7 +6,67 @@ from django.views.generic import View
 from django.http import HttpResponseNotFound, HttpResponse
 
 from trans.models import User, Task, Translation
-from trans.utils import StaffCheckMixin, is_translate_in_editing, unleash_edit_translation_token
+from trans.utils import is_translate_in_editing, unleash_edit_translation_token
+
+
+class AdminCheckMixin(LoginRequiredMixin,object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(AdminCheckMixin, self).dispatch(request, *args, **kwargs)
+
+
+class StaffCheckMixin(LoginRequiredMixin, object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser or user.groups.filter(name="staff").exists()
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(StaffCheckMixin, self).dispatch(request, *args, **kwargs)
+
+
+class ISCEditorCheckMixin(LoginRequiredMixin, object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser or user.groups.filter(name="editor").exists()
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(ISCEditorCheckMixin, self).dispatch(request, *args, **kwargs)
+
+
+class StaffRequiredMixin(LoginRequiredMixin, object):
+    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
+
+    def check_user(self, user):
+        return user.is_superuser or user.is_staff
+
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 
 class UserTranslations(StaffCheckMixin, View):

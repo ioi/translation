@@ -15,6 +15,7 @@
 
     <script type="text/javascript" src="/static/libs/jquery/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
+    <script type="text/javascript" src="/static/js/init-marked.js"></script>
     <script type="text/javascript" src="/static/libs/markdown/katex.js"></script>
     <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
 
@@ -30,7 +31,7 @@
                 <h1>International Olympiad in Informatics 2017</h1>
                 <div>July 28 &ndash; August 4, 2017</div>
                 <div>Tehran, Iran</div>
-                <div>{{contest}} tasks</div>
+                <div>{{contest}} Tasks</div>
             </div>
             <div class="meta">
                 <h1>{{task_name}}</h1>
@@ -44,18 +45,8 @@
 </body>
 <script>
     $(document).ready(function() {
-        marked.setOptions({
-            renderer: new marked.Renderer(),
-            gfm: true,
-            tables: true,
-            breaks: false,
-            pedantic: false,
-            sanitize: false,
-            smartLists: true,
-            smartypants: false
-        });
 
-        text = $('#left_ltr_plain_text_box').html();
+        text = $('#left_ltr_plain_text_box').text();
         $('#rendered_content').html(marked(text));
         renderMathInElement(document.getElementById('rendered_content'));
     });

@@ -1,3 +1,6 @@
+
+@import url(/static/fonts/SourceSansPro/SourceSansPro.css);
+
 body {
     margin: 4em;
     font-size: 10px;
@@ -6,9 +9,9 @@ body {
 }
 
 .page-header {
-    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    padding-bottom: 10px;
-    border-bottom: hsl(0, 0, 45%) 1px solid;
+    font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
 }
 
 .page-header .logo {
@@ -18,22 +21,21 @@ body {
 }
 
 .page-header .logo img {
-    width: auto;
-    height: 100px;
-    margin: -16px -10px 0;
+    height: 70px;
+    padding-right: 15px;
 }
 
 .page-header .text {
     display: inline-block;
     float: left;
-    letter-spacing: -.05em;
+    letter-spacing: -.03em;
     line-height: 1.1em;
 }
 
 .page-header .text h1 {
     font-weight: 600;
     font-size: 1.1em;
-    margin: 0px 0px 3px
+    margin: 0px 0px 3px;
 }
 
 .page-header .meta {
@@ -47,27 +49,30 @@ body {
     font-family: "Courier New", monospace;
     font-weight: bold;
     font-size: 18px;
-    letter-spacing: -.05em;
+    letter-spacing: -.03em;
     line-height: 24px;
     margin: 0px;
 }
 
 .page-header .meta h2 {
-    font-weight: 300;
+    font-weight: 400;
     font-size: 12px;
-    margin: 5px 0;
+    margin: 3px 0;
 }
 
-.markdown-body {
+.page-header hr {
+    margin-top: 8px;
+}
+
+.pdf.markdown-body {
     color: black;
     font-size: 16px;
 }
 
-.markdown-body code {
+.pdf.markdown-body code {
     color: #333;
 }
 
-pre {
-    border: 1px solid #ccc;
-    border-radius: 0px;    
+.pdf pre {
+    border: 1px solid #ddd;
 }

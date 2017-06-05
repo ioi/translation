@@ -1,14 +1,11 @@
-
+{% if text_font_base64 %}
 @font-face {
     font-family: 'CustomTextFont';
     src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
 }
+{% endif %}
 
-#rendered_content {
-    font-family: 'CustomTextFont', Arial, serif;
-}
-
-#right_text_box {
+#rendered_content, #right_text_box {
     font-family: 'CustomTextFont', Arial, serif;
 }
 

@@ -104,3 +104,9 @@ a:hover {
     font-size: 90%;
     color: #333;
 }
+
+/* persian markdown editor */
+#wmd-input {
+    background-color: #fff;
+    padding: 15px !important;
+}

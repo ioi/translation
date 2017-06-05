@@ -6,8 +6,8 @@ from django.views.generic import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from trans.models import Notification
-from trans.utils import get_all_notifs, read_this_notif, read_all_notifs
+from trans.models import Notification, User
+from trans.utils import get_all_notifs, read_this_notif, read_all_notifs, reset_notification_cache
 from trans.views.admin import StaffRequiredMixin
 
 
@@ -43,3 +43,11 @@ class SendNotification(StaffRequiredMixin, View):
         notif = Notification(title=title, description=description)
         notif.save()
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def reset_notifications(request):
+    Notification.objects.all().delete()
+    reset_notification_cache(User.objects.all())
+    return HttpResponseRedirect(request.META["HTTP_REFERER"])

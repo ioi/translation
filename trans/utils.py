@@ -87,6 +87,12 @@ def unleash_edit_translation_token(translation):
 # Notifications Util
 
 
+def reset_notification_cache(users):
+    for user in users:
+        cache.set(get_user_unread_notifs_cache_key(user), [])
+        cache.set(get_user_read_notifs_cache_key(user), [])
+
+
 def update_user_cache(user, all_notifications):
     if cache.get(get_user_read_notifs_cache_key(user)) is None and\
             cache.get(get_user_unread_notifs_cache_key(user)) is None:

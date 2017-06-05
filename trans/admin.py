@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django import forms
+from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse
+from trans.utils import reset_notification_cache
 from .models import *
 from django.shortcuts import render
 
@@ -61,6 +63,10 @@ class CustomUserAdmin(UserAdmin):
     send_EMAIL.short_description = "Send an email to selected users"
 
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'description', 'create_time']
+    ordering = ['create_time']
+
 admin.site.register(Contest)
 admin.site.register(FlatPage)
 admin.site.register(Task)
@@ -69,5 +75,5 @@ admin.site.register(User, CustomUserAdmin)
 admin.site.register(Language)
 admin.site.register(Country)
 admin.site.register(VersionParticle)
-admin.site.register(Notification)
+admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Attachment)

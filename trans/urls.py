@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'^getvers/pdf/$', GetVersionPDF.as_view(), name='get_version_pdf'),
 
     url(r'^notifications/$', ReadNotifications.as_view(), name='notifications'),
+    url(r'^reset_notifications/$', reset_notifications, name='reset_notifications'),
     url(r'^send_notification/$', SendNotification.as_view(), name='send_notif'),
     url(r'^user/font.css', UserFont.as_view(), name='userfontcss')
 

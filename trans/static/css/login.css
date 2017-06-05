@@ -2,14 +2,10 @@ html {
     height: 100%;
 }
 
-body {
-    height: 100%;
-    overflow-y: hidden;
-}
-
 .container {
     height: 505px;
     margin-top: 150px;
+    margin-bottom: 100px;
 }
 
 .wrapper {

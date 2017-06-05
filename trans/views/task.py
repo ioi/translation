@@ -91,7 +91,7 @@ class TaskPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf-template.html'
     cmd_options = {
-        'page-size': 'Letter',
+        'page-size': 'A4',
         'margin-top': '0.75in',
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',
@@ -179,7 +179,7 @@ class GetTaskPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf-template.html'
     cmd_options = {
-        'page-size': 'Letter',
+        'page-size': 'A4',
         'margin-top': '0.75in',
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',

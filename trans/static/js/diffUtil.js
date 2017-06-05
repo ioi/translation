@@ -1,46 +1,35 @@
 
 function DiffUtil(){
 
-    /**
-     *
-     * @param original, text
-     * @param changed, text
-     * @returns {DocumentFragment}, diff of original and changed. Highlight added part by green color and removed part by red color
-     */
-    DiffUtil.getDiffFragment = function(original, changed){
+    DiffUtil.getDiffFragment = function(original, changed) {
+        // Highlight added part by green and removed part by red 
 
-        var diff = JsDiff.diffWords(original, changed, {newlineIsToken:true}),
-            fragment = document.createDocumentFragment();
+        var diff = JsDiff.diffWords(original, changed, {
+            newlineIsToken: true
+        }),
 
-        diff.forEach(function(part){
-          var color = part.added ? 'green' :
-            part.removed ? 'red' : 'grey';
-          var span = document.createElement('span');
-          span.style.color = color;
-          span.appendChild(document.createTextNode(part.value));
-          fragment.appendChild(span);
+        fragment = document.createDocumentFragment();
+
+        diff.forEach(function(part) {
+            var color = part.added || part.removed ? '#24292e' : '#555';
+            var bgcolor = part.added ? '#a6f3a6' :
+                part.removed ? '#f8cbcb' : 'transparent';
+            var span = document.createElement('span');
+            span.style.color = color;
+            span.style.backgroundColor = bgcolor;
+            span.appendChild(document.createTextNode(part.value));
+            fragment.appendChild(span);
         });
 
         return fragment;
     }
 
-    /**
-     *
-     * @param element
-     */
     DiffUtil.clearElement = function(element){
         while (element.firstChild) {
            element.removeChild(element.firstChild);
         }
     }
 
-    /**
-     * clear element and append diff of original and changed text to it
-     *
-     * @param original
-     * @param changed
-     * @param element
-     */
     DiffUtil.appendDiffFragmentToElement = function(original, changed, element){
         var fragment = DiffUtil.getDiffFragment(original, changed);
         DiffUtil.clearElement(element);

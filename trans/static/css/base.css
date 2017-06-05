@@ -27,6 +27,7 @@
 .text-container {
     background: #f6f6f6;
     padding: 15px;
+    color: #555;
 }
 
 #btn-container>.panel {

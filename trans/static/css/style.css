@@ -38,31 +38,31 @@ a:hover {
     text-decoration: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
+.container h1, .container h2, .container h3, .container h4 {
     font-family: 'Source Sans Pro', arial, sans-serif;
 }
 
-h1 {
+.container h1 {
     font-size: 36px;
     font-weight: 200;
     color: #555;
     margin: 60px 0 30px;
 }
 
-h2 {
+.container h2 {
     font-size: 30px;
     font-weight: 300;
     color: #444;
     margin: 40px 0 20px;
 }
 
-h3 {
+.container h3 {
     font-size: 20px;
     font-weight: 400;
     margin: 20px 0;
 }
 
-h4 {
+.container h4 {
     font-size: 18px;
     font-weight: 400
 }
@@ -101,4 +101,6 @@ h4 {
 
 #left_rtl_plain_text_box .editor-content {
     font-family: IranSans, Tahoma, Arial;
+    font-size: 90%;
+    color: #333;
 }

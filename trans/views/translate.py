@@ -112,8 +112,7 @@ class GetTranslatePreview(LoginRequiredMixin, View):
         direction = 'rtl' if translation.user.language.rtl else 'ltr'
         return render(request, 'pdf-template.html', context={'content': translation.get_latest_text(),
                                                              'direction': direction,
-                                                             'task_name': "%s-%s" % (
-                                                             task.name, translation.user.language),
+                                                             'task_name': task.name,
                                                              'text_font_base64': user.text_font_base64,
                                                              'country': translation.user.country.name,
                                                              'language': translation.user.language.name,
@@ -149,7 +148,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf-template.html'
     cmd_options = {
-        'page-size': 'Letter',
+        'page-size': 'A4',
         'margin-top': '0.75in',
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',
@@ -324,7 +323,7 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
     filename = 'my_pdf.pdf'
     template_name = 'pdf-template.html'
     cmd_options = {
-        'page-size': 'Letter',
+        'page-size': 'A4',
         'margin-top': '0.75in',
         'margin-right': '0.75in',
         'margin-bottom': '0.75in',

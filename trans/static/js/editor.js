@@ -1,7 +1,7 @@
 var task_text, translation_text;
 var ques_id;
 var version_particle_url, save_question_url , task_version_url, access_edit_translate_url,
-        preview_url, finish_translation_url, home_url;
+        preview_url, finish_translation_url, get_version_particle_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
@@ -15,23 +15,7 @@ var previewInterval;
 $(document).ready(function(){
 
     getEditTranslateAccess();
-
-    if (rtl){
-        left_plain_text_box_id = 'left_rtl_plain_text_box';
-        $('#' + left_plain_text_box_id).moratab($('#'+left_plain_text_box_id).text(), {strings: {help: ''}});
-        $('#left_rendered_text_box').css('direction', 'rtl');
-    }
-    else{
-
-        left_plain_text_box_id = 'left_ltr_plain_text_box';
-        $('#left_rendered_text_box').css('direction', 'ltr');
-        simplemde = new SimpleMDE({
-            element: document.getElementById('left_ltr_plain_text_box'),
-            status: false,
-            toolbar: false,
-            spellChecker: false
-        });
-    }
+    checkLastAutoSave();
 
     marked.setOptions({
         renderer: new marked.Renderer(),
@@ -44,14 +28,58 @@ $(document).ready(function(){
         smartypants: false
     });
 
+});
+
+function checkLastAutoSave(){
+    $.ajax({
+        url: get_version_particle_url,
+        data: {
+            'id': ques_id,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "GET",
+        success: function (response) {
+            var text;
+            if(response){
+                text = response;
+            }else{
+                text = $('#temp').text();
+            }
+            initial(text);
+        }, error: function () {
+            // before first save, error occurred
+            initial($('#temp').text());
+        }
+    });
+}
+
+function initial(text){
+    if (rtl){
+        left_plain_text_box_id = 'left_rtl_plain_text_box';
+        $('#' + left_plain_text_box_id).moratab(text, {strings: {help: ''}});
+        $('#left_rendered_text_box').css('direction', 'rtl');
+    }
+    else{
+
+        left_plain_text_box_id = 'left_ltr_plain_text_box';
+        $('#left_rendered_text_box').css('direction', 'ltr');
+        simplemde = new SimpleMDE({
+            element: document.getElementById('left_ltr_plain_text_box'),
+            status: false,
+            toolbar: false,
+            spellChecker: false,
+            initialValue: text
+        });
+    }
+
+
     task_text = $("#right_text_box").html();
     translation_text = currentTranslationText();
     latest_translation_text = '';
     last_version_particle_text = currentTranslationText();
     window.setInterval(saveVersionParticle, update_token_interval)
     onPreviewClick();
-
-});
+}
 
 function getDirectionStr(is_rtl){
     if(is_rtl)

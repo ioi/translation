@@ -36,15 +36,18 @@
         <div class="col-sm-6 edit-pane" style="padding: 0;">
             <div id="left_text_box_container" onkeydown="checkIfCanChange()">
                 {% if rtl %}
-                <div id="left_rtl_plain_text_box" style="white-space: pre-wrap">{{ trans }}</div>
+                <div id="left_rtl_plain_text_box" style="white-space: pre-wrap"></div>
                 {% else %}
-                <textarea id="left_ltr_plain_text_box">{{ trans }}</textarea> {% endif %}
+                <textarea id="left_ltr_plain_text_box"></textarea> {% endif %}
             </div>
         </div>
         <div class="col-sm-6 preview-pane markdown-body">
             <div id="right_text_box">{{ task }}</div>
         </div>
     </div>
+
+    <!-- temp div as container of translation text -->
+    <div id="temp" style="display: none">{{ trans }}</div>
 
     <!-- Modal -->
     <div class="modal fade" id="accessDeniedModal" tabindex="-1" role="dialog">
@@ -68,6 +71,7 @@
     preview_url = "{% url 'preview_translate' id=quesId%}";
     save_question_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
     task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_name=task_name  %}";
+    get_version_particle_url = {% url 'getVersionParticle' %};
     csrf_token = "{{csrf_token}}";
     rtl = '{{rtl}}' == 'True';
 </script>

@@ -73,6 +73,7 @@
     save_question_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
     task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_name=task_name  %}";
     get_version_particle_url = {% url 'getVersionParticle' %};
+    list_version_url = "{% url 'versions' contest_slug=contest_slug task_name=task_name %}";
     csrf_token = "{{csrf_token}}";
     rtl = '{{rtl}}' == 'True';
 </script>

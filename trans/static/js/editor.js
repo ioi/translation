@@ -1,7 +1,7 @@
 var task_text, translation_text;
 var ques_id;
 var version_particle_url, save_question_url , task_version_url, access_edit_translate_url,
-        preview_url, finish_translation_url, get_version_particle_url;
+        preview_url, finish_translation_url, get_version_particle_url, list_version_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
@@ -21,23 +21,35 @@ $(document).ready(function(){
 
 function checkLastAutoSave(){
     $.ajax({
-        url: get_version_particle_url,
+        url: list_version_url,
         data: {
-            'id': ques_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "GET",
         success: function (response) {
-            var text;
-            if(response){
-                text = response;
-            }else{
-                text = $('#temp').text();
+            list_version_particles = response.version_particles;
+            if(list_version_particles && list_version_particles.length) {
+                $.ajax({
+                    url: get_version_particle_url,
+                    data: {
+                        'id': list_version_particles[0][0],
+                        csrfmiddlewaretoken: csrf_token
+                    },
+                    type: "GET",
+                    success: function (response) {
+                        var text;
+                        if (response) {
+                            text = response;
+                        } else {
+                            text = $('#temp').text();
+                        }
+                        initial(text);
+                    }, error: function () {
+                        // before first save, error occurred
+                        initial($('#temp').text());
+                    }
+                });
             }
-            initial(text);
-        }, error: function () {
-            // before first save, error occurred
-            initial($('#temp').text());
         }
     });
 }
@@ -148,11 +160,6 @@ function saveVersion() {
                 last_version_particle_text = current_trans_text;
                 ToastrUtil.success('Successfully Saved ...');
             }
-        },
-        complete: function () {
-        },
-        error: function (xhr, textStatus, thrownError) {
-            alert('Error in connection');
         }
     });
     return false;
@@ -179,11 +186,6 @@ function saveVersionParticle() {
             }else{
                 last_version_particle_text = current_trans_text;
             }
-        },
-        complete: function () {
-        },
-        error: function (xhr, textStatus, thrownError) {
-            alert('Error in connection');
         }
     });
     return false;
@@ -247,4 +249,5 @@ function checkIfCanChange(){
 window.onbeforeunload =  function(){
     saveVersionParticle();
     releasToken();
+    document.getElementById(left_plain_text_box_id).reset();
 };

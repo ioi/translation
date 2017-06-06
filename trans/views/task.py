@@ -154,7 +154,8 @@ class TaskVersions(LoginRequiredMixin, View):
             return JsonResponse(dict(versions=list(versions_values)))
         else:
             return render(request, 'task-revisions.html',
-                          context={'task_name': task.name, 'contest_slug': contest_slug, 'versions': versions_values})
+                          context={'task_name': task.name, 'contest_slug': contest_slug,
+                                   'versions': versions_values, 'direction': 'ltr'})
 
 
 #TODO: It's useless now

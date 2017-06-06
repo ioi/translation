@@ -14,3 +14,7 @@ code::before, code::after,
 .math::before, .math::after {
     content: "‎";   /* the string contains an invisible &lrm; character */
 }
+
+.katex-html {
+    direction: ltr;
+}

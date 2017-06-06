@@ -294,9 +294,11 @@ class Versions(LoginRequiredMixin, View):
         if request.is_ajax():
             return JsonResponse(dict(versions=list(v), version_particles=list(vp)))
         else:
+            direction = 'rtl' if user.language.rtl else 'ltr'
             return render(request, 'revisions.html',
                           context={'versions': v, 'versionParticles': vp, 'translation': trans.get_latest_text(),
-                                   'quesId': trans.id, 'task_name': task.name, 'contest_slug': contest_slug})
+                                   'quesId': trans.id, 'task_name': task.name, 'contest_slug': contest_slug,
+                                   'direction': direction})
 
 
 class GetVersion(LoginRequiredMixin, View):

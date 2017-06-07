@@ -15,7 +15,7 @@ from wkhtmltopdf.views import PDFTemplateView
 
 from trans.models import FlatPage
 from trans.forms import UploadFileForm
-from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, CONTEST_ORDER, \
+from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_translation_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation
 
@@ -56,7 +56,7 @@ class Translations(LoginRequiredMixin, View):
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
                                'task_name': task_name,
-                               'quesId': task.id, 'language': user.credentials()})
+                               'taskID': task.id, 'language': user.credentials()})
 
 
 class SaveTranslation(LoginRequiredMixin, View):
@@ -251,7 +251,7 @@ class TranslatePreview(LoginRequiredMixin, View):
 
         return render(request, 'preview.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
-                               'quesId': id,
+                               'taskID': id,
                                'text_font_base64': user.text_font_base64,
                                'language': user.credentials()})
 
@@ -297,7 +297,7 @@ class Versions(LoginRequiredMixin, View):
             direction = 'rtl' if user.language.rtl else 'ltr'
             return render(request, 'revisions.html',
                           context={'versions': v, 'versionParticles': vp, 'translation': trans.get_latest_text(),
-                                   'quesId': trans.id, 'task_name': task.name, 'contest_slug': contest_slug,
+                                   'taskID': trans.id, 'task_name': task.name, 'contest_slug': contest_slug,
                                    'direction': direction})
 
 
@@ -319,6 +319,17 @@ class GetVersionParticle(LoginRequiredMixin, View):
         if version_particle.translation.user != user:
             return HttpResponseForbidden()
         return HttpResponse(version_particle.text)
+
+
+class GetLatestTranslation(LoginRequiredMixin, View):
+    def get(self, request, id):
+        # id = request.GET['id']
+        task = Task.objects.get(id=id)
+        user = User.objects.get(username=request.user)
+        trans = Translation.objects.get(user=user, task=task)
+        if trans.user != user:
+            return HttpResponseForbidden()
+        return HttpResponse(trans.get_latest_text())
 
 
 class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):

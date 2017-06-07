@@ -12,12 +12,6 @@ from django.core import serializers
 logger = logging.getLogger(__name__)
 
 
-# Task Contest Util
-
-
-CONTEST_ORDER ={'Day 2': 0, 'Day 1': 1, 'Practice': 2}
-
-
 def get_task_by_contest_and_name(contest_slug, task_name):
     from trans.models import Contest, Task
     contest = Contest.objects.filter(slug=contest_slug).first()

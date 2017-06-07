@@ -1,6 +1,6 @@
 var task_text, translation_text;
-var ques_id;
-var version_particle_url, save_question_url , task_version_url, access_edit_translate_url,
+var task_id;
+var version_particle_url, save_task_url , task_version_url, access_edit_translate_url,
         preview_url, finish_translation_url, get_version_particle_url, list_version_url;
 var csrf_token;
 var last_time_get_edit_token;
@@ -12,44 +12,28 @@ var last_version_particle_text;
 var update_token_interval = 60 * 1000;
 var previewInterval;
 
-$(document).ready(function(){
+$(document).ready(function() {
 
     getEditTranslateAccess();
-    checkLastAutoSave();
+    loadTranslationText();
 
 });
 
-function checkLastAutoSave(){
+function loadTranslationText() {
     $.ajax({
-        url: list_version_url,
+        url: get_latest_translation_url,
         data: {
             csrfmiddlewaretoken: csrf_token
         },
         type: "GET",
-        success: function (response) {
-            list_version_particles = response.version_particles;
-            if(list_version_particles && list_version_particles.length) {
-                $.ajax({
-                    url: get_version_particle_url,
-                    data: {
-                        'id': list_version_particles[0][0],
-                        csrfmiddlewaretoken: csrf_token
-                    },
-                    type: "GET",
-                    success: function (response) {
-                        var text;
-                        if (response) {
-                            text = response;
-                        } else {
-                            text = $('#temp').text();
-                        }
-                        initial(text);
-                    }, error: function () {
-                        // before first save, error occurred
-                        initial($('#temp').text());
-                    }
-                });
-            }
+        success: function(response) {
+            var text = '';
+            if (response)
+                text = response;
+            initial(text);
+        },
+        error: function() {
+            initial('');
         }
     });
 }
@@ -74,7 +58,7 @@ function initial(text){
     }
 
 
-    task_text = $("#right_text_box").html();
+    task_text = $("#temp").html();
     translation_text = currentTranslationText();
     latest_translation_text = '';
     last_version_particle_text = currentTranslationText();
@@ -143,13 +127,13 @@ function onIscPreviewClick(){
 function saveVersion() {
     getEditTranslateAccess();
     current_trans_text = currentTranslationText();
-    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+task_id)
     $.ajax({
-        url: save_question_url,
+        url: save_task_url,
         data: {
             'content': currentTranslationText(),
              edit_token: edit_token,
-            'id': ques_id,
+            'id': task_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
@@ -170,12 +154,12 @@ function saveVersionParticle() {
     if (last_version_particle_text == current_trans_text)
         return;
     getEditTranslateAccess();
-    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+task_id)
     $.ajax({
         url: version_particle_url,
         data: {
             'content': currentTranslationText(),
-            'id': ques_id,
+            'id': task_id,
             edit_token: edit_token,
             csrfmiddlewaretoken: csrf_token
         },
@@ -193,12 +177,12 @@ function saveVersionParticle() {
 
 function getEditTranslateAccess() {
     //TODO remove lag for transition to preview_url
-    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+task_id)
     $.ajax({
         async: false,
         url: access_edit_translate_url,
         data: {
-            id: ques_id,
+            id: task_id,
             edit_token: edit_token,
             csrfmiddlewaretoken: csrf_token
         },
@@ -208,7 +192,7 @@ function getEditTranslateAccess() {
                 handleAccessDenied();
             }else{
                 last_time_get_edit_token = new Date();
-                sessionStorage.setItem('edit_translate_token_'+ques_id, response.edit_token)
+                sessionStorage.setItem('edit_translate_token_'+task_id, response.edit_token)
             }
         },
         error: function () {
@@ -218,12 +202,12 @@ function getEditTranslateAccess() {
 }
 
 releasToken = function (e) {
-    var edit_token = sessionStorage.getItem('edit_translate_token_'+ques_id)
+    var edit_token = sessionStorage.getItem('edit_translate_token_'+task_id)
     $.ajax({
         async: false,
         url: finish_translation_url,
         data: {
-            id: ques_id,
+            id: task_id,
             edit_token: edit_token,
             csrfmiddlewaretoken: csrf_token
         },

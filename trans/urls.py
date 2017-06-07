@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
     url(r'^check_is_editing/(?P<id>[\w]*)/$', CheckTranslationEditAccess.as_view(), name='check_edit_translate'),
     url(r'^finish_edit_translate/(?P<id>[\w]*)/$', FinishTranslate.as_view(), name='finish_trans'),
+    url(r'^get_latest_translation/(?P<id>[\w]*)/$', GetLatestTranslation.as_view(), name='get_latest_translation'),
 
     url(r'^tasks/$', Tasks.as_view(), name='task'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', EditTask.as_view(), name='edittask'),

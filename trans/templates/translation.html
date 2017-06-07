@@ -43,34 +43,34 @@
             </div>
         </div>
         <div class="col-sm-6 preview-pane markdown-body">
-            <div id="right_text_box">{{ task }}</div>
+            <div id="right_text_box"></div>
         </div>
     </div>
 
-    <!-- temp div as container of translation text -->
-    <div id="temp" style="display: none">{{ trans }}</div>
+    <!-- temp div as container of task text -->
+    <div id="temp" style="display: none">{{ task }}</div>
 
     <!-- Modal -->
     <div class="modal fade" id="accessDeniedModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-body">
-                    <h3>The task is being edited somewhere else!</h3>
+                <div class="modal-header">
+                    <h4>The task is being edited somewhere else!</h4>
                 </div>
                 <div class="modal-footer">
-                    <a href="{% url 'firstpage' %}" class="btn btn-primary">Return</a>
+                    <a href="{% url 'firstpage' %}" class="btn btn-primary">OK</a>
                 </div>
             </div>
         </div>
     </div>
 
 <script type="text/javascript">
-    ques_id = {{quesId}};
+    task_id = {{taskID}};
     version_particle_url = "{% url 'save_version_particle' contest_slug=contest_slug task_name=task_name %}";
-    access_edit_translate_url = "{% url 'access_edit_translate' id=quesId %}";
-    finish_translation_url = "{% url 'finish_trans' id=quesId %}";
-    preview_url = "{% url 'preview_translate' id=quesId%}";
-    save_question_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
+    access_edit_translate_url = "{% url 'access_edit_translate' id=taskID %}";
+    finish_translation_url = "{% url 'finish_trans' id=taskID %}";
+    get_latest_translation_url = "{% url 'get_latest_translation' id=taskID%}";
+    save_task_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
     task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_name=task_name  %}";
     get_version_particle_url = {% url 'getVersionParticle' %};
     list_version_url = "{% url 'versions' contest_slug=contest_slug task_name=task_name %}";

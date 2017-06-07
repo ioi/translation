@@ -105,6 +105,10 @@ a:hover {
     color: #333;
 }
 
+#left_ltr_plain_text_box {
+	display: none;
+}
+
 /* persian markdown editor */
 #wmd-input {
     background-color: #fff;

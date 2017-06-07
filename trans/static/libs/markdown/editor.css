@@ -35,32 +35,6 @@
 .wmd-buttons .btn-group6 li.wmd-button:last-child {
   margin-left: 0;
 }
-/* modal */
-.modal p {
-  direction: rtl;
-  font-size: 18px;
-}
-.modal .btn {
-  font-size: 17px;
-  padding: 2px 12px;
-}
-.modal .modal-body {
-  padding: 20px 15px 15px;
-}
-.modal .modal-footer {
-  border: none;
-  padding: 0 15px 15px;
-}
-.modal .input-group {
-  direction: ltr;
-}
-.modal .close {
-  float: left;
-}
-.modal .glyphicon {
-  font-size: 14px;
-  top: 1px;
-}
 /* editor */
 #wmd-input {
   direction: rtl;

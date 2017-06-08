@@ -71,30 +71,40 @@ class Task(models.Model):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),
                                              release_note=release_note, released=released)
 
+    def get_corresponding_translation(self):
+        return Translation.objects.filter(user__username='ISC', task=self).first()
+
     def publish_latest(self, release_note):
-        latest_version = self.versions.order_by('-create_time').first()
+        ISC_translation = self.get_corresponding_translation()
+        if not ISC_translation:
+            return None
+        latest_version = ISC_translation.versions.order_by('-create_time').first()
         if not latest_version:
             return None
-        query_set = self.versions.filter(id=latest_version.id)
+        query_set = ISC_translation.versions.filter(id=latest_version.id)
         return query_set.update(release_note=release_note, released=True, create_time=timezone.now())
 
     def get_latest_text(self):
-        latest_version = self.versions.order_by('-create_time').first()
-        if latest_version:
-            return latest_version.text
-        return ''
+        ISC_translation = self.get_corresponding_translation()
+        if ISC_translation:
+            return ISC_translation.get_latest_text()
+        return ""
 
     def get_published_text(self):
-        latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
-        if latest_published_version:
-            return latest_published_version.text
-        return None
+        ISC_translation = self.get_corresponding_translation()
+        if ISC_translation:
+            return ISC_translation.get_published_text()
+        return ""
 
     def is_published(self):
-        return self.versions.filter(released=True).exists()
+        ISC_translation = self.get_corresponding_translation()
+        if ISC_translation:
+            return ISC_translation.versions.filter(released=True).exists()
+        return False
 
     def get_latest_change_time(self):
-        latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
+        ISC_translation = self.get_corresponding_translation()
+        latest_published_version = ISC_translation.versions.filter(released=True).order_by('-create_time').first()
         if latest_published_version:
             return latest_published_version.create_time
         return None
@@ -122,6 +132,12 @@ class Translation(models.Model):
                 return latest_version_particle.text
             return latest_version.text
         return ''
+
+    def get_published_text(self):
+        latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
+        if latest_published_version:
+            return latest_published_version.text
+        return None
 
     def get_latest_change_time(self):
         latest_version = self.versions.order_by('-create_time').first()

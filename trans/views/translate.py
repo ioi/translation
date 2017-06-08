@@ -27,7 +27,7 @@ class Home(LoginRequiredMixin, View):
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.filter(contest__public=True):
-            if not task.is_published():
+            if not (task.is_published() or user.is_editor()):
                 continue
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
@@ -45,17 +45,17 @@ class Translations(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
         try:
-            task = get_task_by_contest_and_name(contest_slug, task_name)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
-            return HttpResponseBadRequest(e.message)
+            return HttpResponseBadRequest(e)
         trans = get_trans_by_user_and_task(user, task)
-        if trans.frozen or not task.is_published():
+        if trans.frozen or not (task.is_published() or user.is_editor()):
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text()
         return render(request, 'translation.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
-                               'task_name': task_name,
+                               'task_name': task_name, 'is_editor': user.is_editor(),
                                'taskID': task.id, 'language': user.credentials()})
 
 
@@ -63,13 +63,14 @@ class SaveTranslation(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
         try:
-            task = get_task_by_contest_and_name(contest_slug, task_name)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
-            return HttpResponseBadRequest(e.message)
+            return HttpResponseBadRequest(e)
         translation = get_trans_by_user_and_task(user, task)
         content = request.POST['content']
         edit_token = request.POST.get('edit_token', '')
-        if not can_user_change_translation(user, translation, edit_token) or not task.is_published():
+        if not can_user_change_translation(user, translation, edit_token) or not (
+            task.is_published() or user.is_editor()):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         translation.add_version(content)
         VersionParticle.objects.filter(translation=translation).delete()
@@ -80,9 +81,9 @@ class SaveVersionParticle(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
         try:
-            task = get_task_by_contest_and_name(contest_slug, task_name)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
-            return HttpResponseBadRequest(e.message)
+            return HttpResponseBadRequest(e)
         translation = get_trans_by_user_and_task(user, task)
         content = request.POST['content']
         edit_token = request.POST.get('edit_token', '')
@@ -104,13 +105,20 @@ class GetTranslatePreview(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
         try:
-            task = get_task_by_contest_and_name(contest_slug, task_name)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
-            return HttpResponseBadRequest(e.message)
-        translation = get_trans_by_user_and_task(user, task)
+            return HttpResponseBadRequest(e)
+
+        if request.GET.get('ISC') == 'True':
+            translation = task.get_corresponding_translation()
+            content = task.get_published_text()
+        else:
+            translation = get_trans_by_user_and_task(user, task)
+            content = translation.get_latest_text()
+
         # TODO check if it's available
         direction = 'rtl' if translation.user.language.rtl else 'ltr'
-        return render(request, 'pdf-template.html', context={'content': translation.get_latest_text(),
+        return render(request, 'pdf-template.html', context={'content': content,
                                                              'direction': direction,
                                                              'task_name': task.name,
                                                              'text_font_base64': user.text_font_base64,
@@ -128,6 +136,7 @@ class UserFont(LoginRequiredMixin, View):
 class TranslationMarkdown(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
+
         version_id = request.GET.get('ver')
         if version_id:
             content_version = ContentVersion.objects.filter(id=version_id).first()
@@ -136,11 +145,14 @@ class TranslationMarkdown(LoginRequiredMixin, View):
             content = content_version.text
         else:
             try:
-                task = get_task_by_contest_and_name(contest_slug, task_name)
+                task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
             except Exception as e:
-                return HttpResponseBadRequest(e.message)
-            translation = get_trans_by_user_and_task(user, task)
-            content = translation.get_latest_text()
+                return HttpResponseBadRequest(e)
+            if request.GET.get('ISC') == 'True':
+                content = task.get_published_text()
+            else:
+                translation = get_trans_by_user_and_task(user, task)
+                content = translation.get_latest_text()
 
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
@@ -164,9 +176,9 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         contest_slug = kwargs['contest_slug']
         task_name = kwargs['task_name']
         try:
-            task = get_task_by_contest_and_name(contest_slug, task_name)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
-            return HttpResponseBadRequest(e.message)
+            return HttpResponseBadRequest(e)
         trans = get_trans_by_user_and_task(user, task)
 
         if version_id:
@@ -176,8 +188,12 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
             content = content_version.text
             file_name = "%s-%s-%d.pdf" % (task.name, trans.user.language, version_id)
         else:
-            content = trans.get_latest_text()
-            file_name = "%s-%s.pdf" % (task.name, trans.user.language)
+            if self.request.GET.get('ISC') == 'True':
+                content = task.get_published_text()
+                file_name = "%s-%s.pdf" % (task.name, "ISC")
+            else:
+                content = trans.get_latest_text()
+                file_name = "%s-%s.pdf" % (task.name, trans.user.language)
 
         trans = get_trans_by_user_and_task(user, task)
         self.filename = file_name
@@ -200,7 +216,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
-        if not task.contest.public:
+        if not (task.contest.public or user.is_editor):
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
         if user != translation.user:
@@ -228,7 +244,7 @@ class CheckTranslationEditAccess(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
-        if not task.contest.public:
+        if not (task.contest.public or user.is_editor):
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
         if user != translation.user:
@@ -241,7 +257,7 @@ class TranslatePreview(LoginRequiredMixin, View):
     def get(self, request, id):
         user = User.objects.get(username=request.user)
         task = Task.objects.get(id=id)
-        if task.contest.public == False:
+        if task.contest.public == False or not user.is_editor():
             return HttpResponseBadRequest("There is no published task")
         task_text = task.get_published_text()
         try:

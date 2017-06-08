@@ -1,7 +1,7 @@
 var task_text, translation_text;
 var task_id;
 var version_particle_url, save_task_url , task_version_url, access_edit_translate_url,
-        preview_url, finish_translation_url, get_version_particle_url, list_version_url;
+        preview_url, finish_translation_url, get_version_particle_url, list_version_url, release_task_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
@@ -11,11 +11,13 @@ var rtl;
 var last_version_particle_text;
 var update_token_interval = 60 * 1000;
 var previewInterval;
+var spellChecking = false;
+
 
 $(document).ready(function() {
 
-    getEditTranslateAccess();
     loadTranslationText();
+    getEditTranslateAccess();
 
 });
 
@@ -52,7 +54,7 @@ function initial(text){
             element: document.getElementById('left_ltr_plain_text_box'),
             status: false,
             toolbar: false,
-            spellChecker: false,
+            // spellChecker: false,
             initialValue: text
         });
     }
@@ -235,3 +237,27 @@ window.onbeforeunload =  function(){
     releasToken();
     document.getElementById(left_plain_text_box_id).reset();
 };
+
+
+function onChangeSpellChecking(){
+    spellChecking = !spellChecking;
+    var value = simplemde.value();
+
+    /* reset simpleMDE container */
+    var element = document.getElementById("left_text_box_container");
+    while (element.firstChild) {
+       element.removeChild(element.firstChild);
+    }
+    var textarea = document.createElement('textarea');
+    textarea.setAttribute('id', 'left_ltr_plain_text_box');
+    element.appendChild(textarea);
+
+    /* new simpleMDE */
+    simplemde = new SimpleMDE({
+        element: document.getElementById("left_ltr_plain_text_box"),
+        status: false,
+        toolbar: false,
+        spellChecker: spellChecking,
+        initialValue: value
+    });
+}

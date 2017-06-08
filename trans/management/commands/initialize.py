@@ -2,6 +2,7 @@ import random, string
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import Group
 from trans.models import Country, Language, User, Task, Contest
+from trans.utils import get_trans_by_user_and_task
 
 
 class Command(BaseCommand):
@@ -94,4 +95,7 @@ class Command(BaseCommand):
             content = file.read()
             contest = Contest.objects.get(slug=contest_slug)
             task, created = Task.objects.get_or_create(name=name, contest=contest)
-            task.add_version(content, "Init", True)
+            user = User.objects.get(username="ISC")
+            new_trans = get_trans_by_user_and_task(user, task)
+            new_trans.add_version(content)
+            task.publish_latest("Init")

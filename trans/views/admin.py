@@ -5,7 +5,7 @@ from django.views.generic import View
 
 from django.http import HttpResponseNotFound, HttpResponse
 
-from trans.models import User, Task, Translation
+from trans.models import User, Task, Translation, Contest
 from trans.utils import is_translate_in_editing, unleash_edit_translation_token
 
 
@@ -81,7 +81,19 @@ class UserTranslations(StaffCheckMixin, View):
                 translations.append((task.id, task.name, True, translation.id, translation.frozen, is_editing))
             else:
                 translations.append((task.id, task.name, False, 'None', False, False))
-        return render(request, 'user.html', context={'translations': translations, 'language': user.credentials()})
+        tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
+        for task in Task.objects.filter(contest__public=True):
+            translation = Translation.objects.filter(user=user, task=task).first()
+            is_editing = translation and is_translate_in_editing(translation)
+            frozen = translation and translation.frozen
+            translation_id = translation.id if translation else None
+            tasks_by_contest[task.contest].append(
+                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
+                 'frozen': frozen})
+        tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
+                       Contest.objects.order_by('-order') if
+                       len(tasks_by_contest[c]) > 0]
+        return render(request, 'user.html', context={'tasks_lists': tasks_lists, 'language': user.credentials()})
 
 
 class UsersList(StaffCheckMixin, View):

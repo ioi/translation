@@ -4,70 +4,51 @@
 
     <link rel="stylesheet" href="/static/css/question.css">
 
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <h2>
-                    {{language}}
-                </h2>
-            </div>
-        </div>
-        <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
+{% for contest_tasks in tasks_lists %}
 
-                    <table class="table table-center">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>Main Question</th>
-                                <th>PDF</th>
-                                <th>MarkDown</th>
-                                <th>Frozen</th>
-                                <th>is Editing</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for trans in translations %}
-                            <tr>
-                                <td>{{ trans.1 }}</td>
-                                {% if trans.2 %}
-                                <td>{{ trans.3 }} </td>
-                                <td>MarkDown</td>
-                                <td>PDF</td>
-                                <td>
-                                    <form method="post" action="{% url 'freeze_trans' id=trans.3 %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="freeze" value="{{ trans.4|yesno:'False,True' }}" />
-                                        <input type="submit" value="{% if trans.4 %} Unfreeze {% else %} Freeze {%endif%}" />
-                                    </form>
-                                </td>
-                                <td>
-                                    {% if trans.5 %}
-                                    <form method="post" action="{% url 'unleash_trans_token' id=trans.3 %}">
-                                        {% csrf_token %}
-                                        <input type="submit" value="Unleash Token" />
-                                    </form>
-                                    {% endif %}
-
-                                </td>
-                                {% else %}
-                                <td>None</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                {% endif %}
-
-
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
-        </div>
+    <div class="body container col-sm-10 col-sm-offset-1">
+        <h2>{{contest_tasks.title}}</h2>
+        <table class="table table-hover">
+            <thead><tr>
+                <th width="20%">Task</th>
+                <th width="20%">PDF</th>
+                <th>Frozen</th>
+                <th>Is Editing</th>
+            </tr></thead>
+            <tbody>
+            {% for task in contest_tasks.tasks %}
+                <tr>
+                    <td> {{ task.name }} </td>
+                    {% if task.trans_id %}
+                        <td>
+                            <a href="{% url 'trans_pdf' contest_slug=contest_tasks.slug task_name=task.name%}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}" />
+                                <input type="submit" value="{% if task.frozen %} Unfreeze {% else %} Freeze {%endif%}" />
+                            </form>
+                        </td>
+                        <td>
+                            {% if task.is_editing %}
+                                <form method="post" action="{% url 'unleash_trans_token' id=task.trans_id %}">
+                                            {% csrf_token %}
+                                            <input type="submit" value="Unleash Token" />
+                                        </form>
+                            {% endif %}
+                        </td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+
+{% endfor %}
 
 {% endblock %}

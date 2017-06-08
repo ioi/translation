@@ -209,7 +209,6 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
 
-# TODO
 class FinishTranslate(LoginRequiredMixin, View):
     def post(self, request, id):
         user = User.objects.get(username=request.user)
@@ -237,6 +236,7 @@ class CheckTranslationEditAccess(LoginRequiredMixin, View):
         return JsonResponse({'is_editing': can_save_translate(translation, edit_token)})
 
 
+#TODO this should be removed
 class TranslatePreview(LoginRequiredMixin, View):
     def get(self, request, id):
         user = User.objects.get(username=request.user)

@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 
-from trans.utils import get_task_by_contest_and_name, is_translate_in_editing
+from trans.utils import get_task_by_contest_and_name, is_translate_in_editing, get_trans_by_user_and_task
 from trans.models import Task, User, Contest, Translation, ContentVersion
 from trans.views.admin import ISCEditorCheckMixin
 
@@ -37,11 +37,15 @@ class Tasks(ISCEditorCheckMixin, View):
                       context={'tasks_lists': tasks_lists, 'contests': contests, 'language': user.credentials()})
 
     def post(self, request):
+        if request.user.username != "ISC":
+            return HttpResponseForbidden("You don't have access to this page")
         name = request.POST['name']
         name = name.replace(' ', '').replace('/','')
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
         new_task = Task.objects.create(name=name, contest=contest)
+        user = User.objects.get(username=request.user.username)
+        new_trans = get_trans_by_user_and_task(user, new_task)
         return redirect(to=reverse('edit_translation', kwargs={'contest_slug': contest.slug, 'task_name': new_task.name}))
 
 

@@ -1,7 +1,7 @@
 var task_text, translation_text;
 var task_id;
 var version_particle_url, save_task_url , task_version_url, access_edit_translate_url,
-        preview_url, finish_translation_url, get_version_particle_url, list_version_url;
+        preview_url, finish_translation_url, get_version_particle_url, list_version_url, release_task_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;

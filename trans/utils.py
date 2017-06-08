@@ -12,13 +12,13 @@ from django.core import serializers
 logger = logging.getLogger(__name__)
 
 
-def get_task_by_contest_and_name(contest_slug, task_name):
+def get_task_by_contest_and_name(contest_slug, task_name, is_editor=False):
     from trans.models import Contest, Task
     contest = Contest.objects.filter(slug=contest_slug).first()
     if not contest:
         raise Exception("There is no contest")
     task = Task.objects.get(name=task_name, contest=contest)
-    if not task.contest.public:
+    if not (is_editor or task.contest.public):
         raise Exception("There is no published task")
     return task
 

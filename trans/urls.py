@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^logout/$',Logout.as_view(), name='logout'),
 
     url(r'^translations/$', Home.as_view(), name='home'),
-    url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', Translations.as_view(), name='question'),
+    url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', Translations.as_view(), name='edit_translation'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save/$', SaveTranslation.as_view(),
         name='save_translation'),
     url(r'^translation/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save_particle/$',
@@ -34,7 +34,7 @@ urlpatterns = [
 
     url(r'^tasks/$', Tasks.as_view(), name='task'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', EditTask.as_view(), name='edittask'),
-    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save$', SaveTask.as_view(), name='savetask') ,
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/release', ReleaseTask.as_view(), name='releasetask') ,
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$', TaskVersions.as_view(), name='task_versions'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/markdown$$', TaskMarkdown.as_view(), name='task_md'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/pdf$', TaskPDF.as_view(), name='task_pdf'),

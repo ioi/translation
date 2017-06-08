@@ -43,7 +43,9 @@ class Tasks(ISCEditorCheckMixin, View):
         name = name.replace(' ', '').replace('/','')
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
-        new_task = Task.objects.create(name=name, contest=contest)
+        new_task, created = Task.objects.get_or_create(name=name, contest=contest)
+        if not created:
+            return HttpResponseBadRequest("This task is duplicate")
         user = User.objects.get(username=request.user.username)
         new_trans = get_trans_by_user_and_task(user, new_task)
         return redirect(to=reverse('edit_translation', kwargs={'contest_slug': contest.slug, 'task_name': new_task.name}))

@@ -26,7 +26,7 @@ def get_task_by_contest_and_name(contest_slug, task_name, is_editor=False):
 def get_trans_by_user_and_task(user, task):
     from trans.models import Translation
     trans, created = Translation.objects.get_or_create(user=user, task=task)
-    if created:
+    if created and task.get_published_text():
         trans.add_version(task.get_published_text())
     return trans
 

@@ -88,13 +88,13 @@ class Task(models.Model):
         ISC_translation = self.get_corresponding_translation()
         if ISC_translation:
             return ISC_translation.get_latest_text()
-        return ''
+        return ""
 
     def get_published_text(self):
         ISC_translation = self.get_corresponding_translation()
         if ISC_translation:
             return ISC_translation.get_published_text()
-        return ''
+        return ""
 
     def is_published(self):
         ISC_translation = self.get_corresponding_translation()

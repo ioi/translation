@@ -54,7 +54,7 @@ function initial(text){
             element: document.getElementById('left_ltr_plain_text_box'),
             status: false,
             toolbar: false,
-            // spellChecker: false,
+            spellChecker: false,
             initialValue: text
         });
     }

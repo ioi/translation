@@ -51,20 +51,6 @@ class Tasks(ISCEditorCheckMixin, View):
         return redirect(to=reverse('edit_translation', kwargs={'contest_slug': contest.slug, 'task_name': new_task.name}))
 
 
-class EditTask(ISCEditorCheckMixin, View):
-    def get(self, request, contest_slug, task_name):
-        user = User.objects.get(username=request.user)
-        contest = Contest.objects.filter(slug=contest_slug).first()
-        if not contest:
-            return HttpResponseBadRequest("There is no contest")
-        task = Task.objects.get(name=task_name, contest=contest)
-        if task.frozen:
-            return HttpResponseBadRequest("The task is frozen")
-        return render(request, 'task.html',
-                      context={'content': task.get_latest_text(), 'name': task.name, 'task_id': task.id,
-                               'contest_slug': contest_slug, 'language': user.credentials()})
-
-
 class ReleaseTask(ISCEditorCheckMixin, View):
     def post(self, request, contest_slug, task_name):
         release_note = request.POST.get('release_note', '')

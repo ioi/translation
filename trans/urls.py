@@ -26,14 +26,12 @@ urlpatterns = [
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
 
     url(r'^getverspar/$', GetVersionParticle.as_view(), name='getVersionParticle'),
-    url(r'^preview_translate/(?P<id>[\w]*)/$', TranslatePreview.as_view(), name='preview_translate'),
     url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
     url(r'^check_is_editing/(?P<id>[\w]*)/$', CheckTranslationEditAccess.as_view(), name='check_edit_translate'),
     url(r'^finish_edit_translate/(?P<id>[\w]*)/$', FinishTranslate.as_view(), name='finish_trans'),
     url(r'^get_latest_translation/(?P<id>[\w]*)/$', GetLatestTranslation.as_view(), name='get_latest_translation'),
 
     url(r'^tasks/$', Tasks.as_view(), name='task'),
-    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', EditTask.as_view(), name='edittask'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/release', ReleaseTask.as_view(), name='releasetask') ,
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$', TaskVersions.as_view(), name='task_versions'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/markdown$$', TaskMarkdown.as_view(), name='task_md'),

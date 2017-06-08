@@ -252,27 +252,6 @@ class CheckTranslationEditAccess(LoginRequiredMixin, View):
         return JsonResponse({'is_editing': can_save_translate(translation, edit_token)})
 
 
-#TODO this should be removed
-class TranslatePreview(LoginRequiredMixin, View):
-    def get(self, request, id):
-        user = User.objects.get(username=request.user)
-        task = Task.objects.get(id=id)
-        if task.contest.public == False or not user.is_editor():
-            return HttpResponseBadRequest("There is no published task")
-        task_text = task.get_published_text()
-        try:
-            trans = Translation.objects.get(user=user, task=task)
-        except:
-            trans = Translation.objects.create(user=user, task=task)
-            trans.add_version(task_text)
-
-        return render(request, 'preview.html',
-                      context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
-                               'taskID': id,
-                               'text_font_base64': user.text_font_base64,
-                               'language': user.credentials()})
-
-
 class CheckoutVersion(LoginRequiredMixin, View):
     def post(self, request):
         version_id = self.request.POST['id']

@@ -97,4 +97,5 @@ class Command(BaseCommand):
             task, created = Task.objects.get_or_create(name=name, contest=contest)
             user = User.objects.get(username="ISC")
             new_trans = get_trans_by_user_and_task(user, task)
-            new_trans.add_version(content, "Init", True)
+            new_trans.add_version(content)
+            task.publish_latest("Init")

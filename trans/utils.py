@@ -102,7 +102,7 @@ def get_all_notifs(user, all_notifications):
     for unread_notif in get_all_unread_notifs(user):
         unread_notif['read'] = False
         all_notifs.append(unread_notif)
-    return all_notifs
+    return sorted(all_notifs, key=lambda k: k['create_time'], reverse=True)
 
 
 def get_all_unread_notifs(user):

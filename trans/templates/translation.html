@@ -26,13 +26,17 @@
             <a href="{% url 'gettranspreview' contest_slug=contest_slug task_name=task_name%}" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
             {% if is_editor %}
             <button class="btn btn-default" data-toggle="modal" data-target="#releaseModal" title="Release"><i class="fa fa-btn fa-upload fa-lg"></i></button>
+            &nbsp;
+            <input id="spell-checking" type="checkbox" onchange="onChangeSpellChecking()"> 
+            <label for="spell-checking" style="font-weight: normal;">check spelling</label>
             {% endif %}
+            {% if not is_editor %}
             <div class="btn-group pull-right" role="group">
                 <button type="button" id="preview-btn" class="btn btn-default" onclick="onPreviewClick()">Preview</button>
                 <button type="button" id="isc-preview-btn" class="btn btn-default" onclick="onIscPreviewClick()">ISC Preview</button>
                 <button type="button" id="isc-markdown-btn" class="btn btn-default" onclick="onIscMarkdownClick()">ISC Markdown</button>
-
             </div>
+            {% endif %}
         </div>
     </div>
 

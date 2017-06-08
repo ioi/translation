@@ -146,17 +146,14 @@ class TranslationMarkdown(LoginRequiredMixin, View):
 
 
 class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
-    filename = 'my_pdf.pdf'
     template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'A4',
-        'margin-top': '0.75in',
-        'margin-right': '0.75in',
-        'margin-bottom': '0.75in',
-        'margin-left': '0.75in',
-        'footer-spacing': 3,
-        # 'zoom': 15,
-        'javascript-delay': 500,
+        'margin-top': '0.4in',
+        'margin-right': '0.4in',
+        'margin-bottom': '0.6in',
+        'margin-left': '0.4in',
+        'zoom': 3.5,
     }
 
     def get_context_data(self, **kwargs):
@@ -191,7 +188,9 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         context['language'] = trans.user.language.name
         context['contest'] = trans.task.contest.title
         context['text_font_base64'] = trans.user.text_font_base64
-        self.cmd_options['footer-center'] = '%s [page] / [topage]' % trans.task.name
+        self.footer_template = 'pdf-footer.html'
+        self.show_content_in_browser = True
+        # self.cmd_options['footer-right'] = '%s [page] / [topage]' % trans.task.name
         return context
 
 
@@ -405,6 +404,7 @@ class PrintCustomFile(LoginRequiredMixin, View):
         pdf_file = request.FILES['pdf_file']
         if not pdf_file:
             return HttpResponseBadRequest("You should attach a file")
+        # TODO: send pdf file to printer
         pdf_file = pdf_file.read()
         subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
         text_content = 'Test'

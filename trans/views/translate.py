@@ -149,11 +149,12 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     template_name = 'pdf-template.html'
     cmd_options = {
         'page-size': 'A4',
-        'margin-top': '0.4in',
-        'margin-right': '0.4in',
+        'margin-top': '0.6in',
         'margin-bottom': '0.6in',
-        'margin-left': '0.4in',
-        'zoom': 3.5,
+        'margin-right': '0.75in',
+        'margin-left': '0.75in',
+        'print-media-type': '--print-media-type',
+        # 'zoom': 3.5,
     }
 
     def get_context_data(self, **kwargs):

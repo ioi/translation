@@ -24,9 +24,9 @@
     </script>
 </head>
 
-<body style="border:0; margin: 1.5em;" onload="subst()">
-    <div style="text-align: end;">
-        {{task_name}} <span class="page"></span> of <span class="topage"></span>
+<body style="margin: 1em 0;" onload="subst()">
+    <div style="text-align: end; direction: {{direction}}; font-family: arial;">
+        {{task_name|capfirst}} (<span class="page"></span> of <span class="topage"></span>)&lrm;
     </div>
 </body>
 

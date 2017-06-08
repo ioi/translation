@@ -102,4 +102,10 @@ pre, table th {
     .print {
         visibility: hidden;
     }
+
+    body {
+        margin: 0;
+        zoom: 1;
+        font-family: 'CustomTextFont', Arial, serif;
+    }
 }

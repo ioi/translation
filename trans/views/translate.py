@@ -124,6 +124,7 @@ class UserFont(LoginRequiredMixin, View):
         user = User.objects.get(username=request.user)
         return render(request, 'font.css', content_type='text/css', context={'text_font_base64': user.text_font_base64})
 
+
 class TranslationMarkdown(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
@@ -217,7 +218,7 @@ class FinishTranslate(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         if trans is None:
             return HttpResponseNotFound("There is no task")
-        if not trans.user == user and can_save_translate(trans, edit_token):
+        if not can_save_translate(trans, edit_token):
             return HttpResponseForbidden("You don't have acccess")
         unleash_edit_translation_token(trans)
         return JsonResponse({'message': "Done"})

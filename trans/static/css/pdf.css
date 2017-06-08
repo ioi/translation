@@ -8,44 +8,61 @@ body {
     text-align: justify;
 }
 
-.page-header {
+h1, h2, h3, h4 {
+    page-break-after: avoid;
+}
+
+pre, table th {
+    background-color: #eee important!;
+}
+
+.header {
     font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 400;
 }
 
-.page-header .logo {
+.header .logo {
     display: inline-block;
     float: left;
     margin-right: 0px;
 }
 
-.page-header .logo img {
+.header .logo img {
     height: 70px;
     padding-right: 15px;
 }
 
-.page-header .text {
+.header .text {
     display: inline-block;
     float: left;
     letter-spacing: -.03em;
     line-height: 1.1em;
 }
 
-.page-header .text h1 {
+.header .text h1 {
     font-weight: 600;
     font-size: 1.1em;
     margin: 0px 0px 3px;
 }
 
-.page-header .meta {
+.header .meta {
     display: inline-block;
     float: right;
     text-align: right;
-    margin-top: 30px;
 }
 
-.page-header .meta h1 {
+.header .print {
+    height: 30px;
+}
+
+.header .print button {
+    background-color: darkorange;
+    font-weight: 600;
+    color: white;
+}
+
+.header .meta h1 {
     font-family: "Courier New", monospace;
     font-weight: bold;
     font-size: 18px;
@@ -54,14 +71,17 @@ body {
     margin: 0px;
 }
 
-.page-header .meta h2 {
+.header .meta h2 {
     font-weight: 400;
     font-size: 12px;
-    margin: 3px 0;
+    margin: 0;
 }
 
-.page-header hr {
-    margin-top: 8px;
+.header hr {
+    margin-top: 10px;
+    border: none;
+    border-top: 1px solid #666;
+    height: 1px;
 }
 
 .pdf.markdown-body {
@@ -75,4 +95,17 @@ body {
 
 .pdf pre {
     border: 1px solid #ddd;
+    border-radius: 0px
+}
+
+@media print {
+    .print {
+        visibility: hidden;
+    }
+
+    body {
+        margin: 0;
+        zoom: 1;
+        font-family: 'CustomTextFont', Arial, serif;
+    }
 }

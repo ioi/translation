@@ -60,6 +60,10 @@
 }
 
 .markdown-body h3 {
-    font-size: 1.2em;
+    font-size: 1.17em;
     margin: 1em 0;
+}
+
+.markdown-body .katex {
+    font-size: 1.15em !important;
 }

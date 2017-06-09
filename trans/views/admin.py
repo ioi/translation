@@ -6,7 +6,7 @@ from django.views.generic import View
 from django.http import HttpResponseNotFound, HttpResponse
 
 from trans.models import User, Task, Translation, Contest
-from trans.utils import is_translate_in_editing, unleash_edit_translation_token
+from trans.utils import is_translate_in_editing, unleash_edit_token
 
 
 class AdminCheckMixin(LoginRequiredMixin,object):
@@ -117,5 +117,5 @@ class UnleashEditTranslationToken(StaffCheckMixin, View):
         trans = Translation.objects.get(id=id)
         if trans is None:
             return HttpResponseNotFound("There is no task")
-        unleash_edit_translation_token(trans)
+        unleash_edit_token(trans)
         return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))

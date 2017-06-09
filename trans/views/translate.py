@@ -16,7 +16,7 @@ from wkhtmltopdf.views import PDFTemplateView
 from trans.models import FlatPage
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
-    unleash_edit_translation_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
+    unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation
 
 
@@ -37,9 +37,9 @@ class Home(LoginRequiredMixin, View):
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
-        return render(request, 'translations.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
-                                                           'language': user.credentials()})
-
+        contests = Contest.objects.order_by('order')
+        return render(request, 'home.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
+                                                     'contests': contests, 'is_editor': user.is_editor()})
 
 class Translations(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
@@ -52,10 +52,11 @@ class Translations(LoginRequiredMixin, View):
         if trans.frozen or not (task.is_published() or user.is_editor()):
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text()
-        return render(request, 'translation.html',
+        contests = Contest.objects.order_by('order')
+        return render(request, 'editor.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
-                               'task_name': task_name, 'is_editor': user.is_editor(),
+                               'contests': contests, 'task_name': task_name, 'is_editor': user.is_editor(),
                                'taskID': task.id, 'language': user.credentials()})
 
 
@@ -101,15 +102,15 @@ class SaveVersionParticle(LoginRequiredMixin, View):
         return JsonResponse({'success': True})
 
 
-class GetTranslatePreview(LoginRequiredMixin, View):
-    def get(self, request, contest_slug, task_name):
+class TranslationHTML(LoginRequiredMixin, View):
+    def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
         try:
             task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
             return HttpResponseBadRequest(e)
 
-        if request.GET.get('ISC') == 'True':
+        if task_type == 'released':
             translation = task.get_corresponding_translation()
             content = task.get_published_text()
         else:
@@ -134,7 +135,7 @@ class UserFont(LoginRequiredMixin, View):
 
 
 class TranslationMarkdown(LoginRequiredMixin, View):
-    def get(self, request, contest_slug, task_name):
+    def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
 
         version_id = request.GET.get('ver')
@@ -148,7 +149,7 @@ class TranslationMarkdown(LoginRequiredMixin, View):
                 task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
             except Exception as e:
                 return HttpResponseBadRequest(e)
-            if request.GET.get('ISC') == 'True':
+            if task_type == 'released':
                 content = task.get_published_text()
             else:
                 translation = get_trans_by_user_and_task(user, task)
@@ -175,6 +176,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         version_id = self.request.GET.get('ver')
         contest_slug = kwargs['contest_slug']
         task_name = kwargs['task_name']
+        task_type = kwargs['task_type']
         try:
             task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
@@ -186,14 +188,14 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
             if not content_version.can_view_by(user):
                 return None
             content = content_version.text
-            file_name = "%s-%s-%d.pdf" % (task.name, trans.user.language, version_id)
+            file_name = "%s-%s-v%d.pdf" % (task.name, trans.user.username, version_id)
         else:
-            if self.request.GET.get('ISC') == 'True':
+            if task_type == 'released':
                 content = task.get_published_text()
-                file_name = "%s-%s.pdf" % (task.name, "ISC")
+                file_name = "%s.pdf" % (task.name)
             else:
                 content = trans.get_latest_text()
-                file_name = "%s-%s.pdf" % (task.name, trans.user.language)
+                file_name = "%s-%s.pdf" % (task.name, trans.user.username)
 
         trans = get_trans_by_user_and_task(user, task)
         self.filename = file_name
@@ -201,8 +203,8 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         context['content'] = content
         context['title'] = self.filename
         context['task_name'] = trans.task.name
-        context['country'] = trans.user.country.name
-        context['language'] = trans.user.language.name
+        context['country'] = trans.user.country.code
+        context['language'] = trans.user.language.code
         context['contest'] = trans.task.contest.title
         context['text_font_base64'] = trans.user.text_font_base64
         self.footer_template = 'pdf-footer.html'
@@ -235,7 +237,7 @@ class FinishTranslate(LoginRequiredMixin, View):
             return HttpResponseNotFound("There is no task")
         if not can_save_translate(trans, edit_token):
             return HttpResponseForbidden("You don't have acccess")
-        unleash_edit_translation_token(trans)
+        unleash_edit_token(trans)
         return JsonResponse({'message': "Done"})
 
 
@@ -364,8 +366,8 @@ class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
         context['content'] = content
         context['title'] = self.filename
         context['task_name'] = trans.task.name
-        context['country'] = trans.user.country.name
-        context['language'] = trans.user.language.name
+        context['country'] = trans.user.country.code
+        context['language'] = trans.user.language.code
         context['contest'] = trans.task.contest.title
         context['text_font_base64'] = user.text_font_base64
         self.cmd_options['footer-center'] = '%s [page] / [topage]' % trans.task.name

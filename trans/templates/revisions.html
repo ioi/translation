@@ -35,7 +35,7 @@
                             <tr id="version-{{ version.0 }}" onclick="diff({{ version.0 }},{{ next_element.0 }})">
                                 <td>{{ version.1 | ioi_timezone}}</td>
                                 <td style="white-space: nowrap">
-                                    <a href="{% url 'trans_md' contest_slug=contest_slug task_name=task_name%}?ver={{version.0}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                    <a href="{% url 'trans_md' 'task' contest_slug task_name %}?ver={{version.0}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
                                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.0 }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
                                 </td>
                             </tr>
@@ -85,7 +85,6 @@
         ques_id = {{taskID}};
         checkout_version_url = "{% url 'checkoutversion' %}";
         version_url = "{% url 'getVersion' %}";
-        csrf_token = "{{csrf_token}}";
         list_version_url = "{% url 'versions' contest_slug=contest_slug task_name=task_name %}";
     </script>
 

@@ -1,0 +1,152 @@
+
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add New Task</h4>
+                </div>
+           
+                <div class="modal-body">
+                    <form class="form-horizontal" action="{%  url 'add_task' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="task_name" class="control-label col-sm-3">Task Name:</label>
+                            <div class="col-sm-8">
+                                <input id="task_name" class="form-control" type="text" name="name" required data-modalfocus>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contest_slug" class="control-label col-sm-3">Contest:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" name="contest" id="contest_slug">
+                                     {% for contest in contests %}
+                                     <option value="{{contest.id}}">{{contest.title}}</option>
+                                     {% endfor %}
+                                </select>
+                            </div>                                    
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <input type="submit" class="btn btn-primary" value="Add Task" onclick="return addTask(this);">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>                                    
+                        </div>                                    
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Send Notification -->
+    <div class="modal fade" id="sendNotifModal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Send Notification</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="form-horizontal" action="{%  url 'send_notif' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="notif_title" class="control-label col-sm-3">Title:</label>
+                            <div class="col-sm-8">
+                                <input id="notif_title" class="form-control" type="text" name="title" required data-modalfocus>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="notif_desc" class="control-label col-sm-3">Description:</label>
+                            <div class="col-sm-8">
+                                <input id="notif_desc" class="form-control" type="text" name="description" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <input type="submit" class="btn btn-primary" value="Send Notification" onclick="return sendNotif(this);">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="releaseModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!-- <h4 class="modal-title">Publish the Latest Saved Version</h4> -->
+                    <h4 class="modal-title">Release</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="release-note">Release Note:</label>
+                        <input type="text" class="form-control" id="release-note" required data-modalfocus>
+                        <span class="help-block">
+                            This applies to the latest saved revision.
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="return release(true)">Publish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var release_task_url = "{% url 'releasetask' contest_slug=contest_slug task_name=task_name %}";
+
+        function release() {
+            var note = $('#release-note').val();
+            if (note == '') {
+                alert('Release note is empty.');
+                return false;
+            }
+            $.ajax({
+                url: release_task_url,
+                data: {
+                    'release_note': note,
+                    csrfmiddlewaretoken: csrf_token
+                },
+                type: "POST",
+                success: function (response) {
+                    last_saved_content = simplemde.value();
+                    $('#releaseModal').modal('hide');
+                    ToastrUtil.success('Task Released...');
+                }
+            });
+            return false;
+        }
+            
+        function addTask(form) {
+            var name = $('#task_name').val();
+            if (name == "") {
+                alert('Task name is empty.')
+                return false;
+            }
+            if (/[^a-z]/.test(name)) {
+                alert('Name can only contain lower-case letters.')
+                return false;
+            }
+            return true;
+        }
+        
+        function sendNotif(form) {
+            var title = $('#notif_title').val();
+            if (title == "") {
+                alert('Title is empty.')
+                return false;
+            }
+            var desc = $('#notif_desc').val();
+            if (desc == "") {
+                alert('Description is empty.')
+                return false;
+            }
+            return true;
+        }
+
+    </script>

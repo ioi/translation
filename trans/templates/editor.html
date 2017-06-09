@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block statics %}
 
     <link rel="stylesheet" href="/static/libs/markdown/simplemde.min.css">
     <link rel="stylesheet" href="/static/libs/markdown/editor.css">
@@ -18,12 +18,16 @@
     <script type="text/javascript" src="/static/js/init-marked.js"></script>
     <script type="text/javascript" src="/static/js/editor.js"></script>
 
+{% endblock %}
+
+{% block content %}
+
     <div class="row">
         <div class="btn-container">
             <button class="btn btn-default" onclick="saveVersion()" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
             <a href="{% url 'versions' contest_slug=contest_slug task_name=task_name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-            <a href="{% url 'trans_pdf' contest_slug=contest_slug task_name=task_name %}" class="btn btn-default" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
-            <a href="{% url 'gettranspreview' contest_slug=contest_slug task_name=task_name%}" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
+            <a href="{% url 'task_pdf' 'task' contest_slug task_name %}" class="btn btn-default" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
+            <a href="{% url 'task_print' 'task' contest_slug task_name %}" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
             {% if is_editor %}
             <button class="btn btn-default" data-toggle="modal" data-target="#releaseModal" title="Release"><i class="fa fa-btn fa-upload fa-lg"></i></button>
             &nbsp;
@@ -57,7 +61,7 @@
     <!-- temp div as container of task text -->
     <div id="temp" style="display: none">{{ task }}</div>
 
-    <!-- Modal -->
+    <!-- Access Denied Modal -->
     <div class="modal fade" id="accessDeniedModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -71,56 +75,9 @@
         </div>
     </div>
 
-    {% if is_editor %}
-    <div class="modal fade" id="releaseModal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <!-- <h4 class="modal-title">Publish the Latest Saved Version</h4> -->
-                    <h4 class="modal-title">Release</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="release-note">Release Note:</label>
-                        <input type="text" class="form-control" id="release-note" required data-modalfocus>
-                        <span class="help-block">
-                            This applies to the latest saved revision.
-                        </span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="return release(true)">Publish</button>
-                </div>
-            </div>
-        </div>
-    </div>
+{% endblock %}
 
-    <script>
-        function release() {
-            var note = $('#release-note').val();
-            if (note == '') {
-                alert('Release note is empty.');
-                return false;
-            }
-            $.ajax({
-                url: release_task_url,
-                data: {
-                    'release_note': note,
-                    csrfmiddlewaretoken: csrf_token
-                },
-                type: "POST",
-                success: function (response) {
-                    last_saved_content = simplemde.value();
-                    $('#releaseModal').modal('hide');
-                    ToastrUtil.success('Task Released...');
-                }
-            });
-            return false;
-        }
-        release_task_url = "{% url 'releasetask' contest_slug=contest_slug task_name=task_name %}";
-    </script>
-    {% endif %}
+{% block script %}
 
 <script type="text/javascript">
     task_id = {{taskID}};
@@ -130,10 +87,8 @@
     get_latest_translation_url = "{% url 'get_latest_translation' id=taskID%}";
     save_task_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
     task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_name=task_name  %}";
-    get_version_particle_url = {% url 'getVersionParticle' %};
-    list_version_url = "{% url 'versions' contest_slug=contest_slug task_name=task_name %}";
-    csrf_token = "{{csrf_token}}";
-    rtl = '{{rtl}}' == 'True';
+    rtl = ('{{rtl}}' == 'True');
 </script>
 
 {% endblock %}
+

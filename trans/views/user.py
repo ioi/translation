@@ -16,8 +16,6 @@ class FirstPage(View):
             return redirect(to=reverse('admin:index'))
         if request.user.groups.filter(name="staff").exists():
             return redirect(to=reverse('users_list'))
-        if request.user.groups.filter(name="editor").exists():
-            return redirect(to=reverse('task'))
 
         if request.user.is_authenticated():
             return redirect(to=reverse('home'))

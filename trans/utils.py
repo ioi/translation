@@ -75,7 +75,7 @@ def is_translate_in_editing(translation):
     return (edit_token is not None) and (edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) > current_time)
 
 
-def unleash_edit_translation_token(translation):
+def unleash_edit_token(translation):
     cache.set(get_trans_edit_cache_key(translation), None)
 
 # Notifications Util

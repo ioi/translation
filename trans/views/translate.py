@@ -23,6 +23,8 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
 class Home(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
+        home_flat_page_slug = 'home-editor' if user.is_editor() else 'home'
+        home_flat_page = FlatPage.objects.filter(slug=home_flat_page_slug).first()
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.filter(contest__public=True):

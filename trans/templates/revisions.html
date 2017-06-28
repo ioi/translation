@@ -17,14 +17,14 @@
                 <div class="panel-body">
 
                     <table class="table table-version table-hover">
-                        <thead><tr><td colspan="2">
-                            {{ taskTitle }}
+                        <thead><tr><td colspan="3">
+                            {{ task_name }}
                         </td></tr></thead>
                         <tbody>
                         {% for version in versionParticles %}
-                            <tr id="particle-version-0" onclick="view_particle_version({{ version.0 }})">
-                                <td>{{ version.1 | ioi_timezone}} (auto saved)</td>
-                                <td></td>
+                            <tr id="particle-version-0" onclick="view_particle_version({{ version.id }})">
+                                <td colspan="2">{{ version.create_time | ioi_timezone}} (auto saved)</td>
+                                <td ></td>
                             </tr>
                         {% endfor %}
 
@@ -32,11 +32,12 @@
                             {% with next_element=versions|next:forloop.counter0 %}
                             {% with previous_element=versions|previous:forloop.counter0 %}
 
-                            <tr id="version-{{ version.0 }}" onclick="diff({{ version.0 }},{{ next_element.0 }})">
-                                <td>{{ version.1 | ioi_timezone}}</td>
+                            <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
+                                <td>{{ version.create_time | ioi_timezone}}</td>
+                                <td>{{ version.release_note }}</td>
                                 <td style="white-space: nowrap">
-                                    <a href="{% url 'trans_md' 'task' contest_slug task_name %}?ver={{version.0}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
-                                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.0 }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
+                                    <a href="{% url 'trans_md' 'task' contest_slug task_name %}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.id }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
                                 </td>
                             </tr>
 

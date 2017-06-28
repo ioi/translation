@@ -65,7 +65,7 @@ function view_particle_version(id){
         type: "GET",
         success: function (response) {
             selectVersion('#particle-version-0');
-            get_version(list_versions[0][0], function (res) {
+            get_version(list_versions[0]['id'], function (res) {
                 second_version = res;
                 var diff_fragment = DiffUtil.getDiffFragment(res, response);
                 $('#myversion').html(diff_fragment);
@@ -105,12 +105,12 @@ function getListVersions() {
 
             // onclick first row
             if(list_version_particles && list_version_particles.length){
-                view_particle_version(list_version_particles[0][0]);
+                view_particle_version(list_version_particles[0]['id']);
             }else if(list_versions[0]){
                 if(list_versions[1])
-                    diff(list_versions[0][0], list_versions[1][0]);
+                    diff(list_versions[0]['id'], list_versions[1]['id']);
                 else
-                    view_version(list_versions[0][0])
+                    view_version(list_versions[0]['id'])
             }
         }
     });

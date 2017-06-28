@@ -43,11 +43,6 @@ class ReleaseTask(ISCEditorCheckMixin, View):
 
 class TaskVersions(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
-        # TODO
-        # published_raw = request.GET.get('published', 'false')
-        # published = False
-        # if published_raw == 'true':
-        #     published = True
         user = User.objects.get(username=request.user.username)
         released = True
         if user.is_editor():

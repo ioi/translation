@@ -74,7 +74,7 @@ class SaveTranslation(LoginRequiredMixin, View):
             task.is_published() or user.is_editor()):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         translation.add_version(content)
-        VersionParticle.objects.filter(translation=translation).delete()
+        # VersionParticle.objects.filter(translation=translation).delete()
         return JsonResponse({'success': True})
 
 
@@ -92,12 +92,7 @@ class SaveVersionParticle(LoginRequiredMixin, View):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         if translation.get_latest_text().strip() == content.strip():
             return JsonResponse({'can_edit': True, 'edit_token': edit_token, 'error': 'Not Modified'})
-        last_version_particle = translation.versionparticle_set.order_by('-create_time').first()
-        if last_version_particle:
-            last_version_particle.text = content
-            last_version_particle.save()
-        else:
-            last_version_particle = VersionParticle.objects.create(translation=translation, text=content,
+        last_version_particle = VersionParticle.objects.create(translation=translation, text=content,
                                                                    create_time=timezone.now())
         return JsonResponse({'success': True})
 
@@ -262,18 +257,17 @@ class CheckoutVersion(LoginRequiredMixin, View):
         translation = content_version.content_object
         if user != translation.user or translation.frozen:
             return JsonResponse({'error': 'forbidden'})
-        translation.add_version(content_version.text)
-        VersionParticle.objects.filter(translation=translation).delete()
+        translation.add_version(content_version.text, "Revert")
         return JsonResponse({'message': 'Done'})
 
 
 class Versions(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
-        contest = Contest.objects.filter(slug=contest_slug).first()
-        if not contest:
-            return HttpResponseNotFound("There is no contest")
-        task = Task.objects.get(name=task_name, contest=contest)
+        try:
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
+        except Exception as e:
+            return HttpResponseBadRequest(e)
         try:
             trans = Translation.objects.get(user=user, task=task)
         except:
@@ -283,11 +277,12 @@ class Versions(LoginRequiredMixin, View):
         v = []
         vp = []
         versions = trans.versions.all().order_by('-create_time')
-        version_particles = VersionParticle.objects.filter(translation=trans).order_by('-create_time')
+        version_particles = VersionParticle.objects.filter(translation=trans).order_by('-create_time')[:1]
         for item in version_particles:
-            vp.append((item.id, item.create_time))
+            if glen(versions) > 0 and item.create_time > versions[0].create_time:
+                vp.append({'id': item.id, 'create_time': item.create_time})
         for item in versions:
-            v.append((item.id, item.create_time))
+            v.append({'id': item.id, 'create_time': item.create_time, 'release_note': item.release_note})
 
         if request.is_ajax():
             return JsonResponse(dict(versions=list(v), version_particles=list(vp)))

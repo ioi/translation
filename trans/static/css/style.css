@@ -2,12 +2,14 @@
 Global
 ============================= */
 
-@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);
+/*@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);*/
 
 /*
 IRAN Sans-serif fonts are used in this project under the license: LVGZC
 For more information about the font license please visit www.fontiran.com
 */
+
+
 @font-face {
 	font-family: IransSans;
 	font-style: normal;

@@ -40,7 +40,7 @@ class ContentVersion(models.Model):
     text = models.TextField()
     released = models.BooleanField(default=False)
     release_note = models.CharField(max_length=255, blank=True)
-    create_time = models.DateTimeField(default=timezone.now())
+    create_time = models.DateTimeField(default=timezone.now)
 
     def can_view_by(self, user):
         if self.content_type.model == 'translation' and self.content_object.user != user:
@@ -119,17 +119,16 @@ class Translation(models.Model):
     frozen = models.BooleanField(default=False)
     versions = GenericRelation(ContentVersion)
 
-    def add_version(self, text):
-        return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now())
+    def add_version(self, text, release_note=""):
+        return ContentVersion.objects.create(content_object=self, text=text, release_note=release_note, create_time=timezone.now())
 
     def get_latest_text(self):
         latest_version = self.versions.order_by('-create_time').first()
         latest_version_particle = self.versionparticle_set.order_by('-create_time').first()
         if latest_version_particle:
-            return latest_version_particle.text
-        if latest_version:
-            if latest_version_particle and latest_version_particle.create_time > latest_version.create_time:
+            if not latest_version or latest_version_particle.create_time > latest_version.create_time:
                 return latest_version_particle.text
+        if latest_version:
             return latest_version.text
         return ''
 
@@ -174,7 +173,7 @@ class Country(models.Model):
 class VersionParticle(models.Model):
     translation = models.ForeignKey('Translation')
     text = models.TextField(default=None)
-    create_time = models.DateTimeField(default=timezone.now())
+    create_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return "id : " + str(self.id) + " Translation : " + self.translation.title
@@ -194,7 +193,7 @@ class VersionParticle(models.Model):
 class Notification(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300)
-    create_time = models.DateTimeField(default=datetime.datetime.now())
+    create_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return "%s-%s" % (self.title, self.description)

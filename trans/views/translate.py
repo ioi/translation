@@ -209,8 +209,26 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         return context
 
 
+class TranslationPrint(LoginRequiredMixin, View):
+    def post(self, request, contest_slug, task_name, task_type):
+        user = User.objects.get(username=request.user)
+        try:
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
+        except Exception as e:
+            return HttpResponseBadRequest(e)
+
+        if task_type == 'released':
+            translation = task.get_corresponding_translation()
+            content = task.get_published_text()
+        else:
+            translation = get_trans_by_user_and_task(user, task)
+            content = translation.get_latest_text()
+        # TODO: convert to pdf and send to printer
+        return JsonResponse({'success': True})
+
+
 class AccessTranslationEdit(LoginRequiredMixin, View):
-    def post(selfs, request, id):
+    def post(self, request, id):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
@@ -238,7 +256,7 @@ class FinishTranslate(LoginRequiredMixin, View):
 
 
 class CheckTranslationEditAccess(LoginRequiredMixin, View):
-    def post(selfs, request, id):
+    def post(self, request, id):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)

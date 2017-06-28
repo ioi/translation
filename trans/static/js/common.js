@@ -15,3 +15,24 @@ $(document).ready(function(){
     });
 
 });
+
+
+function sendPrint(print_task_url) {
+    $.ajax({
+        url: print_task_url,
+        data: {
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+            ToastrUtil.success(
+                    'Printouts will be delivered to you shortly.',
+                    'Print request submitted.'
+            ).css('width', '500px');;
+        },
+        error: function (response) {
+            ToastrUtil.error('Print request failed.');
+        }
+    });
+    return false;
+}

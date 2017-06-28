@@ -6,22 +6,22 @@ function ToastrUtil(){
         toastr.options.closeDuration = 300;
         toastr.options.closeEasing = 'swing';
         toastr.options.rtl = false;
-        toastr.options.positionClass = "toast-bottom-center";
+        toastr.options.positionClass = "toast-bottom-full-width";
     }
 
     ToastrUtil.info = function(text, title){
         ToastrUtil.config();
-        toastr.info(text, title);
+        return toastr.info(text, title);
     }
 
     ToastrUtil.success = function(text, title){
         ToastrUtil.config();
-        toastr.success(text, title);
+        return toastr.success(text, title);
     }
 
     ToastrUtil.error = function(text, title){
         ToastrUtil.config();
-        toastr.error(text, title);
+        return toastr.error(text, title);
     }
 
 }

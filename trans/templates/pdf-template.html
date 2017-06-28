@@ -50,16 +50,7 @@
         $('#rendered_content').html(marked(text));
         renderMathInElement(document.getElementById('rendered_content'));
     });
-    
-    function sendPrintRequest() {
-        if (false) // TODO: check if local print disabled
-            window.print();
-        else if (confirm('Send this page to printer?')) {
-            // TODO: send print request
-            alert('Print request submitted.\n\nPrinted sheets will be delivered to you shortly.');
-        }
-    }
-    
+        
 </script>
 
 </html>

@@ -154,8 +154,8 @@ class Translation(models.Model):
 
 
 class Language(models.Model):
-    name = models.CharField(max_length=255,primary_key=True)
-    code = models.CharField(unique=True, max_length=255,default='')
+    name = models.CharField(max_length=255, primary_key=True)
+    code = models.CharField(unique=True, max_length=255, default='')
     rtl = models.BooleanField(default=False)
 
     def __str__(self):
@@ -220,7 +220,13 @@ class Attachment(models.Model):
     title = models.CharField(max_length=100)
     create_time = models.DateTimeField('Date Created')
 
+    def __str__(self):
+        return self.title
+
 
 class FlatPage(models.Model):
     slug = models.CharField(max_length=100, primary_key=True)
-    content = models.TextField(default=None)
+    content = models.TextField(default=None, blank=True)
+
+    def __str__(self):
+        return self.slug

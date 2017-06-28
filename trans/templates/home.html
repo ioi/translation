@@ -39,7 +39,9 @@
                     </td>
                     <td>
                         <a href="{% url 'trans_md' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                        {% if not is_editor %}
                         <a href="{% url 'task_versions' contest_tasks.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+                        {% endif %}
                         <a href="{% url 'task_pdf' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                         <a href="{% url 'task_print' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
                     </td>

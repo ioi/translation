@@ -23,7 +23,6 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
 class Home(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
-        home_flat_page = FlatPage.objects.filter(slug="home").first()
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.filter(contest__public=True):
@@ -279,7 +278,7 @@ class Versions(LoginRequiredMixin, View):
         versions = trans.versions.all().order_by('-create_time')
         version_particles = VersionParticle.objects.filter(translation=trans).order_by('-create_time')[:1]
         for item in version_particles:
-            if glen(versions) > 0 and item.create_time > versions[0].create_time:
+            if len(versions) > 0 and item.create_time > versions[0].create_time:
                 vp.append({'id': item.id, 'create_time': item.create_time})
         for item in versions:
             v.append({'id': item.id, 'create_time': item.create_time, 'release_note': item.release_note})

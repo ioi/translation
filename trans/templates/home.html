@@ -13,7 +13,7 @@
         <table class="table table-hover">
             <thead><tr>
                 <th width="20%">Task</th>
-                <th width="20%">Edit</th>
+                <th width="15%">Edit</th>
                 {% if is_editor %}
                 <th>Current Version</th>
                 <th>Latest Release</th>
@@ -32,16 +32,17 @@
                         {% else %}<a href="{% url 'edit' contest_tasks.slug task.name %}">Edit</a>{% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'trans_md' 'task' contest_tasks.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
                         <a href="{% url 'versions' contest_tasks.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+                        <a href="{% url 'trans_md' 'task' contest_tasks.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-code-o fa-lg"></i></a>
+                        <a href="{% url 'task_html' 'task' contest_tasks.slug task.name %}" class="btn btn-default" title="HTML"><i class="fa fa-btns fa-file-text-o fa-lg"></i></a>
                         <a href="{% url 'task_pdf' 'task' contest_tasks.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-                        <a href="{% url 'task_print' 'task' contest_tasks.slug task.name %}" class="btn btn-default" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
-                    </td>
+                        <a href="{% url 'task_print' 'task' contest_tasks.slug task.name %}" class="btn btn-default" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>                    </td>
                     <td>
-                        <a href="{% url 'trans_md' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
                         {% if not is_editor %}
                         <a href="{% url 'task_versions' contest_tasks.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
                         {% endif %}
+                        <a href="{% url 'trans_md' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-code-o fa-lg"></i></a>
+                        <a href="{% url 'task_html' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="HTML"><i class="fa fa-btns fa-file-text-o fa-lg"></i></a>
                         <a href="{% url 'task_pdf' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                         <a href="{% url 'task_print' 'released' contest_tasks.slug task.name %}" class="btn btn-default" title="Print"><i class="fa fa-btns fa-print fa-lg"></i></a>
                     </td>

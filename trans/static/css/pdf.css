@@ -1,9 +1,6 @@
 
-@import url(/static/fonts/SourceSansPro/SourceSansPro.css);
-
 body {
-    margin: 4em;
-    font-size: 10px;
+    margin: 3em 5em;
     zoom: .9;
     text-align: justify;
 }
@@ -17,15 +14,30 @@ pre, table th {
 }
 
 .header {
-    font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
-    font-size: 16px;
+    font-family: IRANSans, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    letter-spacing: -.04em;
     font-weight: 400;
+}
+
+.header .text {
+    display: inline-block;
+    float: left;
+    line-height: 1.25em;
+}
+
+.header .text h1 {
+    font-weight: 500;
+    font-size: 1.1em;
+    letter-spacing: -.03em;
+    margin: 0px 0px 3px;
 }
 
 .header .logo {
     display: inline-block;
     float: left;
     margin-right: 0px;
+    margin-top: -2px;
 }
 
 .header .logo img {
@@ -33,48 +45,21 @@ pre, table th {
     padding-right: 15px;
 }
 
-.header .text {
-    display: inline-block;
-    float: left;
-    letter-spacing: -.03em;
-    line-height: 1.1em;
-}
-
-.header .text h1 {
-    font-weight: 600;
-    font-size: 1.1em;
-    margin: 0px 0px 3px;
-}
-
 .header .meta {
     display: inline-block;
     float: right;
     text-align: right;
+    margin-top: 28px;
+    font-size: 12px;
 }
 
-.header .print {
-    height: 30px;
-}
-
-.header .print button {
-    background-color: darkorange;
-    font-weight: 600;
-    color: white;
-}
-
-.header .meta h1 {
+.header .meta h2 {
     font-family: "Courier New", monospace;
     font-weight: bold;
     font-size: 18px;
     letter-spacing: -.03em;
-    line-height: 24px;
+    line-height: 25px;
     margin: 0px;
-}
-
-.header .meta h2 {
-    font-weight: 400;
-    font-size: 12px;
-    margin: 0;
 }
 
 .header hr {
@@ -90,7 +75,7 @@ pre, table th {
 }
 
 .pdf.markdown-body code {
-    color: #333;
+    color: black;
 }
 
 .pdf pre {
@@ -106,6 +91,5 @@ pre, table th {
     body {
         margin: 0;
         zoom: 1;
-        font-family: 'CustomTextFont', Arial, serif;
     }
 }

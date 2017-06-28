@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/static/libs/markdown/katex.css">
     <link rel="stylesheet" href="/static/css/markdown.css">
     <link rel="stylesheet" href="/user/font.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="/static/css/pdf.css">
 
     <script type="text/javascript" src="/static/libs/jquery/jquery-3.1.1.min.js"></script>
@@ -32,23 +33,20 @@
                 <div>{{contest}} Tasks</div>
             </div>
             <div class="meta">
-                <div class="print">
-                    <button type="button" onclick="sendPrintRequest()">Print</button>
-                </div>
-                <h1>{{task_name}}</h1>
-                <h2>Language: {{language}}-{{country}}</h2>
+                <h2>{{task_name}}</h2>
+                <div>{{language}} ({{country}})</div>
             </div>
             <div style="clear: both;"></div>
             <hr>
         </div>
-        <div id="left_ltr_plain_text_box" style="display: none">{{content}}</div>
-        <div id="rendered_content" style="direction:{{direction}}"></div>
+        <div id="markdown" style="display: none">{{content}}</div>
+        <div id="rendered_content" dir="{{direction}}"></div>
     </div>
 </body>
 <script>
 
     $(document).ready(function() {
-        text = $('#left_ltr_plain_text_box').text();
+        text = $('#markdown').text();
         $('#rendered_content').html(marked(text));
         renderMathInElement(document.getElementById('rendered_content'));
     });

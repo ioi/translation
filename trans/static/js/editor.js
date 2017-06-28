@@ -103,7 +103,7 @@ function activeBtn(id){
 function onPreviewClick(){
     current_text = currentTranslationText();
     renderMarkdown('right_text_box', current_text);
-    $('#right_text_box').css('direction', getDirectionStr(rtl));
+    $('#right_text_box').attr('dir', getDirectionStr(rtl));
     $('#right_text_box').css('whiteSpace', 'normal');
     previewInterval = setInterval(onlinePreview, 100);
     activeBtn('#preview-btn');

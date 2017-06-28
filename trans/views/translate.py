@@ -119,7 +119,7 @@ class TranslationHTML(LoginRequiredMixin, View):
                                                              'direction': direction,
                                                              'task_name': task.name,
                                                              'text_font_base64': user.text_font_base64,
-                                                             'country': translation.user.country.name,
+                                                             'country': translation.user.country.code,
                                                              'language': translation.user.language.name,
                                                              'contest': translation.task.contest.title})
 
@@ -163,7 +163,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         'margin-right': '0.75in',
         'margin-left': '0.75in',
         'print-media-type': '--print-media-type',
-        # 'zoom': 3.5,
+        # 'zoom': 3,
     }
 
     def get_context_data(self, **kwargs):
@@ -200,7 +200,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         context['title'] = self.filename
         context['task_name'] = trans.task.name
         context['country'] = trans.user.country.code
-        context['language'] = trans.user.language.code
+        context['language'] = trans.user.language.name
         context['contest'] = trans.task.contest.title
         context['text_font_base64'] = trans.user.text_font_base64
         self.footer_template = 'pdf-footer.html'

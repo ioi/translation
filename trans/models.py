@@ -150,7 +150,7 @@ class Translation(models.Model):
         return None
 
     def __str__(self):
-        return "Title : "+ self.title + " id : " + str(self.id)
+        return "id : " + str(self.id)
 
 
 class Language(models.Model):

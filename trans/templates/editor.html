@@ -26,6 +26,7 @@
         <div class="btn-container">
             <button class="btn btn-default" onclick="saveVersion()" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
             <a href="{% url 'versions' contest_slug=contest_slug task_name=task_name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+            <a href="{% url 'task_html' 'task' contest_slug task_name %}" class="btn btn-default" title="HTML"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
             <a href="{% url 'task_pdf' 'task' contest_slug task_name %}" class="btn btn-default" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
             <a href="{% url 'task_print' 'task' contest_slug task_name %}" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></a>
             {% if is_editor %}

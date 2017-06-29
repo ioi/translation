@@ -93,7 +93,8 @@ class UserTranslations(StaffCheckMixin, View):
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
-        return render(request, 'user.html', context={'tasks_lists': tasks_lists, 'language': user.credentials()})
+        return render(request, 'user.html', context={'user_name': username, 'country': user.country.name, 
+                                                     'tasks_lists': tasks_lists, 'language': user.credentials()})
 
 
 class UsersList(StaffCheckMixin, View):

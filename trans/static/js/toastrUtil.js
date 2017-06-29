@@ -6,7 +6,7 @@ function ToastrUtil(){
         toastr.options.closeDuration = 300;
         toastr.options.closeEasing = 'swing';
         toastr.options.rtl = false;
-        toastr.options.positionClass = "toast-bottom-full-width";
+        toastr.options.positionClass = "toast-bottom-center";
     }
 
     ToastrUtil.info = function(text, title){

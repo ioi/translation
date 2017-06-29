@@ -3,41 +3,31 @@
 {% block content %}
 
     <div class="container">
-        <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                </div>
-            </div>
-        </div>
+        <div class="col-md-12 col-lg-10 col-lg-offset-1">
+            
+            <h2>Users</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th width="20%">User</th>
+                        <th width="30%">Translations</th>
+                        <th>Country</th>
+                        <th>Language</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username}}</td>
+                        <td><a href="{% url 'user_trans' username=user.username %}">Translations</a></td>
+                        <td>{{user.country}}</td>
+                        <td>{{user.language}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
-
-        <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-
-                    <table class="table">
-                        <thead><tr>
-                            <th>Username</th>
-                            <th>Country</th>
-                            <th>Language</th>
-                            <th>RTL</th>
-                        </tr></thead>
-                        <tbody>
-                        {% for user in users %}
-                            <tr>
-                                <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username}}</a></td>
-                                <td>{{user.country}}</td>
-                                <td>{{user.language}}</td>
-                                <td>{{user.language.rtl}}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
         </div>
     </div>
-
 
 {% endblock %}

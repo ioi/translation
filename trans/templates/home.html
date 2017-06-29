@@ -1,58 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if home_content %}
-    <div class="body container flatpage col-sm-10 col-sm-offset-1">
-        {{ home_content | safe }}
-    </div>
-{% endif %}
-{% for contest in tasks_lists %}
 
-    <div class="body container col-sm-10 col-sm-offset-1">
-        <h2>{{contest.title}}</h2>
-        <table class="table table-hover">
-            <thead><tr>
-                <th width="20%">Task</th>
-                <th width="15%">Edit</th>
-                {% if is_editor %}
-                <th>Current Version</th>
-                <th>Latest Release</th>
-                {% else %}
-                <th>Translation</th>
-                <th>ISC Version</th>
-                {% endif %}
-            </tr></thead>
-            <tbody>
-            {% for task in contest.tasks %}
-                <tr>
-                    <td> {{ task.name }} </td>
-                    <td>
-                        {% if task.is_editing %} Is editing
-                        {% elif task.frozen %} Frozen
-                        {% else %}<a href="{% url 'edit' contest.slug task.name %}">Edit</a>{% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'versions' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-                        <a href="{% url 'trans_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-code-o fa-lg"></i></a>
-                        <a href="{% url 'task_html' 'task' contest.slug task.name %}" class="btn btn-default" title="HTML"><i class="fa fa-btns fa-file-text-o fa-lg"></i></a>
-                        <a href="{% url 'task_pdf' 'task' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-                        <button onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
-                    </td>
-                    <td>
-                        {% if not is_editor %}
-                        <a href="{% url 'task_versions' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+    <div class="container">
+        <div class="col-md-12 col-lg-10 col-lg-offset-1">
+            {% if home_content %}
+            <div class="flatpage">
+                {{ home_content | safe }}
+            </div>
+            {% endif %}
+            
+            {% for contest in tasks_lists %}
+            <h2>{{ contest.title }}</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th width="20%">Task</th>
+                        <th width="20%">Edit</th>
+                        {% if is_editor %}
+                        <th>Current Version</th>
+                        <th>Latest Release</th>
+                        {% else %}
+                        <th>Translation</th>
+                        <th>ISC Version</th>
                         {% endif %}
-                        <a href="{% url 'trans_md' 'released' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-code-o fa-lg"></i></a>
-                        <a href="{% url 'task_html' 'released' contest.slug task.name %}" class="btn btn-default" title="HTML"><i class="fa fa-btns fa-file-text-o fa-lg"></i></a>
-                        <a href="{% url 'task_pdf' 'released' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-                        <button onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
-                    </td>
-                </tr>
+                    </tr>
+                </thead>                
+                <tbody>
+                {% for task in contest.tasks %}
+                    <tr>
+                        <td> {{ task.name }} </td>
+                        <td>
+                            {% if task.is_editing %} Is editing
+                            {% elif task.frozen %} Frozen
+                            {% else %}<a href="{% url 'edit' contest.slug task.name %}">Edit</a>{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'versions' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+                            <a href="{% url 'task_html' 'task' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
+                            <a href="{% url 'trans_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                            <a href="{% url 'task_pdf' 'task' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                            <button onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
+                        </td>
+                        <td>
+                            {% if not is_editor %}
+                            <a href="{% url 'task_versions' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+                            {% endif %}
+                            <!-- <a href="{% url 'task_html' 'released' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a> -->
+                            <a href="{% url 'trans_md' 'released' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                            <a href="{% url 'task_pdf' 'released' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                            <button onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
             {% endfor %}
-            </tbody>
-        </table>
+        </div>
     </div>
-
-{% endfor %}
 
 {% endblock %}

@@ -54,11 +54,8 @@ class Contest(models.Model):
     slug = models.CharField(max_length=10, blank=False, unique=True)
     public = models.BooleanField(default=False)
 
-    def __repr__(self):
-        return "%d-%s" % (self.order, self.title)
-
     def __str__(self):
-        return "%d-%s" % (self.order, self.title)
+        return "{} (order: {})".format(self.title, self.order)
 
 
 class Task(models.Model):
@@ -150,7 +147,7 @@ class Translation(models.Model):
         return None
 
     def __str__(self):
-        return "id : " + str(self.id)
+        return "{} ({})".format(self.task.name, self.user.username)
 
 
 class Language(models.Model):
@@ -176,7 +173,7 @@ class VersionParticle(models.Model):
     create_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return "id : " + str(self.id) + " Translation : " + self.translation.title
+        return "{}: {} ({})".format(self.id, self.translation.task.name, self.translation.user.username)
 
 
 # Uncomment here when wanted to email people

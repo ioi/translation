@@ -7,6 +7,8 @@ $(document).ready(function(){
         placement: 'bottom',
         trigger : 'hover',
         delay: {show: 400}
+    }).on('click', function () {
+        $(this).tooltip('hide')
     });
 
     // focus on an elemnt when modal is shown

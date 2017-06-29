@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %} {{ task_name | capfirst}} {% endblock %}
+
 {% block statics %}
 
     <link rel="stylesheet" href="/static/libs/markdown/simplemde.min.css">

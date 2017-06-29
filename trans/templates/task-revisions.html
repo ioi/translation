@@ -3,6 +3,8 @@
 {% load list_filter %}
 {% load timezone_filter %}
 
+{% block title %} {{ task_name | capfirst}} : History {% endblock %}
+
 {% block content %}
 
     <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
@@ -18,7 +20,7 @@
 
                     <table class="table table-version table-hover">
                         <thead><tr>
-                            <td colspan="3">{{ task_name }}</td>
+                            <td colspan="3">{{ task_name | capfirst }}</td>
                         </tr></thead>
                         <tbody>
                         {% for version in versions %}

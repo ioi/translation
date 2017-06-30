@@ -1,4 +1,3 @@
-import markdown
 from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from django.http.response import HttpResponseRedirect, HttpResponseNotFound

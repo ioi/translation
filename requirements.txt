@@ -1,10 +1,7 @@
 Django
-moratab
 gunicorn==19.3.0
 psycopg2==2.6
 redis==2.10.3
-markdown
-pdfkit
 requests==2.7.0
 six==1.10.0
 websocket-client==0.35.0
@@ -14,3 +11,4 @@ django-redis
 ipython
 pytz
 django-websocket-redis
+openpyxl

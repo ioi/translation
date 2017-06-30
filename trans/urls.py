@@ -36,7 +36,7 @@ urlpatterns = [
     url(r'^add_task/$', AddTask.as_view(), name='add_task'),
 
     url(r'^users/$', UsersList.as_view(), name='users_list'),
-    url(r'^user/(?P<username>[\w]*)/$', UserTranslations.as_view(), name='user_trans'),
+    url(r'^user/(?P<username>[\w-]*)/$', UserTranslations.as_view(), name='user_trans'),
     url(r'^freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
     url(r'^unleash_edit_token/(?P<id>[\w]*)/$', UnleashEditTranslationToken.as_view(), name='unleash_edit_token'),
 

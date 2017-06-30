@@ -1,4 +1,3 @@
-import markdown
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponse, HttpResponseForbidden
 from django.views.generic.base import View

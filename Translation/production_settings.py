@@ -27,6 +27,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['trans.ioi2017.org']
 
+WKHTMLTOPDF_CMD = 'xvfb-run wkhtmltopdf'
 
 # Application definition
 

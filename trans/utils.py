@@ -38,7 +38,7 @@ def can_user_change_translation(user, translation, edit_token):
 
 def add_pdf_to_file(pdf_response):
     with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
-        file.write(pdf_response.rendered_content)
+        file.write(pdf_response.content)
 
 
 # Cache Utils

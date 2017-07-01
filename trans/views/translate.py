@@ -128,10 +128,10 @@ class TranslationHTML(LoginRequiredMixin, View):
 
 
 class UserFont(LoginRequiredMixin, View):
-    def get(self, request):
+    def get(self, request, username):
         user = User.objects.get(username=request.user)
-        if user.is_staff and 'user' in request.GET:
-            user = User.objects.get(username=request.GET.get('user'))
+        if user.is_staff:
+            user = User.objects.get(username=username)
         return render(request, 'font.css', content_type='text/css', context={'text_font_base64': user.text_font_base64})
 
 

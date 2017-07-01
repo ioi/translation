@@ -52,7 +52,7 @@ urlpatterns = [
     url(r'^notifications/$', ReadNotifications.as_view(), name='notifications'),
     url(r'^reset_notifications/$', reset_notifications, name='reset_notifications'),
     url(r'^send_notification/$', SendNotification.as_view(), name='send_notif'),
-    url(r'^user/font.css', UserFont.as_view(), name='userfontcss')
+    url(r'^user/(?P<username>[\w-]*)/font.css', UserFont.as_view(), name='userfontcss')
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

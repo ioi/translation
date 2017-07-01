@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from django.http.response import HttpResponseRedirect, HttpResponseNotFound
@@ -171,6 +172,15 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         'print-media-type': '--print-media-type',
         # 'zoom': 3,
     }
+
+    def get(self, request, *args, **kwargs):
+        pdf_response = super(TranslationPDF, self).get(request, *args, **kwargs)
+        if request.GET.get('as', '') != 'html':
+            with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
+                file.write(pdf_response.rendered_content)
+
+        return pdf_response
+
 
     def get_context_data(self, **kwargs):
         context = super(TranslationPDF, self).get_context_data(**kwargs)

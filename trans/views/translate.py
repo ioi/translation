@@ -41,6 +41,7 @@ class Home(LoginRequiredMixin, View):
         return render(request, 'home.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
                                                      'contests': contests, 'is_editor': user.is_editor()})
 
+
 class Translations(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
@@ -100,6 +101,8 @@ class SaveVersionParticle(LoginRequiredMixin, View):
 class TranslationHTML(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
+        if user.is_staff and 'user' in request.GET:
+            user = User.objects.get(username=request.GET.get('user'))
         try:
             task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
@@ -120,19 +123,23 @@ class TranslationHTML(LoginRequiredMixin, View):
                                                              'text_font_base64': user.text_font_base64,
                                                              'country': translation.user.country.code,
                                                              'language': translation.user.language.name,
-                                                             'contest': translation.task.contest.title})
+                                                             'contest': translation.task.contest.title,
+                                                             'username': user.username})
 
 
 class UserFont(LoginRequiredMixin, View):
     def get(self, request):
         user = User.objects.get(username=request.user)
+        if user.is_staff and 'user' in request.GET:
+            user = User.objects.get(username=request.GET.get('user'))
         return render(request, 'font.css', content_type='text/css', context={'text_font_base64': user.text_font_base64})
 
 
 class TranslationMarkdown(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-
+        if user.is_staff and 'user' in request.GET:
+            user = User.objects.get(username=request.GET.get('user'))
         version_id = request.GET.get('ver')
         if version_id:
             content_version = ContentVersion.objects.filter(id=version_id).first()
@@ -168,6 +175,8 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     def get_context_data(self, **kwargs):
         context = super(TranslationPDF, self).get_context_data(**kwargs)
         user = User.objects.get(username=self.request.user)
+        if user.is_staff and 'user' in self.request.GET:
+            user = User.objects.get(username=self.request.GET.get('user'))
         version_id = self.request.GET.get('ver')
         contest_slug = kwargs['contest_slug']
         task_name = kwargs['task_name']
@@ -202,6 +211,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         context['language'] = trans.user.language.name
         context['contest'] = trans.task.contest.title
         context['text_font_base64'] = trans.user.text_font_base64
+        context['username'] = user.username
         self.footer_template = 'pdf-footer.html'
         self.show_content_in_browser = True
         # self.cmd_options['footer-right'] = '%s [page] / [topage]' % trans.task.name

@@ -1,11 +1,12 @@
 FROM python:3.4
 
 RUN apt-get update && apt-get install -qy libfontconfig wget
+RUN apt-get install -qy wkhtmltopdf xvfb
 
-WORKDIR /tmp
-RUN wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-    tar xJf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-    cp -r wkhtmltox/* /usr/local/
+#WORKDIR /tmp
+#RUN wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
+#    tar xJf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
+#    cp -r wkhtmltox/* /usr/local/
 
 RUN mkdir -p /usr/src/app/
 

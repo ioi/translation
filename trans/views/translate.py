@@ -161,6 +161,11 @@ class TranslationMarkdown(LoginRequiredMixin, View):
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
 
+def add_pdf_to_file(pdf_response):
+    with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
+        file.write(pdf_response.rendered_content)
+
+
 class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     template_name = 'pdf-template.html'
     cmd_options = {
@@ -176,8 +181,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     def get(self, request, *args, **kwargs):
         pdf_response = super(TranslationPDF, self).get(request, *args, **kwargs)
         if request.GET.get('as', '') != 'html':
-            with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
-                file.write(pdf_response.rendered_content)
+            pdf_response.add_post_render_callback(add_pdf_to_file)
 
         return pdf_response
 

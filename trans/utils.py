@@ -3,6 +3,7 @@ import logging
 import datetime
 import string
 import random
+from django.conf import settings
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -33,6 +34,12 @@ def get_trans_by_user_and_task(user, task):
 
 def can_user_change_translation(user, translation, edit_token):
     return user == translation.user and can_save_translate(translation, edit_token) and not translation.frozen
+
+
+def add_pdf_to_file(pdf_response):
+    with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
+        file.write(pdf_response.rendered_content)
+
 
 # Cache Utils
 

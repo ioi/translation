@@ -17,7 +17,7 @@ from trans.models import FlatPage
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
-    can_user_change_translation
+    can_user_change_translation, add_pdf_to_file
 
 
 class Home(LoginRequiredMixin, View):
@@ -159,11 +159,6 @@ class TranslationMarkdown(LoginRequiredMixin, View):
                 content = translation.get_latest_text()
 
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
-
-
-def add_pdf_to_file(pdf_response):
-    with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
-        file.write(pdf_response.rendered_content)
 
 
 class TranslationPDF(LoginRequiredMixin, PDFTemplateView):

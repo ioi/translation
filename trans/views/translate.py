@@ -301,6 +301,7 @@ class CheckoutVersion(LoginRequiredMixin, View):
 class Versions(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)
+        view_all = request.GET.get('view_all','false') == 'true'
         try:
             task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
@@ -314,13 +315,15 @@ class Versions(LoginRequiredMixin, View):
         v = []
         vp = []
         versions = trans.versions.all().order_by('-create_time')
-        version_particles = VersionParticle.objects.filter(translation=trans).order_by('-create_time')[:1]
+
+        version_particles = VersionParticle.objects.filter(translation=trans).order_by('-create_time')
+        if not view_all:
+            version_particles = version_particles[:1]
         for item in version_particles:
-            if len(versions) > 0 and item.create_time > versions[0].create_time:
+            if view_all or (len(versions) > 0 and item.create_time > versions[0].create_time):
                 vp.append({'id': item.id, 'create_time': item.create_time})
         for item in versions:
             v.append({'id': item.id, 'create_time': item.create_time, 'release_note': item.release_note})
-
         if request.is_ajax():
             return JsonResponse(dict(versions=list(v), version_particles=list(vp)))
         else:

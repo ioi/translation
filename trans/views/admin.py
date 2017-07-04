@@ -6,7 +6,7 @@ from django.views.generic import View
 from django.http import HttpResponseNotFound, HttpResponse
 
 from trans.models import User, Task, Translation, Contest
-from trans.utils import is_translate_in_editing, unleash_edit_token
+from trans.utils import is_translate_in_editing, unleash_edit_token, unreleased_pdf_path, final_pdf_path
 
 
 class AdminCheckMixin(LoginRequiredMixin,object):
@@ -109,9 +109,14 @@ class FreezeTranslation(StaffCheckMixin, View):
         trans = Translation.objects.filter(id=id).first()
         if trans is None:
             return HttpResponseNotFound("There is no task")
-        trans.frozen = frozen
+        trans.frozen = (frozen == 'True')
         trans.save()
+        if trans.frozen:
+            from shutil import copyfile
+            trans_pdf_name = "%s-%s" % (trans.task.name, trans.user.username)
+            copyfile(unreleased_pdf_path(trans_pdf_name), final_pdf_path(trans_pdf_name))
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+
 
 class UnleashEditTranslationToken(StaffCheckMixin, View):
     def post(self, request, id):

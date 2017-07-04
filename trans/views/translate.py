@@ -205,7 +205,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         else:
             if task_type == 'released':
                 content = task.get_published_text()
-                file_name = "%s.pdf" % (task.name)
+                file_name = "%s-%s.pdf" % (task.name, 'ISC')
             else:
                 content = trans.get_latest_text()
                 file_name = "%s-%s.pdf" % (task.name, trans.user.username)

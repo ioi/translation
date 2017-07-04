@@ -36,8 +36,20 @@ def can_user_change_translation(user, translation, edit_token):
     return user == translation.user and can_save_translate(translation, edit_token) and not translation.frozen
 
 
+def unreleased_pdf_path(pdf_name):
+    if pdf_name.split('.')[-1] == 'pdf':
+        return '%s/%s' % (settings.MEDIA_ROOT, pdf_name)
+    return '%s/%s.pdf' % (settings.MEDIA_ROOT, pdf_name)
+
+
+def final_pdf_path(pdf_name):
+    if pdf_name.split('.')[-1] == 'pdf':
+        return '%s/%s' % (settings.FINAL_PDF_ROOT, pdf_name)
+    return '%s/%s.pdf' % (settings.FINAL_PDF_ROOT, pdf_name)
+
+
 def add_pdf_to_file(pdf_response):
-    with open('%s/%s' % (settings.MEDIA_ROOT, pdf_response.filename), 'wb') as file:
+    with open(unreleased_pdf_path(pdf_response.filename), 'wb') as file:
         file.write(pdf_response.content)
 
 

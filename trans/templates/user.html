@@ -28,7 +28,8 @@
                         <td>
                             {% if task.is_editing %} Is editing
                             {% elif task.frozen %} Frozen
-                            {% else %} Normal {% endif %}
+                            {% elif task.trans_id == None %} Not started
+                            {% else %} Normal{% endif %}
                         </td>
                         <td>
                             <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
@@ -38,13 +39,15 @@
                             <!-- <button onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button> -->
                         </td>
                         <td>
-                            <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}" />
-                                <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}">
-                                    {% if task.frozen %} Unfreeze {% else %} Freeze {% endif %}
-                                </button>
-                            </form>
+                            {% if task.trans_id %}
+                                <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}" />
+                                    <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}">
+                                        {% if task.frozen %} Unfreeze {% else %} Freeze {% endif %}
+                                    </button>
+                                </form>
+                            {% endif %}
                         </td>
                         <td>
                             {% if task.is_editing %}

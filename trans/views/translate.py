@@ -27,12 +27,12 @@ class Home(LoginRequiredMixin, View):
         home_flat_page = FlatPage.objects.filter(slug=home_flat_page_slug).first()
         home_content = home_flat_page.content if home_flat_page else ''
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
-        for task in Task.objects.filter(contest__public=True):
+        for task in Task.objects.filter(contest__public=True).order_by('order'):
             if not (task.is_published() or user.is_editor()):
                 continue
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
-            frozen = translation and translation.frozen
+            frozen = translation and translation.frozen or task.contest.frozen
             tasks_by_contest[task.contest].append(
                 {'id': task.id, 'name': task.name, 'is_editing': is_editing, 'frozen': frozen})
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
@@ -51,7 +51,7 @@ class Translations(LoginRequiredMixin, View):
         except Exception as e:
             return HttpResponseBadRequest(e)
         trans = get_trans_by_user_and_task(user, task)
-        if trans.frozen or not (task.is_published() or user.is_editor()):
+        if trans.frozen or task.contest.frozen or not (task.is_published() or user.is_editor()):
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text()
         contests = Contest.objects.order_by('order')

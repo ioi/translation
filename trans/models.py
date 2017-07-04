@@ -31,7 +31,8 @@ class User(User):
         return User.objects.filter(is_staff=False)
 
     def is_editor(self):
-        return self.groups.filter(name="editor").exists() or self.is_superuser
+        return self.groups.filter(name='editor').exists() or self.is_superuser
+
 
 class ContentVersion(models.Model):
     content_type = models.ForeignKey(ContentType)
@@ -50,9 +51,10 @@ class ContentVersion(models.Model):
 
 class Contest(models.Model):
     title = models.CharField(max_length=100, blank=False)
-    order = models.IntegerField()
+    order = models.IntegerField(default=1)
     slug = models.CharField(max_length=10, blank=False, unique=True)
     public = models.BooleanField(default=False)
+    frozen = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} (order: {})".format(self.title, self.order)
@@ -61,8 +63,7 @@ class Contest(models.Model):
 class Task(models.Model):
     name = models.CharField(max_length=255, blank=False)
     contest = models.ForeignKey('Contest', default=None)
-    frozen = models.BooleanField(default=False)
-    versions = GenericRelation(ContentVersion)
+    order = models.IntegerField(default=1)
 
     def add_version(self, text, release_note="", released=False):
         return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),
@@ -107,7 +108,7 @@ class Task(models.Model):
         return None
 
     def __str__(self):
-        return "name : " + str(self.name) + " id :" + str(self.id)
+        return '{} ({}: {})'.format(self.name, self.contest.title, self.order)
 
 
 class Translation(models.Model):

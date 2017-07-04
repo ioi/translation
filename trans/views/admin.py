@@ -82,7 +82,7 @@ class UserTranslations(StaffCheckMixin, View):
             else:
                 translations.append((task.id, task.name, False, 'None', False, False))
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
-        for task in Task.objects.filter(contest__public=True):
+        for task in Task.objects.filter(contest__public=True).filter(contest__frozen=False).order_by('order'):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.frozen
@@ -93,13 +93,13 @@ class UserTranslations(StaffCheckMixin, View):
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
-        return render(request, 'user.html', context={'user_name': username, 'country': user.country.name, 
+        return render(request, 'user.html', context={'user_name': username, 'country': user.country.name,
                                                      'tasks_lists': tasks_lists, 'language': user.credentials()})
 
 
 class UsersList(StaffCheckMixin, View):
     def get(self, request):
-        users = (User.get_translators() | User.objects.filter(username='ISC')).distinct()
+        users = User.get_translators()
         return render(request, 'users.html', context={'users': users})
 
 

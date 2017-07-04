@@ -71,6 +71,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'ws4redis.context_processors.default',
+                'trans.context_processors.ioi_settings',
             ],
         },
     },

@@ -99,7 +99,7 @@ class UserTranslations(StaffCheckMixin, View):
 
 class UsersList(StaffCheckMixin, View):
     def get(self, request):
-        users = User.get_translators()
+        users = (User.get_translators() | User.objects.filter(username='ISC')).distinct()
         return render(request, 'users.html', context={'users': users})
 
 

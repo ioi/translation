@@ -103,7 +103,7 @@ class Command(BaseCommand):
             new_trans = get_trans_by_user_and_task(user, task)
             new_trans.add_version(content)
             if contest.public == True:
-                task.publish_latest("Init")
+                task.publish_latest("First Release")
 
     def read_data(self, data_sheet, title_list):
         '''read data corresponding to the title_list from data sheet'''
@@ -112,5 +112,6 @@ class Command(BaseCommand):
         titles = [c[0].value for c in table.columns]
         index = {t: titles.index(t) for t in title_list}
         for i in range(table.max_row - 1):
-            data.append(list([str(table[i + 2][index[t]].value).strip() for t in title_list]))
+            row = table[i + 2]
+            data.append(list([str(row[index[t]].value).strip() for t in title_list]))
         return data

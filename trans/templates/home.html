@@ -48,7 +48,7 @@
                             {% if not is_editor %}
                             <a href="{% url 'task_versions' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
                             {% endif %}
-                            <!-- <a href="{% url 'task_html' 'released' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a> -->
+                            <a href="{% url 'task_html' 'released' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                             <a href="{% url 'trans_md' 'released' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
                             <a href="{% url 'task_pdf' 'released' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                             <button onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>

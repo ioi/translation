@@ -43,7 +43,7 @@ class ContentVersion(models.Model):
     create_time = models.DateTimeField(default=timezone.now)
 
     def can_view_by(self, user):
-        if self.content_type.model == 'translation' and self.content_object.user != user:
+        if self.content_type.model == 'translation' and self.content_object.user != user and self.content_object.user.username != 'ISC':
             return False
         return True
 

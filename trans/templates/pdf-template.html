@@ -6,9 +6,15 @@
     <meta charset="utf-8">
     <title>{{ task_name | capfirst }} - IOI 2017</title>
 
+    <style>
+    @font-face {
+        font-family: CustomTextFont;
+        src: url(data:font/ttf;base64,{{text_font_base64}})
+    }
+    </style>
     <link rel="stylesheet" href="/static/libs/markdown/katex.css">
     <link rel="stylesheet" href="/static/css/markdown.css">
-    <link rel="stylesheet" href="/user/{{username}}/font.css">
+    <!--<link rel="stylesheet" href="/user/{{username}}/font.css">-->
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="/static/css/pdf.css">
 
@@ -19,6 +25,7 @@
     <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
 
 </head>
+
 
 <body>
     <div class="markdown-body pdf">

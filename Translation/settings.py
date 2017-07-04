@@ -27,7 +27,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CONTEST_TITLE = 'IOI 2017'
+SITE_TITLE = 'IOI 2017 Translation'
+
+PRINT_ENABLED = True
+
+
 WKHTMLTOPDF_CMD = 'xvfb-run wkhtmltopdf'
+WKHTMLTOPDF_CMD_OPTIONS = {
+    'quiet':True,
+}
+
 
 # Application definition
 
@@ -80,10 +90,6 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'Translation.wsgi.application'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-
-WKHTMLTOPDF_CMD_OPTIONS = {
-'quiet':True,
-}
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases

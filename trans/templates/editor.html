@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/libs/markdown/simplemde.min.css">
     <link rel="stylesheet" href="/static/libs/markdown/editor.css">
     <link rel="stylesheet" href="/static/libs/markdown/katex.css">
-    <link rel="stylesheet" href="/user/font.css">
+    <link rel="stylesheet" href="/user/{{username}}/font.css">
 
     <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
     <script type="text/javascript" src="/static/libs/markdown/simplemde.min.js"></script>
@@ -35,9 +35,9 @@
             {% endif %}
             {% if is_editor %}
             <button class="btn btn-default" data-toggle="modal" data-target="#releaseModal" title="Release"><i class="fa fa-btn fa-upload fa-lg"></i></button>
-            &nbsp;
+            <!-- &nbsp;
             <input id="spell-checking" type="checkbox" onchange="onChangeSpellChecking()"> 
-            <label for="spell-checking" style="font-weight: normal;">check spelling</label>
+            <label for="spell-checking" style="font-weight: normal;">check spelling</label> -->
             {% endif %}
             {% if not is_editor %}
             <div class="btn-group pull-right" role="group">

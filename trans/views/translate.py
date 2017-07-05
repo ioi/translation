@@ -59,7 +59,7 @@ class Translations(LoginRequiredMixin, View):
                       context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
                                'contests': contests, 'task_name': task_name, 'is_editor': user.is_editor(),
-                               'taskID': task.id, 'language': user.credentials()})
+                               'taskID': task.id, 'language': user.credentials(), 'username': user.username})
 
 
 class SaveTranslation(LoginRequiredMixin, View):
@@ -128,11 +128,9 @@ class TranslationHTML(LoginRequiredMixin, View):
                                                              'username': user.username})
 
 
-class UserFont(LoginRequiredMixin, View):
+class UserFont(View):
     def get(self, request, username):
-        user = User.objects.get(username=request.user)
-        if user.is_staff:
-            user = User.objects.get(username=username)
+        user = User.objects.get(username=username)
         return render(request, 'font.css', content_type='text/css', context={'text_font_base64': user.text_font_base64})
 
 

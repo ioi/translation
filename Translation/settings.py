@@ -27,13 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CONTEST_TITLE = 'IOI 2017'
-SITE_TITLE = 'IOI 2017 Translation'
-
-PRINT_ENABLED = True
-
-
 WKHTMLTOPDF_CMD = 'xvfb-run wkhtmltopdf'
+
 WKHTMLTOPDF_CMD_OPTIONS = {
     'quiet':True,
 }

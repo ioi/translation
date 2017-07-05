@@ -1,6 +1,8 @@
-from django.conf import settings
 
 def ioi_settings(request):
-    imported_settings = ['SITE_TITLE', 'CONTEST_TITLE', 'PRINT_ENABLED']
-    data = {i: getattr(settings, i) for i in imported_settings}
-    return {'settings': data}
+    settings = {
+        'SITE_TITLE': 'IOI 2017 Translation',
+        'CONTEST_TITLE': 'IOI 2017',
+        'PRINT_ENABLED': True,
+    }
+    return {'settings': settings}

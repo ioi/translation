@@ -3,9 +3,9 @@
     font-weight: 400;
     font-style: normal;
     font-stretch: normal;
-    src: url('SourceSansPro-Regular.eot') format('embedded-opentype'),
-         url('SourceSansPro-Regular.ttf.woff2') format('woff2'),
-         url('SourceSansPro-Regular.ttf') format('truetype');
+    src: url('eot/SourceSansPro-Regular.eot') format('embedded-opentype'),
+         url('woff2/SourceSansPro-Regular.ttf.woff2') format('woff2'),
+         url('ttf/SourceSansPro-Regular.ttf') format('truetype');
 }
 
 @font-face{
@@ -13,9 +13,9 @@
     font-weight: 300;
     font-style: normal;
     font-stretch: normal;
-    src: url('SourceSansPro-Light.eot') format('embedded-opentype'),
-         url('SourceSansPro-Light.ttf.woff2') format('woff2'),
-         url('SourceSansPro-Light.ttf') format('truetype');
+    src: url('eot/SourceSansPro-Light.eot') format('embedded-opentype'),
+         url('woff2/SourceSansPro-Light.ttf.woff2') format('woff2'),
+         url('ttf/SourceSansPro-Light.ttf') format('truetype');
 }
 
 @font-face{
@@ -23,7 +23,7 @@
     font-weight: 600;
     font-style: normal;
     font-stretch: normal;
-    src: url('SourceSansPro-Semibold.eot') format('embedded-opentype'),
-         url('SourceSansPro-Semibold.ttf.woff2') format('woff2'),
-         url('SourceSansPro-Semibold.ttf') format('truetype');
+    src: url('eot/SourceSansPro-Semibold.eot') format('embedded-opentype'),
+         url('woff2/SourceSansPro-Semibold.ttf.woff2') format('woff2'),
+         url('ttf/SourceSansPro-Semibold.ttf') format('truetype');
 }

@@ -18,6 +18,15 @@
     <script type="text/javascript" src="/static/libs/markdown/katex.js"></script>
     <script type="text/javascript" src="/static/libs/markdown/auto-render.min.js"></script>
 
+    {% if pdf_output and text_font_base64 %}
+    <style>
+        @font-face {
+            font-family: 'CustomTextFont';
+            src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
+        }
+    </style>
+    {% endif %}
+
 </head>
 
 
@@ -27,29 +36,29 @@
             <div class="logo">
                 <img src="/static/img/IOI-2017.svg" />
             </div>
-            <div class="text">
-                <h1>International Olympiad in Informatics 2017</h1>
+            <div class="title">
+                <div>International Olympiad in Informatics 2017</div>
                 <div>July 28 &ndash; August 4, 2017</div>
                 <div>Tehran, Iran</div>
                 <div>{{contest}} Tasks</div>
             </div>
             <div class="meta">
-                <h2>{{task_name}}</h2>
+                <div>{{task_name}}</div>
                 <div>{{language}} ({{country}})</div>
             </div>
             <div style="clear: both;"></div>
             <hr>
         </div>
         <div id="markdown" style="display: none">{{content}}</div>
-        <div id="rendered_content" dir="{{direction}}"></div>
+        <div id="preview" class="rendered_content" dir="{{direction}}" lang="{{language_code}}"></div>
     </div>
 </body>
 <script>
 
     $(document).ready(function() {
         text = $('#markdown').text();
-        $('#rendered_content').html(marked(text));
-        renderMathInElement(document.getElementById('rendered_content'));
+        $('#preview').html(marked(text));
+        renderMathInElement(document.getElementById('preview'));
     });
         
 </script>

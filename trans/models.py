@@ -156,6 +156,9 @@ class Language(models.Model):
     code = models.CharField(unique=True, max_length=255, default='')
     rtl = models.BooleanField(default=False)
 
+    def direction(self):
+        return 'rtl' if self.rtl else 'ltr'
+
     def __str__(self):
         return self.name
 

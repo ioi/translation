@@ -82,7 +82,7 @@ class UserTranslations(StaffCheckMixin, View):
             else:
                 translations.append((task.id, task.name, False, 'None', False, False))
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
-        for task in Task.objects.filter(contest__public=True).filter(contest__frozen=False).order_by('order'):
+        for task in Task.objects.filter(contest__public=True, contest__frozen=False).order_by('order'):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.frozen

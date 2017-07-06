@@ -7,7 +7,7 @@ var last_time_get_edit_token;
 var latest_translation_text;
 var simplemde;
 var left_plain_text_box_id;
-var rtl;
+var direction, language;
 var last_version_particle_text;
 var update_token_interval = 60 * 1000;
 var previewInterval;
@@ -41,15 +41,13 @@ function loadTranslationText() {
 }
 
 function initial(text){
-    if (rtl){
+    if (direction=='rtl'){
         left_plain_text_box_id = 'left_rtl_plain_text_box';
         $('#' + left_plain_text_box_id).moratab(text, {strings: {help: ''}});
-        $('#left_rendered_text_box').css('direction', 'rtl');
     }
     else{
 
         left_plain_text_box_id = 'left_ltr_plain_text_box';
-        $('#left_rendered_text_box').css('direction', 'ltr');
         simplemde = new SimpleMDE({
             element: document.getElementById('left_ltr_plain_text_box'),
             status: false,
@@ -59,23 +57,18 @@ function initial(text){
         });
     }
 
-
+    $('#left_rendered_text_box').css('direction', direction);
     task_text = $("#temp").html();
     translation_text = currentTranslationText();
     latest_translation_text = '';
     last_version_particle_text = currentTranslationText();
-    window.setInterval(saveVersionParticle, update_token_interval)
+    setInterval(saveVersionParticle, update_token_interval)
+    setInterval(onlinePreview, 100);
     onPreviewClick();
 }
 
-function getDirectionStr(is_rtl){
-    if(is_rtl)
-        return 'rtl';
-    return 'ltr';
-}
-
 function currentTranslationText(){
-    if (rtl)
+    if (direction=='rtl')
         return $('#' + left_plain_text_box_id).text();
     return simplemde.value();
 }
@@ -89,40 +82,34 @@ function onlinePreview() {
     current_text = currentTranslationText();
     if (current_text != latest_translation_text){
         latest_translation_text = current_text;
-        renderMarkdown('right_text_box', current_text)
+        renderMarkdown('preview', current_text)
     }
 }
 
-function activeBtn(id){
-    $('#preview-btn').removeClass('btn-active');
-    $('#isc-preview-btn').removeClass('btn-active');
-    $('#isc-markdown-btn').removeClass('btn-active');
-    $(id).addClass('btn-active');
+function switchTab(id){
+    var tabs = ['preview', 'isc-preview', 'isc-markdown'];
+    for (var i = 0 ; i < 3 ; i++) {
+        $('#' + tabs[i]).hide();
+        $('#' + tabs[i] + '-btn').removeClass('btn-active');
+    }
+    $('#' + id).show();
+    $('#' + id + '-btn').addClass('btn-active');
 }
 
 function onPreviewClick(){
     current_text = currentTranslationText();
-    renderMarkdown('right_text_box', current_text);
-    $('#right_text_box').attr('dir', getDirectionStr(rtl));
-    $('#right_text_box').css('whiteSpace', 'normal');
-    previewInterval = setInterval(onlinePreview, 100);
-    activeBtn('#preview-btn');
-}
-
-function onIscMarkdownClick(){
-    $('#right_text_box').html(task_text);
-    $('#right_text_box').css('direction', 'ltr');
-    $('#right_text_box').css('whiteSpace', 'pre-wrap');
-    clearInterval(previewInterval);
-    activeBtn('#isc-markdown-btn');
+    renderMarkdown('preview', current_text);
+    switchTab('preview');
 }
 
 function onIscPreviewClick(){
-    renderMarkdown('right_text_box', task_text);
-    $('#right_text_box').css('direction', 'ltr');
-    $('#right_text_box').css('whiteSpace', 'normal');
-    clearInterval(previewInterval);
-    activeBtn('#isc-preview-btn');
+    renderMarkdown('isc-preview', task_text);
+    switchTab('isc-preview');
+}
+
+function onIscMarkdownClick(){
+    $('#isc-markdown').html(task_text);
+    switchTab('isc-markdown');
 }
 
 

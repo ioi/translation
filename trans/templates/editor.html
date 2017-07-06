@@ -52,14 +52,16 @@
     <div class="row">
         <div class="col-sm-6 edit-pane" style="padding: 0;">
             <div id="left_text_box_container" onkeydown="checkIfCanChange()">
-                {% if rtl %}
+                {% if direction == 'rtl' %}
                 <div id="left_rtl_plain_text_box" style="white-space: pre-wrap"></div>
                 {% else %}
                 <textarea id="left_ltr_plain_text_box"></textarea> {% endif %}
             </div>
         </div>
         <div class="col-sm-6 preview-pane markdown-body">
-            <div id="right_text_box"></div>
+            <div id="preview" class="rendered_content" dir="{{direction}}" lang="{{language}}"></div>
+            <div id="isc-preview"></div>
+            <div id="isc-markdown" style="white-space: pre-wrap;"></div>
         </div>
     </div>
 
@@ -74,7 +76,7 @@
                     <h4>The task is being edited somewhere else!</h4>
                 </div>
                 <div class="modal-footer">
-                    <a href="{% url 'firstpage' %}" class="btn btn-primary">OK</a>
+                    <a href="{% url 'firstpage' %}" class="btn btn-primary">Return to Home</a>
                 </div>
             </div>
         </div>
@@ -85,14 +87,15 @@
 {% block script %}
 
 <script type="text/javascript">
-    task_id = {{taskID}};
+    task_id = "{{taskID}}";
     version_particle_url = "{% url 'save_version_particle' contest_slug=contest_slug task_name=task_name %}";
     access_edit_translate_url = "{% url 'access_edit_translate' id=taskID %}";
     finish_translation_url = "{% url 'finish_trans' id=taskID %}";
     get_latest_translation_url = "{% url 'get_latest_translation' id=taskID%}";
     save_task_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
     task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_name=task_name  %}";
-    rtl = ('{{rtl}}' == 'True');
+    language = "{{language}}";
+    direction = "{{direction}}";
 </script>
 
 {% endblock %}

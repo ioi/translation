@@ -56,10 +56,11 @@ class Translations(LoginRequiredMixin, View):
         task_text = task.get_published_text()
         contests = Contest.objects.order_by('order')
         return render(request, 'editor.html',
-                      context={'trans': trans.get_latest_text(), 'task': task_text, 'rtl': user.language.rtl,
+                      context={'trans': trans.get_latest_text(), 'task': task_text,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
                                'contests': contests, 'task_name': task_name, 'is_editor': user.is_editor(),
-                               'taskID': task.id, 'language': user.credentials(), 'username': user.username})
+                               'taskID': task.id, 'language': user.credentials(), 'username': user.username,
+                               'language': user.language.code, 'direction': user.language.direction()})
 
 
 class SaveTranslation(LoginRequiredMixin, View):
@@ -99,35 +100,6 @@ class SaveVersionParticle(LoginRequiredMixin, View):
         return JsonResponse({'success': True})
 
 
-class TranslationHTML(LoginRequiredMixin, View):
-    def get(self, request, contest_slug, task_name, task_type):
-        user = User.objects.get(username=request.user)
-        if user.is_staff and 'user' in request.GET:
-            user = User.objects.get(username=request.GET.get('user'))
-        try:
-            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
-        except Exception as e:
-            return HttpResponseBadRequest(e)
-
-        if task_type == 'released':
-            translation = task.get_corresponding_translation()
-            content = task.get_published_text()
-        else:
-            translation = get_trans_by_user_and_task(user, task)
-            content = translation.get_latest_text()
-
-        # TODO check if it's available
-        direction = 'rtl' if translation.user.language.rtl else 'ltr'
-        return render(request, 'pdf-template.html', context={'content': content,
-                                                             'direction': direction,
-                                                             'task_name': task.name,
-                                                             'text_font_base64': user.text_font_base64,
-                                                             'country': translation.user.country.code,
-                                                             'language': translation.user.language.name,
-                                                             'contest': translation.task.contest.title,
-                                                             'username': user.username})
-
-
 class UserFont(View):
     def get(self, request, username):
         user = User.objects.get(username=username)
@@ -159,6 +131,38 @@ class TranslationMarkdown(LoginRequiredMixin, View):
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
 
+class TranslationHTML(LoginRequiredMixin, View):
+    def get(self, request, contest_slug, task_name, task_type):
+        user = User.objects.get(username=request.user)
+        if user.is_staff and 'user' in request.GET:
+            user = User.objects.get(username=request.GET.get('user'))
+        try:
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
+        except Exception as e:
+            return HttpResponseBadRequest(e)
+
+        if task_type == 'released':
+            trans = task.get_corresponding_translation()
+            content = task.get_published_text()
+        else:
+            trans = get_trans_by_user_and_task(user, task)
+            content = trans.get_latest_text()
+
+        # TODO check if it's available
+        context = {
+            'content': content,
+            'task_name': task.name,
+            'country': user.country.code,
+            'language': trans.user.language.name,
+            'language_code': trans.user.language.code,
+            'direction': trans.user.language.direction(),
+            'text_font_base64': trans.user.text_font_base64,
+            'contest': task.contest.title,
+            'username': trans.user.username,
+        }
+        return render(request, 'pdf-template.html', context=context)
+
+
 class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
     template_name = 'pdf-template.html'
     cmd_options = {
@@ -168,7 +172,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         'margin-right': '0.75in',
         'margin-left': '0.75in',
         'print-media-type': '--print-media-type',
-        # 'zoom': 3,
+        # 'zoom': 1.2, # zoom factor is defined in the pdf-template
     }
 
     def get(self, request, *args, **kwargs):
@@ -184,7 +188,6 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         user = User.objects.get(username=self.request.user)
         if user.is_staff and 'user' in self.request.GET:
             user = User.objects.get(username=self.request.GET.get('user'))
-        version_id = self.request.GET.get('ver')
         contest_slug = kwargs['contest_slug']
         task_name = kwargs['task_name']
         task_type = kwargs['task_type']
@@ -194,22 +197,15 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
             return HttpResponseBadRequest(e)
         trans = get_trans_by_user_and_task(user, task)
 
-        if version_id:
-            content_version = ContentVersion.objects.filter(id=version_id).first()
-            if not content_version.can_view_by(user):
-                return None
-            content = content_version.text
-            file_name = "%s-%s-v%d.pdf" % (task.name, trans.user.username, version_id)
+        if task_type == 'released':
+            trans = task.get_corresponding_translation()
+            content = task.get_published_text()
         else:
-            if task_type == 'released':
-                content = task.get_published_text()
-                file_name = "%s-%s.pdf" % (task.name, 'ISC')
-            else:
-                content = trans.get_latest_text()
-                file_name = "%s-%s.pdf" % (task.name, trans.user.username)
+            trans = get_trans_by_user_and_task(user, task)
+            content = trans.get_latest_text()
 
-        trans = get_trans_by_user_and_task(user, task)
-        self.filename = file_name
+        self.filename = "{}-{}.pdf".format(task.name, trans.user.username)
+        context['pdf_output'] = True
         context['direction'] = 'rtl' if trans.user.language.rtl else 'ltr'
         context['content'] = content
         context['title'] = self.filename
@@ -218,9 +214,9 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         context['language'] = trans.user.language.name
         context['contest'] = trans.task.contest.title
         context['text_font_base64'] = trans.user.text_font_base64
-        context['username'] = user.username
-        self.footer_template = 'pdf-footer.html'
+        context['username'] = trans.user.username
         self.show_content_in_browser = True
+        # self.footer_template = 'pdf-footer.html'
         # self.cmd_options['footer-right'] = '%s [page] / [topage]' % trans.task.name
         return context
 

@@ -3,7 +3,7 @@ body {
     margin: 3em 5em;
     zoom: .9;
     text-align: justify;
-    background-color: #ddd;
+    background-color: rgb(82, 86, 89);
 }
 
 h1, h2, h3, h4 {
@@ -16,8 +16,8 @@ pre, table th {
 
 div.pdf {
     background-color: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 2px #888;
+    border: 1px solid #333;
+    box-shadow: 0 0 2px #333;
     width: 45em;
     margin: 4em auto;
     padding: 4.5em 5.5em;
@@ -30,13 +30,13 @@ div.pdf {
     font-weight: 400;
 }
 
-.header .text {
+.header .title {
     display: inline-block;
     float: left;
     line-height: 1.25em;
 }
 
-.header .text h1 {
+.header .title div:first-child {
     font-weight: 500;
     font-size: 1.1em;
     letter-spacing: -.03em;
@@ -63,7 +63,7 @@ div.pdf {
     font-size: 12px;
 }
 
-.header .meta h2 {
+.header .meta div:first-child {
     font-family: "Courier New", monospace;
     font-weight: bold;
     font-size: 18px;
@@ -94,13 +94,9 @@ div.pdf {
 }
 
 @media print {
-    .print {
-        visibility: hidden;
-    }
 
     body {
         margin: 0;
-        zoom: 1;
         background-color: white;
     }
 

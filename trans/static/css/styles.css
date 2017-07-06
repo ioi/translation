@@ -198,14 +198,6 @@ div.CodeMirror {
     padding: 15px !important;
 }
 
-#rendered_content, #right_text_box {
-    font-family: CustomTextFont, Arial, serif;
-}
-
-#rendered_content[dir="rtl"], #right_text_box[dir="rtl"] {
-    font-family: CustomTextFont, IRANSans, Tahoma, Arial;
-}
-
 code::before, code::after,
 .md-code::before, .md-code::after,
 .math::before, .math::after {
@@ -217,5 +209,21 @@ code::before, code::after,
 }
 
 code, pre {
-    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Default text fonts */
+
+.rendered_content {
+    font-family: CustomTextFont, Arial, serif;
+}
+
+.rendered_content[dir="rtl"] {
+    font-family: CustomTextFont, IRANSans, Tahoma, Arial;
+}
+
+/* Default text fonts per language */
+
+.rendered_content[lang="ja"] {
+    font-family: 'TakaoPGothic', CustomTextFont, Arial, serif;
 }

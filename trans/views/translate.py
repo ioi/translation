@@ -152,7 +152,7 @@ class TranslationHTML(LoginRequiredMixin, View):
         context = {
             'content': content,
             'task_name': task.name,
-            'country': user.country.code,
+            'country': trans.user.country.code,
             'language': trans.user.language.name,
             'language_code': trans.user.language.code,
             'direction': trans.user.language.direction(),

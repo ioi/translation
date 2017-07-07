@@ -2,7 +2,7 @@ var task_version_url, task_type,
     csrf_token,
     task_versions,
     version_id_to_revert,
-    checkout_version_url;
+    revert_url;
 
 $(document).ready(function () {
     getVersions();
@@ -59,15 +59,25 @@ function getVersions() {
     return false;
 }
 
-function revert(version_id){
-    version_id_to_revert = version_id;
+function revert(version_id) {
+    bootbox.confirm({
+        title: 'Confirm',
+        message: "Are you sure to revert to this revision?",
+        buttons: {
+            confirm: {label: 'Revert'},
+        },
+        callback: function (result) {
+            if (result)
+                applyRevert(version_id);
+        }
+    });
 }
 
-function revert_confirm(){
+function applyRevert(version_id) {
     $.ajax({
-        url: checkout_version_url,
+        url: revert_url,
         data: {
-            'id': version_id_to_revert,
+            id: version_id,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",

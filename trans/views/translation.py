@@ -260,7 +260,7 @@ class CheckTranslationEditAccess(LoginRequiredMixin, View):
         return JsonResponse({'is_editing': can_save_translate(translation, edit_token)})
 
 
-class CheckoutVersion(LoginRequiredMixin, View):
+class Revert(LoginRequiredMixin, View):
     def post(self, request):
         version_id = self.request.POST['id']
         content_version = Version.objects.filter(id=version_id).first()

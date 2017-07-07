@@ -34,7 +34,7 @@
             <button onclick="sendPrint('{% url 'task_print' 'task' contest_slug task_name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
             {% endif %}
             {% if is_editor %}
-            <button class="btn btn-default" data-toggle="modal" data-target="#releaseModal" title="Release"><i class="fa fa-btn fa-upload fa-lg"></i></button>
+            <button class="btn btn-default" onclick="release()" title="Release"><i class="fa fa-btn fa-upload fa-lg"></i></button>
             <!-- &nbsp;
             <input id="spell-checking" type="checkbox" onchange="onChangeSpellChecking()"> 
             <label for="spell-checking" style="font-weight: normal;">check spelling</label> -->
@@ -65,22 +65,7 @@
         </div>
     </div>
 
-    <!-- temp div as container of task text -->
     <div id="temp" style="display: none">{{ task }}</div>
-
-    <!-- Access Denied Modal -->
-    <div class="modal fade" id="accessDeniedModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <h4>The task is being edited somewhere else!</h4>
-                </div>
-                <div class="modal-footer">
-                    <a href="{% url 'firstpage' %}" class="btn btn-primary">Return to Home</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
 
@@ -88,6 +73,7 @@
 
 <script type="text/javascript">
     task_id = "{{taskID}}";
+    home_page_url = "{% url 'firstpage' %}";
     access_edit_translate_url = "{% url 'access_edit_translate' id=taskID %}";
     finish_translation_url = "{% url 'finish_trans' id=taskID %}";
     get_latest_translation_url = "{% url 'get_latest_translation' id=taskID%}";

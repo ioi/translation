@@ -1,5 +1,4 @@
 from django.conf import settings
-__author__ = 'MiladDK'
 
 from django.conf.urls import url
 from .views import *
@@ -19,9 +18,9 @@ urlpatterns = [
     url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/preview$', TranslationHTML.as_view(), name='task_html'),
     url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/print$', TranslationPrint.as_view(), name='task_print'),
     url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$', Versions.as_view(), name='revisions'),
+
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
-    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save/$', SaveTranslation.as_view(),
-        name='save_translation'),
+    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save/$', SaveTranslation.as_view(), name='save_translation'),
 
     url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
     url(r'^check_is_editing/(?P<id>[\w]*)/$', CheckTranslationEditAccess.as_view(), name='check_edit_translate'),
@@ -30,20 +29,16 @@ urlpatterns = [
 
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/release', ReleaseTask.as_view(), name='releasetask') ,
     url(r'^add_task/$', AddTask.as_view(), name='add_task'),
+    url(r'^revert/$', Revert.as_view(), name='revert'),
 
     url(r'^users/$', UsersList.as_view(), name='users_list'),
     url(r'^user/(?P<username>[\w-]*)/$', UserTranslations.as_view(), name='user_trans'),
     url(r'^freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
     url(r'^unleash_edit_token/(?P<id>[\w]*)/$', UnleashEditTranslationToken.as_view(), name='unleash_edit_token'),
 
-    url(r'^checkout_version/$', CheckoutVersion.as_view(), name='checkoutversion'),
-
     url(r'^get_task_pdf/$', GetTranslatePDF.as_view(), name='gettranspdf'),
     url(r'^mail_task_pdf/$', MailTranslatePDF.as_view(), name='mailtranspdf'),
     url(r'^print/$', PrintCustomFile.as_view(), name='printcustomfile'),
-
-    url(r'^getvers/md/$', GetVersionMarkDown.as_view(), name='get_version_md'),
-    url(r'^getvers/pdf/$', GetVersionPDF.as_view(), name='get_version_pdf'),
 
     url(r'^notifications/$', ReadNotifications.as_view(), name='notifications'),
     url(r'^reset_notifications/$', reset_notifications, name='reset_notifications'),

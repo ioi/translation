@@ -20,6 +20,21 @@ $(document).ready(function(){
 
 
 function sendPrint(print_task_url) {
+    bootbox.confirm({
+        title: 'Confirm',
+        message: "Are you sure to print this version?",
+        buttons: {
+            confirm: {label: 'Print'},
+        },
+        callback: function (result) {
+            if (result)
+                sendPrintJob(print_task_url);
+        }
+    });
+}
+
+
+function sendPrintJob(print_task_url) {
     $.ajax({
         url: print_task_url,
         data: {
@@ -29,12 +44,11 @@ function sendPrint(print_task_url) {
         success: function (response) {
             ToastrUtil.success(
                     'Printouts will be delivered to you shortly.',
-                    'Print request submitted.'
+                    'Print job submitted.'
             ).css('width', '500px');;
         },
         error: function (response) {
             ToastrUtil.error('Print request failed.');
         }
     });
-    return false;
 }

@@ -11,7 +11,6 @@ from trans.models import Task, User, Contest
 from trans.views.admin import ISCEditorCheckMixin
 
 
-
 class AddTask(ISCEditorCheckMixin, View):
     def post(self, request):
         if request.user.username != "ISC":
@@ -36,4 +35,3 @@ class ReleaseTask(ISCEditorCheckMixin, View):
             return HttpResponseBadRequest("The task is frozen")
         task.publish_latest(release_note)
         return HttpResponse("done")
-

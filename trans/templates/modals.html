@@ -72,55 +72,10 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="releaseModal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <!-- <h4 class="modal-title">Publish the Latest Saved Version</h4> -->
-                    <h4 class="modal-title">Release</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="release-note">Release Note:</label>
-                        <input type="text" class="form-control" id="release-note" required data-modalfocus>
-                        <span class="help-block">
-                            This applies to the latest saved revision.
-                        </span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="return release(true)">Publish</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <script>
         var release_task_url = "{% url 'releasetask' contest_slug=contest_slug task_name=task_name %}";
-
-        function release() {
-            var note = $('#release-note').val();
-            if (note == '') {
-                alert('Release note is empty.');
-                return false;
-            }
-            $.ajax({
-                url: release_task_url,
-                data: {
-                    'release_note': note,
-                    csrfmiddlewaretoken: csrf_token
-                },
-                type: "POST",
-                success: function (response) {
-                    last_saved_content = simplemde.value();
-                    $('#releaseModal').modal('hide');
-                    ToastrUtil.success('Task Released...');
-                }
-            });
-            return false;
-        }
             
         function addTask(form) {
             var name = $('#task_name').val();

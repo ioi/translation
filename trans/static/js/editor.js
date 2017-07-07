@@ -1,6 +1,6 @@
 var task_id, task_text, translation_text;
 var save_task_url, task_version_url, access_edit_translate_url,
-    preview_url, finish_translation_url, list_version_url, release_task_url;
+    home_page_url, finish_translation_url, list_version_url, release_task_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
@@ -189,8 +189,16 @@ releasToken = function (e) {
 };
 
 function handleAccessDenied(){
-    $("#accessDeniedModal").modal({backdrop: "static", keyboard: false, show: true});
-    //window.location.replace(preview_url);
+    bootbox.alert({
+        // title: 'Alert',
+        message: "<b>The task is open somewhere else!</b>",
+        buttons: {
+            ok: {label: 'Return to Home'},
+        },
+        callback: function (result) {
+            window.location.replace(home_page_url);
+        }
+    });
 }
 
 function checkIfCanChange(){
@@ -226,5 +234,40 @@ function onChangeSpellChecking(){
         toolbar: false,
         spellChecker: spellChecking,
         initialValue: value
+    });
+}
+
+function release() {
+    autoSave();
+    bootbox.prompt({
+        title: 'Release Note:',
+        buttons: {
+            confirm: {label: 'Release'},
+        },
+        callback: function (result) {
+            if (result)
+                sendRelease(result);
+            else if (result == '') {
+                ToastrUtil.error('Release note cannot be empty.');
+            }
+        }
+    });
+}
+
+function sendRelease(note) {
+    $.ajax({
+        url: release_task_url,
+        data: {
+            release_note: note,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+            last_saved_content = simplemde.value();
+            ToastrUtil.success('Task Released...');
+        },
+        error: function (response) {
+            ToastrUtil.error('Release failed.');
+        }
     });
 }

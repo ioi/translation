@@ -1,13 +1,15 @@
-<!DOCTYPE html> {% load staticfiles %}
+<!DOCTYPE html> 
+{% load staticfiles %}
 
 <html>
 
 <head>
     <meta charset="utf-8">
-    <title>Login - IOI 2017 Translation</title>
+    <title>Login - {{settings.SITE_TITLE}}</title>
+    <link rel="shortcut icon" href="/static/img/favicon.ico"/>
+    <meta name="description" content="Translation System for the International Olympiad in Informatics (IOI)">
+    <meta name="author" content="IOI 2017">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
 
     <link rel="stylesheet" href="/static/libs/bootstrap/bootstrap.min.css">
@@ -27,7 +29,7 @@
                 <div class="panel-body">
 
                     <div class="img-container">
-                        <img class="login-img" src="/static/img/IOI-2017.png">
+                        <img class="login-img" src="/static/img/IOI-2017-Logo.svg">
                     </div>
 
                     <div class="login-error">

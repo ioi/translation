@@ -9,38 +9,33 @@
 
     <script type="text/javascript" src="/static/libs/markdown/marked.js"></script>
     <script type="text/javascript" src="/static/js/init-marked.js"></script>
-    <script type="text/javascript" src="/static/js/versions.js"></script>
-
+    <script type="text/javascript" src="/static/js/revisions.js"></script>
 
 
     <div class="container">
+
         <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-body">
 
                     <table class="table table-version table-hover">
-                        <thead><tr><td colspan="3">
-                            {{ task_name | capfirst }}
-                        </td></tr></thead>
+                        <thead><tr>
+                            <td colspan="3">{{ task_name | capfirst }}</td>
+                        </tr></thead>
                         <tbody>
-                        {% for version in versionParticles %}
-                            <tr id="particle-version-0" onclick="view_particle_version({{ version.id }})">
-                                <td colspan="2">{{ version.create_time | ioi_timezone}} (auto saved)</td>
-                                <td ></td>
-                            </tr>
-                        {% endfor %}
-
                         {% for version in versions %}
                             {% with next_element=versions|next:forloop.counter0 %}
                             {% with previous_element=versions|previous:forloop.counter0 %}
 
                             <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
-                                <td>{{ version.create_time | ioi_timezone}}</td>
+                                <td style="white-space: nowrap">{{ version.create_time | ioi_timezone }}</td>
                                 <td>{{ version.release_note }}</td>
                                 <td style="white-space: nowrap">
-                                    <a href="{% url 'trans_md' 'task' contest_slug task_name %}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                    {% if task_type != 'released' %}
                                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#saveModal" onclick="revert({{ version.id }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
-                                </td>
+                                    {% endif %}
+                                    <a href="{% url 'trans_md' task_type contest_slug task_name %}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
+                                </td> 
                             </tr>
 
                             {% endwith %}
@@ -56,15 +51,11 @@
         <div class="col-sm-8" id="right-container">
             <div class="panel panel-default">
                 <div class="panel-body">
-
                     <div id="myversion" class="text-container" style="white-space: pre-wrap; direction: {{ direction }};"></div>
-                    <div id="original" style="display: none;">{{ translation }}</div>
-                </div>
-
                 </div>
             </div>
         </div>
-
+        
     </div>
 
     <!-- Modal -->
@@ -80,15 +71,13 @@
                 </div>
             </div>
         </div>
-     </div>
+    </div>
 
 
     <script type="text/javascript">
-        particle_version_url = {% url 'getVersionParticle' %};
-        ques_id = {{taskID}};
+        task_type = '{{ task_type }}';
+        task_version_url = "{% url 'revisions' task_type contest_slug task_name %}";
         checkout_version_url = "{% url 'checkoutversion' %}";
-        version_url = "{% url 'getVersion' %}";
-        list_version_url = "{% url 'versions' contest_slug=contest_slug task_name=task_name %}";
     </script>
 
 {% endblock %}

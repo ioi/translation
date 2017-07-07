@@ -18,21 +18,17 @@ urlpatterns = [
     url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/pdf$', TranslationPDF.as_view(), name='task_pdf'),
     url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/preview$', TranslationHTML.as_view(), name='task_html'),
     url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/print$', TranslationPrint.as_view(), name='task_print'),
-    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$', Versions.as_view(), name='versions'),
+    url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$', Versions.as_view(), name='revisions'),
     url(r'^getvers/$', GetVersion.as_view(), name='getVersion'),
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save/$', SaveTranslation.as_view(),
         name='save_translation'),
-    url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save_particle/$',
-        SaveVersionParticle.as_view(), name='save_version_particle'),
 
-    url(r'^getverspar/$', GetVersionParticle.as_view(), name='getVersionParticle'),
     url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
     url(r'^check_is_editing/(?P<id>[\w]*)/$', CheckTranslationEditAccess.as_view(), name='check_edit_translate'),
     url(r'^finish_edit_translate/(?P<id>[\w]*)/$', FinishTranslate.as_view(), name='finish_trans'),
     url(r'^get_latest_translation/(?P<id>[\w]*)/$', GetLatestTranslation.as_view(), name='get_latest_translation'),
 
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/release', ReleaseTask.as_view(), name='releasetask') ,
-    url(r'^released/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$', TaskVersions.as_view(), name='task_versions'),
     url(r'^add_task/$', AddTask.as_view(), name='add_task'),
 
     url(r'^users/$', UsersList.as_view(), name='users_list'),

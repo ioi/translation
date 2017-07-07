@@ -34,19 +34,21 @@ class User(User):
         return self.groups.filter(name='editor').exists() or self.is_superuser
 
 
-class ContentVersion(models.Model):
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-    text = models.TextField()
+class Version(models.Model):
+    translation = models.ForeignKey('Translation')
+    text = models.TextField(default=None)
+    saved = models.BooleanField(default=False)
     released = models.BooleanField(default=False)
     release_note = models.CharField(max_length=255, blank=True)
     create_time = models.DateTimeField(default=timezone.now)
 
     def can_view_by(self, user):
-        if self.content_type.model == 'translation' and self.content_object.user != user and self.content_object.user.username != 'ISC':
+        if self.translation.user != user and self.translation.user.username != 'ISC':
             return False
         return True
+
+    def __str__(self):
+        return "{}: {} ({})".format(self.id, self.translation.task.name, self.translation.user.username)
 
 
 class Contest(models.Model):
@@ -65,44 +67,36 @@ class Task(models.Model):
     contest = models.ForeignKey('Contest', default=None)
     order = models.IntegerField(default=1)
 
-    def add_version(self, text, release_note="", released=False):
-        return ContentVersion.objects.create(content_object=self, text=text, create_time=timezone.now(),
-                                             release_note=release_note, released=released)
-
-    def get_corresponding_translation(self):
+    def get_base_translation(self):
         return Translation.objects.filter(user__username='ISC', task=self).first()
 
     def publish_latest(self, release_note):
-        ISC_translation = self.get_corresponding_translation()
-        if not ISC_translation:
+        base_trans = self.get_base_translation()
+        if not base_trans:
             return None
-        latest_version = ISC_translation.versions.order_by('-create_time').first()
+        latest_version = base_trans.get_latest_version()
         if not latest_version:
             return None
-        query_set = ISC_translation.versions.filter(id=latest_version.id)
-        return query_set.update(release_note=release_note, released=True, create_time=timezone.now())
+        query = Version.objects.filter(id=latest_version.id)
+        return query.update(release_note=release_note, released=True, saved=True, create_time=timezone.now())
 
     def get_latest_text(self):
-        ISC_translation = self.get_corresponding_translation()
-        if ISC_translation:
-            return ISC_translation.get_latest_text()
-        return ""
+        base_trans = self.get_base_translation()
+        return base_trans.get_latest_text() if base_trans else ''
 
     def get_published_text(self):
-        ISC_translation = self.get_corresponding_translation()
-        if ISC_translation:
-            return ISC_translation.get_published_text()
-        return ""
+        base_trans = self.get_base_translation()
+        return base_trans.get_published_text() if base_trans else ''
 
     def is_published(self):
-        ISC_translation = self.get_corresponding_translation()
-        if ISC_translation:
-            return ISC_translation.versions.filter(released=True).exists()
+        base_trans = self.get_base_translation()
+        if base_trans:
+            return base_trans.version_set.filter(released=True).exists()
         return False
 
     def get_latest_change_time(self):
-        ISC_translation = self.get_corresponding_translation()
-        latest_published_version = ISC_translation.versions.filter(released=True).order_by('-create_time').first()
+        base_trans = self.get_base_translation()
+        latest_published_version = base_trans.version_set.filter(released=True).order_by('-create_time').first()
         if latest_published_version:
             return latest_published_version.create_time
         return None
@@ -115,37 +109,28 @@ class Translation(models.Model):
     user = models.ForeignKey('User')
     task = models.ForeignKey('Task', default=0)
     frozen = models.BooleanField(default=False)
-    versions = GenericRelation(ContentVersion)
 
-    def add_version(self, text, release_note=""):
-        return ContentVersion.objects.create(content_object=self, text=text, release_note=release_note, create_time=timezone.now())
+    def add_version(self, text, release_note='', saved=True):
+        latest_version = self.version_set.order_by('-create_time').first()
+        if latest_version and latest_version.text.strip() == text.strip():
+            query = Version.objects.filter(id=latest_version.id)
+            return query.update(create_time=timezone.now(), saved=(saved or latest_version.saved))
+        return Version.objects.create(translation=self, text=text, release_note=release_note, saved=saved)
+
+    def get_latest_version(self):
+        return self.version_set.order_by('-create_time').first()
 
     def get_latest_text(self):
-        latest_version = self.versions.order_by('-create_time').first()
-        latest_version_particle = self.versionparticle_set.order_by('-create_time').first()
-        if latest_version_particle:
-            if not latest_version or latest_version_particle.create_time > latest_version.create_time:
-                return latest_version_particle.text
-        if latest_version:
-            return latest_version.text
-        return ''
+        latest_version = self.get_latest_version()
+        return latest_version.text if latest_version else ''
 
     def get_published_text(self):
-        latest_published_version = self.versions.filter(released=True).order_by('-create_time').first()
-        if latest_published_version:
-            return latest_published_version.text
-        return None
+        latest_published_version = self.version_set.filter(released=True).order_by('-create_time').first()
+        return latest_published_version.text if latest_published_version else None
 
     def get_latest_change_time(self):
-        latest_version = self.versions.order_by('-create_time').first()
-        latest_version_particle = self.versionparticle_set.order_by('-create_time').first()
-        if latest_version_particle:
-            return latest_version_particle.create_time
-        if latest_version:
-            if latest_version_particle and latest_version_particle.create_time > latest_version.create_time:
-                return latest_version_particle.create_time
-            return latest_version.create_time
-        return None
+        latest_version = self.get_latest_version()
+        return latest_version.create_time if latest_version else None
 
     def __str__(self):
         return "{} ({})".format(self.task.name, self.user.username)
@@ -169,15 +154,6 @@ class Country(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class VersionParticle(models.Model):
-    translation = models.ForeignKey('Translation')
-    text = models.TextField(default=None)
-    create_time = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return "{}: {} ({})".format(self.id, self.translation.task.name, self.translation.user.username)
 
 
 # Uncomment here when wanted to email people

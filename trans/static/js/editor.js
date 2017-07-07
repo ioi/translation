@@ -1,14 +1,13 @@
-var task_text, translation_text;
-var task_id;
-var version_particle_url, save_task_url , task_version_url, access_edit_translate_url,
-        preview_url, finish_translation_url, get_version_particle_url, list_version_url, release_task_url;
+var task_id, task_text, translation_text;
+var save_task_url, task_version_url, access_edit_translate_url,
+    preview_url, finish_translation_url, list_version_url, release_task_url;
 var csrf_token;
 var last_time_get_edit_token;
 var latest_translation_text;
 var simplemde;
 var left_plain_text_box_id;
 var direction, language;
-var last_version_particle_text;
+var last_autosaved_text;
 var update_token_interval = 60 * 1000;
 var previewInterval;
 var spellChecking = false;
@@ -61,8 +60,8 @@ function initial(text){
     task_text = $("#temp").html();
     translation_text = currentTranslationText();
     latest_translation_text = '';
-    last_version_particle_text = currentTranslationText();
-    setInterval(saveVersionParticle, update_token_interval)
+    last_autosaved_text = currentTranslationText();
+    setInterval(autoSave, update_token_interval)
     setInterval(onlinePreview, 100);
     onPreviewClick();
 }
@@ -112,52 +111,33 @@ function onIscMarkdownClick(){
     switchTab('isc-markdown');
 }
 
-
-function saveVersion() {
-    getEditTranslateAccess();
-    current_trans_text = currentTranslationText();
-    var edit_token = sessionStorage.getItem('edit_translate_token_'+task_id)
-    $.ajax({
-        url: save_task_url,
-        data: {
-            'content': currentTranslationText(),
-             edit_token: edit_token,
-            'id': task_id,
-            csrfmiddlewaretoken: csrf_token
-        },
-        type: "POST",
-        success: function (response) {
-            if (response.can_edit == false){
-                handleAccessDenied();
-            }else{
-                last_version_particle_text = current_trans_text;
-                ToastrUtil.success('Successfully Saved ...');
-            }
-        }
-    });
-    return false;
+function autoSave() {
+    saveVersion(true);
 }
 
-function saveVersionParticle() {
+function saveVersion(autosave=false) {
     current_trans_text = currentTranslationText();
-    if (last_version_particle_text == current_trans_text)
+    if (autosave && last_autosaved_text == current_trans_text)
         return;
     getEditTranslateAccess();
     var edit_token = sessionStorage.getItem('edit_translate_token_'+task_id)
     $.ajax({
-        url: version_particle_url,
+        url: save_task_url,
         data: {
-            'content': currentTranslationText(),
-            'id': task_id,
+            content: currentTranslationText(),
+            id: task_id,
+            saved: !autosave,
             edit_token: edit_token,
             csrfmiddlewaretoken: csrf_token
         },
         type: "POST",
         success: function (response) {
-            if (response.can_edit == false){
+            if (response.can_edit == false)
                 handleAccessDenied();
-            }else{
-                last_version_particle_text = current_trans_text;
+            else {
+                last_autosaved_text = current_trans_text;
+                if (!autosave)
+                    ToastrUtil.success('Successfully Saved ...');
             }
         }
     });
@@ -220,7 +200,7 @@ function checkIfCanChange(){
 }
 
 window.onbeforeunload =  function(){
-    saveVersionParticle();
+    autoSave();
     releasToken();
     document.getElementById(left_plain_text_box_id).reset();
 };

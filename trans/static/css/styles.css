@@ -182,6 +182,10 @@ div.CodeMirror {
     border: 0px;
 }
 
+.toast {
+    opacity: .95 !important;
+}
+
 #left_rtl_plain_text_box .editor-content {
     font-family: IRANSans, Tahoma, Arial;
     font-size: 90%;

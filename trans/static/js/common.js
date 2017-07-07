@@ -45,7 +45,7 @@ function sendPrintJob(print_task_url) {
             ToastrUtil.success(
                     'Printouts will be delivered to you shortly.',
                     'Print job submitted.'
-            ).css('width', '500px');;
+            ).css('width', '400px');;
         },
         error: function (response) {
             ToastrUtil.error('Print request failed.');

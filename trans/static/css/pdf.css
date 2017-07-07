@@ -19,6 +19,7 @@ div.pdf {
     border: 1px solid #333;
     box-shadow: 0 0 2px #333;
     width: 45em;
+    min-height: 67em;
     margin: 4em auto;
     padding: 4.5em 5.5em;
 }
@@ -52,6 +53,7 @@ div.pdf {
 
 .header .logo img {
     height: 70px;
+    margin-top: -1px;
     padding-right: 15px;
 }
 

@@ -75,7 +75,7 @@
     
 
     <script>
-        var release_task_url = "{% url 'releasetask' contest_slug=contest_slug task_name=task_name %}";
+        var release_task_url = "{% url 'release_task' contest_slug=contest_slug task_name=task_name %}";
             
         function addTask(form) {
             var name = $('#task_name').val();

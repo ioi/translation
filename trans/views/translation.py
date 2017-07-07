@@ -268,7 +268,9 @@ class Revert(LoginRequiredMixin, View):
         translation = content_version.translation
         if user != translation.user or translation.frozen:
             return JsonResponse({'error': 'forbidden'})
-        translation.add_version(translation.get_latest_text()) # save unsaved autosave
+        # save last unsaved version if exists
+        if not translation.get_latest_version().saved:
+            translation.add_version(translation.get_latest_text())
         translation.add_version(content_version.text, 'Revert')
         return JsonResponse({'message': 'Done'})
 

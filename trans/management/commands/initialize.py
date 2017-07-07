@@ -90,23 +90,28 @@ class Command(BaseCommand):
             contest_slug = os.path.basename(os.path.normpath(folder))
             for file_name in glob(folder + '*.md'):
                 task_name = os.path.basename(file_name).split('.')[0]
+                task_parts = task_name.split('-')
+                order = 1
+                if len(task_parts) > 1:
+                    order = int(task_parts[0])
+                task_name = task_parts[-1]
+                self.import_task(file_name, task_name, order, contest_slug)
                 # print('Task {} imported to {}.'.format(task_name, contest_slug))
-                self.import_task(file_name, task_name, contest_slug)
         print('Tasks improted.')
 
-    def import_task(self, file_name, task_name, contest_slug):
+    def import_task(self, file_name, task_name, order, contest_slug):
         with open(file_name, 'r') as file:
             content = file.read()
             contest = Contest.objects.get(slug=contest_slug)
-            task, created = Task.objects.get_or_create(name=task_name, contest=contest)
+            task, created = Task.objects.get_or_create(name=task_name, order=order, contest=contest)
             user = User.objects.get(username="ISC")
             new_trans = get_trans_by_user_and_task(user, task)
             new_trans.add_version(content)
             if contest.public == True:
-                task.publish_latest("First Release")
+                task.publish_latest("Initial Release")
 
     def read_data(self, data_sheet, title_list):
-        '''read data corresponding to the title_list from data sheet'''
+        '''read data from spreadsheet'''
         data = []
         table = load_workbook(InitialDataFile)[data_sheet]
         titles = [c[0].value for c in table.columns]

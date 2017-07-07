@@ -3,7 +3,7 @@ from django.http.response import HttpResponse, HttpResponseForbidden
 from django.views.generic.base import View
 from wkhtmltopdf.views import PDFTemplateView
 
-from trans.models import User, ContentVersion, Translation, Task
+from trans.models import User, Version, Translation, Task
 
 
 class VersionDownloadMixin(object):
@@ -30,7 +30,7 @@ class VersionDownloadMixin(object):
                     return None
                 return translation.get_latest_text()
             elif content_type_model == 'task':
-                return task.get_published_text()
+                return task.get_published_text
             else:
                 return None
 

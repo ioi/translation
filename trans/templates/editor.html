@@ -27,7 +27,7 @@
     <div class="row">
         <div class="btn-container">
             <button class="btn btn-default" onclick="saveVersion()" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
-            <a href="{% url 'versions' contest_slug task_name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+            <a href="{% url 'revisions' 'task' contest_slug task_name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
             <a href="{% url 'task_html' 'task' contest_slug task_name %}" class="btn btn-default" title="Preview"><i class="fa fa-btn fa-search fa-lg"></i></a>
             <a href="{% url 'task_pdf' 'task' contest_slug task_name %}" class="btn btn-default" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></a>
             {% if settings.PRINT_ENABLED %}
@@ -88,12 +88,11 @@
 
 <script type="text/javascript">
     task_id = "{{taskID}}";
-    version_particle_url = "{% url 'save_version_particle' contest_slug=contest_slug task_name=task_name %}";
     access_edit_translate_url = "{% url 'access_edit_translate' id=taskID %}";
     finish_translation_url = "{% url 'finish_trans' id=taskID %}";
     get_latest_translation_url = "{% url 'get_latest_translation' id=taskID%}";
     save_task_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
-    task_version_url = "{% url 'task_versions' contest_slug=contest_slug task_name=task_name  %}";
+    task_version_url = "{% url 'revisions' 'task' contest_slug task_name  %}";
     language = "{{language}}";
     direction = "{{direction}}";
 </script>

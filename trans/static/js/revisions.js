@@ -1,4 +1,4 @@
-var task_version_url,
+var task_version_url, task_type,
     csrf_token,
     task_versions;
 
@@ -18,9 +18,9 @@ function diff(id1, id2){
         if(version.id == id2)
             text2 = version.text;
     });
-    if(!text2){
+    if (!text2) {
         view_version(text1, id1)
-    }else {
+    } else {
         var diff_fragment = DiffUtil.getDiffFragment(text2, text1);
         $('#myversion').html(diff_fragment);
         selectVersion('#version-' + id1);
@@ -38,7 +38,7 @@ function getVersions() {
     $.ajax({
         url: task_version_url,
         data: {
-            published: true,
+            task_type: task_type,
             csrfmiddlewaretoken: csrf_token
         },
         type: "GET",
@@ -46,7 +46,7 @@ function getVersions() {
             task_versions = response.versions;
 
             // onclick first row
-            if(task_versions[0]){
+            if (task_versions[0]) {
                 if(task_versions[1])
                     diff(task_versions[0].id, task_versions[1].id);
                 else

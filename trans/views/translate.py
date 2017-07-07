@@ -265,10 +265,11 @@ class CheckoutVersion(LoginRequiredMixin, View):
         version_id = self.request.POST['id']
         content_version = Version.objects.filter(id=version_id).first()
         user = User.objects.get(username=request.user)
-        translation = content_version.content_object
+        translation = content_version.translation
         if user != translation.user or translation.frozen:
             return JsonResponse({'error': 'forbidden'})
-        translation.add_version(content_version.text, "Revert")
+        translation.add_version(translation.get_latest_text()) # save unsaved autosave
+        translation.add_version(content_version.text, 'Revert')
         return JsonResponse({'message': 'Done'})
 
 

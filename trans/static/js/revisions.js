@@ -1,6 +1,8 @@
 var task_version_url, task_type,
     csrf_token,
-    task_versions;
+    task_versions,
+    version_id_to_revert,
+    checkout_version_url;
 
 $(document).ready(function () {
     getVersions();
@@ -55,4 +57,22 @@ function getVersions() {
         }
     });
     return false;
+}
+
+function revert(version_id){
+    version_id_to_revert = version_id;
+}
+
+function revert_confirm(){
+    $.ajax({
+        url: checkout_version_url,
+        data: {
+            'id': version_id_to_revert,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+            location.reload();
+        },
+    });
 }

@@ -19,7 +19,7 @@ class ReadNotifications(LoginRequiredMixin, View):
             return JsonResponse(dict(notifications=get_all_notifs(request.user, all_notifications)))
         else:
             return render(request, 'notifications.html',
-                          context={'notifications': all_notifications})
+                          context={'notifications': get_all_notifs(request.user, all_notifications)})
 
     def post(self, request, *args, **kwargs):
         if 'id' in request.POST:

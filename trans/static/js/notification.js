@@ -71,7 +71,7 @@ function getNotifications() {
     });
 }
 
-function readNotification(id){
+function readNotification(id, reload){
     $.ajax({
         url: notification_url,
         data: {
@@ -81,12 +81,15 @@ function readNotification(id){
         type: "POST",
         success: function (response) {
             // TODO: This should be more eficient
-            getNotifications();
+            if(reload)
+                location.reload(true);
+            else
+                getNotifications();
         }
     });
 }
 
-function readAllNotification(){
+function readAllNotification(reload){
     $.ajax({
         url: notification_url,
         data: {
@@ -96,7 +99,10 @@ function readAllNotification(){
         type: "POST",
         success: function (response) {
             // TODO: This should be more eficient
-            getNotifications();
+            if(reload)
+                location.reload(true);
+            else
+                getNotifications();
         }
     });
 }

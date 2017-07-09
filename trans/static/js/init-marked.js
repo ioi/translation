@@ -2,18 +2,23 @@
 // Initilize Makrded.js Renderer
 
 var renderer = new marked.Renderer();
+var IMAGES_URL;
+
 
 // enable resize option for images
 renderer.image = function(href, title, text) {
-    var tags = '';
+    var style = '';
+    var images_folder = '';
+    if (href.indexOf('/') < 0 && typeof IMAGES_URL !== 'undefined')
+        images_folder = IMAGES_URL;
     if (title) {
         size = title.split('x');
         if (size[1])
-            tags = 'width=' + size[0] + ' height=' + size[1];
+            style = 'width: ' + size[0] + 'px; height: ' + size[1] + 'px;';
         else
-            tags = 'width=' + size[0];
+            style = 'width: ' + size[0] + 'px;';
     }
-    return ('<img src="' + href + '" alt="' + text + '" ' + tags + '>');
+    return ('<img src="' + images_folder + href + '" alt="' + text + '" style="' + style + '">');
 };
 
 // remove trailing newline in code blocks

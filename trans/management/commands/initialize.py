@@ -108,7 +108,7 @@ class Command(BaseCommand):
             new_trans = get_trans_by_user_and_task(user, task)
             new_trans.add_version(content)
             if contest.public == True:
-                task.publish_latest("Initial Release")
+                task.publish_latest("Init")
 
     def read_data(self, data_sheet, title_list):
         '''read data from spreadsheet'''

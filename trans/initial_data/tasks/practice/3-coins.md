@@ -1,22 +1,22 @@
-# Coins 
+# Coins
 
-Zahhak, the enemy of Jamshid, has captured Jamshid's daughters, Arnavaz and Shahrnaz. But he decided to offer them an opportunity to free themselves by solving a puzzle. 
+Zahhak, the enemy of Jamshid, has captured Jamshid's daughters, Arnavaz and Shahrnaz. But he decided to offer them an opportunity to free themselves by solving a puzzle.
 
 Zahhak has an $8 \times 8$ chessboard with cells labeled from $0$ to $63$, as in the figure.
-He has put a coin on each of the $64$ cells. 
+He has put a coin on each of the $64$ cells.
 The cell with label $c$ has a special coin which is physically identical to the other coins, but it is cursed.
-Each coin is facing either heads or tails. 
+Each coin is facing either heads or tails.
 
-![Chessboard](/media/uploads/Coins.svg )
+![Chessboard](Coins.png "280")
 
 Zahhak invited the sisters to dinner to describe the puzzle: after the dinner, the sisters should go to different rooms. Then Zahhak goes to Arnavaz's room, presents her the chessboard and tells her the value of $c$ (the label of the cell containing the cursed coin).
-Arnavaz cannot change the position of the coins but can flip (turn over) at least $1$ and at most $k$ coins. She might flip the same coin several times. 
-Then Zahhak goes to the other room and presents the chessboard to Shahrnaz. 
+Arnavaz cannot change the position of the coins but can flip (turn over) at least $1$ and at most $k$ coins. She might flip the same coin several times.
+Then Zahhak goes to the other room and presents the chessboard to Shahrnaz.
 If she finds the cursed coin, both sisters will be freed. The sisters can agree on a strategy during the dinner, but cannot communicate afterward.
 
-Your task is to help the sisters solve Zahhak's puzzle. 
+Your task is to help the sisters solve Zahhak's puzzle.
 
-## Implementation details 
+## Implementation details
 
 You should implement two different procedures:
 ```
@@ -31,7 +31,7 @@ int[] coin_flips(int[] b, int c)
 int find_coin(int[] b)
 ```
 * This procedure plays for Shahrnaz.
-* $b$: an integer array of length $64$, demonstrating the chessboard that Zahhak presents to Shahrnaz (after Arnavaz has flipped some coins). 
+* $b$: an integer array of length $64$, demonstrating the chessboard that Zahhak presents to Shahrnaz (after Arnavaz has flipped some coins).
 * It should return $c$, the position of the cursed coin.
 
 There are $T$ scenarios. For each scenario, the grader calls the procedure `coin_flips`. Based on its returned value, the grader updates the chessboard and calls the procedure `find_coin`. Note that in the judging system these procedures are called in separate programs.
@@ -46,9 +46,9 @@ In the first program, procedure `coin_flips` is called once for each scenario. I
 
 1. ($10$ points) $c < 2$, $k = 1$
 1. ($15$ points) $c < 3$, $k = 1$
-1. ($10$ points) $k = 64$ 
-1. ($15$ points) $k = 8$ 
-1. ($50$ points) $k = 1$ 
+1. ($10$ points) $k = 64$
+1. ($15$ points) $k = 8$
+1. ($50$ points) $k = 1$
 
 ## Example
 

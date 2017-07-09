@@ -14,6 +14,7 @@ var spellChecking = false;
 // Settings
 var markdown_render_interval = 100;
 var autosave_interval = 30 * 1000;
+var update_token_interval = 60 * 1000;
 
 
 $(document).ready(function() {
@@ -162,7 +163,7 @@ function getEditTranslateAccess(callback) {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
         // TODO: remove async = false
-        // async: false,
+        async: false,
         url: access_edit_translate_url,
         data: {
             id: task_id,
@@ -219,7 +220,7 @@ function handleAccessDenied(){
 
 function checkIfCanChange(){
     current_date = new Date();
-    if ((current_date - last_time_get_edit_token) >  autosave_interval)
+    if ((current_date - last_time_get_edit_token) >  update_token_interval)
         getEditTranslateAccess();
 }
 

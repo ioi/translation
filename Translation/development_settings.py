@@ -166,6 +166,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 
 
 TRANSLATION_EDIT_TIME_OUT = 120
+PRINT_SYSTEM_ADDRESS="http://print.ioi2017.org"
 
 EMAIL_HOST_USER = ''
 #Must generate specific password for your app in [gmail settings][1]

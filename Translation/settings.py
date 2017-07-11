@@ -167,6 +167,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 
 TRANSLATION_EDIT_TIME_OUT = 120
+PRINT_SYSTEM_ADDRESS="http://print.ioi2017.org"
 
 
 EMAIL_HOST_USER = ''

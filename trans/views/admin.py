@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls.base import reverse
 from django.views.generic import View
 
-from django.http import HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseNotFound
 
 from trans.models import User, Task, Translation, Contest
 from trans.utils import is_translate_in_editing, unleash_edit_token, unreleased_pdf_path, final_pdf_path

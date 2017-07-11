@@ -1,10 +1,9 @@
-from django.http.response import HttpResponseRedirect, HttpResponseForbidden
+from django.http.response import HttpResponseForbidden
 
 from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.core.urlresolvers import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 
 from trans.utils import get_trans_by_user_and_task
 from trans.models import Task, User, Contest

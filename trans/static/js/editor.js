@@ -187,7 +187,7 @@ function getEditTranslateAccess(callback) {
     });
 }
 
-function releasToken() {
+function releaseToken() {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
         async: false,
@@ -226,7 +226,7 @@ function checkIfCanChange(){
 
 window.onbeforeunload = function(){
     autoSave();
-    releasToken();
+    releaseToken();
     document.getElementById(left_plain_text_box_id).reset();
 };
 

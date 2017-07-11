@@ -1,11 +1,9 @@
-from django.conf import settings
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from django.http.response import HttpResponseRedirect, HttpResponseNotFound
-from django.urls.base import reverse
 from django.forms.models import model_to_dict
 
 from django.views.generic import View
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from trans.models import User, Task, Translation, Version, Contest, FlatPage
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
@@ -197,7 +195,7 @@ class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
         context['username'] = trans.user.username
         self.show_content_in_browser = True
         # self.footer_template = 'pdf-footer.html'
-        # self.cmd_options['footer-right'] = '%s [page] / [topage]' % trans.task.name
+        self.cmd_options['footer-right'] = '%s [page] / [topage]' % trans.task.name
         return context
 
 
@@ -245,19 +243,6 @@ class FinishTranslate(LoginRequiredMixin, View):
             return HttpResponseForbidden("You don't have acccess")
         unleash_edit_token(trans)
         return JsonResponse({'message': "Done"})
-
-
-class CheckTranslationEditAccess(LoginRequiredMixin, View):
-    def post(self, request, id):
-        edit_token = request.POST.get('edit_token', '')
-        task = Task.objects.get(id=id)
-        user = User.objects.get(username=request.user)
-        if not (task.contest.public or user.is_editor):
-            return HttpResponseBadRequest("There is no published task")
-        translation = Translation.objects.get(user=user, task=task)
-        if user != translation.user:
-            return HttpResponseForbidden()
-        return JsonResponse({'is_editing': can_save_translate(translation, edit_token)})
 
 
 class Revert(LoginRequiredMixin, View):
@@ -326,52 +311,7 @@ class GetLatestTranslation(LoginRequiredMixin, View):
         return HttpResponse(trans.get_latest_text())
 
 
-# TODO: unify with TranslationPDF
-class GetTranslatePDF(LoginRequiredMixin, PDFTemplateView):
-    filename = 'my_pdf.pdf'
-    template_name = 'pdf-template.html'
-    cmd_options = {
-        'page-size': 'A4',
-        'margin-top': '0.75in',
-        'margin-right': '0.75in',
-        'margin-bottom': '0.75in',
-        'margin-left': '0.75in',
-        'footer-spacing': 3,
-        # 'zoom': 15,
-        'javascript-delay': 500,
-    }
-
-    def get_context_data(self, **kwargs):
-        context = super(GetTranslatePDF, self).get_context_data(**kwargs)
-        print(kwargs)
-        task_id = self.request.GET['id']
-
-        user = User.objects.get(username=self.request.user.username)
-        task = Task.objects.filter(id=task_id).first()
-        if task is None:
-            # TODO
-            return None
-
-        trans = Translation.objects.filter(user=user, task=task).first()
-        if trans is None:
-            # TODO
-            return None
-
-        self.filename = "%s-%s.pdf" % (task.name, trans.user.language)
-        content = trans.get_latest_text()
-        context['direction'] = 'rtl' if trans.user.language.rtl else 'ltr'
-        context['content'] = content
-        context['title'] = self.filename
-        context['task_name'] = trans.task.name
-        context['country'] = trans.user.country.code
-        context['language'] = trans.user.language.code
-        context['contest'] = trans.task.contest.title
-        context['text_font_base64'] = user.text_font_base64
-        self.cmd_options['footer-center'] = '%s [page] / [topage]' % trans.task.name
-        return context
-
-
-class MailTranslatePDF(GetTranslatePDF):
+class MailTranslatePDF(TranslationPDF):
     def get(self, request, *args, **kwargs):
         response = super(MailTranslatePDF, self).get(request, *args, **kwargs)
         response.render()

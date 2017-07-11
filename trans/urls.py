@@ -23,7 +23,6 @@ urlpatterns = [
     url(r'^task/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/save/$', SaveTranslation.as_view(), name='save_translation'),
 
     url(r'^access_edit_translate/(?P<id>[\w]*)/$', AccessTranslationEdit.as_view(), name='access_edit_translate'),
-    url(r'^check_is_editing/(?P<id>[\w]*)/$', CheckTranslationEditAccess.as_view(), name='check_edit_translate'),
     url(r'^finish_edit_translate/(?P<id>[\w]*)/$', FinishTranslate.as_view(), name='finish_trans'),
     url(r'^get_latest_translation/(?P<id>[\w]*)/$', GetLatestTranslation.as_view(), name='get_latest_translation'),
 
@@ -36,7 +35,6 @@ urlpatterns = [
     url(r'^freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
     url(r'^unleash_edit_token/(?P<id>[\w]*)/$', UnleashEditTranslationToken.as_view(), name='unleash_edit_token'),
 
-    url(r'^get_task_pdf/$', GetTranslatePDF.as_view(), name='gettranspdf'),
     url(r'^mail_task_pdf/$', MailTranslatePDF.as_view(), name='mailtranspdf'),
     url(r'^print/$', PrintCustomFile.as_view(), name='printcustomfile'),
 

@@ -1,59 +1,11 @@
 import json
 import logging
-import datetime
-import string
-import random
-from django.conf import settings
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
 from django.core.cache import cache
 from django.core import serializers
 
 logger = logging.getLogger(__name__)
 
-
-def get_task_by_contest_and_name(contest_slug, task_name, is_editor=False):
-    from trans.models import Contest, Task
-    contest = Contest.objects.filter(slug=contest_slug).first()
-    if not contest:
-        raise Exception("There is no contest")
-    task = Task.objects.get(name=task_name, contest=contest)
-    if not (is_editor or task.contest.public):
-        raise Exception("There is no published task")
-    return task
-
-
-def get_trans_by_user_and_task(user, task):
-    from trans.models import Translation
-    trans, created = Translation.objects.get_or_create(user=user, task=task)
-    if created and task.get_published_text():
-        trans.add_version(task.get_published_text())
-    return trans
-
-
-def can_user_change_translation(user, translation, edit_token):
-    return user == translation.user and can_save_translate(translation, edit_token) and not translation.frozen
-
-
-def unreleased_pdf_path(pdf_name):
-    if pdf_name.split('.')[-1] == 'pdf':
-        return '%s/%s' % (settings.MEDIA_ROOT, pdf_name)
-    return '%s/%s.pdf' % (settings.MEDIA_ROOT, pdf_name)
-
-
-def final_pdf_path(pdf_name):
-    if pdf_name.split('.')[-1] == 'pdf':
-        return '%s/%s' % (settings.FINAL_PDF_ROOT, pdf_name)
-    return '%s/%s.pdf' % (settings.FINAL_PDF_ROOT, pdf_name)
-
-
-def add_pdf_to_file(pdf_response):
-    with open(unreleased_pdf_path(pdf_response.filename), 'wb') as file:
-        file.write(pdf_response.content)
-
-
-# Cache Utils
 
 def get_user_unread_notifs_cache_key(user):
     return "NOTIF_UN-%d" % user.id
@@ -61,43 +13,6 @@ def get_user_unread_notifs_cache_key(user):
 
 def get_user_read_notifs_cache_key(user):
     return "NOTIF_RN-%d" % user.id
-
-
-def get_trans_edit_cache_key(translation):
-    return "TRANS_ET-%d" % translation.id
-
-
-# Translation Utils
-TRANSLATION_EDIT_TIME_OUT = 120
-
-
-def get_translate_edit_permission(translation, my_token=None):
-    edit_token = cache.get(get_trans_edit_cache_key(translation))
-    current_time = datetime.datetime.now()
-    if edit_token is None \
-            or edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) < current_time \
-            or edit_token[0] == my_token:
-        new_edit_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        cache.set(get_trans_edit_cache_key(translation), (new_edit_key, current_time))
-        return True, new_edit_key
-    return False, ""
-
-
-def can_save_translate(translation, my_token):
-    edit_token = cache.get(get_trans_edit_cache_key(translation))
-    return (edit_token is None) or my_token == edit_token[0]
-
-
-def is_translate_in_editing(translation):
-    current_time = datetime.datetime.now()
-    edit_token = cache.get(get_trans_edit_cache_key(translation))
-    return (edit_token is not None) and (edit_token[1] + datetime.timedelta(seconds=TRANSLATION_EDIT_TIME_OUT) > current_time)
-
-
-def unleash_edit_token(translation):
-    cache.set(get_trans_edit_cache_key(translation), None)
-
-# Notifications Util
 
 
 def reset_notification_cache(users):
@@ -182,6 +97,7 @@ def remove_notification_in_user(user, notif):
 def remove_notification(users, notif):
     for user in users:
         remove_notification_in_user(user, notif)
+
 
 def read_all_notifs(user):
     cache.set(get_user_read_notifs_cache_key(user), get_all_unread_notifs(user) + get_all_read_notifs(user))

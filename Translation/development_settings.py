@@ -165,6 +165,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 
 
+TRANSLATION_EDIT_TIME_OUT = 120
 
 EMAIL_HOST_USER = ''
 #Must generate specific password for your app in [gmail settings][1]

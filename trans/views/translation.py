@@ -73,8 +73,9 @@ class SaveTranslation(LoginRequiredMixin, View):
         if not can_user_change_translation(user, translation, edit_token) or not (
             task.is_published() or user.is_editor()):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
+        can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         translation.add_version(content, saved=saved)
-        return JsonResponse({'success': True})
+        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
 
 
 class UserFont(View):
@@ -228,7 +229,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         if user != translation.user:
             return HttpResponseForbidden()
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
-        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token})
+        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token, 'content': translation.get_latest_text()})
 
 
 class FinishTranslate(LoginRequiredMixin, View):
@@ -243,6 +244,7 @@ class FinishTranslate(LoginRequiredMixin, View):
             return HttpResponseForbidden("You don't have acccess")
         unleash_edit_token(trans)
         return JsonResponse({'message': "Done"})
+
 
 
 class Revert(LoginRequiredMixin, View):

@@ -19,46 +19,39 @@ var update_token_interval = 60 * 1000;
 
 $(document).ready(function() {
 
-    getEditTranslateAccess();
-    loadTranslationText();
-
-});
-
-
-function loadTranslationText() {
-    $.ajax({
-        url: get_latest_translation_url,
-        data: {
-            csrfmiddlewaretoken: csrf_token
-        },
-        type: "GET",
-        success: function(response) {
-            var text = '';
-            if (response)
-                text = response;
-            initial(text);
-        },
-        error: function() {
-            initial('');
-        }
-    });
-}
-
-function initial(text){
     if (direction=='rtl') {
         left_plain_text_box_id = 'left_rtl_plain_text_box';
-        $('#' + left_plain_text_box_id).moratab(text, {strings: {help: ''}});
+        $('#' + left_plain_text_box_id).moratab('', {strings: {help: ''}});
     }
     else {
         left_plain_text_box_id = 'left_ltr_plain_text_box';
+        $('#' + left_plain_text_box_id).html('');
         simplemde = new SimpleMDE({
             element: document.getElementById('left_ltr_plain_text_box'),
             status: false,
             toolbar: false,
             spellChecker: false,
-            initialValue: text
+            initialValue: ''
         });
     }
+    getEditTranslateAccess(initial);
+
+});
+
+
+function loadTranslationText(text){
+
+    if (direction=='rtl') {
+        $('#' + left_plain_text_box_id).html('');
+        $('#' + left_plain_text_box_id).moratab(text, {strings: {help: ''}});
+    }
+    else {
+        $('#' + left_plain_text_box_id).html('');
+        simplemde.value(text)
+    }
+}
+
+function initial(){
 
     $('#left_rendered_text_box').css('direction', direction);
     task_text = $("#temp").html();
@@ -125,6 +118,13 @@ function saveAndGo(url) {
     });
 }
 
+
+function setEditToken(edit_token){
+    last_time_get_edit_token = new Date();
+    sessionStorage.setItem('edit_translate_token_' + task_id, edit_token);
+}
+
+
 function saveVersion(autosave=false, callback=null) {
     current_trans_text = currentTranslationText();
     if (autosave && last_autosaved_text == current_trans_text) {
@@ -132,30 +132,29 @@ function saveVersion(autosave=false, callback=null) {
             callback();
         return;
     }
-    getEditTranslateAccess(function() {
-        var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
-        $.ajax({
-            url: save_task_url,
-            data: {
-                content: currentTranslationText(),
-                id: task_id,
-                saved: !autosave,
-                edit_token: edit_token,
-                csrfmiddlewaretoken: csrf_token
-            },
-            type: "POST",
-            success: function (response) {
-                if (response.can_edit == false)
-                    handleAccessDenied();
-                else {
-                    last_autosaved_text = current_trans_text;
-                    if (callback)
-                        callback();
-                    else if (!autosave)
-                        ToastrUtil.success('Successfully Saved ...');
-                }
+    var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
+    $.ajax({
+        url: save_task_url,
+        data: {
+            content: currentTranslationText(),
+            id: task_id,
+            saved: !autosave,
+            edit_token: edit_token,
+            csrfmiddlewaretoken: csrf_token
+        },
+        type: "POST",
+        success: function (response) {
+            if (response.can_edit == false)
+                handleAccessDenied();
+            else {
+                last_autosaved_text = current_trans_text;
+                setEditToken(response.edit_token)
+                if (callback)
+                    callback();
+                else if (!autosave)
+                    ToastrUtil.success('Successfully Saved ...');
             }
-        });
+        }
     });
 }
 
@@ -163,7 +162,7 @@ function getEditTranslateAccess(callback) {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
         // TODO: remove async = false
-        async: false,
+//        async: false,
         url: access_edit_translate_url,
         data: {
             id: task_id,
@@ -175,8 +174,8 @@ function getEditTranslateAccess(callback) {
             if (response.can_edit == false) {
                 handleAccessDenied();
             } else {
-                last_time_get_edit_token = new Date();
-                sessionStorage.setItem('edit_translate_token_' + task_id, response.edit_token);
+                setEditToken(response.edit_token)
+                loadTranslationText(response.content);
                 if (callback)
                     callback();
             }
@@ -227,7 +226,6 @@ function checkIfCanChange(){
 window.onbeforeunload = function(){
     autoSave();
     releaseToken();
-    document.getElementById(left_plain_text_box_id).reset();
 };
 
 

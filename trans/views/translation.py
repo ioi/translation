@@ -7,13 +7,15 @@ from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from trans.models import User, Task, Translation, Version, Contest, FlatPage
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
+from django.conf import settings
 
-from wkhtmltopdf.views import PDFTemplateView
+import os, re
 
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
-    can_user_change_translation, add_pdf_to_file
+    can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
+    pdf_response, get_requested_user
 
 
 class Home(LoginRequiredMixin, View):
@@ -87,8 +89,7 @@ class UserFont(View):
 class TranslationMarkdown(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        if user.is_staff and 'user' in request.GET:
-            user = User.objects.get(username=request.GET.get('user'))
+        requested_user = get_requested_user(request, task_type)
         version_id = request.GET.get('ver')
         if version_id:
             content_version = Version.objects.filter(id=version_id).first()
@@ -103,17 +104,16 @@ class TranslationMarkdown(LoginRequiredMixin, View):
             if task_type == 'released':
                 content = task.get_published_text
             else:
-                translation = get_trans_by_user_and_task(user, task)
+                translation = get_trans_by_user_and_task(requested_user, task)
                 content = translation.get_latest_text()
 
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
 
 class TranslationHTML(LoginRequiredMixin, View):
-    def get(self, request, contest_slug, task_name, task_type):
+    def get(self, request, contest_slug, task_name, task_type, pdf_output=False):
         user = User.objects.get(username=request.user)
-        if user.is_staff and 'user' in request.GET:
-            user = User.objects.get(username=request.GET.get('user'))
+        requested_user = get_requested_user(request, task_type)
         try:
             task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         except Exception as e:
@@ -121,100 +121,61 @@ class TranslationHTML(LoginRequiredMixin, View):
 
         if task_type == 'released':
             trans = task.get_base_translation()
-            content = task.get_published_text
+            content = task.get_published_text()
         else:
-            trans = get_trans_by_user_and_task(user, task)
+            trans = get_trans_by_user_and_task(requested_user, task)
             content = trans.get_latest_text()
 
         # TODO check if it's available
         context = {
             'content': content,
-            'task_name': task.name,
-            'country': trans.user.country.code,
-            'language': trans.user.language.name,
-            'language_code': trans.user.language.code,
-            'direction': trans.user.language.direction(),
-            'text_font_base64': trans.user.text_font_base64,
             'contest': task.contest.title,
-            'username': trans.user.username,
+            'task_name': task.name,
+            'country': requested_user.country.code,
+            'language': requested_user.language.name,
+            'direction': requested_user.language.direction(),
+            'username': requested_user.username,
+            'pdf_output': pdf_output,
         }
-        return render(request, 'pdf-template.html', context=context)
+        response = render(request, 'pdf-template.html', context=context)
+        response['edit_time'] = trans.get_latest_version().create_time.timestamp()
+        return response
 
 
-# TODO: merge with TranslationHTML
-class TranslationPDF(LoginRequiredMixin, PDFTemplateView):
-    template_name = 'pdf-template.html'
-    cmd_options = {
-        'page-size': 'A4',
-        'margin-top': '0.6in',
-        'margin-bottom': '0.6in',
-        'margin-right': '0.75in',
-        'margin-left': '0.75in',
-        'print-media-type': '--print-media-type',
-        # 'zoom': 1.2, # zoom factor is defined in the pdf-template
-    }
+class TranslationPDF(LoginRequiredMixin, View):
+    def get(self, request, contest_slug, task_name, task_type):
+        requested_user = get_requested_user(request, task_type)
+        file_path = '{}/output/{}/{}/'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+        file_name = '{}-{}.pdf'.format(task_name, requested_user.username)
+        pdf_file  = '{}/{}'.format(file_path, file_name)
 
-    def get(self, request, *args, **kwargs):
-        pdf_response = super(TranslationPDF, self).get(request, *args, **kwargs)
-        if request.GET.get('as', '') != 'html':
-            pdf_response.add_post_render_callback(add_pdf_to_file)
+        html_response = TranslationHTML().get(request, contest_slug, task_name, task_type, pdf_output=True)
+        if not 'edit_time' in html_response:
+            return html_response
 
-        return pdf_response
+        last_edit_time = float(html_response['edit_time'])
 
+        if not os.path.exists(pdf_file) or os.path.getmtime(pdf_file) < last_edit_time:
+            os.makedirs(file_path, exist_ok=True)
+            html = html_response.content.decode("utf-8")
+            html = re.sub(r'(href|src)="/', r'\1="{}://{}/'.format(request.scheme, request.get_host()), html)
+            convert_html_to_pdf(html, pdf_file)
+            add_page_numbers_to_pdf(pdf_file, task_name)
 
-    def get_context_data(self, **kwargs):
-        context = super(TranslationPDF, self).get_context_data(**kwargs)
-        user = User.objects.get(username=self.request.user)
-        if user.is_staff and 'user' in self.request.GET:
-            user = User.objects.get(username=self.request.GET.get('user'))
-        contest_slug = kwargs['contest_slug']
-        task_name = kwargs['task_name']
-        task_type = kwargs['task_type']
-        try:
-            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
-        except Exception as e:
-            return HttpResponseBadRequest(e)
-        trans = get_trans_by_user_and_task(user, task)
-
-        if task_type == 'released':
-            trans = task.get_base_translation()
-            content = task.get_published_text
-        else:
-            trans = get_trans_by_user_and_task(user, task)
-            content = trans.get_latest_text()
-
-        self.filename = "{}-{}.pdf".format(task.name, trans.user.username)
-        context['pdf_output'] = True
-        context['direction'] = 'rtl' if trans.user.language.rtl else 'ltr'
-        context['content'] = content
-        context['title'] = self.filename
-        context['task_name'] = trans.task.name
-        context['country'] = trans.user.country.code
-        context['language'] = trans.user.language.name
-        context['contest'] = trans.task.contest.title
-        context['text_font_base64'] = trans.user.text_font_base64
-        context['username'] = trans.user.username
-        self.show_content_in_browser = True
-        # self.footer_template = 'pdf-footer.html'
-        self.cmd_options['footer-right'] = '%s [page] / [topage]' % trans.task.name
-        return context
+        return pdf_response(pdf_file, file_name)
 
 
 class TranslationPrint(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        try:
-            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
-        except Exception as e:
-            return HttpResponseBadRequest(e)
+        pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
 
-        if task_type == 'released':
-            translation = task.get_base_translation()
-            content = task.get_published_text
-        else:
-            translation = get_trans_by_user_and_task(user, task)
-            content = translation.get_latest_text()
-        # TODO: convert to pdf and send to printer
+        if not 'pdf_file' in pdf_response:
+            return JsonResponse({'success': False})
+
+        pdf_file = pdf_response['pdf_file']
+        # Todo: add user info to pdf_file and send it to printer
+
         return JsonResponse({'success': True})
 
 
@@ -311,22 +272,6 @@ class GetLatestTranslation(LoginRequiredMixin, View):
         if trans.user != user:
             return HttpResponseForbidden()
         return HttpResponse(trans.get_latest_text())
-
-
-class MailTranslatePDF(TranslationPDF):
-    def get(self, request, *args, **kwargs):
-        response = super(MailTranslatePDF, self).get(request, *args, **kwargs)
-        response.render()
-
-        subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
-        text_content = 'Test'
-        html_content = '<p>This is an <strong>TEST</strong> message.</p>'
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.attach('file.pdf', response.content, 'application/pdf')
-        msg.send()
-
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 class PrintCustomFile(LoginRequiredMixin, View):

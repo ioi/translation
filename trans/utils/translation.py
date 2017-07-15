@@ -33,6 +33,16 @@ def can_user_change_translation(user, translation, edit_token):
     return user == translation.user and can_save_translate(translation, edit_token) and not translation.frozen
 
 
+def get_requested_user(request, task_type):
+    from trans.models import User
+    user = User.objects.get(username=request.user)
+    if user.is_staff and 'user' in request.GET:
+        user = User.objects.get(username=request.GET.get('user'))
+    if task_type == 'released':
+        user = User.objects.get(username='ISC')
+    return user
+
+
 def get_translate_edit_permission(translation, my_token=None):
     if can_save_translate(translation, my_token):
         new_edit_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
@@ -56,4 +66,3 @@ def is_translate_in_editing(translation):
 
 def unleash_edit_token(translation):
     cache.set(get_trans_edit_cache_key(translation), None)
-

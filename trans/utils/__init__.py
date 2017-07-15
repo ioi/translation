@@ -1,3 +1,3 @@
 from .translation import  *
-from .print import *
+from .pdf import *
 from .notification import *

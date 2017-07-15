@@ -35,7 +35,6 @@ urlpatterns = [
     url(r'^freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
     url(r'^unleash_edit_token/(?P<id>[\w]*)/$', UnleashEditTranslationToken.as_view(), name='unleash_edit_token'),
 
-    url(r'^mail_task_pdf/$', MailTranslatePDF.as_view(), name='mailtranspdf'),
     url(r'^print/$', PrintCustomFile.as_view(), name='printcustomfile'),
 
     url(r'^notifications/$', ReadNotifications.as_view(), name='notifications'),

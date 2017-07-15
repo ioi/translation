@@ -3,12 +3,17 @@ import logging
 import datetime
 import string
 import random
+import os
+from shutil import copyfile
+from subprocess import call
+from uuid import uuid4
 from django.conf import settings
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.core.cache import cache
 from django.core import serializers
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
@@ -17,10 +22,10 @@ def get_task_by_contest_and_name(contest_slug, task_name, is_editor=False):
     from trans.models import Contest, Task
     contest = Contest.objects.filter(slug=contest_slug).first()
     if not contest:
-        raise Exception("There is no contest")
+        raise Exception("There is no such contest.")
     task = Task.objects.get(name=task_name, contest=contest)
     if not (is_editor or task.contest.public):
-        raise Exception("There is no published task")
+        raise Exception("You don't have access to this task.")
     return task
 
 
@@ -36,10 +41,22 @@ def can_user_change_translation(user, translation, edit_token):
     return user == translation.user and can_save_translate(translation, edit_token) and not translation.frozen
 
 
+def get_requested_user(request, task_type):
+    from trans.models import User
+    user = User.objects.get(username=request.user)
+    if user.is_staff and 'user' in request.GET:
+        user = User.objects.get(username=request.GET.get('user'))
+    if task_type == 'released':
+        user = User.objects.get(username='ISC')
+    return user
+
+
+# PDF Utils
+
 def unreleased_pdf_path(pdf_name):
     if pdf_name.split('.')[-1] == 'pdf':
-        return '%s/%s' % (settings.MEDIA_ROOT, pdf_name)
-    return '%s/%s.pdf' % (settings.MEDIA_ROOT, pdf_name)
+        return '%s%s' % (settings.MEDIA_ROOT, pdf_name)
+    return '%s%s.pdf' % (settings.MEDIA_ROOT, pdf_name)
 
 
 def final_pdf_path(pdf_name):
@@ -52,6 +69,32 @@ def add_pdf_to_file(pdf_response):
     with open(unreleased_pdf_path(pdf_response.filename), 'wb') as file:
         file.write(pdf_response.content)
 
+
+def pdf_response(pdf_file, file_name):
+    with open(pdf_file, 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename={}'.format(file_name)
+        response['pdf_file'] = pdf_file
+        return response
+
+
+def convert_html_to_pdf(html, pdf_file):
+    html_file = '/tmp/{}.html'.format(str(uuid4()))
+    with open(html_file, 'w') as f:
+        f.write(html)
+    cmd = settings.WKHTMLTOPDF_CMD
+    cmd_options = settings.WKHTMLTOPDF_CMD_OPTIONS
+    res = call([cmd] + cmd_options + [html_file, pdf_file])
+    # res = res and call(['pdftk', pdf_file, 'output', pdf_file])
+    # copyfile(html_file, 'render.html')
+    os.remove(html_file)
+    return res
+
+
+def add_page_numbers_to_pdf(pdf_file, task_name):
+    cmd = ('cpdf -add-text "{0} (%Page of %EndPage)" -font "Arial" ' + \
+          '-font-size 10 -bottomright .75in {1} -o {1}').format(task_name.capitalize(), pdf_file)
+    os.system(cmd)
 
 # Cache Utils
 

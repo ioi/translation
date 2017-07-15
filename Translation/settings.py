@@ -28,11 +28,17 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 WKHTMLTOPDF_CMD = 'xvfb-run wkhtmltopdf'
+# WKHTMLTOPDF_CMD = 'wkhtmltopdf'
 
-WKHTMLTOPDF_CMD_OPTIONS = {
-    'quiet':True,
-}
-
+WKHTMLTOPDF_CMD_OPTIONS = [
+    '--page-size', 'A4',
+    '--margin-left', '0.75in',
+    '--margin-right', '0.75in',
+    '--margin-top', '0.75in',
+    '--margin-bottom', '1.1in',
+    # '--zoom', '2.9',
+    '--print-media-type',
+]
 
 # Application definition
 
@@ -45,7 +51,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ws4redis',
     'trans',
-    'wkhtmltopdf',
 ]
 
 WEBSOCKET_URL = '/ws3/'
@@ -181,6 +186,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, 'trans/static/')
 FINAL_PDF_ROOT = os.path.join(BASE_DIR, 'output_pdf/')

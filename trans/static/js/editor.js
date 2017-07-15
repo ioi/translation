@@ -182,7 +182,7 @@ function getEditTranslateAccess(callback) {
             }
         },
         error: function () {
-            handleAccessDenied();
+            handleAccessDenied('Connection error!');
         }
     });
 }
@@ -205,10 +205,11 @@ function releasToken() {
     });
 };
 
-function handleAccessDenied(){
+function handleAccessDenied(message='') {
+    msg = message || "The task is open somewhere else!"
     bootbox.alert({
         // title: 'Alert',
-        message: "<b>The task is open somewhere else!</b>",
+        message: '<b>' + msg + '</b>',
         buttons: {
             ok: {label: 'Back to Home'},
         },

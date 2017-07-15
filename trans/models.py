@@ -1,13 +1,7 @@
-import datetime
 
 from django.db.models.signals import post_save, post_delete
-from django.core.mail import EmailMessage
-from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-
 from django.utils import timezone
 
 from trans.utils import add_notification_to_users_cache, remove_notification
@@ -32,23 +26,6 @@ class User(User):
 
     def is_editor(self):
         return self.groups.filter(name='editor').exists() or self.is_superuser
-
-
-class Version(models.Model):
-    translation = models.ForeignKey('Translation')
-    text = models.TextField(default=None)
-    saved = models.BooleanField(default=False)
-    released = models.BooleanField(default=False)
-    release_note = models.CharField(max_length=255, blank=True)
-    create_time = models.DateTimeField(default=timezone.now)
-
-    def can_view_by(self, user):
-        if self.translation.user != user and self.translation.user.username != 'ISC':
-            return False
-        return True
-
-    def __str__(self):
-        return "{}: {} ({})".format(self.id, self.translation.task.name, self.translation.user.username)
 
 
 class Contest(models.Model):
@@ -136,6 +113,23 @@ class Translation(models.Model):
         return "{} ({})".format(self.task.name, self.user.username)
 
 
+class Version(models.Model):
+    translation = models.ForeignKey('Translation')
+    text = models.TextField(default=None)
+    saved = models.BooleanField(default=False)
+    released = models.BooleanField(default=False)
+    release_note = models.CharField(max_length=255, blank=True)
+    create_time = models.DateTimeField(default=timezone.now)
+
+    def can_view_by(self, user):
+        if self.translation.user != user and self.translation.user.username != 'ISC':
+            return False
+        return True
+
+    def __str__(self):
+        return "{}: {} ({})".format(self.id, self.translation.task.name, self.translation.user.username)
+
+
 class Language(models.Model):
     name = models.CharField(max_length=255, primary_key=True)
     code = models.CharField(unique=True, max_length=255, default='')
@@ -155,17 +149,6 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
-
-# Uncomment here when wanted to email people
-
-# def email_new_user(sender, **kwargs):
-#     if kwargs["created"]:  # only for new users
-#         new_user = kwargs["instance"]
-#         print(new_user.email)
-#         email = EmailMessage('Hello', 'World', to=[new_user.email])
-#         email.send()
-#
-# post_save.connect(email_new_user, sender=User)
 
 class Notification(models.Model):
     title = models.CharField(max_length=50)
@@ -193,9 +176,9 @@ post_delete.connect(remove_notif, sender=Notification)
 
 
 class Attachment(models.Model):
-    uploaded_file = models.FileField(upload_to='uploads/')
+    uploaded_file = models.FileField(upload_to='images/')
     title = models.CharField(max_length=100)
-    create_time = models.DateTimeField('Date Created')
+    create_time = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.title

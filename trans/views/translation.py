@@ -15,7 +15,7 @@ from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
-    pdf_response, get_requested_user
+    pdf_response, get_requested_user, add_info_line_to_pdf
 
 
 class Home(LoginRequiredMixin, View):
@@ -145,24 +145,25 @@ class TranslationHTML(LoginRequiredMixin, View):
 class TranslationPDF(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         requested_user = get_requested_user(request, task_type)
-        file_path = '{}/output/{}/{}/'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+        file_path = '{}/output/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
         file_name = '{}-{}.pdf'.format(task_name, requested_user.username)
-        pdf_file  = '{}/{}'.format(file_path, file_name)
+        pdf_file_path = '{}/{}'.format(file_path, file_name)
 
         html_response = TranslationHTML().get(request, contest_slug, task_name, task_type, pdf_output=True)
         if not 'edit_time' in html_response:
             return html_response
 
         last_edit_time = float(html_response['edit_time'])
+        rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
 
-        if not os.path.exists(pdf_file) or os.path.getmtime(pdf_file) < last_edit_time:
+        if rebuild_needed or 'refresh' in request.GET:
             os.makedirs(file_path, exist_ok=True)
             html = html_response.content.decode("utf-8")
             html = re.sub(r'(href|src)="/', r'\1="{}://{}/'.format(request.scheme, request.get_host()), html)
-            convert_html_to_pdf(html, pdf_file)
-            add_page_numbers_to_pdf(pdf_file, task_name)
+            convert_html_to_pdf(html, pdf_file_path)
+            add_page_numbers_to_pdf(pdf_file_path, task_name)
 
-        return pdf_response(pdf_file, file_name)
+        return pdf_response(pdf_file_path, file_name)
 
 
 class TranslationPrint(LoginRequiredMixin, View):
@@ -170,11 +171,16 @@ class TranslationPrint(LoginRequiredMixin, View):
         user = User.objects.get(username=request.user)
         pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
 
-        if not 'pdf_file' in pdf_response:
+        if not 'pdf_file_path' in pdf_response:
             return JsonResponse({'success': False})
 
-        pdf_file = pdf_response['pdf_file']
-        # Todo: add user info to pdf_file and send it to printer
+        pdf_file_path = pdf_response['pdf_file_path']
+        info_line = '{} ({})'.format(user.country.name, user.country.code)
+        output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
+
+        # TODO: send pdf file to printer
+
+        os.remove(output_pdf_path)
 
         return JsonResponse({'success': True})
 
@@ -205,7 +211,6 @@ class FinishTranslate(LoginRequiredMixin, View):
             return HttpResponseForbidden("You don't have acccess")
         unleash_edit_token(trans)
         return JsonResponse({'message': "Done"})
-
 
 
 class Revert(LoginRequiredMixin, View):
@@ -283,17 +288,17 @@ class PrintCustomFile(LoginRequiredMixin, View):
         form = UploadFileForm(request.POST, request.FILES)
         if not form.is_valid():
             return HttpResponseBadRequest("You should attach a file")
-        pdf_file = request.FILES['pdf_file']
-        if not pdf_file:
+        pdf_file_path = request.FILES['pdf_file_path']
+        if not pdf_file_path:
             return HttpResponseBadRequest("You should attach a file")
         # TODO: send pdf file to printer
-        pdf_file = pdf_file.read()
+        pdf_file_path = pdf_file_path.read()
         subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
         text_content = 'Test'
         html_content = '<p>This is an <strong>TEST</strong> message.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
-        msg.attach('file.pdf', pdf_file, 'application/pdf')
+        msg.attach('file.pdf', pdf_file_path, 'application/pdf')
         msg.send()
 
         return HttpResponseRedirect(request.META['HTTP_REFERER'])

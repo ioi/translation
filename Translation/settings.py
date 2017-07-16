@@ -30,15 +30,15 @@ ALLOWED_HOSTS = ['*']
 WKHTMLTOPDF_CMD = 'xvfb-run wkhtmltopdf'
 # WKHTMLTOPDF_CMD = 'wkhtmltopdf'
 
-WKHTMLTOPDF_CMD_OPTIONS = [
-    '--page-size', 'A4',
-    '--margin-left', '0.75in',
-    '--margin-right', '0.75in',
-    '--margin-top', '0.75in',
-    '--margin-bottom', '1.1in',
-    # '--zoom', '2.9',
-    '--print-media-type',
-]
+WKHTMLTOPDF_CMD_OPTIONS = {
+    'page-size': 'A4',
+    'margin-left': '0.75in',
+    'margin-right': '0.75in',
+    'margin-top': '0.75in',
+    'margin-bottom': '1.2in',
+    'print-media-type': '',
+    # 'zoom': '2.9',
+}
 
 # Application definition
 

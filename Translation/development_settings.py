@@ -79,6 +79,7 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'Translation.wsgi.application'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
+WKHTMLTOPDF_CMD = 'wkhtmltopdf'
 WKHTMLTOPDF_CMD_OPTIONS = {
 'quiet':True,
 }

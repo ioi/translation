@@ -133,6 +133,7 @@ class TranslationHTML(LoginRequiredMixin, View):
             'task_name': task.name,
             'country': requested_user.country.code,
             'language': requested_user.language.name,
+            'language_code': requested_user.language.code,
             'direction': requested_user.language.direction(),
             'username': requested_user.username,
             'pdf_output': pdf_output,

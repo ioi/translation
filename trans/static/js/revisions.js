@@ -2,7 +2,8 @@ var task_version_url, task_type,
     csrf_token,
     task_versions,
     version_id_to_revert,
-    revert_url;
+    revert_url,
+    view_all;
 
 $(document).ready(function () {
     getVersions();
@@ -15,9 +16,9 @@ function selectVersion(id){
 function diff(id1, id2){
     var text1, text2;
     $.each(task_versions, function(index, version) {
-        if(version.id == id1)
+        if (version.id == id1)
             text1 = version.text;
-        if(version.id == id2)
+        if (version.id == id2)
             text2 = version.text;
     });
     if (!text2) {
@@ -41,6 +42,7 @@ function getVersions() {
         url: task_version_url,
         data: {
             task_type: task_type,
+            view_all: view_all,
             csrfmiddlewaretoken: csrf_token
         },
         type: "GET",

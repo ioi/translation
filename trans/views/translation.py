@@ -224,7 +224,7 @@ class Revert(LoginRequiredMixin, View):
         # save last unsaved version if exists
         if not translation.get_latest_version().saved:
             translation.add_version(translation.get_latest_text())
-        translation.add_version(content_version.text, 'Revert')
+        translation.add_version(content_version.text, 'Reverted')
         return JsonResponse({'message': 'Done'})
 
 
@@ -255,7 +255,7 @@ class Versions(LoginRequiredMixin, View):
             return JsonResponse(dict(versions=list(versions_list)))
         return render(request, 'revisions.html', context={'task_name': task.name, 'contest_slug': contest_slug,
                                                           'versions': versions_list, 'direction': direction,
-                                                          'task_type': task_type})
+                                                          'task_type': task_type, 'view_all': view_all})
 
 
 class GetVersion(LoginRequiredMixin, View):

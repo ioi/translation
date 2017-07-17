@@ -12,7 +12,7 @@
     <script type="text/javascript" src="/static/js/revisions.js"></script>
 
 
-    <div class="container">
+    <div class="container revisions">
 
         <div class="col-sm-4">
             <div class="panel panel-default">
@@ -20,7 +20,7 @@
 
                     <table class="table table-version table-hover">
                         <thead><tr>
-                            <td colspan="3">
+                            <td colspan="4">
                                 {{ task_name | capfirst }} 
                                 {% if task_type == 'released'%} (ISC) {% endif %}
                             </td>
@@ -28,13 +28,21 @@
                         <tbody>
                         {% for version in versions %}
                             {% with next_element=versions|next:forloop.counter0 %}
-                            {% with previous_element=versions|previous:forloop.counter0 %}
 
                             <tr id="version-{{ version.id }}" onclick="diff({{ version.id }},{{ next_element.id }})">
-                                <td style="white-space: nowrap">{{ version.create_time | ioi_timezone }}</td>
+                                <td width="10px">
+                                    {% if task_type != 'released' %}
+                                    <div title="{{version.saved | yesno:"Saved,Auto-Saved"}}" class="circle {{version.saved | yesno:"saved,autosaved"}}"></div>
+                                    {% else %}
+                                    r{{ forloop.revcounter }}
+                                    {% endif %}
+                                </td>
+                                <td style="white-space: nowrap">
+                                    {{ version.create_time | ioi_timezone | safe }}
+                                </td>
                                 <td>{{ version.release_note }}</td>
                                 <td style="white-space: nowrap">
-                                    {% if task_type != 'released' %}
+                                    {% if task_type != 'released' and forloop.counter0 > 0%}
                                     <button type="button" class="btn btn-default" onclick="revert({{ version.id }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
                                     {% endif %}
                                     <a href="{% url 'task_md' task_type contest_slug task_name %}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>
@@ -42,12 +50,22 @@
                             </tr>
 
                             {% endwith %}
-                            {% endwith %}
                         {% endfor %}
                         </tbody>
                     </table>
 
                 </div>
+            </div>
+            <div style="margin: -10px; font-size: small; text-align: center; color: #999;">
+                Timezone: {{settings.TIME_ZONE}}
+                {% if task_type != 'released' %}
+                 -
+                {% if not view_all %}
+                <a href="?view_all=true">View full history</a> 
+                {% else %}
+                <a href="?">View compact history</a> 
+                {% endif %}
+                {% endif %}
             </div>
         </div>
 
@@ -65,6 +83,7 @@
         task_type = '{{ task_type }}';
         task_version_url = "{% url 'revisions' task_type contest_slug task_name %}";
         revert_url = "{% url 'revert' %}";
+        view_all = {{ view_all | yesno:"true,false" }};
     </script>
 
 {% endblock %}

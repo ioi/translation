@@ -61,3 +61,7 @@
     font-size: 11px;
     color: gray;
 }
+
+.notification {
+    cursor: pointer;
+}

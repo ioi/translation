@@ -186,6 +186,24 @@ div.CodeMirror {
     opacity: .95 !important;
 }
 
+.revisions .circle {
+    width: 8px;
+    height: 8px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background: #dad;
+    display: inline-block;
+}
+
+.revisions .circle.saved {
+    background: #dad;
+}
+
+.revisions .circle.autosaved {
+    background: #aaa;
+}
+
 #left_rtl_plain_text_box .editor-content {
     font-family: IRANSans, Tahoma, Arial;
     font-size: 90%;

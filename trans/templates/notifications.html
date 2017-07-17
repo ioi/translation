@@ -13,15 +13,14 @@
                     <th>Time</th>
                     <th>Title</th>
                     <th>Description</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for notif in notifications %}
-                <tr style="{% if not notif.read %}border-left: solid 5px #ccc; cursor: pointer;{% endif %}" onclick="readNotification({{ notif.id }}, true)">
-                    <td width="20%">{{notif.create_time | ioi_timezone}}</td>
+                <tr class="notification {% if not notif.read %}active{% endif %}" {% if not notif.read %} onclick="readNotification({{ notif.id }}, true)"{% endif %}>
+                    <td width="20%">{{notif.create_time | ioi_timezone | safe}}</td>
                     <td width="20%">{{notif.title}}</td>
-                    <td width="60%">{{notif.description}}</td>
+                    <td>{{notif.description}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -108,8 +108,8 @@ function onIscMarkdownClick(){
     switchTab('isc-markdown');
 }
 
-function autoSave() {
-    saveVersion(true);
+function autoSave(callback=null) {
+    saveVersion(true, callback);
 }
 
 function saveAndGo(url) {
@@ -189,7 +189,6 @@ function getEditTranslateAccess(callback) {
 function releaseToken() {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
-        async: false,
         url: finish_translation_url,
         data: {
             id: task_id,
@@ -225,8 +224,7 @@ function checkIfCanChange(){
 }
 
 window.onbeforeunload = function(){
-    autoSave();
-    releaseToken();
+    autoSave(releaseToken);
 };
 
 

@@ -244,6 +244,10 @@ code, pre {
     font-family: CustomTextFont, IRANSans, Tahoma, Arial;
 }
 
+.rendered_content[dir="rtl"] th {
+    text-align: start;
+}
+
 /* Default text fonts per language */
 
 .rendered_content[lang="ja"] {

@@ -2,6 +2,7 @@
 // Initilize Makrded.js Renderer
 
 var renderer = new marked.Renderer();
+var original_table_renderer = renderer.table;
 var IMAGES_URL;
 
 
@@ -25,6 +26,19 @@ renderer.image = function(href, title, text) {
 renderer.code = function(code, language) {
     return ('<pre><code>' + code + '</code></pre>');
 };
+
+// render ltr tables (started with %ltr%)
+renderer.table = function(header, body) {
+    var html = '';
+    if (header.search('%ltr%') < 0) {
+        html = original_table_renderer(header, body);
+    }
+    else {
+        header = header.replace('%ltr%', '');
+        html = '<div dir="ltr">' + original_table_renderer(header, body) + '</div>';
+    }
+    return html;
+}
 
 // global options
 marked.setOptions({

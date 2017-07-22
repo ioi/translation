@@ -34,7 +34,7 @@
                                     {% if task_type != 'released' %}
                                     <div title="{{version.saved | yesno:"Saved,Auto-Saved"}}" class="circle {{version.saved | yesno:"saved,autosaved"}}"></div>
                                     {% else %}
-                                    r{{ forloop.revcounter }}
+                                    {{ forloop.revcounter }}.
                                     {% endif %}
                                 </td>
                                 <td style="white-space: nowrap">

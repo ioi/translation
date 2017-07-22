@@ -9,13 +9,13 @@ from trans.models import User, Task, Translation, Version, Contest, FlatPage
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
 
-import os, re
+import os
 
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
-    pdf_response, get_requested_user, add_info_line_to_pdf
+    pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
 
 
 class Home(LoginRequiredMixin, View):
@@ -111,58 +111,33 @@ class TranslationMarkdown(LoginRequiredMixin, View):
 
 
 class TranslationHTML(LoginRequiredMixin, View):
-    def get(self, request, contest_slug, task_name, task_type, pdf_output=False):
+    def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        requested_user = get_requested_user(request, task_type)
-        try:
-            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
-        except Exception as e:
-            return HttpResponseBadRequest(e)
-
-        if task_type == 'released':
-            trans = task.get_base_translation()
-            content = task.get_published_text()
-        else:
-            trans = get_trans_by_user_and_task(requested_user, task)
-            content = trans.get_latest_text()
-
-        # TODO check if it's available
-        context = {
-            'content': content,
-            'contest': task.contest.title,
-            'task_name': task.name,
-            'country': requested_user.country.code,
-            'language': requested_user.language.name,
-            'language_code': requested_user.language.code,
-            'direction': requested_user.language.direction(),
-            'username': requested_user.username,
-            'pdf_output': pdf_output,
-        }
-        response = render(request, 'pdf-template.html', context=context)
-        response['edit_time'] = trans.get_latest_version().create_time.timestamp()
-        return response
+        return HttpResponse(render_pdf_template(
+            request, user, contest_slug, task_name, task_type,
+            static_path='/static',
+            images_path=settings.HOST_URL + 'media/images/',
+            pdf_output=False
+        ))
 
 
 class TranslationPDF(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
+        user = User.objects.get(username=request.user)
         requested_user = get_requested_user(request, task_type)
         file_path = '{}/output/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
         file_name = '{}-{}.pdf'.format(task_name, requested_user.username)
         pdf_file_path = '{}/{}'.format(file_path, file_name)
 
-        html_response = TranslationHTML().get(request, contest_slug, task_name, task_type, pdf_output=True)
-        if not 'edit_time' in html_response:
-            return html_response
-
-        last_edit_time = float(html_response['edit_time'])
-        rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
-
-        if rebuild_needed or 'refresh' in request.GET:
-            os.makedirs(file_path, exist_ok=True)
-            html = html_response.content.decode("utf-8")
-            html = re.sub(r'(href|src)="/', r'\1="{}://{}/'.format(request.scheme, request.get_host()), html)
-            convert_html_to_pdf(html, pdf_file_path)
-            add_page_numbers_to_pdf(pdf_file_path, task_name)
+        html = render_pdf_template(
+            request, user, contest_slug, task_name, task_type,
+            static_path=settings.STATIC_ROOT,
+            images_path=settings.MEDIA_ROOT + 'images/',
+            pdf_output=True
+        )
+        os.makedirs(file_path, exist_ok=True)
+        convert_html_to_pdf(html, pdf_file_path)
+        add_page_numbers_to_pdf(pdf_file_path, task_name)
 
         return pdf_response(pdf_file_path, file_name)
 

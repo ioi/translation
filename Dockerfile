@@ -1,22 +1,26 @@
-FROM python:3.4
+FROM ubuntu:xenial-20170710
 
-RUN apt-get update && apt-get install -qy libfontconfig wget
-RUN apt-get install -qy wkhtmltopdf xvfb pdftk
+RUN apt-get -yq update && \
+    apt-get -yq install apt-transport-https
 
-#WORKDIR /tmp
-#RUN wget https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-#    tar xJf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-#    cp -r wkhtmltox/* /usr/local/
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+RUN apt-get -yq install python3 python3-pip libfontconfig wkhtmltopdf xvfb \
+        libpq-dev ttf-mscorefonts-installer fonts-takao-pgothic && \
+    pip3 install -U pip
 
-RUN mkdir -p /usr/src/app/
+COPY binaries/cpdf /usr/bin/
+RUN chmod +x /usr/bin/cpdf
 
-WORKDIR /usr/src/app/
+COPY trans/static/fonts/IRANSans/ttf/* /usr/share/fonts/
+COPY trans/static/fonts/SourceSansPro/ttf/* /usr/share/fonts/
 
-COPY requirements.txt /usr/src/app/
-RUN pip install -U pip
-RUN pip install -r requirements.txt
+COPY requirements.txt /root/requirements.txt
+RUN pip3 install -r /root/requirements.txt
 
-#COPY . /usr/src/app
-#COPY ./IOI_Translate/production_settings.py /usr/src/app/IOI_Translate/settings.py
+COPY docker-entrypoint.sh /root/docker-entrypoint.sh
+RUN chmod +x /root/docker-entrypoint.sh
 
-CMD ["./docker-entrypoint.sh"]
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+
+ENTRYPOINT ["/root/docker-entrypoint.sh"]

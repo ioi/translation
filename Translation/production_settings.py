@@ -25,7 +25,7 @@ SECRET_KEY = 'jq5w*u%s@o&b5gf59qmuby*y1$xrm5cpcw5kbxb86vu@z^1gm9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['trans.ioi2017.org']
+ALLOWED_HOSTS = ['*']
 
 WKHTMLTOPDF_CMD = 'xvfb-run wkhtmltopdf'
 
@@ -79,7 +79,12 @@ WSGI_APPLICATION = 'Translation.wsgi.application'
 # WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 WKHTMLTOPDF_CMD_OPTIONS = {
-'quiet':True,
+    'page-size': 'A4',
+    'margin-left': '0.75in',
+    'margin-right': '0.75in',
+    'margin-top': '0.75in',
+    'margin-bottom': '1.2in',
+    'print-media-type': '',
 }
 
 # Database
@@ -184,3 +189,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 FINAL_PDF_ROOT = os.path.join(BASE_DIR, 'output_pdf/')
+HOST_URL = 'https://trans.ioi2017.org/'

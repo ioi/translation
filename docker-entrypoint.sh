@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
+while ! timeout 2 bash -c "cat < /dev/null > /dev/tcp/postgres/5432" 2> /dev/null; do
+    echo "Waiting for db..."
+    sleep 1
+done
+
 cd /usr/src/app
 
+cf-cache
+
 echo "Collecting staticfiles"
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
 
 echo "Migrating Models"
-python manage.py migrate
+python3 manage.py migrate
 
 echo "Starting Gunicorn"
-/usr/local/bin/gunicorn Translation.wsgi:application -w 1 -b :8000
+exec /usr/local/bin/gunicorn Translation.wsgi:application -w 1 -b :8000

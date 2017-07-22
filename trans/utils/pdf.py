@@ -1,8 +1,45 @@
-from django.conf import settings
 import os
 from uuid import uuid4
 
-from django.http import HttpResponse, JsonResponse
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+import pdfkit
+from xvfbwrapper import Xvfb
+
+from trans.utils.translation import get_requested_user, \
+    get_task_by_contest_and_name, get_trans_by_user_and_task
+
+
+def render_pdf_template(request, user, contest_slug, task_name, task_type,
+                        static_path, images_path, pdf_output):
+    requested_user = get_requested_user(request, task_type)
+    task = get_task_by_contest_and_name(contest_slug, task_name,
+                                        user.is_editor())
+
+    if task_type == 'released':
+        content = task.get_published_text()
+    else:
+        trans = get_trans_by_user_and_task(requested_user, task)
+        content = trans.get_latest_text()
+
+    context = {
+        'content': content,
+        'contest': task.contest.title,
+        'task_name': task.name,
+        'country': requested_user.country.code,
+        'language': requested_user.language.name,
+        'language_code': requested_user.language.code,
+        'direction': requested_user.language.direction(),
+        'username': requested_user.username,
+        'pdf_output': pdf_output,
+        'static_path': static_path,
+        'images_path': images_path,
+        'text_font_base64': requested_user.text_font_base64
+    }
+    return render_to_string('pdf-template.html', context=context,
+                            request=request)
 
 
 def unreleased_pdf_path(pdf_name):
@@ -29,20 +66,13 @@ def convert_html_to_pdf(html, pdf_file_path):
     html_file_path = '/tmp/{}.html'.format(str(uuid4()))
     with open(html_file_path, 'w') as f:
         f.write(html)
-    cmd = settings.WKHTMLTOPDF_CMD
-    cmd_options = ['--{} {}'.format(a, b) for a, b in settings.WKHTMLTOPDF_CMD_OPTIONS.items()]
-    cmd = '{} {} --load-error-handling ignore {} {}'.format(cmd, ' '.join(cmd_options), html_file_path, pdf_file_path)
-    # print(cmd)
-    os.system(cmd)
+    with Xvfb():
+        pdfkit.from_file(html_file_path, pdf_file_path, options=settings.WKHTMLTOPDF_CMD_OPTIONS)
     os.remove(html_file_path)
-
-    # fix corrupted pdf file
-    cmd = 'pdftk {0} output {0}'.format(pdf_file_path)
-    os.system(cmd)
 
 
 def add_page_numbers_to_pdf(pdf_file_path, task_name):
-    cmd = ('cpdf -add-text "{0} (%Page of %EndPage)" -font "Arial" ' + \
+    cmd = ('cpdf -add-text "{0} (%Page of %EndPage)" -font "Arial" ' +
           '-font-size 10 -bottomright .75in {1} -o {1}').format(task_name.capitalize(), pdf_file_path)
     os.system(cmd)
 

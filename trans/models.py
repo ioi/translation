@@ -1,13 +1,13 @@
 
 from django.db.models.signals import post_save, post_delete
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as DjangoUser
 from django.db import models
 from django.utils import timezone
 
-from trans.utils import add_notification_to_users_cache, remove_notification
+from trans.utils.notification import add_notification_to_users_cache, remove_notification
 
 
-class User(User):
+class User(DjangoUser):
     language = models.ForeignKey('Language')
     country = models.ForeignKey('Country')
     raw_password = models.CharField(max_length=255, default='')

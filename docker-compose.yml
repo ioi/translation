@@ -1,43 +1,46 @@
-web:
-  restart: always
-  build: ./
-  expose:
-    - "8000"
-  links:
-    - postgres:postgres
-    - redis:redis
-  volumes:
-    - .:/usr/src/app
-    - /usr/src/app/static
-  environment:
-    DB_USER: "$POSTGRES_USER"
-    DB_PASSWORD: "$POSTGRES_PASSWORD"
-    DB_NAME: "$POSTGRES_DB"
-    EMAIL_HOST_USER: "$EMAIL_HOST_USER"
-    EMAIL_HOST_PASSWORD: "$EMAIL_HOST_PASSWORD"
+version: '3.1'
 
-nginx:
-  restart: always
-  build: ./nginx/
-  ports:
-    - "80:80"
-  volumes:
-    - /www/static
-  volumes_from:
-    - web
-  links:
+services:
+  web:
+    restart: always
+    build: ./
+    volumes:
+    - ioi_source:/usr/src/app/
+    depends_on:
+    - postgres
+    - redis
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: ioitrans
+      EMAIL_HOST_USER: test
+      EMAIL_HOST_PASSWORD: test
+      DJANGO_SETTINGS_MODULE: Translation.production_settings
+  
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+    - 8000:80
+    links:
     - web:web
-
-postgres:
-  restart: always
-  image: postgres:9.6-alpine
-  volumes:
+    volumes:
+    - ioi_source:/usr/src/app
+  
+  postgres:
+    restart: always
+    image: postgres:9.6-alpine
+    volumes:
     - ioi_pgdata:/var/lib/postgresql/data/
-  environment:
-    POSTGRES_USER: "$POSTGRES_USER"
-    POSTGRES_PASSWORD: "$POSTGRES_PASSWORD"
-    POSTGRES_DB: "$POSTGRES_DB"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ioitrans
+  
+  redis:
+    restart: always
+    image: redis:3.2-alpine
 
-redis:
-  restart: always
-  image: redis:3.2-alpine
+volumes:
+  ioi_pgdata:
+  ioi_source:

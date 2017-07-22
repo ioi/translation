@@ -5,7 +5,8 @@ services:
     restart: always
     build: ./
     volumes:
-    - ioi_source:/usr/src/app/
+    - ioi_static:/usr/src/app/static/
+    - ioi_media:/usr/src/app/media/
     depends_on:
     - postgres
     - redis
@@ -25,7 +26,8 @@ services:
     links:
     - web:web
     volumes:
-    - ioi_source:/usr/src/app
+    - ioi_static:/usr/src/app/static/:ro
+    - ioi_media:/usr/src/app/media/:ro
   
   postgres:
     restart: always
@@ -43,4 +45,5 @@ services:
 
 volumes:
   ioi_pgdata:
-  ioi_source:
+  ioi_static:
+  ioi_media:

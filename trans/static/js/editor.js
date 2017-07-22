@@ -108,12 +108,12 @@ function onIscMarkdownClick(){
     switchTab('isc-markdown');
 }
 
-function autoSave(callback=null) {
-    saveVersion(true, callback);
+function autoSave(on_unleash=false, callback=null) {
+    saveVersion(true, on_unleash, callback);
 }
 
 function saveAndGo(url) {
-    saveVersion(true, function() {
+    saveVersion(true, false, function() {
         window.location.href = url;
     });
 }
@@ -125,7 +125,7 @@ function setEditToken(edit_token){
 }
 
 
-function saveVersion(autosave=false, callback=null) {
+function saveVersion(autosave=false, on_unleash=false, callback=null) {
     current_trans_text = currentTranslationText();
     if (autosave && last_autosaved_text == current_trans_text) {
         if (callback)
@@ -134,6 +134,7 @@ function saveVersion(autosave=false, callback=null) {
     }
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
+        async: !on_unleash,
         url: save_task_url,
         data: {
             content: currentTranslationText(),
@@ -189,6 +190,7 @@ function getEditTranslateAccess(callback) {
 function releaseToken() {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
+        async: false,
         url: finish_translation_url,
         data: {
             id: task_id,
@@ -224,7 +226,7 @@ function checkIfCanChange(){
 }
 
 window.onbeforeunload = function(){
-    autoSave(releaseToken);
+    autoSave(true, releaseToken);
 };
 
 

@@ -134,6 +134,7 @@ function saveVersion(autosave=false, callback=null) {
     }
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
+        async: false,
         url: save_task_url,
         data: {
             content: currentTranslationText(),
@@ -189,6 +190,7 @@ function getEditTranslateAccess(callback) {
 function releaseToken() {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
     $.ajax({
+        async: false,
         url: finish_translation_url,
         data: {
             id: task_id,

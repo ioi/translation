@@ -31,7 +31,7 @@ def convert_html_to_pdf(html, pdf_file_path):
         f.write(html)
     cmd = settings.WKHTMLTOPDF_CMD
     cmd_options = ['--{} {}'.format(a, b) for a, b in settings.WKHTMLTOPDF_CMD_OPTIONS.items()]
-    cmd = '{} {} --load-error-handling ignore {} {}'.format(cmd, ' '.join(cmd_options), html_file_path, pdf_file_path)
+    cmd = '{} {} {} {}'.format(cmd, ' '.join(cmd_options), html_file_path, pdf_file_path)
     # print(cmd)
     os.system(cmd)
     os.remove(html_file_path)

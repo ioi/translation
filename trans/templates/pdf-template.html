@@ -56,8 +56,8 @@
         
 </script>
 
-{% if pdf_output %}
 <style>
+    {% if pdf_output %}
     @media print {
         body {
             zoom: 1.2;
@@ -65,14 +65,15 @@
         .header .logo img {
             margin-top: 1px;
         }
-        {% if text_font_base64 %}
-            @font-face {
-                font-family: 'CustomTextFont';
-                src: url(data:font/truetype;charset=utf-8;base64,{{ text_font_base64 }})
-            }
-        {% endif %}
+        
     }
+    {% endif %}
+    {% if text_font_base64 %}
+        @font-face {
+            font-family: 'CustomTextFont';
+            src: url(data:font/truetype;charset=utf-8;base64,{{ text_font_base64 }})
+        }
+    {% endif %}
 </style>
-{% endif %}
 
 </html>

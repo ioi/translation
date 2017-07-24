@@ -1,5 +1,6 @@
 import os
 from uuid import uuid4
+import logging
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -7,6 +8,8 @@ from django.template.loader import render_to_string
 
 import pdfkit
 from xvfbwrapper import Xvfb
+
+logger = logging.getLogger(__name__)
 
 from trans.utils.translation import get_requested_user, \
     get_task_by_contest_and_name, get_trans_by_user_and_task
@@ -63,12 +66,15 @@ def pdf_response(pdf_file_path, file_name):
 
 
 def convert_html_to_pdf(html, pdf_file_path):
-    html_file_path = '/tmp/{}.html'.format(str(uuid4()))
-    with open(html_file_path, 'wb') as f:
-        f.write(html.encode('utf-8'))
-    with Xvfb():
-        pdfkit.from_file(html_file_path, pdf_file_path, options=settings.WKHTMLTOPDF_CMD_OPTIONS)
-    os.remove(html_file_path)
+    try:
+        html_file_path = '/tmp/{}.html'.format(str(uuid4()))
+        with open(html_file_path, 'wb') as f:
+            f.write(html.encode('utf-8'))
+        with Xvfb():
+            pdfkit.from_file(html_file_path, pdf_file_path, options=settings.WKHTMLTOPDF_CMD_OPTIONS)
+        os.remove(html_file_path)
+    except Exception as e:
+        logger.error(e)
 
 
 def add_page_numbers_to_pdf(pdf_file_path, task_name):

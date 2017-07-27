@@ -97,6 +97,9 @@ class Translation(models.Model):
     def get_latest_version(self):
         return self.version_set.order_by('-create_time').first()
 
+    def get_published_versions_count(self):
+        return self.version_set.filter(released=True).count()
+
     def get_latest_text(self):
         latest_version = self.get_latest_version()
         return latest_version.text if latest_version else ''

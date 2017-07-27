@@ -159,14 +159,19 @@ class TranslationPrint(LoginRequiredMixin, View):
             return JsonResponse({'success': False})
 
         pdf_file_path = pdf_response['pdf_file_path']
-        info_line = '{} ({})'.format(user.country.name, user.country.code)
+        if translation.user.username == 'ISC':
+            info_line = 'Release {}, For {}'.format(translation.get_published_versions_count(), user.country.code)
+        else:
+            info_line = 'Saved at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
 
-        send_pdf_to_printer(pdf_file_path)
+        send_pdf_to_printer(output_pdf_path)
         if translation.user == user and user.username != 'ISC':
+            translation.add_version()
             last_version = translation.get_latest_version()
             if last_version.release_note == '':
                 last_version.release_note = 'Printed'
+                last_version.saved = True
                 last_version.save()
         os.remove(output_pdf_path)
 

@@ -125,8 +125,8 @@ class FreezeTranslation(StaffCheckMixin, View):
             source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, user)
             target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
             copyfile(source_pdf_file_path, target_pdf_file_path)
-            with open(final_markdown_path(contest_slug, task_name, user), 'w') as f:
-                f.write(trans.get_latest_text())
+            with open(final_markdown_path(contest_slug, task_name, user), 'wb') as f:
+                f.write(trans.get_latest_text().encode('utf-8'))
                 f.close()
         trans.frozen = (frozen == 'True')
         trans.save()

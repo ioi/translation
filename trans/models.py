@@ -107,7 +107,7 @@ class Translation(models.Model):
 
     def get_latest_change_time(self):
         latest_version = self.get_latest_version()
-        return latest_version.create_time if latest_version else None
+        return latest_version.create_time.timestamp() if latest_version else None
 
     def is_editable_by(self, user):
         contest = self.task.contest

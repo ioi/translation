@@ -136,15 +136,17 @@ class TranslationPDF(LoginRequiredMixin, View):
             return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
         pdf_file_path = unreleased_pdf_path(contest_slug, task_name, requested_user)
-
-        html = render_pdf_template(
-            request, user, contest_slug, task_name, task_type,
-            static_path=settings.STATIC_ROOT,
-            images_path=settings.MEDIA_ROOT + 'images/',
-            pdf_output=True
-        )
-        convert_html_to_pdf(html, pdf_file_path)
-        add_page_numbers_to_pdf(pdf_file_path, task_name)
+        last_edit_time = translation.get_latest_change_time()
+        rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
+        if rebuild_needed:
+            html = render_pdf_template(
+                request, user, contest_slug, task_name, task_type,
+                static_path=settings.STATIC_ROOT,
+                images_path=settings.MEDIA_ROOT + 'images/',
+                pdf_output=True
+            )
+            convert_html_to_pdf(html, pdf_file_path)
+            add_page_numbers_to_pdf(pdf_file_path, task_name)
 
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
@@ -162,7 +164,6 @@ class TranslationPrint(LoginRequiredMixin, View):
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
 
         send_pdf_to_printer(pdf_file_path)
-
         os.remove(output_pdf_path)
 
         return JsonResponse({'success': True})

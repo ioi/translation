@@ -4,91 +4,136 @@
 
 {% block content %}
 
-    <div class="container">
-        <div class="col-md-12 col-lg-10 col-lg-offset-1">
-            <h1>{{ country }} ({{ user_name }})</h1>
+<div class="container">
+    <div class="col-md-12 col-lg-10 col-lg-offset-1">
+        <h1>{{ country }} ({{ user_name }})</h1>
 
-            
-            {% for contest in tasks_lists %}
-            <h2>{{ contest.title }}</h2>
-            {% if contest.user_contest %}
-                <h3>This contest has been frozen for this user</h3>
-                {% if contest.user_contest.note %}
-                <h4>Note:</h4>
-                <p>
-                    {{contest.user_contest.note}}
-                </p>
+
+        {% for contest in tasks_lists %}
+        <h2>{{ contest.title }}</h2>
+        {% if contest.user_contest %}
+        <h3>This contest has been frozen for this user</h3>
+        {% if contest.user_contest.note %}
+        <h4>Note:</h4>
+        <p>
+            {{contest.user_contest.note}}
+        </p>
+        {% endif %}
+        <form method="post" onsubmit="return confirm('Are you sure?');"
+              action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-default btn-danger ">
+                UnFreeze
+            </button>
+        </form>
+        {% else %}
+        <h3>Freeze the contest for user {{user_name}}</h3>
+        <form method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
+            {% csrf_token %}
+            <label>Note</label>
+            <textarea name="note"></textarea>
+            <br>
+            <button type="submit" class="btn btn-default ">
+                Freeze
+            </button>
+        </form>
+        {% endif %}
+        <h3></h3>
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th width="20%">Task</th>
+                <th width="20%">Status</th>
+                <th>Translation</th>
+                <th width="15%">Delivered</th>
+                <th width="15%">Unleash Lock</th>
+                {% if can_upload_final_pdf and contest.user_contest.frozen %}
+                    <th>Upload Final Translation</th>
                 {% endif %}
-                    <form method="post" onsubmit="return confirm('Are you sure?');" action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-default btn-danger ">
-                            UnFreeze
-                        </button>
-                    </form>
-            {% else %}
-                <h3>Freeze the contest for user {{user_name}}</h3>
-                    <form method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
-                        {% csrf_token %}
-                        <label>Note</label>
-                        <textarea name="note"></textarea>
-                        <br>
-                        <button type="submit" class="btn btn-default ">
-                            Freeze
-                        </button>
-                    </form>
-            {% endif %}
-            <h3></h3>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th width="20%">Task</th>
-                        <th width="20%">Status</th>
-                        <th>Translation</th>
-                        <th width="20%">Freeze</th>
-                        <th width="15%">Unleash Lock</th>
-                    </tr>
-                </thead>                
-                <tbody>
-                {% for task in contest.tasks %}
-                    <tr>
-                        <td> {{ task.name | capfirst }} </td>
-                        <td>
-                            {% if task.is_editing %} Is editing
-                            {% elif task.frozen %} Frozen
-                            {% elif task.trans_id == None %} Not started
-                            {% else %} Started {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
-                            <a href="{% url 'task_pdf' 'task' contest.slug task.name %}?user={{user_name}}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-                            <!-- <button onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button> -->
-                        </td>
-                        <td>
-                            {% if task.trans_id %}
-                                <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}" />
-                                    <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}">
-                                        {% if task.frozen %} Reopen {% else %} Deliver it {% endif %}
-                                    </button>
-                                </form>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if task.is_editing %}
-                                <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-info"> Unleash </button>
-                                </form>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            </tr>
+            </thead>
+            <tbody>
+            {% for task in contest.tasks %}
+            <tr>
+                <td> {{ task.name | capfirst }}</td>
+                <td>
+                    {% if task.is_editing %} Is editing
+                    {% elif task.frozen %} Delivered
+                    {% elif task.trans_id == None %} Not started
+                    {% else %} Started {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}"
+                       class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
+                    <a href="{% url 'task_pdf' 'task' contest.slug task.name %}?user={{user_name}}"
+                       class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                </td>
+                <td>
+                    {% if task.trans_id %}
+                        {% if task.frozen and can_upload_final_pdf or not contest.user_contest.frozen%}
+                            <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
+                                <button type="submit"
+                                        class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}" onclick="return confirm('Are you sure?');">
+                                    {% if task.frozen %} Reopen {% else %} Deliver it {% endif %}
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if task.is_editing %}
+                        <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info"> Unleash </button>
+                        </form>
+                    {% endif %}
+                </td>
+                {% if can_upload_final_pdf and contest.user_contest.frozen %}
+                    <td>
+                        {% if not task.frozen %}
+                            <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Add Final Translation</a>
+                        {% endif %}
+                    </td>
+                {% endif %}
+
+            </tr>
             {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="modal fade" id="addTransPDF" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Upload Final Translated Task</h4>
+            </div>
+            <div>
+                <form class="form" id="uploadPdfId" action="{% url 'upload_final_pdf'%}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        {{ form }}
+                        <input type="hidden" name="trans_id" id="input_trans_id" value="">
+                        <button type="submit">Upload Final Pdf</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+</div>
+
+<script>
+    $(document).on("click", ".open-UploadTaskPDF", function () {
+         var myTransId = $(this).data('id');
+         $("#input_trans_id").attr('value', myTransId );
+    });
+</script>
+
 
 {% endblock %}
 

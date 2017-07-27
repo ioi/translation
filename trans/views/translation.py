@@ -105,7 +105,7 @@ class TranslationMarkdown(LoginRequiredMixin, View):
             except Exception as e:
                 return HttpResponseBadRequest(e)
             if task_type == 'released':
-                content = task.get_published_text
+                content = task.get_published_text()
             else:
                 translation = get_trans_by_user_and_task(requested_user, task)
                 content = translation.get_latest_text()

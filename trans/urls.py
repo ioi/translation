@@ -40,6 +40,7 @@ urlpatterns = [
 
           url(r'^users/$', UsersList.as_view(), name='users_list'),
           url(r'^user/(?P<username>[\w-]*)/$', UserTranslations.as_view(), name='user_trans'),
+          url(r'^upload_final_pdf/$', AddFinalPDF.as_view(), name='upload_final_pdf'),
           url(r'^freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
           url(r'^freeze_user_contest/(?P<username>[\w]*)/(?P<contest_id>[\w]*)/$', FreezeUserContest.as_view(),
               name='freeze_user_contest'),

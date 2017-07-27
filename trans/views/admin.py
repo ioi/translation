@@ -1,6 +1,8 @@
 from collections import defaultdict
 
 import os
+from django.contrib.auth.decorators import permission_required
+from django.http.response import HttpResponseBadRequest
 from shutil import copyfile
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,10 +11,12 @@ from django.urls.base import reverse
 from django.views.generic import View
 
 from django.http import HttpResponseNotFound
+from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest
 from trans.utils import is_translate_in_editing, unleash_edit_token, unreleased_pdf_path, final_pdf_path
 from trans.utils.pdf import final_markdown_path
+from trans.utils.translation import get_trans_by_user_and_task
 from trans.views.translation import TranslationPDF
 
 
@@ -102,8 +106,11 @@ class UserTranslations(StaffCheckMixin, View):
                         'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
+        can_upload_final_pdf = request.user.has_perm('trans.change_translation')
+        form = UploadFileForm()
         return render(request, 'user.html', context={'user_name': username, 'country': user.country.name,
-                                                     'tasks_lists': tasks_lists, 'language': user.credentials()})
+                                                     'tasks_lists': tasks_lists, 'language': user.credentials(),
+                                                     'can_upload_final_pdf': can_upload_final_pdf, 'form': form})
 
 
 class UsersList(StaffCheckMixin, View):
@@ -119,6 +126,28 @@ class UsersList(StaffCheckMixin, View):
             user['frozen_note'] = user_notes[user['username']]
             returned_users.append(user)
         return render(request, 'users.html', context={'users': returned_users})
+
+
+class AddFinalPDF(StaffCheckMixin, View):
+    # @permission_required('trans.change_translation')
+    def post(self, request):
+        id = request.POST['trans_id']
+        trans = Translation.objects.filter(id=id).first()
+        form = UploadFileForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return HttpResponseBadRequest("You should attach a file")
+
+        pdf_file = request.FILES.get('uploaded_file', None)
+        if not pdf_file or pdf_file.name.split('.')[-1] != 'pdf':
+            return HttpResponseBadRequest("You should attach a pdf file")
+        pdf_file_path = final_pdf_path(trans.task.contest.slug, trans.task.name, trans.user)
+        with open(pdf_file_path, 'wb') as f:
+            for chunk in pdf_file.chunks():
+                f.write(chunk)
+
+        trans.frozen = True
+        trans.save()
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 class FreezeTranslation(StaffCheckMixin, View):
@@ -140,8 +169,10 @@ class FreezeTranslation(StaffCheckMixin, View):
                 f.write(trans.get_latest_text().encode('utf-8'))
                 f.close()
         else:
-            os.remove(final_pdf_path(contest_slug, task_name, user))
-            os.remove(final_markdown_path(contest_slug, task_name, user))
+            if os.path.exists(final_pdf_path(contest_slug, task_name, user)):
+                os.remove(final_pdf_path(contest_slug, task_name, user))
+            if os.path.exists(final_markdown_path(contest_slug, task_name, user)):
+                os.remove(final_markdown_path(contest_slug, task_name, user))
         trans.frozen = (frozen == 'True')
         trans.save()
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
@@ -158,6 +189,8 @@ class FreezeUserContest(StaffCheckMixin, View):
         user_contest.frozen = True
         user_contest.note = note
         user_contest.save()
+        for task in contest.task_set.all():
+            get_trans_by_user_and_task(user, task)
         return redirect(to=reverse('user_trans', kwargs={'username': username}))
 
 

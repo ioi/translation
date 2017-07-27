@@ -64,8 +64,20 @@ def unreleased_pdf_path(contest_slug, task_name, user):
 
 
 def final_pdf_path(contest_slug, task_name, user):
-    file_path = '{}/final/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+    file_path = '{}/final/pdf/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+    if user.username == 'ISC':
+        file_path = '{}/final/pdf/{}'.format(settings.MEDIA_ROOT, contest_slug)
     file_name = '{}-{}.pdf'.format(task_name, user.username)
+    pdf_file_path = '{}/{}'.format(file_path, file_name)
+    os.makedirs(file_path, exist_ok=True)
+    return pdf_file_path
+
+
+def final_markdown_path(contest_slug, task_name, user):
+    file_path = '{}/final/markdown/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+    if user.username == 'ISC':
+        file_path = '{}/final/markdown/{}'.format(settings.MEDIA_ROOT, contest_slug)
+    file_name = '{}-{}.md'.format(task_name, user.username)
     pdf_file_path = '{}/{}'.format(file_path, file_name)
     os.makedirs(file_path, exist_ok=True)
     return pdf_file_path

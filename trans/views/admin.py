@@ -116,11 +116,11 @@ class FreezeTranslation(StaffCheckMixin, View):
         trans = Translation.objects.filter(id=id).first()
         if trans is None:
             return HttpResponseNotFound("There is no task")
+        user = trans.user
+        task_type = 'released' if user.username == 'ISC' else 'task'
+        contest_slug = trans.task.contest.slug
+        task_name = trans.task.name
         if frozen == 'True':
-            user = trans.user
-            task_type = 'released' if user.username == 'ISC' else 'task'
-            contest_slug = trans.task.contest.slug
-            task_name = trans.task.name
             pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
             source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, user)
             target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
@@ -128,6 +128,9 @@ class FreezeTranslation(StaffCheckMixin, View):
             with open(final_markdown_path(contest_slug, task_name, user), 'wb') as f:
                 f.write(trans.get_latest_text().encode('utf-8'))
                 f.close()
+        else:
+            os.remove(final_pdf_path(contest_slug, task_name, user))
+            os.remove(final_markdown_path(contest_slug, task_name, user))
         trans.frozen = (frozen == 'True')
         trans.save()
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))

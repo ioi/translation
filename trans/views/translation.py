@@ -20,7 +20,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
 from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page, unreleased_pdf_path, \
-    get_file_name_from_path
+    get_file_name_from_path, get_translation_by_contest_and_task_type, final_pdf_path
 
 
 class Home(LoginRequiredMixin, View):
@@ -129,7 +129,12 @@ class TranslationHTML(LoginRequiredMixin, View):
 class TranslationPDF(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
+        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         requested_user = get_requested_user(request, task_type)
+        if translation.frozen:
+            pdf_file_path = final_pdf_path(contest_slug, task_name, requested_user)
+            return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
+
         pdf_file_path = unreleased_pdf_path(contest_slug, task_name, requested_user)
 
         html = render_pdf_template(

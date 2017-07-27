@@ -16,6 +16,15 @@ from trans.utils.translation import get_requested_user, \
     get_task_by_contest_and_name, get_trans_by_user_and_task
 
 
+def get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type):
+    requested_user = get_requested_user(request, task_type)
+    task = get_task_by_contest_and_name(contest_slug, task_name,
+                                        user.is_editor())
+
+    if task_type == 'released':
+        return task.get_base_translation()
+    return get_trans_by_user_and_task(requested_user, task)
+
 def render_pdf_template(request, user, contest_slug, task_name, task_type,
                         static_path, images_path, pdf_output):
     requested_user = get_requested_user(request, task_type)

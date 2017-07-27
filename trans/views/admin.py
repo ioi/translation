@@ -120,7 +120,7 @@ class FreezeTranslation(StaffCheckMixin, View):
             task_type = 'released' if user.username == 'ISC' else 'task'
             contest_slug = trans.task.contest.slug
             task_name = trans.task.name
-            pdf_response = TranslationPDF().get(request, trans.task.slug, trans.task.name, task_type)
+            pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
             source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, user)
             target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
             copyfile(source_pdf_file_path, target_pdf_file_path)

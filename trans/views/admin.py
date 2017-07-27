@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import os
 from shutil import copyfile
 
@@ -106,8 +108,17 @@ class UserTranslations(StaffCheckMixin, View):
 
 class UsersList(StaffCheckMixin, View):
     def get(self, request):
-        users = (User.get_translators() | User.objects.filter(username='ISC')).distinct()
-        return render(request, 'users.html', context={'users': users})
+        users = (User.get_translators() | User.objects.filter(username='ISC')).\
+            distinct().values('country', 'language', 'username')
+        returned_users = []
+        user_contest_notes = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'note')
+        user_notes = defaultdict(str)
+        for user_name, note in user_contest_notes:
+            user_notes[user_name] += note
+        for user in users:
+            user['frozen_note'] = user_notes[user['username']]
+            returned_users.append(user)
+        return render(request, 'users.html', context={'users': returned_users})
 
 
 class FreezeTranslation(StaffCheckMixin, View):

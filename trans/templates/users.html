@@ -15,6 +15,7 @@
                         <th width="30%">Translations</th>
                         <th>Country</th>
                         <th>Language</th>
+                        <th>Frozen Note</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,6 +25,7 @@
                         <td><a href="{% url 'user_trans' username=user.username %}">Translations</a></td>
                         <td>{{user.country}}</td>
                         <td>{{user.language}}</td>
+                        <td>{{user.frozen_note}}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

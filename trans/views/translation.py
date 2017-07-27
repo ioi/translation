@@ -167,11 +167,7 @@ class TranslationPrint(LoginRequiredMixin, View):
 
         send_pdf_to_printer(output_pdf_path)
         if translation.user == user and user.username != 'ISC':
-            last_version = translation.get_latest_version()
-            if last_version.release_note == '':
-                last_version.release_note = 'Printed'
-                last_version.saved = True
-                last_version.save()
+            translation.save_last_version(release_note='Printed', saved=True)
         os.remove(output_pdf_path)
 
         return JsonResponse({'success': True})

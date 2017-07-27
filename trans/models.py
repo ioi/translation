@@ -94,6 +94,13 @@ class Translation(models.Model):
             return query.update(create_time=timezone.now(), saved=(saved or latest_version.saved))
         return Version.objects.create(translation=self, text=text, release_note=release_note, saved=saved)
 
+    def save_last_version(self, release_note='', saved=True):
+        latest_version = self.get_latest_version()
+        latest_version.create_time = timezone.now()
+        latest_version.release_note = release_note
+        latest_version.saved = saved
+        latest_version.save()
+
     def get_latest_version(self):
         return self.version_set.order_by('-create_time').first()
 

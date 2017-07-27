@@ -1,3 +1,6 @@
+import os
+from shutil import copyfile
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls.base import reverse
@@ -5,8 +8,9 @@ from django.views.generic import View
 
 from django.http import HttpResponseNotFound
 
-from trans.models import User, Task, Translation, Contest
+from trans.models import User, Task, Translation, Contest, UserContest
 from trans.utils import is_translate_in_editing, unleash_edit_token, unreleased_pdf_path, final_pdf_path
+from trans.views.translation import TranslationPDF
 
 
 class AdminCheckMixin(LoginRequiredMixin,object):
@@ -90,7 +94,9 @@ class UserTranslations(StaffCheckMixin, View):
             tasks_by_contest[task.contest].append(
                 {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
                  'frozen': frozen})
-        tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
+        tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
+                        'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+                        'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
         return render(request, 'user.html', context={'user_name': username, 'country': user.country.name,
@@ -99,7 +105,7 @@ class UserTranslations(StaffCheckMixin, View):
 
 class UsersList(StaffCheckMixin, View):
     def get(self, request):
-        users = User.get_translators()
+        users = (User.get_translators() | User.objects.filter(username='ISC')).distinct()
         return render(request, 'users.html', context={'users': users})
 
 
@@ -109,13 +115,43 @@ class FreezeTranslation(StaffCheckMixin, View):
         trans = Translation.objects.filter(id=id).first()
         if trans is None:
             return HttpResponseNotFound("There is no task")
+        if frozen == 'True':
+            user = trans.user
+            task_type = 'released' if user.username == 'ISC' else 'task'
+            contest_slug = trans.task.contest.slug
+            task_name = trans.task.name
+            pdf_response = TranslationPDF().get(request, trans.task.slug, trans.task.name, task_type)
+            source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, user)
+            target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
+            copyfile(source_pdf_file_path, target_pdf_file_path)
+
         trans.frozen = (frozen == 'True')
         trans.save()
-        if trans.frozen:
-            from shutil import copyfile
-            trans_pdf_name = "%s-%s" % (trans.task.name, trans.user.username)
-            copyfile(unreleased_pdf_path(trans_pdf_name), final_pdf_path(trans_pdf_name))
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+
+
+class FreezeUserContest(StaffCheckMixin, View):
+    def post(self, request, username, contest_id):
+        note = request.POST.get('note', '')
+        user = User.objects.get(username=username)
+        contest = Contest.objects.filter(id=contest_id).first()
+        if contest is None:
+            return HttpResponseNotFound("There is no contest")
+        user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
+        user_contest.frozen = True
+        user_contest.note = note
+        user_contest.save()
+        return redirect(to=reverse('user_trans', kwargs={'username': username}))
+
+
+class UnfreezeUserContest(StaffCheckMixin, View):
+    def post(self, request, username, contest_id):
+        user = User.objects.get(username=username)
+        contest = Contest.objects.filter(id=contest_id).first()
+        if contest is None:
+            return HttpResponseNotFound("There is no contest")
+        UserContest.objects.filter(contest=contest, user=user).delete()
+        return redirect(to=reverse('user_trans', kwargs={'username': username}))
 
 
 class UnleashEditTranslationToken(StaffCheckMixin, View):

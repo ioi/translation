@@ -11,6 +11,33 @@
             
             {% for contest in tasks_lists %}
             <h2>{{ contest.title }}</h2>
+            {% if contest.user_contest %}
+                <h3>This contest has been frozen for this user</h3>
+                {% if contest.user_contest.note %}
+                <h4>Note:</h4>
+                <p>
+                    {{contest.user_contest.note}}
+                </p>
+                {% endif %}
+                    <form method="post" onsubmit="return confirm('Are you sure?');" action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-default btn-danger ">
+                            UnFreeze
+                        </button>
+                    </form>
+            {% else %}
+                <h3>Freeze the contest for user {{user_name}}</h3>
+                    <form method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
+                        {% csrf_token %}
+                        <label>Note</label>
+                        <textarea name="note"></textarea>
+                        <br>
+                        <button type="submit" class="btn btn-default ">
+                            Freeze
+                        </button>
+                    </form>
+            {% endif %}
+            <h3></h3>
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -42,7 +69,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}" />
                                     <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}">
-                                        {% if task.frozen %} Unfreeze {% else %} Freeze {% endif %}
+                                        {% if task.frozen %} Reopen {% else %} Deliver it {% endif %}
                                     </button>
                                 </form>
                             {% endif %}

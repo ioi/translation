@@ -19,7 +19,8 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page
+from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page, unreleased_pdf_path, \
+    get_file_name_from_path, get_translation_by_contest_and_task_type, final_pdf_path
 
 
 class Home(LoginRequiredMixin, View):
@@ -34,7 +35,7 @@ class Home(LoginRequiredMixin, View):
                 continue
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
-            frozen = translation and translation.frozen or task.contest.frozen
+            frozen = translation and translation.is_editable_by(user)
             tasks_by_contest[task.contest].append(
                 {'id': task.id, 'name': task.name, 'is_editing': is_editing, 'frozen': frozen})
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
@@ -53,7 +54,7 @@ class Translations(LoginRequiredMixin, View):
         except Exception as e:
             return HttpResponseBadRequest(e)
         trans = get_trans_by_user_and_task(user, task)
-        if trans.frozen or task.contest.frozen or not (task.is_published() or user.is_editor()):
+        if trans.is_editable_by(user) or not (task.is_published() or user.is_editor()):
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text
         contests = Contest.objects.order_by('order')
@@ -76,7 +77,7 @@ class SaveTranslation(LoginRequiredMixin, View):
         content = request.POST['content']
         saved = request.POST['saved'] == 'true'
         edit_token = request.POST.get('edit_token', '')
-        if not can_user_change_translation(user, translation, edit_token) or not (
+        if translation.is_editable_by(user) or not can_user_change_translation(user, translation, edit_token) or not (
             task.is_published() or user.is_editor()):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
@@ -128,10 +129,13 @@ class TranslationHTML(LoginRequiredMixin, View):
 class TranslationPDF(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
+        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         requested_user = get_requested_user(request, task_type)
-        file_path = '{}/output/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
-        file_name = '{}-{}.pdf'.format(task_name, requested_user.username)
-        pdf_file_path = '{}/{}'.format(file_path, file_name)
+        if translation.frozen:
+            pdf_file_path = final_pdf_path(contest_slug, task_name, requested_user)
+            return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
+
+        pdf_file_path = unreleased_pdf_path(contest_slug, task_name, requested_user)
 
         html = render_pdf_template(
             request, user, contest_slug, task_name, task_type,
@@ -139,11 +143,10 @@ class TranslationPDF(LoginRequiredMixin, View):
             images_path=settings.MEDIA_ROOT + 'images/',
             pdf_output=True
         )
-        os.makedirs(file_path, exist_ok=True)
         convert_html_to_pdf(html, pdf_file_path)
         add_page_numbers_to_pdf(pdf_file_path, task_name)
 
-        return pdf_response(pdf_file_path, file_name)
+        return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
 
 class TranslationPrint(LoginRequiredMixin, View):
@@ -173,7 +176,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         if not (task.contest.public or user.is_editor):
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
-        if user != translation.user:
+        if translation.is_editable_by(user) or user != translation.user:
             return HttpResponseForbidden()
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token, 'content': translation.get_latest_text()})
@@ -199,7 +202,7 @@ class Revert(LoginRequiredMixin, View):
         content_version = Version.objects.filter(id=version_id).first()
         user = User.objects.get(username=request.user)
         translation = content_version.translation
-        if user != translation.user or translation.frozen:
+        if user != translation.user or translation.is_editable_by(user):
             return JsonResponse({'error': 'forbidden'})
         # save last unsaved version if exists
         if not translation.get_latest_version().saved:

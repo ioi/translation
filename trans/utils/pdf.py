@@ -16,6 +16,15 @@ from trans.utils.translation import get_requested_user, \
     get_task_by_contest_and_name, get_trans_by_user_and_task
 
 
+def get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type):
+    requested_user = get_requested_user(request, task_type)
+    task = get_task_by_contest_and_name(contest_slug, task_name,
+                                        user.is_editor())
+
+    if task_type == 'released':
+        return task.get_base_translation()
+    return get_trans_by_user_and_task(requested_user, task)
+
 def render_pdf_template(request, user, contest_slug, task_name, task_type,
                         static_path, images_path, pdf_output):
     requested_user = get_requested_user(request, task_type)
@@ -46,16 +55,24 @@ def render_pdf_template(request, user, contest_slug, task_name, task_type,
                             request=request)
 
 
-def unreleased_pdf_path(pdf_name):
-    if pdf_name.split('.')[-1] == 'pdf':
-        return '%s%s' % (settings.MEDIA_ROOT, pdf_name)
-    return '%s%s.pdf' % (settings.MEDIA_ROOT, pdf_name)
+def unreleased_pdf_path(contest_slug, task_name, user):
+    file_path = '{}/output/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+    file_name = '{}-{}.pdf'.format(task_name, user.username)
+    pdf_file_path = '{}/{}'.format(file_path, file_name)
+    os.makedirs(file_path, exist_ok=True)
+    return pdf_file_path
 
 
-def final_pdf_path(pdf_name):
-    if pdf_name.split('.')[-1] == 'pdf':
-        return '%s/%s' % (settings.FINAL_PDF_ROOT, pdf_name)
-    return '%s/%s.pdf' % (settings.FINAL_PDF_ROOT, pdf_name)
+def final_pdf_path(contest_slug, task_name, user):
+    file_path = '{}/final/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+    file_name = '{}-{}.pdf'.format(task_name, user.username)
+    pdf_file_path = '{}/{}'.format(file_path, file_name)
+    os.makedirs(file_path, exist_ok=True)
+    return pdf_file_path
+
+
+def get_file_name_from_path(file_path):
+    return file_path.split('/')[-1]
 
 
 def pdf_response(pdf_file_path, file_name):

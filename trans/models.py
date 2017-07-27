@@ -109,8 +109,22 @@ class Translation(models.Model):
         latest_version = self.get_latest_version()
         return latest_version.create_time if latest_version else None
 
+    def is_editable_by(self, user):
+        contest = self.task.contest
+        user_contest = UserContest.objects.filter(user=user, contest=contest).first()
+        frozen_by_user_contest = user_contest and user_contest.frozen
+        return self.frozen or contest.frozen or frozen_by_user_contest
+
+
     def __str__(self):
         return "{} ({})".format(self.task.name, self.user.username)
+
+
+class UserContest(models.Model):
+    user = models.ForeignKey('User')
+    contest = models.ForeignKey('Contest', default=None)
+    frozen = models.BooleanField(default=False)
+    note = models.TextField(default='')
 
 
 class Version(models.Model):

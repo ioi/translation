@@ -16,4 +16,4 @@ echo "Migrating Models"
 python3 manage.py migrate
 
 echo "Starting Gunicorn"
-exec /usr/local/bin/gunicorn Translation.wsgi:application -w 1 -b :8000
+exec /usr/local/bin/gunicorn Translation.wsgi:application -w $GUNICORN_WORKERS -b :8000

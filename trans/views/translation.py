@@ -154,6 +154,7 @@ class TranslationPDF(LoginRequiredMixin, View):
 class TranslationPrint(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
+        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
 
         if not 'pdf_file_path' in pdf_response:
@@ -164,6 +165,11 @@ class TranslationPrint(LoginRequiredMixin, View):
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
 
         send_pdf_to_printer(pdf_file_path)
+        if translation.user == user and user.username != 'ISC':
+            last_version = translation.get_latest_version()
+            if last_version.release_note == '':
+                last_version.release_note = 'Printed'
+                last_version.save()
         os.remove(output_pdf_path)
 
         return JsonResponse({'success': True})

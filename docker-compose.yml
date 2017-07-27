@@ -17,6 +17,7 @@ services:
       EMAIL_HOST_USER: test
       EMAIL_HOST_PASSWORD: test
       DJANGO_SETTINGS_MODULE: Translation.production_settings
+      GUNICORN_WORKERS: 40
   
   nginx:
     restart: always

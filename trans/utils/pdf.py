@@ -25,6 +25,7 @@ def get_translation_by_contest_and_task_type(request, user, contest_slug, task_n
         return task.get_base_translation()
     return get_trans_by_user_and_task(requested_user, task)
 
+
 def render_pdf_template(request, user, contest_slug, task_name, task_type,
                         static_path, images_path, pdf_output):
     requested_user = get_requested_user(request, task_type)

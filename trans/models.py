@@ -31,7 +31,7 @@ class User(DjangoUser):
 class Contest(models.Model):
     title = models.CharField(max_length=100, blank=False)
     order = models.IntegerField(default=1)
-    slug = models.CharField(max_length=10, blank=False, unique=True)
+    slug = models.CharField(db_index=True, max_length=10, blank=False, unique=True)
     public = models.BooleanField(default=False)
     frozen = models.BooleanField(default=False)
 
@@ -40,7 +40,7 @@ class Contest(models.Model):
 
 
 class Task(models.Model):
-    name = models.CharField(max_length=255, blank=False)
+    name = models.CharField(db_index=True, max_length=255, blank=False)
     contest = models.ForeignKey('Contest', default=None)
     order = models.IntegerField(default=1)
 
@@ -114,7 +114,6 @@ class Translation(models.Model):
         user_contest = UserContest.objects.filter(user=user, contest=contest).first()
         frozen_by_user_contest = user_contest and user_contest.frozen
         return self.frozen or contest.frozen or frozen_by_user_contest
-
 
     def __str__(self):
         return "{} ({})".format(self.task.name, self.user.username)

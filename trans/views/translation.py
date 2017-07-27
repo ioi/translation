@@ -1,8 +1,6 @@
 import urllib
-from uuid import uuid4
 
-from django.core.mail.message import EmailMessage, EmailMultiAlternatives
-from django.http.response import HttpResponseRedirect, HttpResponseNotFound
+from django.http.response import HttpResponseNotFound
 from django.forms.models import model_to_dict
 
 from django.views.generic import View
@@ -63,7 +61,7 @@ class Translations(LoginRequiredMixin, View):
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
                                'contests': contests, 'task_name': task_name, 'is_editor': user.is_editor(),
                                'taskID': task.id, 'language': user.credentials(), 'username': user.username,
-                               'language': user.language.code, 'direction': user.language.direction()})
+                               'direction': user.language.direction()})
 
 
 class SaveTranslation(LoginRequiredMixin, View):
@@ -78,7 +76,7 @@ class SaveTranslation(LoginRequiredMixin, View):
         saved = request.POST['saved'] == 'true'
         edit_token = request.POST.get('edit_token', '')
         if translation.is_editable_by(user) or not can_user_change_translation(user, translation, edit_token) or not (
-            task.is_published() or user.is_editor()):
+                    task.is_published() or user.is_editor()):
             return JsonResponse({'can_edit': False, 'edit_token': '', 'error': 'forbidden'})
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
         translation.add_version(content, saved=saved)
@@ -186,7 +184,8 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         if translation.is_editable_by(user) or user != translation.user:
             return HttpResponseForbidden()
         can_edit, new_edit_token = get_translate_edit_permission(translation, edit_token)
-        return JsonResponse({'can_edit': can_edit, 'edit_token': new_edit_token, 'content': translation.get_latest_text()})
+        return JsonResponse(
+            {'can_edit': can_edit, 'edit_token': new_edit_token, 'content': translation.get_latest_text()})
 
 
 class FinishTranslate(LoginRequiredMixin, View):
@@ -291,5 +290,5 @@ class PrintCustomFile(LoginRequiredMixin, View):
         send_pdf_to_printer_with_header_page(pdf_file_path, user.country.code, user.country.name)
 
         response = redirect('printcustomfile')
-        response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name,safe='=?&')
+        response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name, safe='=?&')
         return response

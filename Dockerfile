@@ -1,4 +1,4 @@
-FROM ubuntu:xenial-20170710
+FROM hub.docker.hamravesh.ir/library/ubuntu:xenial-20170710
 
 RUN apt-get -yq update && \
     apt-get -yq install apt-transport-https

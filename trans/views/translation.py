@@ -1,9 +1,12 @@
+import urllib
+from uuid import uuid4
+
 from django.core.mail.message import EmailMessage, EmailMultiAlternatives
 from django.http.response import HttpResponseRedirect, HttpResponseNotFound
 from django.forms.models import model_to_dict
 
 from django.views.generic import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from trans.models import User, Task, Translation, Version, Contest, FlatPage
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
@@ -16,6 +19,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
+from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page
 
 
 class Home(LoginRequiredMixin, View):
@@ -154,7 +158,7 @@ class TranslationPrint(LoginRequiredMixin, View):
         info_line = '{} ({})'.format(user.country.name, user.country.code)
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
 
-        # TODO: send pdf file to printer
+        send_pdf_to_printer(pdf_file_path)
 
         os.remove(output_pdf_path)
 
@@ -261,20 +265,21 @@ class PrintCustomFile(LoginRequiredMixin, View):
         return render(request, 'custom-print.html', {'form': form})
 
     def post(self, request):
+        user = User.objects.get(username=request.user)
         form = UploadFileForm(request.POST, request.FILES)
         if not form.is_valid():
             return HttpResponseBadRequest("You should attach a file")
-        pdf_file_path = request.FILES['pdf_file_path']
-        if not pdf_file_path:
-            return HttpResponseBadRequest("You should attach a file")
-        # TODO: send pdf file to printer
-        pdf_file_path = pdf_file_path.read()
-        subject, from_email, to = 'hello', 'navidsalehn@gmail.com', 'navidsalehn@gmail.com'
-        text_content = 'Test'
-        html_content = '<p>This is an <strong>TEST</strong> message.</p>'
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
-        msg.attach_alternative(html_content, "text/html")
-        msg.attach('file.pdf', pdf_file_path, 'application/pdf')
-        msg.send()
 
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        pdf_file = request.FILES.get('uploaded_file', None)
+        if not pdf_file or pdf_file.name.split('.')[-1] != 'pdf':
+            return HttpResponseBadRequest("You should attach a pdf file")
+        pdf_file_path = '/tmp/{}_{}'.format(user.country.code, pdf_file.name)
+        with open(pdf_file_path, 'wb') as f:
+            for chunk in pdf_file.chunks():
+                f.write(chunk)
+
+        send_pdf_to_printer_with_header_page(pdf_file_path, user.country.code, user.country.name)
+
+        response = redirect('printcustomfile')
+        response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name,safe='=?&')
+        return response

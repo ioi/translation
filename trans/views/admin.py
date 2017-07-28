@@ -161,6 +161,8 @@ class FreezeTranslation(StaffCheckMixin, View):
         contest_slug = trans.task.contest.slug
         task_name = trans.task.name
         if frozen == 'True':
+            request.GET = request.GET.copy()
+            request.GET['user'] = user.username
             pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
             source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, user)
             target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)

@@ -8,18 +8,19 @@ var IMAGES_URL;
 
 // enable resize option for images
 renderer.image = function(href, title, text) {
-    var style = '';
+    var style = 'page-break-inside:avoid; ';
     var images_folder = '';
     if (href.indexOf('/') < 0 && typeof IMAGES_URL !== 'undefined')
         images_folder = IMAGES_URL;
     if (title) {
         size = title.split('x');
         if (size[1])
-            style = 'width: ' + size[0] + 'px; height: ' + size[1] + 'px;';
+            style += 'width: ' + size[0] + 'px; height: ' + size[1] + 'px;';
         else
-            style = 'width: ' + size[0] + 'px;';
+            style += 'width: ' + size[0] + 'px;';
     }
-    return ('<img src="' + images_folder + href + '" alt="' + text + '" style="' + style + '">');
+    return ('' +
+            '<img src="' + images_folder + href + '" alt="' + text + '" style="' + style + '">');
 };
 
 // remove trailing newline in code blocks
@@ -30,13 +31,14 @@ renderer.code = function(code, language) {
 // render ltr tables (started with %ltr%)
 renderer.table = function(header, body) {
     var html = '';
+    var tags = 'style="page-break-inside:avoid;"';
     if (header.search('%ltr%') < 0) {
-        html = original_table_renderer(header, body);
+        tags += ' dir="ltr"';
     }
     else {
         header = header.replace('%ltr%', '');
-        html = '<div dir="ltr">' + original_table_renderer(header, body) + '</div>';
     }
+    html = '<div ' + tags + '>' + original_table_renderer(header, body) + '</div>';
     return html;
 }
 

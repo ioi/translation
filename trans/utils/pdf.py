@@ -109,15 +109,17 @@ def convert_html_to_pdf(html, pdf_file_path):
 
 
 def add_page_numbers_to_pdf(pdf_file_path, task_name):
-    cmd = ('cpdf -add-text "{0} (%Page of %EndPage)" -font "Arial" ' +
-          '-font-size 10 -bottomright .75in {1} -o {1} > /dev/null 2>&1').format(task_name.capitalize(), pdf_file_path)
+    color =  '-color "0.4 0.4 0.4" '
+    cmd = ('cpdf -add-text "{0} (%Page of %EndPage)   " -font "Arial" ' + color + \
+          '-font-size 10 -bottomright .62in {1} -o {1}').format(task_name.capitalize(), pdf_file_path)
     os.system(cmd)
 
 
 def add_info_line_to_pdf(pdf_file_path, info):
+    color =  '-color "0.4 0.4 0.4" '
     output_pdf_path = '/tmp/{}.pdf'.format(str(uuid4()))
-    cmd = 'cpdf -add-text "{}" -font "Arial" -font-size 10 -bottomleft .75in {} -o {} > /dev/null 2>&1'.format(
-        info, pdf_file_path, output_pdf_path)
+    cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
+        info, pdf_file_path, output_pdf_path, color)
     os.system(cmd)
     return output_pdf_path
 

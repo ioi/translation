@@ -10,7 +10,7 @@ Sudoku is played on a board that is a grid of $n^2 \times n^2$ cells. The whole 
 
 The following figure shows two valid Sudoku boards with no empty cells:
 
-![Sudoku board](Sudoku.png "340")
+![Sudoku board](Sudoku.svg "340")
 
 Fereydun has a valid board with some empty cells and has asked for your help. Your task is to fill as many empty cells as you can while keeping the board valid.
 It is guaranteed that there is at least one way to fill all the empty cells while keeping the board valid.

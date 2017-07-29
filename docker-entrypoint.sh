@@ -7,7 +7,7 @@ done
 
 cd /usr/src/app
 
-cf-cache
+fc-cache
 
 echo "Collecting staticfiles"
 python3 manage.py collectstatic --noinput

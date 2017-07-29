@@ -257,3 +257,7 @@ code, pre {
 .rendered_content[lang="kr"] {
     font-family: 'NanumMyeongjo', CustomTextFont, Arial, serif;
 }
+
+.rendered_content[lang="th"] {
+    font-family: 'Loma', CustomTextFont, Arial, serif;
+}

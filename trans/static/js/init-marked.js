@@ -25,7 +25,7 @@ renderer.image = function(href, title, text) {
 
 // remove trailing newline in code blocks
 renderer.code = function(code, language) {
-    return ('<pre><code>' + code + '</code></pre>');
+    return ('<pre style="page-break-inside:avoid;"><code>' + code + '</code></pre>');
 };
 
 // render ltr tables (started with %ltr%)

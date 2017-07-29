@@ -253,3 +253,7 @@ code, pre {
 .rendered_content[lang="ja"] {
     font-family: 'TakaoPGothic', CustomTextFont, Arial, serif;
 }
+
+.rendered_content[lang="kr"] {
+    font-family: 'NanumMyeongjo', CustomTextFont, Arial, serif;
+}

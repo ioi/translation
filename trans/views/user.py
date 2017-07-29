@@ -1,3 +1,4 @@
+import os
 from django.contrib.auth import authenticate, login, logout
 from django.http.response import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse
 from django.views.generic import View
@@ -7,7 +8,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from trans.forms import UploadFileForm
 
-from trans.models import User
+from trans.models import User, Translation
+from trans.utils.pdf import unreleased_pdf_path
 
 
 class FirstPage(View):
@@ -59,6 +61,9 @@ class Settings(LoginRequiredMixin,View):
         import base64
         text_font_base64 = base64.b64encode(font_file.read())
         user = User.objects.get(username=request.user.username)
+        for trans in Translation.objects.filter(user=user):
+            if os.path.exists(unreleased_pdf_path(trans.task.contest.slug, trans.task.name, user)):
+                os.remove(unreleased_pdf_path(trans.task.contest.slug, trans.task.name, user))
         user.text_font_base64 = text_font_base64
         user.text_font_name = font_file.name
         user.save()
@@ -66,6 +71,10 @@ class Settings(LoginRequiredMixin,View):
 
     def delete(self, request):
         user = User.objects.get(username=request.user)
+        for trans in Translation.objects.filter(user=user):
+            if os.path.exists(unreleased_pdf_path(trans.task.contest.slug, trans.task.name, user)):
+                os.remove(unreleased_pdf_path(trans.task.contest.slug, trans.task.name, user))
+
         user.text_font_base64 = ''
         user.text_font_name = ''
         user.save()

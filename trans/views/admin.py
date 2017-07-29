@@ -123,6 +123,7 @@ class UsersList(StaffCheckMixin, View):
         for user_name, note in user_contest_notes:
             user_notes[user_name] += note
         for user in users:
+            user['is_frozen'] = (user['username'] in user_notes.keys())
             user['frozen_note'] = user_notes[user['username']]
             returned_users.append(user)
         return render(request, 'users.html', context={'users': returned_users})

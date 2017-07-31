@@ -88,6 +88,8 @@ class Translation(models.Model):
     frozen = models.BooleanField(default=False)
 
     def add_version(self, text, release_note='', saved=True):
+        if text.strip() == '':
+            return None
         latest_version = self.version_set.order_by('-create_time').first()
         if latest_version and latest_version.text.strip() == text.strip():
             query = Version.objects.filter(id=latest_version.id)

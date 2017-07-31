@@ -17,8 +17,8 @@ class AddTask(ISCEditorCheckMixin, View):
         name = request.POST['name']
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
-        latest_task = Task.objects.filter(contest=contest).latest('order')
-        order = latest_task.order + 1 if latest_task else 1
+        contest_tasks = Task.objects.filter(contest=contest)
+        order = contest_tasks.latest('order').order + 1 if contest_tasks else 1
         new_task, created = Task.objects.get_or_create(name=name, contest=contest, order=order)
         user = User.objects.get(username=request.user.username)
         trans = get_trans_by_user_and_task(user, new_task) # to initiate translation

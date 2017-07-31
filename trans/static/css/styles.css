@@ -261,3 +261,7 @@ code, pre {
 .rendered_content[lang="th"] {
     font-family: 'Loma', CustomTextFont, Arial, serif;
 }
+
+.rendered_content[lang="zh"], .rendered_content[lang="tw"]{
+    font-family: 'PMingLiU', CustomTextFont, Arial, serif;
+}

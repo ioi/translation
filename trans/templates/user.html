@@ -14,26 +14,22 @@
         {% if contest.user_contest %}
         <h3>This contest has been frozen for this user</h3>
         {% if contest.user_contest.note %}
-        <h4>Note:</h4>
-        <p>
-            {{contest.user_contest.note}}
-        </p>
+        <b>Note:</b>
+        {{contest.user_contest.note}}
         {% endif %}
-        <form method="post" onsubmit="return confirm('Are you sure?');"
+        <form class="form-inline" method="post" onsubmit="return confirm('Are you sure to unfreeze?');"
               action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
             {% csrf_token %}
             <button type="submit" class="btn btn-default btn-danger ">
-                UnFreeze
+                Unfreeze
             </button>
         </form>
         {% else %}
-        <h3>Freeze the contest for user {{user_name}}</h3>
-        <form method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
+        <form class="form-inline" method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
             {% csrf_token %}
-            <label>Note</label>
-            <textarea name="note"></textarea>
-            <br>
-            <button type="submit" class="btn btn-default ">
+            <label for="note">Freeze Note:</label>
+            <input type="text" class="form-control" id="note" name="note">
+            <button type="submit" class="btn btn-success ">
                 Freeze
             </button>
         </form>
@@ -46,10 +42,10 @@
                 <th width="20%">Task</th>
                 <th width="20%">Status</th>
                 <th>Translation</th>
-                <th width="15%">Delivered</th>
+                <th width="15%">Finalize</th>
                 <th width="15%">Unleash Lock</th>
                 {% if can_upload_final_pdf and contest.user_contest.frozen %}
-                    <th>Upload Final Translation</th>
+                <th>User PDF</th>
                 {% endif %}
             </tr>
             </thead>
@@ -59,7 +55,7 @@
                 <td> {{ task.name | capfirst }}</td>
                 <td>
                     {% if task.is_editing %} Is editing
-                    {% elif task.frozen %} Delivered
+                    {% elif task.frozen %} Finalized
                     {% elif task.trans_id == None %} Not started
                     {% else %} Started {% endif %}
                 </td>
@@ -75,9 +71,8 @@
                             <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
-                                <button type="submit"
-                                        class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}" onclick="return confirm('Are you sure?');">
-                                    {% if task.frozen %} Reopen {% else %} Deliver it {% endif %}
+                                <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}" onclick="return confirm('Are you sure?');">
+                                    {% if task.frozen %} Reopen {% else %} Finalize {% endif %}
                                 </button>
                             </form>
                         {% endif %}
@@ -94,7 +89,7 @@
                 {% if can_upload_final_pdf and contest.user_contest.frozen %}
                     <td>
                         {% if not task.frozen %}
-                            <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Add Final Translation</a>
+                            <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Add User PDF</a>
                         {% endif %}
                     </td>
                 {% endif %}
@@ -111,7 +106,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Upload Final Translated Task</h4>
+                <h4 class="modal-title">Add Final Translated Task</h4>
             </div>
             <div>
                 <form class="form" id="uploadPdfId" action="{% url 'upload_final_pdf'%}" method="post" enctype="multipart/form-data">
@@ -119,7 +114,7 @@
                         {% csrf_token %}
                         {{ form }}
                         <input type="hidden" name="trans_id" id="input_trans_id" value="">
-                        <button type="submit">Upload Final Pdf</button>
+                        <button type="submit">Add Final Pdf</button>
                     </div>
                 </form>
             </div>
@@ -132,6 +127,7 @@
          var myTransId = $(this).data('id');
          $("#input_trans_id").attr('value', myTransId );
     });
+    
 </script>
 
 

@@ -160,7 +160,7 @@ class TranslationPrint(LoginRequiredMixin, View):
 
         pdf_file_path = pdf_response['pdf_file_path']
         if translation.user.username == 'ISC':
-            info_line = 'Release {}, deliver to {}'.format(translation.get_published_versions_count(), user.country.name)
+            info_line = 'Release {}, deliver to {}'.format(translation.get_published_versions_count(), user.country.code)
         else:
             info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)

@@ -31,7 +31,5 @@ Development Settings
 Screenshots
 ----------------
 ![Editing panel](https://raw.githubusercontent.com/noidsirius/IOI-Translation/master/docs/screenshots/edit.png)
-![Revision Mode](https://raw.githubusercontent.com/noidsirius/IOI-Translation/master/docs/screenshots/diff.png)
-![Homepage](https://raw.githubusercontent.com/noidsirius/IOI-Translation/master/docs/screenshots/home.png)
 
 

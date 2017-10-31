@@ -19,9 +19,9 @@ Deployment Steps
 * You may create `docker-compose.override.yml` and change the variables such as db password
 * Run `docker-compose build`
 * Run `docker-compose create`
-* If you want to create essential data for the system (dbseed), run `docker-compose run web bash`, then in the shell execute `python3 manage.py loaddata initial_data.json` for the very first time. This commmand will create essential users and groups. Then exit from the shell by typing `exit`.
-* For creating sample data such as countries, languages or tasks, run `docker-compose run web bash`, then in the shell execute `python3 manage.py initialize`. Then exit from the shell by typing `exit`.
 * To start the system, just run `docker-compose start` and to stop it, run `docker-compose stop`
+* If you want to create essential data for the system (dbseed), run `docker-compose exec web bash` after the system has been started, then in the shell execute `python3 manage.py loaddata initial_data.json` for the very first time. This commmand will create essential users and groups. Then exit from the shell by typing `exit`.
+* For creating sample data such as countries, languages or tasks, run `docker-compose exec web bash` after the system has been started, then in the shell execute `python3 manage.py initialize`. Then exit from the shell by typing `exit`.
 * You may have access to the logs by running `dokcer-compose logs`, for following log from now on run `docker-compose logs -f --tail=0`
 
 Development Settings

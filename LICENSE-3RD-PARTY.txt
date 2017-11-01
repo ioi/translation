@@ -1,0 +1,258 @@
+-----------------------------------------------------------------------------
+    MIT License
+    applies to:
+        - jQuery (Files: trans/static/libs/jquery/*)
+        - Boostrap (Files: trans/static/libs/bootstrap/*)
+        - Marked Editor (Files: trans/static/libs/markdown/*)
+        - CodeMirror (Files: trans/static/libs/codemirror/*)
+        - Toastr (Files: trans/static/libs/toastr/*)
+        - Boostbox (Files: trans/static/libs/bootbox/*)
+-----------------------------------------------------------------------------
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+-----------------------------------------------------------------------------
+    SIL OPEN FONT LICENSE Version 1.1
+    applies to:
+        - Source Sans Pro (Files: trans/static/fonts/SourceSansPro/*)
+        - Font Awesome (Files: trans/static/fonts/fontawesome/*)
+-----------------------------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+
+
+-----------------------------------------------------------------------------
+    IranSans Proprietary License
+    applies to:
+        - IRAN Sans Font (Files: trans/static/fonts/IRANSans/*)
+-----------------------------------------------------------------------------
+
+IRAN Sans-serif fonts are considered a proprietary software.
+To gain information about the laws regarding the use of these fonts,
+please visit www.fontiran.com 
+
+This set of fonts are used in this project under the license: LVGZC
+
+
+-----------------------------------------------------------------------------
+    Software License Agreement (BSD License)
+    applies to:
+        - Diff (Files: trans/static/libs/diff/*)
+-----------------------------------------------------------------------------
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the <organization> nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+-----------------------------------------------------------------------------
+    Coherent Graphics Ltd Non-Commercial Use License Agreement
+    applies to:
+        - Cpdf (Files: binaries/cpdf/*)
+-----------------------------------------------------------------------------
+
+This Coherent Graphics Ltd License Agreement is a legal agreement between you
+and Coherent Graphics Ltd for the software, data and documentation mentioned
+above (together, the "Software").
+
+By installing, copying or otherwise using this Software, you agree to be bound
+by the terms of this license agreement. If you do not agreee, do not install,
+copy, or use the Software. The Software is protected by copyright and other
+intellectual property laws and is licensed, not sold.
+
+
+SCOPE OF RIGHTS:
+
+You may use, copy, reproduce and distribute this Software for any
+non-commercial purpose subject to the restrictions in this license. For
+example, teaching, academic research and personal experimentation.
+
+You may not use or distribute this Software or any derivative works in any form
+for commercial purposes. For example running business operations, licensing,
+leasing, or selling the Software, distributing the Software for use with
+commercial products, using the Software in the creation or use of commercial
+products or any other activity whose purpose is to procure a commercial gain to
+you or others.
+
+If the Software contains source code, you may create derivative works of such
+portions of the Software and distribute them under the same terms and
+conditions as in this license, and you will not grant other rights to the
+Software or derivative works that are different from this license.
+
+If you have created derivative works of the Software, and distribute them, they
+must carry prominent notices so that recipients know they are not receiving the
+original software.
+
+
+In return for these rights, we require:
+
+1. That you will not remove any copyright or other notices from the software
+
+2. The Coherent Graphics Ltd is granted back, without any restrictions or
+limitations, a non-exclusive, perpetual, irrevocable, royalty-free, assignable
+and sub-licensable license to reproduce, perform or display, install, use,
+modify, post, distribute, make and have made, sell and transfer your
+modifications to and/or derivative works of the Software source code or data,
+for any purpose.
+
+3. THAT THE SOFTWARE COMES "AS IS", WITH NO WARRANTIES. THIS MEANS NO EXPRESS,
+IMPLIED OR STATUTORY WARRANTY, INCLUDING WITHOUT LIMITATION, WARRANTIES OF
+MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ANY WARRANTY AGAINST
+INTERFERENCE WITH YOUR ENJOYMENT OF THE SOFTWARE OR ANY WARRANTY OR TITLE OF
+NON-INFRINGEMENT. THERE IS NO WARRANTY THAT THE SOFTWARE WILL FULFILL ANY OF
+YOUR PARTICULAR PURPOSES OR NEEDS. ALSO, YOU MUST PASS THIS DISCLAIMER ON
+WHENEVER YOU DISTRIBUTE THE SOFTWARE OR DERIVATIVE WORKS.
+
+4. THAT NEITHER COHERENT GRAPHICS LTD NOR ANY CONTRIBUTOR TO THE SOFTWARE WILL
+BE LIABLE FOR ANY DAMAGES RELATED TO THE SOFTWARE OR THIS LICENSE, INCLUDING
+DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL OR INCIDENTAL DAMAGES, TO THE MAXIMUM
+EXTENT THE LAW PERMITS, NO MATTER WHAT LEGAL THEORY IT IS BASED ON. ALSO, YOU
+MUST PASS THIS LIMITATION OF LIABILITY ON WHENEVER YOU DISTRIBUTE THE SOFTTWARE
+OR DERIVATIVE WORKS.
+
+5. That we have no duty of reasonable care or lack of negligence, and we are
+not obligated to provide technical support for the Software.
+
+6. That if you breach this license, this license terminated immediately.
+Sections 3,4,5,7 and 8 of this license survive such or any termination.
+
+7. That all rights not expressly granted to you in this license are reserved.
+
+8. That this license shall be construed and controlled by the laws of the
+United Kingdom of Great Britain and Northern Ireland, without regard to
+conflicts of law. If any provision of this license shall be deemed
+unenforceable or contrary to the law, the rest of this license shall remain in
+full effect and interpreted in an enforceable manner that most nearly captures
+the effect of the original license.
+
+In addition, we draw your attention to these license terms concerning the
+embedded AFM data in these binaries:
+
+These executables constitute a modification of Adobe's AFM data files. This
+file also constitutes a modification of Adobe's license file.
+
+This file and the 14 PostScript(R) AFM files it accompanies may be used,
+copied, and distributed for any purpose and without charge, with or without
+modification, provided that all copyright notices are retained; that the AFM
+files are not distributed without this file; that all modifications to this
+file or any of the AFM files are prominently noted in the modified file(s); and
+that this paragraph is not modified. Adobe Systems has no responsibility or
+obligation to support the use of the AFM files.
+
+

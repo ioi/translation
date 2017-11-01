@@ -8,7 +8,7 @@ RUN apt-get -yq install python3 python3-pip libfontconfig wkhtmltopdf xvfb \
         libpq-dev ttf-mscorefonts-installer fonts-takao-pgothic && \
     pip3 install -U pip
 
-COPY binaries/cpdf /usr/bin/
+COPY binaries/cpdf/cpdf /usr/bin/
 RUN chmod +x /usr/bin/cpdf
 
 COPY trans/static/fonts/IRANSans/ttf/* /usr/share/fonts/

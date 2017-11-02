@@ -48,6 +48,11 @@ For using docker in development settings, please add `--reload` option
 to the execution line of gunicorn in `docker-entrypoint.sh` file.
 Then run docker by `docker-compose up --build`.
 
+Screenshots
+----------------
+![Editing panel](https://raw.githubusercontent.com/ioi-2017/translation/master/docs/screenshots/edit.png)
+See more screenshots [here](https://github.com/ioi-2017/translation/tree/master/docs/screenshots).
+
 License
 -------
 This software is distributed under the MIT license,

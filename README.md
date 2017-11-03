@@ -23,34 +23,34 @@ Features
 Installation
 ------------
 
-You can install the translation system by the following three steps:
+You can install the translation system in just three steps:
 1. Install [docker](https://docs.docker.com/engine/installation/) and
    [docker-compose](https://docs.docker.com/compose/install/).
 2. Clone the project on your machine.
-3. Run `docker-compose up -d` from the project directory.
+3. Run `docker-compose up -d`.
 
-At this point, you will have a copy of the translation system up and ready to work.
-You can access it via `http://your_server_address:8000/`.
-You may optionally perform the following steps:
+At this point, you will have a copy of the translation system up
+and running at `http://your_server_address:8000/`.
+You may optionally perform the following tasks:
 
-* You may create a file named `docker-compose.override.yml`,
-  and change the variables such as db password, before running `docker-compose up`.
-* If you want to create essential data for the system (dbseed),
+
+* To create essential data for the system such as admin users and groups,
   run `docker-compose exec web bash` after the system has been started,
-  then in the shell execute `python3 manage.py loaddata initial_data.json`
-  for the very first time. This command will create essential users and groups.
+  and then in the shell, execute `python3 manage.py loaddata initial_data.json`
+  for the very first time.
   Then exit from the shell by typing `exit`.
-* For creating sample data such as countries, languages or tasks,
-  run `docker-compose exec web bash` after the system has been started,
-  then in the shell execute `python3 manage.py initialize`.
+* For importing data such as countries, languages, and sample tasks,
+  run `docker-compose exec web bash`, and
+  then in the shell, execute `python3 manage.py initialize`.
   Then exit from the shell by typing `exit`.
-* You can access the logs by running `dokcer-compose logs`.
+* You can get access to the system logs by running `dokcer-compose logs`.
   To follow the logs from now on, run `docker-compose logs -f --tail=0`.
+* To stop the system, run `dokcer-compose stop`.
 
 Development Settings
 --------------------
 
-For using docker in development settings, please add `--reload` option
+For using docker in development settings, add `--reload` option
 to the execution line of gunicorn in `docker-entrypoint.sh` file.
 Then run docker by `docker-compose up --build`.
 

@@ -14,11 +14,9 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: ioitrans
-      EMAIL_HOST_USER: test
-      EMAIL_HOST_PASSWORD: test
-      DJANGO_SETTINGS_MODULE: Translation.production_settings
-      GUNICORN_WORKERS: 40
-  
+      DJANGO_SETTINGS_MODULE: Translation.settings
+      GUNICORN_WORKERS: 2
+
   nginx:
     restart: always
     build: ./nginx/
@@ -29,20 +27,20 @@ services:
     volumes:
     - ioi_static:/usr/src/app/static/:ro
     - ioi_media:/usr/src/app/media/:ro
-  
+
   postgres:
     restart: always
-    image: hub.docker.hamravesh.ir/library/postgres:9.6-alpine
+    image: postgres:9.6-alpine
     volumes:
     - ioi_pgdata:/var/lib/postgresql/data/
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: ioitrans
-  
+
   redis:
     restart: always
-    image: hub.docker.hamravesh.ir/library/redis:3.2-alpine
+    image: redis:3.2-alpine
 
 volumes:
   ioi_pgdata:

@@ -20,15 +20,21 @@ Features
 * Dockerized and easy to develop and deploy
 
 
-Deployment Steps
-----------------
+Installation
+------------
 
-* Install [docker](https://docs.docker.com/engine/installation/) and
-[docker-compose](https://docs.docker.com/compose/install/).
-* You may create `docker-compose.override.yml` and change the variables such as db password.
-* Run `docker-compose build`.
-* Run `docker-compose create`.
-* To start the system, just run `docker-compose start` and to stop it, run `docker-compose stop`.
+You can install the translation system by the following three steps:
+1. Install [docker](https://docs.docker.com/engine/installation/) and
+   [docker-compose](https://docs.docker.com/compose/install/).
+2. Clone the project on your machine.
+3. Run `docker-compose up -d` from the project directory.
+
+At this point, you will have a copy of the translation system up and ready to work.
+You can access it via `http://your_server_address:8000/`.
+You may optionally perform the following steps:
+
+* You may create a file named `docker-compose.override.yml`,
+  and change the variables such as db password, before running `docker-compose up`.
 * If you want to create essential data for the system (dbseed),
   run `docker-compose exec web bash` after the system has been started,
   then in the shell execute `python3 manage.py loaddata initial_data.json`
@@ -38,8 +44,8 @@ Deployment Steps
   run `docker-compose exec web bash` after the system has been started,
   then in the shell execute `python3 manage.py initialize`.
   Then exit from the shell by typing `exit`.
-* You may have access to the logs by running `dokcer-compose logs`,
-  for following log from now on run `docker-compose logs -f --tail=0`.
+* You can access the logs by running `dokcer-compose logs`.
+  To follow the logs from now on, run `docker-compose logs -f --tail=0`.
 
 Development Settings
 --------------------

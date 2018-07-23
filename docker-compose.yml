@@ -4,39 +4,37 @@ services:
   web:
     restart: always
     build: ./
-    volumes:
-    - ioi_static:/usr/src/app/static/
-    - ioi_media:/usr/src/app/media/
+    command: gunicorn
     depends_on:
-    - postgres
-    - redis
+      - postgres
+      - redis
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: ioitrans
+      DB_HOST: postgres
+      DB_USER: &db_user postgres
+      DB_PASSWORD: &db_password postgres
+      DB_NAME: &db_name ioitrans
       DJANGO_SETTINGS_MODULE: Translation.settings
       GUNICORN_WORKERS: 2
 
   nginx:
     restart: always
-    build: ./nginx/
+    build: ./
+    command: nginx
+    environment:
+      NO_DATABASE: 1
+      DJANGO_SETTINGS_MODULE: Translation.settings
     ports:
-    - 8000:80
-    links:
-    - web:web
-    volumes:
-    - ioi_static:/usr/src/app/static/:ro
-    - ioi_media:/usr/src/app/media/:ro
+      - 8000:80
 
   postgres:
     restart: always
     image: postgres:9.6-alpine
     volumes:
-    - ioi_pgdata:/var/lib/postgresql/data/
+      - ioi_pgdata:/var/lib/postgresql/data/
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ioitrans
+      POSTGRES_USER: *db_user
+      POSTGRES_PASSWORD: *db_password
+      POSTGRES_DB: *db_name
 
   redis:
     restart: always
@@ -44,5 +42,3 @@ services:
 
 volumes:
   ioi_pgdata:
-  ioi_static:
-  ioi_media:

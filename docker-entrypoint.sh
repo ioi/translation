@@ -12,8 +12,17 @@ fc-cache
 echo "Collecting staticfiles"
 python3 manage.py collectstatic --noinput
 
-echo "Migrating Models"
-python3 manage.py migrate
+case "$1" in
+    nginx)
+        echo "Starting nginx"
+        exec /usr/sbin/nginx -g 'daemon off;'
+        ;;
 
-echo "Starting Gunicorn"
-exec /usr/local/bin/gunicorn Translation.wsgi:application -w $GUNICORN_WORKERS -b :8000
+    *)
+        echo "Migrating Models"
+        python3 manage.py migrate
+
+        echo "Starting Gunicorn"
+        exec /usr/local/bin/gunicorn Translation.wsgi:application -w $GUNICORN_WORKERS -b :8000
+        ;;
+esac

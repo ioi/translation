@@ -13,7 +13,6 @@ services:
       DB_USER: &db_user postgres
       DB_PASSWORD: &db_password postgres
       DB_NAME: &db_name ioitrans
-      DJANGO_SETTINGS_MODULE: Translation.settings
       GUNICORN_WORKERS: 2
 
   nginx:
@@ -22,7 +21,6 @@ services:
     command: nginx
     environment:
       NO_DATABASE: 1
-      DJANGO_SETTINGS_MODULE: Translation.settings
     ports:
       - 8000:80
 

@@ -28,7 +28,6 @@ services:
     - app
     volumes:
     - ioi_static:/usr/src/app/static/:ro
-    - ioi_media:/usr/src/app/media/:ro
 
   postgres:
     restart: always

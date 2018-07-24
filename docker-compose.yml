@@ -1,13 +1,15 @@
-version: '3.1'
+version: '2.1'
 
 services:
   web:
     restart: always
     build: ./
-    command: gunicorn
+    volumes:
+    - ioi_static:/usr/src/app/static/
+    - ioi_media:/usr/src/app/media/
     depends_on:
-      - postgres
-      - redis
+    - postgres
+    - redis
     environment:
       DB_HOST: postgres
       DB_USER: &db_user postgres
@@ -17,22 +19,24 @@ services:
 
   nginx:
     restart: always
-    build: ./
-    command: nginx
-    environment:
-      NO_DATABASE: 1
+    build: ./nginx/
     ports:
-      - 8000:80
+    - 8000:80
+    links:
+    - web:web
+    volumes:
+    - ioi_static:/usr/src/app/static/:ro
+    - ioi_media:/usr/src/app/media/:ro
 
   postgres:
     restart: always
     image: postgres:9.6-alpine
     volumes:
-      - ioi_pgdata:/var/lib/postgresql/data/
+    - ioi_pgdata:/var/lib/postgresql/data/
     environment:
-      POSTGRES_USER: *db_user
-      POSTGRES_PASSWORD: *db_password
-      POSTGRES_DB: *db_name
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ioitrans
 
   redis:
     restart: always
@@ -40,3 +44,5 @@ services:
 
 volumes:
   ioi_pgdata:
+  ioi_static:
+  ioi_media:

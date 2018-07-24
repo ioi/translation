@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  web:
+  app:
     restart: always
     build: ./
     volumes:
@@ -24,8 +24,8 @@ services:
     build: ./nginx/
     ports:
     - 8000:80
-    links:
-    - web:web
+    depends_on:
+    - app
     volumes:
     - ioi_static:/usr/src/app/static/:ro
     - ioi_media:/usr/src/app/media/:ro

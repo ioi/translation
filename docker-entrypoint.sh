@@ -20,7 +20,7 @@ if [[ $# -eq 0 ]]; then
     python3 manage.py migrate
 
     echo "Starting Gunicorn"
-    exec /usr/local/bin/gunicorn Translation.wsgi:application -w $GUNICORN_WORKERS -b :8000
+    exec /usr/local/bin/gunicorn Translation.wsgi:application -w "${GUNICORN_WORKERS:-1}" -b :8000
 fi
 
 exec "$@"

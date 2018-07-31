@@ -178,7 +178,7 @@ USE_L10N = True
 USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
-PRINT_SYSTEM_ADDRESS="http://print.ioi2017.org"
+PRINT_SYSTEM_ADDRESS=os.environ.get('PRINT_SYSTEM_URL')
 
 
 STATIC_URL = '/static/'

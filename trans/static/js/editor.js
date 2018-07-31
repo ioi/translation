@@ -48,6 +48,7 @@ function loadTranslationText(text){
     else {
         $('#' + left_plain_text_box_id).html('');
         simplemde.value(text)
+        simplemde.codemirror.refresh()
     }
 }
 

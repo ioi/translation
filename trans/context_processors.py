@@ -9,6 +9,5 @@ def ioi_settings(request):
         'CONTEST_PLACE': 'Tsukuba, Japan',
         'PRINT_ENABLED': settings.PRINT_SYSTEM_ADDRESS is not None,
         'TIME_ZONE': settings.TIME_ZONE,
-        'IMAGES_URL': settings.HOST_URL + 'media/images/',
-        'HOST_URL': settings.HOST_URL
+        'IMAGES_URL': '/media/images/',
     }}

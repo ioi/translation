@@ -119,7 +119,7 @@ class TranslationHTML(LoginRequiredMixin, View):
         return HttpResponse(render_pdf_template(
             request, user, contest_slug, task_name, task_type,
             static_path='/static',
-            images_path=settings.HOST_URL + 'media/images/',
+            images_path='/media/images/',
             pdf_output=False
         ))
 
@@ -140,7 +140,7 @@ class TranslationPDF(LoginRequiredMixin, View):
             html = render_pdf_template(
                 request, user, contest_slug, task_name, task_type,
                 static_path=settings.STATIC_ROOT,
-                images_path=settings.MEDIA_ROOT + 'images/',
+                images_path=settings.HOST_URL + 'media/images/',
                 pdf_output=True
             )
             convert_html_to_pdf(html, pdf_file_path)

@@ -20,6 +20,11 @@ services:
       REDIS_DB: 1
       GUNICORN_WORKERS: 2
       PRINT_SYSTEM_URL: http://print.ioi18.net
+      S3_BUCKET: ioi18-translation-files-dev
+      S3_REGION: ap-northeast-1
+      AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}'
+      AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}'
+      AWS_SESSION_TOKEN: '${AWS_SESSION_TOKEN}'
 
   nginx:
     restart: always

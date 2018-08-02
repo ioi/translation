@@ -133,7 +133,7 @@ class TranslationPDF(LoginRequiredMixin, View):
             pdf_file_path = final_pdf_path(contest_slug, task_name, requested_user)
             return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
-        pdf_file_path = unreleased_pdf_path(contest_slug, task_name, task_type, requested_user)
+        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
         last_edit_time = translation.get_latest_change_time()
         rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
         if rebuild_needed:

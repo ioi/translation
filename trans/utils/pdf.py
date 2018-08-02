@@ -69,8 +69,10 @@ def released_pdf_path(contest_slug, task_name, user):
 def unreleased_pdf_path(contest_slug, task_name, user):
     return output_pdf_path(contest_slug, task_name, 'task', user)
 
-def base_pdf_path(contest_slug, task_name, user):
-    return output_pdf_path(contest_slug, task_name, 'base', user)
+# base pdf is a pdf of ISC
+def base_pdf_path(contest_slug, task_name, task_type):
+    user = User.objects.get(username='ISC')
+    return output_pdf_path(contest_slug, task_name, task_type, user)
 
 def final_pdf_path(contest_slug, task_name, user):
     file_path = '{}/final/pdf/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)

@@ -19,7 +19,9 @@ class S3Storage(S3Boto3Storage):
 
 class S3Redirector(View):
     def get(self, request, **kwargs):
-        return redirect(default_storage.s3url(kwargs['path']))
+        response = redirect(default_storage.s3url(kwargs['path']))
+        response['X-Accel-Redirect'] = '/s3proxy'
+        return response
 
     @classmethod
     def urlpatterns(cls):

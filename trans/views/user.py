@@ -9,7 +9,7 @@ from django.shortcuts import render
 from trans.forms import UploadFileForm
 
 from trans.models import User, Translation
-from trans.utils.pdf import output_pdf_path
+from trans.utils.pdf import released_pdf_path, unreleased_pdf_path
 
 
 class FirstPage(View):
@@ -81,8 +81,7 @@ class Settings(LoginRequiredMixin,View):
             task_name = trans.task.name
             pdf_paths = [
                 released_pdf_path(slug, task_name, user),
-                unreleased_pdf_path(slug, task_name, user),
-                base_pdf_path(slug, task_name, user)
+                unreleased_pdf_path(slug, task_name, user)
             ]
             for pdf_path in pdf_paths:
                 if os.path.exists(pdf_path):

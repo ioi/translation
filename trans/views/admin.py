@@ -165,7 +165,7 @@ class FreezeTranslation(StaffCheckMixin, View):
             request.GET = request.GET.copy()
             request.GET['user'] = user.username
             pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
-            source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, task_type, user)
+            source_pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, user)
             target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
             copyfile(source_pdf_file_path, target_pdf_file_path)
             with open(final_markdown_path(contest_slug, task_name, user), 'wb') as f:

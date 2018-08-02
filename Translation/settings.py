@@ -186,3 +186,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 HOST_URL = 'http://127.0.0.1:8000/'
+
+if 'S3_BUCKET' in os.environ:
+    DEFAULT_FILE_STORAGE = 'trans.s3storage.S3Storage'
+    AWS_STORAGE_BUCKET_NAME = os.environ['S3_BUCKET']
+    AWS_S3_REGION_NAME = os.environ.get('S3_REGION')
+    AWS_DEFAULT_ACL = 'private'

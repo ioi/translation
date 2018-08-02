@@ -56,13 +56,21 @@ def render_pdf_template(request, user, contest_slug, task_name, task_type,
                             request=request)
 
 
-def unreleased_pdf_path(contest_slug, task_name, task_type, user):
-    file_path = '{}/output/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
-    file_name = '{}-{}-{}.pdf'.format(task_type, task_name, user.username)
+def general_pdf_path(contest_slug, task_name, task_type, user):
+    file_path = '{}/output/{}/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name, task_type)
+    file_name = '{}-{}.pdf'.format(task_name, user.username)
     pdf_file_path = '{}/{}'.format(file_path, file_name)
     os.makedirs(file_path, exist_ok=True)
     return pdf_file_path
 
+def released_pdf_path(contest_slug, task_name, user):
+    return general_pdf_path(contest_slug, task_name, 'released', user)
+
+def unreleased_pdf_path(contest_slug, task_name, user):
+    return general_pdf_path(contest_slug, task_name, 'unreleased', user)
+
+def base_pdf_path(contest_slug, task_name, user):
+    return general_pdf_path(contest_slug, task_name, 'base', user)
 
 def final_pdf_path(contest_slug, task_name, user):
     file_path = '{}/final/pdf/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)

@@ -9,7 +9,7 @@ from django.shortcuts import render
 from trans.forms import UploadFileForm
 
 from trans.models import User, Translation
-from trans.utils.pdf import unreleased_pdf_path
+from trans.utils.pdf import output_pdf_path
 
 
 class FirstPage(View):
@@ -76,11 +76,15 @@ class Settings(LoginRequiredMixin,View):
         return JsonResponse({'message': "Done"})
 
     def __remove_user_related_pdfs(self, user):
-        # this task types might not be enough
-        search_task_types = ['task', 'released']
         for trans in Translation.objects.filter(user=user):
-            for task_type in search_task_types:
-                pdf_path = unreleased_pdf_path(trans.task.contest.slug, trans.task.name, task_type, user)
+            slug = trans.task.contest.slug
+            task_name = trans.task.name
+            pdf_paths = [
+                released_pdf_path(slug, task_name, user),
+                unreleased_pdf_path(slug, task_name, user),
+                base_pdf_path(slug, task_name, user)
+            ]
+            for pdf_path in pdf_paths:
                 if os.path.exists(pdf_path):
                     os.remove(pdf_path)
 

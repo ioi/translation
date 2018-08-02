@@ -55,7 +55,7 @@ def render_pdf_template(request, user, contest_slug, task_name, task_type,
     return render_to_string('pdf-template.html', context=context,
                             request=request)
 
-
+# pdf file paths (excepting final pdf path)
 def output_pdf_path(contest_slug, task_name, task_type, user):
     file_path = '{}/output/{}/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name, task_type)
     file_name = '{}-{}.pdf'.format(task_name, user.username)

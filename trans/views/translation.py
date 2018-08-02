@@ -17,7 +17,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page, unreleased_pdf_path, \
+from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page, output_pdf_path, \
     get_file_name_from_path, get_translation_by_contest_and_task_type, final_pdf_path
 
 

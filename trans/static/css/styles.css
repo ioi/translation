@@ -251,17 +251,17 @@ code, pre {
 /* Default text fonts per language */
 
 .rendered_content[lang="ja"] {
-    font-family: 'TakaoPGothic', CustomTextFont, Arial, serif;
+    font-family: CustomTextFont, 'TakaoPGothic', Arial, serif;
 }
 
 .rendered_content[lang="kr"] {
-    font-family: 'NanumMyeongjo', CustomTextFont, Arial, serif;
+    font-family: CustomTextFont, 'NanumMyeongjo', Arial, serif;
 }
 
 .rendered_content[lang="th"] {
-    font-family: 'Loma', CustomTextFont, Arial, serif;
+    font-family: CustomTextFont, 'Loma', Arial, serif;
 }
 
-.rendered_content[lang="zh"], .rendered_content[lang="tw"]{
-    font-family: 'PMingLiU', CustomTextFont, Arial, serif;
+.rendered_content[lang="zh"] {
+    font-family: CustomTextFont, 'PMingLiU', Arial, serif;
 }

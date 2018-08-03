@@ -27,6 +27,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+USE_X_FORWARDED_HOST = True
 
 WKHTMLTOPDF_CMD_OPTIONS = {
     'page-size': 'A4',

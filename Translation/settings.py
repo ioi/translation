@@ -150,6 +150,10 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
         },
+        'stderr': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
         'sentry': {
             'level': 'WARNING',
             'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
@@ -157,7 +161,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'sentry'],
+            'handlers': os.environ.get('LOG_HANDLERS', 'stderr').split(','),
             'level': 'DEBUG',
             'propagate': True,
         },

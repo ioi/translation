@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
           url(r'^$', FirstPage.as_view(), name='firstpage'),
+          url(r'^healthcheck$', Healthcheck.as_view(), name='healthcheck'),
           url(r'^settings/$', Settings.as_view(), name='settings'),
           url(r'^login/$', Login.as_view(), name='login'),
           url(r'^logout/$', Logout.as_view(), name='logout'),

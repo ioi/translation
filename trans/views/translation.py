@@ -1,3 +1,4 @@
+import errno
 import urllib
 
 from django.http.response import HttpResponseNotFound
@@ -42,6 +43,19 @@ class Home(LoginRequiredMixin, View):
         contests = Contest.objects.order_by('order')
         return render(request, 'home.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
                                                      'contests': contests, 'is_editor': user.is_editor()})
+
+
+class Healthcheck(View):
+    def get(self, request):
+        try:
+            with open('REVISION', 'r') as f:
+                revision = f.read().strip()
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise e
+            revision = 'unknown'
+
+        return JsonResponse({'revision': revision})
 
 
 class Translations(LoginRequiredMixin, View):

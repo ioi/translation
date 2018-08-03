@@ -60,7 +60,7 @@
             </div>
         </div>
         <div class="col-sm-6 preview-pane markdown-body">
-            <div id="preview" class="rendered_content" dir="{{direction}}" lang="{{language}}"></div>
+            <div id="preview" class="rendered_content" dir="{{direction}}" lang="{{language_code}}"></div>
             <div id="isc-preview"></div>
             <div id="isc-markdown" style="white-space: pre-wrap;"></div>
         </div>
@@ -80,7 +80,7 @@
     get_latest_translation_url = "{% url 'get_latest_translation' id=taskID%}";
     save_task_url = "{% url 'save_translation' contest_slug=contest_slug task_name=task_name %}";
     task_version_url = "{% url 'revisions' 'task' contest_slug task_name  %}";
-    language = "{{language}}";
+    language_code = "{{language_code}}";
     direction = "{{direction}}";
     IMAGES_URL = '{{ settings.IMAGES_URL }}';
 

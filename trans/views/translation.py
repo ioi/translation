@@ -74,7 +74,7 @@ class Translations(LoginRequiredMixin, View):
                       context={'trans': trans.get_latest_text(), 'task': task_text,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
                                'contests': contests, 'task_name': task_name, 'is_editor': user.is_editor(),
-                               'taskID': task.id, 'language': user.credentials(), 'username': user.username,
+                               'taskID': task.id, 'language_code': user.language.code, 'username': user.username,
                                'direction': user.language.direction()})
 
 

@@ -14,7 +14,7 @@ from django.http import HttpResponseNotFound
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest
-from trans.utils import is_translate_in_editing, unleash_edit_token, unreleased_pdf_path, final_pdf_path
+from trans.utils import is_translate_in_editing, unleash_edit_token, output_pdf_path, final_pdf_path
 from trans.utils.pdf import final_markdown_path
 from trans.utils.translation import get_trans_by_user_and_task
 from trans.views.translation import TranslationPDF
@@ -165,7 +165,7 @@ class FreezeTranslation(StaffCheckMixin, View):
             request.GET = request.GET.copy()
             request.GET['user'] = user.username
             pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
-            source_pdf_file_path = unreleased_pdf_path(contest_slug, task_name, user)
+            source_pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, user)
             target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
             copyfile(source_pdf_file_path, target_pdf_file_path)
             with open(final_markdown_path(contest_slug, task_name, user), 'wb') as f:

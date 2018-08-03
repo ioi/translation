@@ -55,14 +55,24 @@ def render_pdf_template(request, user, contest_slug, task_name, task_type,
     return render_to_string('pdf-template.html', context=context,
                             request=request)
 
-
-def unreleased_pdf_path(contest_slug, task_name, user):
-    file_path = '{}/output/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
+# pdf file paths (excepting final pdf path)
+def output_pdf_path(contest_slug, task_name, task_type, user):
+    file_path = '{}/output/{}/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name, task_type)
     file_name = '{}-{}.pdf'.format(task_name, user.username)
     pdf_file_path = '{}/{}'.format(file_path, file_name)
     os.makedirs(file_path, exist_ok=True)
     return pdf_file_path
 
+def released_pdf_path(contest_slug, task_name, user):
+    return output_pdf_path(contest_slug, task_name, 'released', user)
+
+def unreleased_pdf_path(contest_slug, task_name, user):
+    return output_pdf_path(contest_slug, task_name, 'task', user)
+
+# base pdf is a pdf of ISC
+def base_pdf_path(contest_slug, task_name, task_type):
+    user = User.objects.get(username='ISC')
+    return output_pdf_path(contest_slug, task_name, task_type, user)
 
 def final_pdf_path(contest_slug, task_name, user):
     file_path = '{}/final/pdf/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)

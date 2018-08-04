@@ -2,6 +2,7 @@
 
 cd /usr/src/app
 export DJANGO_SETTINGS_MODULE=Translation.settings
+export LANG=C.UTF-8
 
 fc-cache
 

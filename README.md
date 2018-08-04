@@ -40,9 +40,7 @@ You may optionally perform the following tasks:
   for the very first time.
   Then exit from the shell by typing `exit`.
 * For importing data such as countries, languages, and sample tasks,
-  run `docker-compose exec web bash`, and
-  then in the shell, execute `python3 manage.py initialize`.
-  Then exit from the shell by typing `exit`.
+  use the CSV importer in the admin console.
 * You can get access to the system logs by running `dokcer-compose logs`.
   To follow the logs from now on, run `docker-compose logs -f --tail=0`.
 * To stop the system, run `dokcer-compose stop`.

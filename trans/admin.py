@@ -3,6 +3,9 @@ from django.contrib.auth.admin import UserAdmin
 from django import forms
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse
+from import_export.admin import ImportExportMixin, ImportExportModelAdmin
+from import_export.resources import ModelResource
+from import_export.fields import Field
 from trans.utils import reset_notification_cache
 from .models import *
 from django.shortcuts import render
@@ -20,29 +23,30 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
-# class MyModelAdmin(admin.ModelAdmin):
-#     def get_urls(self):
-#         urls = super(MyModelAdmin, self).get_urls()
-#         my_urls = urls('',
-#             (r'^send_email/$', self.my_view)
-#         )
-#         return my_urls + urls
+
+class CustomUserResource(ModelResource):
+    raw_password = Field('raw_password')
+
+    class Meta:
+        model = User
+        fields = ('username', 'country', 'language', 'raw_password',)
+        import_id_fields = ('username',)
 
 
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(ImportExportMixin, UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
+    resource_class = CustomUserResource
     list_display = ("username", "translate_versions", "country", "language")
     ordering = ("username",)
-    actions = ['send_EMAIL']
 
     fieldsets = (
-        (None, {'fields': ('username', 'raw_password', 'text_font_base64', 'text_font_name', 'email','password', 'first_name', 'last_name','language','country')}),
+        (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country')}),
         )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email','password', 'first_name', 'last_name','language','country', 'is_superuser', 'is_staff', 'is_active')}
+            'fields': ('username','password','language','country', 'is_superuser', 'is_staff', 'is_active')}
             ),
         )
 
@@ -53,27 +57,45 @@ class CustomUserAdmin(UserAdmin):
 
     translate_versions.allow_tags = True
 
-    def send_EMAIL(self, request, queryset):
-        from django.core.mail import send_mail
-        for i in queryset:
-            if i.email:
-                send_mail('Subject here', 'Here is the message.', 'milad.ameri73@gmail.com',[i.email], fail_silently=False)
-            else:
-                self.message_user(request, "Mail sent successfully ")
-    send_EMAIL.short_description = "Send an email to selected users"
+
+class LanguageResource(ModelResource):
+    class Meta:
+        model = Language
+        fields = ('code', 'name', 'rtl',)
+        import_id_fields = ('code',)
+
+
+class LanguageAdmin(ImportExportModelAdmin):
+    resource_class = LanguageResource
+    list_display = ['code', 'name', 'direction']
+    ordering = ['code']
+
+
+class CountryResource(ModelResource):
+    class Meta:
+        model = Country
+        fields = ('code', 'name',)
+        import_id_fields = ('code',)
+
+
+class CountryAdmin(ImportExportModelAdmin):
+    resource_class = CountryResource
+    list_display = ['code', 'name']
+    ordering = ['code']
 
 
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'description', 'create_time']
     ordering = ['create_time']
 
+
 admin.site.register(Contest)
 admin.site.register(FlatPage)
 admin.site.register(Task)
 admin.site.register(Translation)
 admin.site.register(User, CustomUserAdmin)
-admin.site.register(Language)
-admin.site.register(Country)
+admin.site.register(Language, LanguageAdmin)
+admin.site.register(Country, CountryAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Attachment)
 admin.site.register(Version)

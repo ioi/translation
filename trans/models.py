@@ -8,9 +8,8 @@ from trans.utils.notification import add_notification_to_users_cache, remove_not
 
 
 class User(DjangoUser):
-    language = models.ForeignKey('Language')
-    country = models.ForeignKey('Country')
-    raw_password = models.CharField(max_length=255, default='')
+    language = models.ForeignKey('Language', on_delete=models.deletion.CASCADE)
+    country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
 
@@ -19,6 +18,14 @@ class User(DjangoUser):
 
     def credentials(self):
         return self.country.name + '_' + self.language.name
+
+    @property
+    def raw_password(self):
+        return '****'
+
+    @raw_password.setter
+    def raw_password(self, raw_password):
+        self.set_password(raw_password)
 
     @staticmethod
     def get_translators():
@@ -156,8 +163,8 @@ class Version(models.Model):
 
 
 class Language(models.Model):
-    name = models.CharField(max_length=255, primary_key=True)
-    code = models.CharField(unique=True, max_length=255, default='')
+    name = models.CharField(max_length=255)
+    code = models.CharField(primary_key=True, max_length=255)
     rtl = models.BooleanField(default=False)
 
     def direction(self):
@@ -168,8 +175,8 @@ class Language(models.Model):
 
 
 class Country(models.Model):
-    name = models.CharField(max_length=255,primary_key=True)
-    code = models.CharField(unique=True, max_length=255,default='')
+    name = models.CharField(max_length=255)
+    code = models.CharField(primary_key=True, max_length=255)
 
     def __str__(self):
         return self.name

@@ -10,7 +10,6 @@ from trans.utils.notification import add_notification_to_users_cache, remove_not
 class User(DjangoUser):
     language = models.ForeignKey('Language', on_delete=models.deletion.CASCADE)
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
-    raw_password = models.CharField(max_length=255, default='')
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
 
@@ -19,6 +18,14 @@ class User(DjangoUser):
 
     def credentials(self):
         return self.country.name + '_' + self.language.name
+
+    @property
+    def raw_password(self):
+        return '****'
+
+    @raw_password.setter
+    def raw_password(self, raw_password):
+        self.set_password(raw_password)
 
     @staticmethod
     def get_translators():

@@ -12,6 +12,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from django.conf import settings
 
 import os
+from shutil import copyfile
 
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
@@ -162,7 +163,7 @@ class TranslationPDF(LoginRequiredMixin, View):
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
     def __build_pdf(self, request, contest_slug, task_name, task_type, user):
-        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
+        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, user)
         html = render_pdf_template(
             request, user, contest_slug, task_name, task_type,
             static_path=settings.STATIC_ROOT,
@@ -177,7 +178,7 @@ class TranslationPDF(LoginRequiredMixin, View):
         self.__build_pdf(request, contest_slug, task_name, task_type, requested_user)
         source_pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
         final_pdf_file_path = final_pdf_path(contest_slug, task_name, requested_user)
-        copyfile(source_pdf_file_path, finale_pdf_file_path)
+        copyfile(source_pdf_file_path, final_pdf_file_path)
 
 class TranslationPrint(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name, task_type):

@@ -118,6 +118,7 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+SESSION_COOKIE_SECURE = int(os.environ.get('SESSION_COOKIE_SECURE', 1)) != 0
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

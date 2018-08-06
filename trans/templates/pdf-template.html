@@ -47,13 +47,28 @@
 <script>
 
     $(document).ready(function() {
+        {% if pdf_output %}
+        var mutated = Date.now();
+        var observer = new MutationObserver(function() { mutated = Date.now(); });
+        function checkMutation() {
+            if(Date.now() - 1000 < mutated)
+                return setTimeout(checkMutation, 100);
+            window.print();
+        }
+        observer.observe(document, {childList: true, subtree: true});
+        {% endif %}
+
         text = $('#markdown').text();
         $('#preview').html(marked(text));
         renderMathInElement(document.getElementById('preview'));
+
+        {% if pdf_output %}
+        setTimeout(checkMutation, 100);
+        {% endif %}
     });
-    
+
     IMAGES_URL = '{{ images_path }}';
-        
+
 </script>
 
 <style>
@@ -65,7 +80,7 @@
         .header .logo img {
             margin-top: 1px;
         }
-        
+
     }
     {% endif %}
     {% if text_font_base64 %}

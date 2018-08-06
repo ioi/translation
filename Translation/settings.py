@@ -36,6 +36,8 @@ WKHTMLTOPDF_CMD_OPTIONS = {
     'margin-top': '0.62in',
     'margin-bottom': '1in',
     'print-media-type': '',
+    'no-stop-slow-scripts': '',
+    'javascript-delay': '30000',  # max wait until rendering finishes
 }
 
 

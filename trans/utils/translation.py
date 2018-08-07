@@ -44,11 +44,19 @@ def get_requested_user(request, task_type):
 
 
 def get_translate_edit_permission(translation, my_token=None):
-    if can_save_translate(translation, my_token):
-        new_edit_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        cache.set(get_trans_edit_cache_key(translation), (new_edit_key, datetime.datetime.now()))
-        return True, new_edit_key
-    return False, ""
+    edit_token = cache.get(get_trans_edit_cache_key(translation))
+    current_time = datetime.datetime.now()
+
+    if edit_token is None:
+        my_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        cache.set(get_trans_edit_cache_key(translation), (my_token, datetime.datetime.now()))
+        return True, my_token
+    elif my_token == edit_token[0] or edit_token[1] + datetime.timedelta(
+            seconds=settings.TRANSLATION_EDIT_TIME_OUT) < current_time:
+        cache.set(get_trans_edit_cache_key(translation), (my_token, datetime.datetime.now()))
+        return True, my_token
+
+    return False, None
 
 
 def can_save_translate(translation, my_token):

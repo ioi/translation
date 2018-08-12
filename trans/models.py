@@ -27,6 +27,15 @@ class User(DjangoUser):
     def raw_password(self, raw_password):
         self.set_password(raw_password)
 
+    @property
+    def language_code(self):
+        language_code = language.code
+        country_code2 = country.code2
+        if country_code2 is None:
+            return language_code
+        else:
+            return '{}_{}'.format(language_code, country_code2)
+
     @staticmethod
     def get_translators():
         return User.objects.filter(is_staff=False)
@@ -177,6 +186,7 @@ class Language(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(primary_key=True, max_length=255)
+    code2 = models.CharField(max_length=255, null=True, default=None)
 
     def __str__(self):
         return self.name

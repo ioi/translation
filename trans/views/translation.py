@@ -18,7 +18,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, send_pdf_to_printer_with_header_page, output_pdf_path, \
+from trans.utils.pdf import send_pdf_to_printer, output_pdf_path, \
     get_file_name_from_path, get_translation_by_contest_and_task_type, final_pdf_path
 
 
@@ -179,7 +179,7 @@ class TranslationPrint(LoginRequiredMixin, View):
             info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
 
-        send_pdf_to_printer(output_pdf_path)
+        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, cover_page=False)
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)
         os.remove(output_pdf_path)
@@ -301,7 +301,7 @@ class PrintCustomFile(LoginRequiredMixin, View):
             for chunk in pdf_file.chunks():
                 f.write(chunk)
 
-        send_pdf_to_printer_with_header_page(pdf_file_path, user.country.code, user.country.name)
+        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, cover_page=True)
 
         response = redirect('printcustomfile')
         response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name, safe='=?&')

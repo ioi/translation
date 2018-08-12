@@ -74,13 +74,13 @@ class LanguageAdmin(ImportExportModelAdmin):
 class CountryResource(ModelResource):
     class Meta:
         model = Country
-        fields = ('code', 'name',)
+        fields = ('code', 'code2', 'name',)
         import_id_fields = ('code',)
 
 
 class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
-    list_display = ['code', 'name']
+    list_display = ['code', 'code2', 'name']
     ordering = ['code']
 
 

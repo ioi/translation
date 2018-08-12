@@ -29,8 +29,8 @@ class User(DjangoUser):
 
     @property
     def language_code(self):
-        language_code = language.code
-        country_code2 = country.code2
+        language_code = self.language.code
+        country_code2 = self.country.code2
         if country_code2 is None:
             return language_code
         else:

@@ -53,6 +53,12 @@
             <ul class="nav navbar-nav">
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                {% if settings.PRINT_ENABLED %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/print" title="Print PDF"><i class="fa fa-btn fa-print fa-lg"></i></a>
+                </li>
+                {% endif %}
+
                 <li class="dropdown">
                     <span class="notif-badge" id="notif-badge" style="display: none"></span>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>

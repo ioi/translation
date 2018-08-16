@@ -109,6 +109,7 @@ class UserTranslations(StaffCheckMixin, View):
         can_upload_final_pdf = request.user.has_perm('trans.change_translation')
         form = UploadFileForm()
         return render(request, 'user.html', context={'user_name': username, 'country': user.country.name,
+                                                    'is_editor': user.is_editor,
                                                      'tasks_lists': tasks_lists, 'language': user.credentials(),
                                                      'can_upload_final_pdf': can_upload_final_pdf, 'form': form})
 

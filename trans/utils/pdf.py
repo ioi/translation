@@ -85,7 +85,6 @@ def final_pdf_path(contest_slug, task_name, user):
     os.makedirs(file_path, exist_ok=True)
     return pdf_file_path
 
-
 def final_markdown_path(contest_slug, task_name, user):
     file_path = '{}/final/markdown/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
     file_name = '{}-{}.md'.format(task_name, user.username)

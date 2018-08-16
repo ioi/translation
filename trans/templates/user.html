@@ -41,7 +41,13 @@
             <tr>
                 <th width="20%">Task</th>
                 <th width="20%">Status</th>
-                <th>Translation</th>
+                {% if is_editor %}
+                <th>Translation(Current Version)</th>
+                <th>Translation(Latest Released)</th>
+                {% else %}
+                <th>Translation(Current Version)</th>
+                <th>Translation(ISC Version)</th>
+                {% endif %}
                 <th width="15%">Finalize</th>
                 <th width="15%">Unleash Lock</th>
                 {% if can_upload_final_pdf and contest.user_contest.frozen %}
@@ -63,6 +69,12 @@
                     <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}"
                        class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                     <a href="{% url 'task_pdf' 'task' contest.slug task.name %}?user={{user_name}}"
+                       class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                </td>
+                <td>
+                    <a href="{% url 'task_html' 'released' contest.slug task.name %}"
+                       class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
+                    <a href="{% url 'task_pdf' 'released' contest.slug task.name %}"
                        class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                 </td>
                 <td>
@@ -127,9 +139,8 @@
          var myTransId = $(this).data('id');
          $("#input_trans_id").attr('value', myTransId );
     });
-    
+
 </script>
 
 
 {% endblock %}
-

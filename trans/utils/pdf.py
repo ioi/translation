@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 
 import pdfkit
+from shutil import copyfile
 from xvfbwrapper import Xvfb
 
 logger = logging.getLogger(__name__)
@@ -75,25 +76,22 @@ def base_pdf_path(contest_slug, task_name, task_type):
     user = User.objects.get(username='ISC')
     return output_pdf_path(contest_slug, task_name, task_type, user)
 
-def final_pdf_path(contest_slug, task_name, user):
-    file_path = '{}/final/pdf/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
-    file_name = '{}-{}.pdf'.format(task_name, user.username)
-    if user.username == 'ISC':
-        file_path = '{}/final/pdf/{}'.format(settings.MEDIA_ROOT, contest_slug)
-        file_name = '{}.pdf'.format(task_name)
-    pdf_file_path = '{}/{}'.format(file_path, file_name)
-    os.makedirs(file_path, exist_ok=True)
+def build_pdf(request, contest_slug, task_name, task_type, requested_user, user):
+    pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
+    html = render_pdf_template(
+        request, user, contest_slug, task_name, task_type,
+        static_path=settings.STATIC_ROOT,
+        images_path=settings.HOST_URL + 'media/images/',
+        pdf_output=True,
+    )
+    convert_html_to_pdf(html, pdf_file_path)
+    add_page_numbers_to_pdf(pdf_file_path, task_name)
     return pdf_file_path
 
-def final_markdown_path(contest_slug, task_name, user):
-    file_path = '{}/final/markdown/{}/{}'.format(settings.MEDIA_ROOT, contest_slug, task_name)
-    file_name = '{}-{}.md'.format(task_name, user.username)
-    if user.username == 'ISC':
-        file_path = '{}/final/markdown/{}'.format(settings.MEDIA_ROOT, contest_slug)
-        file_name = '{}.md'.format(task_name)
-    md_file_path = '{}/{}'.format(file_path, file_name)
-    os.makedirs(file_path, exist_ok=True)
-    return md_file_path
+
+def build_final_pdf(request, contest_slug, task_name, requested_user, user):
+    task_type = 'released' if requested_user.username == 'ISC' else 'task'
+    return build_pdf(request, contest_slug, task_name, task_type, requested_user, user)
 
 
 def get_file_name_from_path(file_path):

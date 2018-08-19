@@ -12,7 +12,6 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from django.conf import settings
 
 import os
-from shutil import copyfile
 
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
@@ -20,7 +19,8 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
 from trans.utils.pdf import send_pdf_to_printer, output_pdf_path, \
-    get_file_name_from_path, get_translation_by_contest_and_task_type, final_pdf_path
+    get_file_name_from_path, get_translation_by_contest_and_task_type, \
+    build_pdf
 
 
 class Home(LoginRequiredMixin, View):
@@ -145,40 +145,14 @@ class TranslationPDF(LoginRequiredMixin, View):
         translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         requested_user = get_requested_user(request, task_type)
 
-        # if translation is frozen, return final pdf file
-        if translation.frozen:
-            pdf_file_path = final_pdf_path(contest_slug, task_name, requested_user)
-            # regenerate final PDF file if it does not exists
-            rebuild_needed = not os.path.exists(pdf_file_path)
-            if rebuild_needed:
-                self.__build_frozen_pdf(request, contest_slug, task_name, requested_user, user)
-            return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
-
         pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
         last_edit_time = translation.get_latest_change_time()
         rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
         if rebuild_needed:
-            self.__build_pdf(request, contest_slug, task_name, task_type, requested_user, user)
+            build_pdf(request, contest_slug, task_name, task_type, requested_user, user)
 
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
-    def __build_pdf(self, request, contest_slug, task_name, task_type, requested_user, user):
-        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
-        html = render_pdf_template(
-            request, user, contest_slug, task_name, task_type,
-            static_path=settings.STATIC_ROOT,
-            images_path=settings.HOST_URL + 'media/images/',
-            pdf_output=True
-        )
-        convert_html_to_pdf(html, pdf_file_path)
-        add_page_numbers_to_pdf(pdf_file_path, task_name)
-
-    def __build_frozen_pdf(self, request, contest_slug, task_name, requested_user, user):
-        task_type = 'released' if requested_user.username == 'ISC' else 'task'
-        self.__build_pdf(request, contest_slug, task_name, task_type, requested_user, user)
-        source_pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
-        final_pdf_file_path = final_pdf_path(contest_slug, task_name, requested_user)
-        copyfile(source_pdf_file_path, final_pdf_file_path)
 
 class TranslationPrint(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name, task_type):

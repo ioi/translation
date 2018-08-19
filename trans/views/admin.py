@@ -97,7 +97,7 @@ class UserTranslations(StaffCheckMixin, View):
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.frozen
             translation_id = translation.id if translation else None
-            final_pdf_url = translation.final_pdf.url if translation.final_pdf else None
+            final_pdf_url = translation.final_pdf.url if translation and translation.final_pdf else None
             tasks_by_contest[task.contest].append(
                 {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
                  'frozen': frozen, 'final_pdf_url': final_pdf_url})

@@ -18,8 +18,15 @@
     <script type="text/javascript" src="{{ static_path }}/libs/markdown/katex.js"></script>
     <script type="text/javascript" src="{{ static_path }}/libs/markdown/auto-render.min.js"></script>
 
+    {% if text_font_base64 %}
+    <style>
+        @font-face {
+            font-family: 'CustomTextFont';
+            src: url(data:font/truetype;charset=utf-8;base64,{{ text_font_base64 }})
+        }
+    </style>
+    {% endif %}
 </head>
-
 
 <body>
     <div class="markdown-body pdf">
@@ -70,25 +77,4 @@
     IMAGES_URL = '{{ images_path }}';
 
 </script>
-
-<style>
-    {% if pdf_output %}
-    @media print {
-        body {
-            zoom: 1.2;
-        }
-        .header .logo img {
-            margin-top: 1px;
-        }
-
-    }
-    {% endif %}
-    {% if text_font_base64 %}
-        @font-face {
-            font-family: 'CustomTextFont';
-            src: url(data:font/truetype;charset=utf-8;base64,{{ text_font_base64 }})
-        }
-    {% endif %}
-</style>
-
 </html>

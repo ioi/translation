@@ -3,8 +3,8 @@ from collections import defaultdict
 import os
 from django.contrib.auth.decorators import permission_required
 from django.http.response import HttpResponseBadRequest
-from shutil import copyfile
 
+from django.core.files import File
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls.base import reverse
@@ -14,10 +14,9 @@ from django.http import HttpResponseNotFound
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest
-from trans.utils import is_translate_in_editing, unleash_edit_token, output_pdf_path, final_pdf_path
-from trans.utils.pdf import final_markdown_path
+from trans.utils import is_translate_in_editing, unleash_edit_token, get_requested_user
+from trans.utils.pdf import build_final_pdf
 from trans.utils.translation import get_trans_by_user_and_task
-from trans.views.translation import TranslationPDF
 
 
 class AdminCheckMixin(LoginRequiredMixin,object):
@@ -98,9 +97,10 @@ class UserTranslations(StaffCheckMixin, View):
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.frozen
             translation_id = translation.id if translation else None
+            final_pdf_url = translation.final_pdf.url if translation.final_pdf else None
             tasks_by_contest[task.contest].append(
                 {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
-                 'frozen': frozen})
+                 'frozen': frozen, 'final_pdf_url': final_pdf_url})
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
                         'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
                         'tasks': tasks_by_contest[c]} for c in
@@ -142,19 +142,16 @@ class AddFinalPDF(StaffCheckMixin, View):
         pdf_file = request.FILES.get('uploaded_file', None)
         if not pdf_file or pdf_file.name.split('.')[-1] != 'pdf':
             return HttpResponseBadRequest("You should attach a pdf file")
-        pdf_file_path = final_pdf_path(trans.task.contest.slug, trans.task.name, trans.user)
-        with open(pdf_file_path, 'wb') as f:
-            for chunk in pdf_file.chunks():
-                f.write(chunk)
 
         trans.frozen = True
+        trans.final_pdf = pdf_file
         trans.save()
         return redirect(request.META.get('HTTP_REFERER'))
 
 
 class FreezeTranslation(StaffCheckMixin, View):
     def post(self, request, id):
-        frozen = request.POST.get('freeze', False)
+        frozen = request.POST['freeze'] == 'True'
         trans = Translation.objects.filter(id=id).first()
         if trans is None:
             return HttpResponseNotFound("There is no task")
@@ -162,23 +159,18 @@ class FreezeTranslation(StaffCheckMixin, View):
         task_type = 'released' if user.username == 'ISC' else 'task'
         contest_slug = trans.task.contest.slug
         task_name = trans.task.name
-        if frozen == 'True':
-            request.GET = request.GET.copy()
-            request.GET['user'] = user.username
-            pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
-            source_pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, user)
-            target_pdf_file_path = final_pdf_path(contest_slug, task_name, user)
-            copyfile(source_pdf_file_path, target_pdf_file_path)
-            with open(final_markdown_path(contest_slug, task_name, user), 'wb') as f:
-                f.write(trans.get_latest_text().encode('utf-8'))
-                f.close()
+
+        trans.frozen = frozen
+        if frozen:
+            requested_user = get_requested_user(request, task_type)
+            pdf_path = build_final_pdf(request, contest_slug, task_name, requested_user, user)
+            with open(pdf_path, 'rb') as f:
+                trans.final_pdf = File(f)
+                trans.save()
         else:
-            if os.path.exists(final_pdf_path(contest_slug, task_name, user)):
-                os.remove(final_pdf_path(contest_slug, task_name, user))
-            if os.path.exists(final_markdown_path(contest_slug, task_name, user)):
-                os.remove(final_markdown_path(contest_slug, task_name, user))
-        trans.frozen = (frozen == 'True')
-        trans.save()
+            trans.final_pdf.delete()
+            trans.save()
+
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
 
 

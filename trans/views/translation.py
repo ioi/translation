@@ -18,9 +18,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, \
-    get_file_name_from_path, get_translation_by_contest_and_task_type, \
-    build_pdf
+from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf
 
 
 class Home(LoginRequiredMixin, View):
@@ -127,11 +125,20 @@ class TranslationMarkdown(LoginRequiredMixin, View):
 
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
 
+class TranslationView(LoginRequiredMixin, View):
+    def _get_translation_by_contest_and_task_type(self, request, user, contest_slug, task_name, task_type):
+        requested_user = get_requested_user(request, task_type)
+        task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
 
-class TranslationHTML(LoginRequiredMixin, View):
+        if task_type == 'released':
+            return task.get_base_translation()
+        return get_trans_by_user_and_task(requested_user, task)
+
+
+class TranslationHTML(TranslationView):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
+        translation = self._get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         return HttpResponse(render_pdf_template(
             translation, task_type,
             static_path='/static',
@@ -140,18 +147,18 @@ class TranslationHTML(LoginRequiredMixin, View):
         ))
 
 
-class TranslationPDF(LoginRequiredMixin, View):
+class TranslationPDF(TranslationView):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
+        translation = self._get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         pdf_file_path = build_pdf(translation, task_type)
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
 
-class TranslationPrint(LoginRequiredMixin, View):
+class TranslationPrint(TranslationView):
     def post(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
+        translation = self._get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         pdf_file_path = build_pdf(translation, task_type)
 
         if translation.user.username == 'ISC':

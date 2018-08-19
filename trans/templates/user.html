@@ -41,15 +41,13 @@
             <tr>
                 <th width="20%">Task</th>
                 <th width="20%">Status</th>
-                {% if is_editor %}
-                <th>Translation(Current Version)</th>
-                <th>Translation(Latest Released)</th>
+                <th width="15%">Unleash Lock</th>
+                {% if user_name == "ISC" %}
+                <th>ISC Version</th>
                 {% else %}
-                <th>Translation(Current Version)</th>
-                <th>Translation(ISC Version)</th>
+                <th>Translation</th>
                 {% endif %}
                 <th width="15%">Finalize</th>
-                <th width="15%">Unleash Lock</th>
                 <th>Final PDF</th>
             </tr>
             </thead>
@@ -64,17 +62,28 @@
                     {% else %} Started {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}"
-                       class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
-                    <a href="{% url 'task_pdf' 'task' contest.slug task.name %}?user={{user_name}}"
-                       class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                    {% if task.is_editing %}
+                        <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info"> Unleash </button>
+                        </form>
+                    {% endif %}
                 </td>
+                {% if user_name == "ISC" %}
                 <td>
                     <a href="{% url 'task_html' 'released' contest.slug task.name %}"
                        class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                     <a href="{% url 'task_pdf' 'released' contest.slug task.name %}"
                        class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                 </td>
+                {% else %}
+                <td>
+                    <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}"
+                       class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
+                    <a href="{% url 'task_pdf' 'task' contest.slug task.name %}?user={{user_name}}"
+                       class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                </td>
+                {% endif %}
                 <td>
                     {% if task.trans_id %}
                         {% if task.frozen and can_upload_final_pdf or not contest.user_contest.frozen%}
@@ -86,14 +95,6 @@
                                 </button>
                             </form>
                         {% endif %}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if task.is_editing %}
-                        <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-info"> Unleash </button>
-                        </form>
                     {% endif %}
                 </td>
                 <td>

@@ -98,10 +98,19 @@ class Task(models.Model):
         return '{} ({}: {})'.format(self.name, self.contest.title, self.order)
 
 
+def final_pdf_path(instance, _):
+    return 'final_pdf/{}/{}.{}.pdf'.format(
+        instance.task.name,
+        instance.user.username,
+        instance.user.language_code,
+    )
+
+
 class Translation(models.Model):
     user = models.ForeignKey('User')
     task = models.ForeignKey('Task', default=0)
     frozen = models.BooleanField(default=False)
+    final_pdf = models.FileField(upload_to=final_pdf_path, null=True)
 
     def add_version(self, text, release_note='', saved=True):
         if text.strip() == '':

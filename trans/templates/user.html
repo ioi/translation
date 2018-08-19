@@ -50,9 +50,7 @@
                 {% endif %}
                 <th width="15%">Finalize</th>
                 <th width="15%">Unleash Lock</th>
-                {% if can_upload_final_pdf and contest.user_contest.frozen %}
-                <th>User PDF</th>
-                {% endif %}
+                <th>Final PDF</th>
             </tr>
             </thead>
             <tbody>
@@ -98,13 +96,15 @@
                         </form>
                     {% endif %}
                 </td>
-                {% if can_upload_final_pdf and contest.user_contest.frozen %}
-                    <td>
-                        {% if not task.frozen %}
-                            <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Add User PDF</a>
-                        {% endif %}
-                    </td>
+                <td>
+                {% if task.final_pdf_url %}
+                    <a href="{{task.final_pdf_url}}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                {% else %}
+                    {% if can_upload_final_pdf and contest.user_contest.frozen %}
+                         <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Add User PDF</a>
+                    {% endif %}
                 {% endif %}
+                </td>
 
             </tr>
             {% endfor %}

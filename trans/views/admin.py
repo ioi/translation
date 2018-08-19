@@ -14,9 +14,9 @@ from django.http import HttpResponseNotFound
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest
-from trans.utils import is_translate_in_editing, unleash_edit_token, get_requested_user
+from trans.utils import is_translate_in_editing, unleash_edit_token
 from trans.utils.pdf import build_final_pdf
-from trans.utils.translation import get_trans_by_user_and_task, get_task_by_contest_and_name
+from trans.utils.translation import get_trans_by_user_and_task
 
 
 class AdminCheckMixin(LoginRequiredMixin,object):

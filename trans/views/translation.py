@@ -18,7 +18,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, output_pdf_path, \
+from trans.utils.pdf import send_pdf_to_printer, \
     get_file_name_from_path, get_translation_by_contest_and_task_type, \
     build_pdf
 
@@ -144,13 +144,7 @@ class TranslationPDF(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
         translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
-
-        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, translation.user)
-        last_edit_time = translation.get_latest_change_time()
-        rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
-        if rebuild_needed:
-            build_pdf(translation, task_type)
-
+        pdf_file_path = build_pdf(translation, task_type)
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 
 

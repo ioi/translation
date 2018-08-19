@@ -152,12 +152,8 @@ class TranslationPrint(LoginRequiredMixin, View):
     def post(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
         translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
-        pdf_response = TranslationPDF().get(request, contest_slug, task_name, task_type)
+        pdf_file_path = build_pdf(translation, task_type)
 
-        if not 'pdf_file_path' in pdf_response:
-            return JsonResponse({'success': False})
-
-        pdf_file_path = pdf_response['pdf_file_path']
         if translation.user.username == 'ISC':
             info_line = 'Release {}, deliver to {}'.format(translation.get_published_versions_count(), user.country.code)
         else:

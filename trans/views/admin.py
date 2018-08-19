@@ -16,7 +16,7 @@ from trans.forms import UploadFileForm
 from trans.models import User, Task, Translation, Contest, UserContest
 from trans.utils import is_translate_in_editing, unleash_edit_token, get_requested_user
 from trans.utils.pdf import build_final_pdf
-from trans.utils.translation import get_trans_by_user_and_task
+from trans.utils.translation import get_trans_by_user_and_task, get_task_by_contest_and_name
 
 
 class AdminCheckMixin(LoginRequiredMixin,object):
@@ -163,7 +163,8 @@ class FreezeTranslation(StaffCheckMixin, View):
         trans.frozen = frozen
         if frozen:
             requested_user = get_requested_user(request, task_type)
-            pdf_path = build_final_pdf(request, contest_slug, task_name, requested_user, user)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
+            pdf_path = build_final_pdf(request, task, requested_user)
             with open(pdf_path, 'rb') as f:
                 trans.final_pdf = File(f)
                 trans.save()

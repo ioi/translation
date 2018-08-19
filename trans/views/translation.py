@@ -131,8 +131,9 @@ class TranslationMarkdown(LoginRequiredMixin, View):
 class TranslationHTML(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
+        task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
         return HttpResponse(render_pdf_template(
-            request, user, contest_slug, task_name, task_type,
+            request, task, task_type,
             static_path='/static',
             images_path='/media/images/',
             pdf_output=False
@@ -149,7 +150,8 @@ class TranslationPDF(LoginRequiredMixin, View):
         last_edit_time = translation.get_latest_change_time()
         rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
         if rebuild_needed:
-            build_pdf(request, contest_slug, task_name, task_type, requested_user, user)
+            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
+            build_pdf(request, task, task_type, requested_user)
 
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 

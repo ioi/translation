@@ -28,11 +28,9 @@ def get_translation_by_contest_and_task_type(request, user, contest_slug, task_n
     return get_trans_by_user_and_task(requested_user, task)
 
 
-def render_pdf_template(request, user, contest_slug, task_name, task_type,
+def render_pdf_template(request, task, task_type,
                         static_path, images_path, pdf_output):
     requested_user = get_requested_user(request, task_type)
-    task = get_task_by_contest_and_name(contest_slug, task_name,
-                                        user.is_editor())
 
     if task_type == 'released':
         content = task.get_published_text()
@@ -76,22 +74,22 @@ def base_pdf_path(contest_slug, task_name, task_type):
     user = User.objects.get(username='ISC')
     return output_pdf_path(contest_slug, task_name, task_type, user)
 
-def build_pdf(request, contest_slug, task_name, task_type, requested_user, user):
-    pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
+def build_pdf(request, task, task_type, requested_user):
+    pdf_file_path = output_pdf_path(task.contest.slug, task.name, task_type, requested_user)
     html = render_pdf_template(
-        request, user, contest_slug, task_name, task_type,
+        request, task, task_type,
         static_path=settings.STATIC_ROOT,
         images_path=settings.HOST_URL + 'media/images/',
         pdf_output=True,
     )
     convert_html_to_pdf(html, pdf_file_path)
-    add_page_numbers_to_pdf(pdf_file_path, task_name)
+    add_page_numbers_to_pdf(pdf_file_path, task.name)
     return pdf_file_path
 
 
-def build_final_pdf(request, contest_slug, task_name, requested_user, user):
+def build_final_pdf(request, task, requested_user):
     task_type = 'released' if requested_user.username == 'ISC' else 'task'
-    return build_pdf(request, contest_slug, task_name, task_type, requested_user, user)
+    return build_pdf(request, task, task_type, requested_user)
 
 
 def get_file_name_from_path(file_path):

@@ -14,10 +14,6 @@ from xvfbwrapper import Xvfb
 
 logger = logging.getLogger(__name__)
 
-from trans.utils.translation import get_requested_user, \
-    get_task_by_contest_and_name, get_trans_by_user_and_task
-
-
 def render_pdf_template(translation, task_type,
                         static_path, images_path, pdf_output):
     requested_user = translation.user

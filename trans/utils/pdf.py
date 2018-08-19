@@ -77,6 +77,12 @@ def build_pdf(translation, task_type):
     task = translation.task
     user = translation.user
     pdf_file_path = output_pdf_path(task.contest.slug, task.name, task_type, user)
+
+    last_edit_time = translation.get_latest_change_time()
+    rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
+    if not rebuild_needed:
+        return pdf_file_path
+
     html = render_pdf_template(
         translation, task_type,
         static_path=settings.STATIC_ROOT,
@@ -86,6 +92,7 @@ def build_pdf(translation, task_type):
     convert_html_to_pdf(html, pdf_file_path)
     add_page_numbers_to_pdf(pdf_file_path, task.name)
     return pdf_file_path
+
 
 def build_final_pdf(translation):
     task_type = 'released' if translation.user.username == 'ISC' else 'task'

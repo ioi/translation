@@ -28,15 +28,15 @@ def get_translation_by_contest_and_task_type(request, user, contest_slug, task_n
     return get_trans_by_user_and_task(requested_user, task)
 
 
-def render_pdf_template(request, task, task_type,
+def render_pdf_template(translation, task_type,
                         static_path, images_path, pdf_output):
-    requested_user = get_requested_user(request, task_type)
+    requested_user = translation.user
+    task = translation.task
 
     if task_type == 'released':
-        content = task.get_published_text()
+        content = translation.get_published_text()
     else:
-        trans = get_trans_by_user_and_task(requested_user, task)
-        content = trans.get_latest_text()
+        content = translation.get_latest_text()
 
     context = {
         'content': content,
@@ -52,8 +52,7 @@ def render_pdf_template(request, task, task_type,
         'images_path': images_path,
         'text_font_base64': requested_user.text_font_base64
     }
-    return render_to_string('pdf-template.html', context=context,
-                            request=request)
+    return render_to_string('pdf-template.html', context=context)
 
 # pdf file paths (excepting final pdf path)
 def output_pdf_path(contest_slug, task_name, task_type, user):
@@ -74,10 +73,12 @@ def base_pdf_path(contest_slug, task_name, task_type):
     user = User.objects.get(username='ISC')
     return output_pdf_path(contest_slug, task_name, task_type, user)
 
-def build_pdf(request, task, task_type, requested_user):
-    pdf_file_path = output_pdf_path(task.contest.slug, task.name, task_type, requested_user)
+def build_pdf(translation, task_type):
+    task = translation.task
+    user = translation.user
+    pdf_file_path = output_pdf_path(task.contest.slug, task.name, task_type, user)
     html = render_pdf_template(
-        request, task, task_type,
+        translation, task_type,
         static_path=settings.STATIC_ROOT,
         images_path=settings.HOST_URL + 'media/images/',
         pdf_output=True,
@@ -86,10 +87,9 @@ def build_pdf(request, task, task_type, requested_user):
     add_page_numbers_to_pdf(pdf_file_path, task.name)
     return pdf_file_path
 
-
-def build_final_pdf(request, task, requested_user):
-    task_type = 'released' if requested_user.username == 'ISC' else 'task'
-    return build_pdf(request, task, task_type, requested_user)
+def build_final_pdf(translation):
+    task_type = 'released' if translation.user.username == 'ISC' else 'task'
+    return build_pdf(translation, task_type)
 
 
 def get_file_name_from_path(file_path):

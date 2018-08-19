@@ -131,9 +131,9 @@ class TranslationMarkdown(LoginRequiredMixin, View):
 class TranslationHTML(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
-        task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
+        translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         return HttpResponse(render_pdf_template(
-            request, task, task_type,
+            translation, task_type,
             static_path='/static',
             images_path='/media/images/',
             pdf_output=False
@@ -144,14 +144,12 @@ class TranslationPDF(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name, task_type):
         user = User.objects.get(username=request.user)
         translation = get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
-        requested_user = get_requested_user(request, task_type)
 
-        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, requested_user)
+        pdf_file_path = output_pdf_path(contest_slug, task_name, task_type, translation.user)
         last_edit_time = translation.get_latest_change_time()
         rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
         if rebuild_needed:
-            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
-            build_pdf(request, task, task_type, requested_user)
+            build_pdf(translation, task_type)
 
         return pdf_response(pdf_file_path, get_file_name_from_path(pdf_file_path))
 

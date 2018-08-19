@@ -155,16 +155,10 @@ class FreezeTranslation(StaffCheckMixin, View):
         trans = Translation.objects.filter(id=id).first()
         if trans is None:
             return HttpResponseNotFound("There is no task")
-        user = trans.user
-        task_type = 'released' if user.username == 'ISC' else 'task'
-        contest_slug = trans.task.contest.slug
-        task_name = trans.task.name
 
         trans.frozen = frozen
         if frozen:
-            requested_user = get_requested_user(request, task_type)
-            task = get_task_by_contest_and_name(contest_slug, task_name, user.is_editor())
-            pdf_path = build_final_pdf(request, task, requested_user)
+            pdf_path = build_final_pdf(trans)
             with open(pdf_path, 'rb') as f:
                 trans.final_pdf = File(f)
                 trans.save()

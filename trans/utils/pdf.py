@@ -12,6 +12,8 @@ import pdfkit
 from shutil import copyfile
 from xvfbwrapper import Xvfb
 
+from trans.context_processors import ioi_settings
+
 logger = logging.getLogger(__name__)
 
 def render_pdf_template(translation, task_type,
@@ -38,6 +40,7 @@ def render_pdf_template(translation, task_type,
         'images_path': images_path,
         'text_font_base64': requested_user.text_font_base64
     }
+    context.update(ioi_settings(None))
     return render_to_string('pdf-template.html', context=context)
 
 # pdf file paths (excepting final pdf path)

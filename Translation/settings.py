@@ -201,3 +201,7 @@ if 'S3_BUCKET' in os.environ:
     AWS_STORAGE_BUCKET_NAME = os.environ['S3_BUCKET']
     AWS_S3_REGION_NAME = os.environ.get('S3_REGION')
     AWS_DEFAULT_ACL = 'private'
+
+SQS_QUEUE_NAME = os.environ.get('SQS_QUEUE_NAME')
+SQS_REGION_NAME = os.environ.get('SQS_REGION_NAME')
+

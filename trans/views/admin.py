@@ -146,6 +146,7 @@ class AddFinalPDF(StaffCheckMixin, View):
         trans.frozen = True
         trans.final_pdf = pdf_file
         trans.save()
+        trans.notify_final_pdf_change()
         return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -166,6 +167,7 @@ class FreezeTranslation(StaffCheckMixin, View):
             trans.final_pdf.delete()
             trans.save()
 
+        trans.notify_final_pdf_change()
         return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
 
 

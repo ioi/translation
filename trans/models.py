@@ -114,6 +114,11 @@ class Translation(models.Model):
     frozen = models.BooleanField(default=False)
     final_pdf = models.FileField(upload_to=final_pdf_path, null=True)
 
+    class Meta:
+        unique_together = (
+            ('user', 'task',),
+        )
+
     def add_version(self, text, release_note='', saved=True):
         if text.strip() == '':
             return None

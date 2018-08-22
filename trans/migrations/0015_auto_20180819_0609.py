@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.utils.timezone
 
+import trans.models
 
 class Migration(migrations.Migration):
 
@@ -16,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='translation',
             name='final_pdf',
-            field=models.FileField(null=True, upload_to='final_pdf/'),
+            field=models.FileField(null=True, upload_to=trans.models.final_pdf_path),
         ),
     ]

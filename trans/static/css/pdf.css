@@ -109,6 +109,7 @@ div.pdf {
         border-width: 0;
         box-shadow: none;
         width: 100%;
+        min-height: 0;
     }
 
     .header .logo img {

@@ -9,7 +9,7 @@ phases:
       - IMAGE_TAG=$(git rev-parse HEAD)
       - 'echo $IMAGE_TAG > REVISION'
       - 'docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:latest || :'
-      - docker --cache-from=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:latest build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:$IMAGE_TAG .
+      - docker build --cache-from=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:latest -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:$IMAGE_TAG .
       - docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ioi18-translation:latest
   post_build:
     commands:

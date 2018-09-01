@@ -6,6 +6,7 @@ from django.urls.base import reverse
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from import_export.resources import ModelResource
 from import_export.fields import Field
+import import_export.tmp_storages
 from trans.utils import reset_notification_cache
 from .models import *
 from django.shortcuts import render
@@ -40,6 +41,8 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     list_display = ("username", "translate_versions", "country", "language")
     ordering = ("username",)
 
+    tmp_storage_class = import_export.tmp_storages.MediaStorage
+
     fieldsets = (
         (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country')}),
         )
@@ -70,6 +73,7 @@ class LanguageAdmin(ImportExportModelAdmin):
     list_display = ['code', 'name', 'direction']
     ordering = ['code']
 
+    tmp_storage_class = import_export.tmp_storages.MediaStorage
 
 class CountryResource(ModelResource):
     class Meta:
@@ -83,6 +87,7 @@ class CountryAdmin(ImportExportModelAdmin):
     list_display = ['code', 'code2', 'name']
     ordering = ['code']
 
+    tmp_storage_class = import_export.tmp_storages.MediaStorage
 
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'description', 'create_time']

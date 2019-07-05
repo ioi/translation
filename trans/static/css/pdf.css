@@ -61,13 +61,14 @@ div.pdf {
     display: inline-block;
     float: right;
     text-align: right;
-    margin-top: 28px;
+    margin-top: 14px; /* ioi-2019 */
+	font-weight: bold; /* ioi-2019 */
     font-size: 12px;
 }
 
 .header .meta div:first-child {
-    font-family: "Courier New", monospace;
-    font-weight: bold;
+ /*   font-family: "Courier New", monospace; */ /* ioi-2019 */
+ /*   font-weight: bold; */  /* ioi-2019 */
     font-size: 18px;
     letter-spacing: -.03em;
     line-height: 25px;

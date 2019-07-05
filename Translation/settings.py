@@ -178,7 +178,7 @@ LOGGING = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Tokyo'
+TIME_ZONE = 'Asia/Baku'
 
 USE_I18N = True
 
@@ -194,7 +194,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
-HOST_URL = 'http://127.0.0.1:8000/'
+HOST_URL = 'http://127.0.0.1:9000/'
 
 if 'S3_BUCKET' in os.environ:
     DEFAULT_FILE_STORAGE = 'trans.s3storage.S3Storage'

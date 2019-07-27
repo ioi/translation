@@ -2,7 +2,6 @@ from django.conf import settings
 
 from django.conf.urls import url
 from .views import *
-from .s3storage import S3Redirector
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -58,5 +57,4 @@ urlpatterns = [
           url(r'^send_notification/$', SendNotification.as_view(), name='send_notif'),
           url(r'^user/(?P<username>[\w-]*)/font.css', UserFont.as_view(), name='userfontcss')
 
-      ] + S3Redirector.urlpatterns() \
-      + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+      ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

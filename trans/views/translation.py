@@ -7,7 +7,7 @@ from django.forms.models import model_to_dict
 from django.views.generic import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from trans.models import User, Task, Translation, Version, Contest, FlatPage
+from trans.models import User, Task, Translation, Version, Contest, FlatPage, UserContest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.conf import settings
 
@@ -34,9 +34,12 @@ class Home(LoginRequiredMixin, View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.is_editable_by(user)
+            translation_id = translation.id if translation else None    # neo added
             tasks_by_contest[task.contest].append(
-                {'id': task.id, 'name': task.name, 'is_editing': is_editing, 'frozen': frozen})
-        tasks_lists = [{'title': c.title, 'slug': c.slug, 'tasks': tasks_by_contest[c]} for c in
+                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing, 'frozen': frozen})
+        tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
+                        'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+                        'tasks': tasks_by_contest[c]} for c in
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
         contests = Contest.objects.order_by('order')

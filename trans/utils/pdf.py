@@ -75,7 +75,7 @@ def build_pdf(translation, task_type):
     html = render_pdf_template(
         translation, task_type,
         static_path=settings.STATIC_ROOT,
-        images_path=settings.HOST_URL + 'media/images/',
+        images_path=settings.MEDIA_ROOT + 'images/',
         pdf_output=True,
     )
     convert_html_to_pdf(html, pdf_file_path)

@@ -17,13 +17,14 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th width="20%">Task</th>
-                        <th width="20%">Edit</th>
+                        <th>Task</th>
+                        <th>Edit</th>
                         {% if is_editor %}
                         <th>Current Version</th>
                         <th>Latest Release</th>
                         {% else %}
                         <th>Translation</th>
+						<th>Finalize</th>
                         <th>ISC Version</th>
                         {% endif %}
                     </tr>
@@ -37,7 +38,7 @@
                             {% elif task.frozen %} Frozen
                             {% else %}<a href="{% url 'edit' contest.slug task.name %}">Edit</a>{% endif %}
                         </td>
-                        <td>
+                        <td> 
                             <a href="{% url 'revisions' 'task' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
                             <a href="{% url 'task_html' 'task' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                             <!-- <a href="{% url 'task_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
@@ -46,6 +47,25 @@
                             <button onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
                             {% endif %}
                         </td>
+						{% if not is_editor %}
+						<td>
+							{% if task.trans_id %}
+								{% if not contest.user_contest.frozen%}
+									<form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
+										{% csrf_token %}
+										<input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
+										{% if task.frozen %}
+										<button type="button" class="btn btn-default" disabled >Reopen (staff)</button>
+										{% else %}
+										<button type="submit" class="btn btn-info" onclick="return confirm('Are you sure? Once Finalized, only STAFF can Reopen.');">Finalize</button>
+										{% endif %}
+									</form>
+								{% endif %}
+								{% else %}
+								Not started
+							{% endif %}
+						</td>
+						{% endif %}
                         <td>
                             {% if not is_editor %}
                             <a href="{% url 'revisions' 'released' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>

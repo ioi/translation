@@ -1,5 +1,4 @@
 import json
-import boto3
 
 from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User as DjangoUser
@@ -158,28 +157,6 @@ class Translation(models.Model):
         user_contest = UserContest.objects.filter(user=user, contest=contest).first()
         frozen_by_user_contest = user_contest and user_contest.frozen
         return self.frozen or contest.frozen or frozen_by_user_contest
-
-    def notify_final_pdf_change(self):
-        sqs = boto3.resource('sqs', region_name=settings.SQS_REGION_NAME)
-        queue = sqs.get_queue_by_name(QueueName=settings.SQS_QUEUE_NAME)
-        message = self.__final_pdf_change_message()
-        queue.send_message(MessageBody=json.dumps(message))
-
-    def __final_pdf_change_message(self):
-        msg = {
-            'task_name': self.task.name,
-            'user': self.user.username,
-            'language_code': self.user.language_code,
-        }
-
-        if self.final_pdf is None or self.final_pdf.name is None:
-            msg['type'] = 'statement_deleted'
-        else:
-            msg['type'] = 'statement_updated'
-            msg['s3_bucket'] = settings.AWS_STORAGE_BUCKET_NAME
-            msg['s3_key'] = self.final_pdf.name
-
-        return msg
 
     def __str__(self):
         return "{} ({})".format(self.task.name, self.user.username)

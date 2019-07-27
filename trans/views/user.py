@@ -29,7 +29,6 @@ class Login(View):
         username = request.POST.get('mail')
         password = request.POST.get('password')
         remember_me = request.POST.get('remember_me')
-        # @milad you should probably verify this, it's supposed to login the user
         user = authenticate(username=username, password=password)
 
         if user is not None:

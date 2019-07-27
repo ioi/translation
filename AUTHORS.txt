@@ -10,3 +10,7 @@ OTHER CONTRIBUTORS
 Kian Mirjalali <mirjalali@gmail.com>
 Eqbal Sarjami <eqbalsarjami1994@gmail.com>
 Mohammadreza Montazeri <monta2009@gmail.com>
+
+OTHER CONTRIBUTORS [ioi-2019-baku]
+
+Emil Abbasov <emil916@gmail.com>

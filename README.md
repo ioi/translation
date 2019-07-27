@@ -5,7 +5,7 @@ The IOI Translation System provides a web interface for translating the tasks (p
 into various languages during the International Olympiads in Informatics.
 The system has been developed and first used in the IOI 2017 in Tehran, Iran.
 
-This fork, used in IOI 2018, contains AWS S3 support for the file storage and CMS integration.
+This fork, used in IOI 2019 Baku.
 
 Features
 --------
@@ -27,7 +27,7 @@ Deployment
 
 ioi-translation is designed to be deployed on a Docker-compatible container platform. PostgreSQL and Redis are required for persistent storage and session store, respectively. Deployment behind reverse proxy such as nginx is recommended.
 
-See `docker-compose.yml` for example deployment configurations (Note that `docker-compose.yml` in this repository is for development and not intended for use in production deployment). For the actual deployment in IOI 2018, refer to <https://github.com/jcioi/ioi-htc> (especially [ECS and nginx configuration](https://github.com/jcioi/ioi-htc/blob/master/hako/translation-prd.jsonnet) and [CMS integration](https://github.com/jcioi/ioi-htc/blob/master/itamae/cookbooks/ioi-cms-import-statement-worker/files/usr/bin/ioi-cms-import-statement-worker.rb))
+See `docker-compose.yml` for example deployment configurations (Note that `docker-compose.yml` in this repository is for development and not intended for use in production deployment). For the actual deployment in IOI 2019, refer to <https://github.com/ioi-2019>.
 
 
 Development Installation
@@ -40,7 +40,7 @@ You can install the translation system in just three steps:
 3. Run `docker-compose up -d`.
 
 At this point, you will have a copy of the translation system up
-and running at `http://your_server_address:8000/`.
+and running at `http://your_server_address:9000/`.
 You may optionally perform the following tasks:
 
 * To create essential data for the system such as admin users and groups,

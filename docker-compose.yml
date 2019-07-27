@@ -11,7 +11,7 @@ services:
     - postgres
     - redis
     environment:
-      SECRET_KEY: 'secret_key_for_development_2969b4b149439648a52aa663bd740a4f'
+      SECRET_KEY: 'secret_key_for_development_3969b4b149439648a52aa663bd740a4f'
       SESSION_COOKIE_SECURE: 0
       DB_HOST: postgres
       DB_USER: &db_user postgres
@@ -20,14 +20,8 @@ services:
       REDIS_HOST: redis
       REDIS_DB: 1
       GUNICORN_WORKERS: 2
-      PRINT_SYSTEM_URL: http://print.ioi18.net
-#      S3_BUCKET: ioi18-translation-files-dev
-#      S3_REGION: ap-northeast-1
-#      SQS_QUEUE_NAME: cms-statement-dev
-#      SQS_REGION_NAME: ap-northeast-1
-#      AWS_ACCESS_KEY_ID: '${AWS_ACCESS_KEY_ID}'
-#      AWS_SECRET_ACCESS_KEY: '${AWS_SECRET_ACCESS_KEY}'
-#      AWS_SESSION_TOKEN: '${AWS_SESSION_TOKEN}'
+      PRINT_SYSTEM_URL: http://localhost
+
 
   nginx:
     restart: always
@@ -38,6 +32,7 @@ services:
     - app
     volumes:
     - ioi_static:/usr/src/app/static/:ro
+    - ioi_media:/usr/src/app/media/:ro
 
   postgres:
     restart: always

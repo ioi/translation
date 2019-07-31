@@ -23,7 +23,7 @@ if [[ $# -eq 0 ]]; then
     echo "Starting Gunicorn"
 	
 #	For using docker in development settings, add `--reload` option below to the execution line of gunicorn
-    exec /usr/local/bin/gunicorn Translation.wsgi:application --reload -w "${GUNICORN_WORKERS:-1}" -b :9000
+    exec /usr/local/bin/gunicorn Translation.wsgi:application -w "${GUNICORN_WORKERS:-1}" -b :9000
 fi
 
 exec "$@"

@@ -55,6 +55,11 @@ urlpatterns = [
           url(r'^notifications/$', ReadNotifications.as_view(), name='notifications'),
           url(r'^reset_notifications/$', reset_notifications, name='reset_notifications'),
           url(r'^send_notification/$', SendNotification.as_view(), name='send_notif'),
-          url(r'^user/(?P<username>[\w-]*)/font.css', UserFont.as_view(), name='userfontcss')
+          url(r'^user/(?P<username>[\w-]*)/font.css', UserFont.as_view(), name='userfontcss'),
+
+          url(r'^merge_print_and_freeze_contest/(?P<contest_id>[\w]*)/$', TranslationSubmitFreezeContest.as_view(), name='merge_print_and_freeze_contest'),
+		  
+          url(r'^staff_extra_print/(?P<pdf_file_path>[\S]*)/(?P<username>[\w-]*)/(?P<extra_name>[\w-]*)$', StaffExtraPrint.as_view(), name='staff_extra_print')
+
 
       ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -9,16 +9,20 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from trans.models import User, Task, Translation, Version, Contest, FlatPage, UserContest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 import os
+import requests
+import datetime
 
 from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf
+from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf, merge_final_pdfs
+from trans.views.admin import FreezeUserContest
 
 
 class Home(LoginRequiredMixin, View):
@@ -43,8 +47,9 @@ class Home(LoginRequiredMixin, View):
                        Contest.objects.order_by('-order') if
                        len(tasks_by_contest[c]) > 0]
         contests = Contest.objects.order_by('order')
-        return render(request, 'home.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
-                                                     'contests': contests, 'is_editor': user.is_editor()})
+#        return render(request, 'home.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
+#                                                     'contests': contests, 'is_editor': user.is_editor()})
+        return render(request, 'home.html', context={'user': user, 'tasks_lists': tasks_lists, 'home_content': home_content,'contests': contests, 'is_editor': user.is_editor()})
 
 
 class Healthcheck(View):
@@ -72,6 +77,12 @@ class Translations(LoginRequiredMixin, View):
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text
         contests = Contest.objects.order_by('order')
+		
+        # For Monitor udpates:
+        try:
+            response = requests.get(settings.MONITOR_ADDRESS + '/status/translate/' + user.country.code)
+        except Exception as e:
+            print(type(e))
         return render(request, 'editor.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
@@ -167,13 +178,23 @@ class TranslationPrint(TranslationView):
         if translation.user.username == 'ISC':
             info_line = 'Release {}, deliver to {}'.format(translation.get_published_versions_count(), user.country.code)
         else:
-            info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
+            #info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
+            info_line = 'Printed at {}'.format(datetime.datetime.now().strftime("%H:%M"))
         output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
 
-        send_pdf_to_printer(output_pdf_path, user.country.code, user.country.name, cover_page=False)
+#        send_pdf_to_printer(output_pdf_path, user.country.code, user.country.name, cover_page=False)
+        send_pdf_to_printer(output_pdf_path, user.country.code, user.country.name, settings.DRAFT_PRINTER)	
+
+
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)
         os.remove(output_pdf_path)
+        
+        # For Monitor udpates:
+        try:
+           response = requests.get(settings.MONITOR_ADDRESS + '/status/printdraft/' + user.country.code)
+        except Exception as e:
+            print(type(e))
 
         return JsonResponse({'success': True})
 
@@ -247,7 +268,7 @@ class Versions(LoginRequiredMixin, View):
         # versions_values = versions.values('id', 'text', 'create_time', 'release_note')
         if request.is_ajax():
             return JsonResponse(dict(versions=list(versions_list)))
-        return render(request, 'revisions.html', context={'task_name': task.name, 'contest_slug': contest_slug,
+        return render(request, 'revisions.html', context={'task_name': task.name, 'trans_frozen': trans.frozen, 'contest_slug': contest_slug,
                                                           'versions': versions_list, 'direction': direction,
                                                           'task_type': task_type, 'view_all': view_all})
 
@@ -291,9 +312,56 @@ class PrintCustomFile(LoginRequiredMixin, View):
         with open(pdf_file_path, 'wb') as f:
             for chunk in pdf_file.chunks():
                 f.write(chunk)
-
-        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, cover_page=True)
+				
+#        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, cover_page=True)
+        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name)
 
         response = redirect('printcustomfile')
         response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name, safe='=?&')
         return response
+
+
+# ADDED by Emil Abbasov, IOI2019
+
+class TranslationSubmitFreezeContest(LoginRequiredMixin, View):
+    def post(self, request, contest_id):
+        not_translating_check = request.POST.get('not_translating', 'unchecked')
+        extra_country1 = request.POST.get('extra_country1', 'None')
+        extra_country2 = request.POST.get('extra_country2', 'None')
+
+        user = User.objects.get(username=request.user)
+        contest = Contest.objects.filter(id=contest_id).first()
+
+        user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
+        user_contest.extra_country1 = extra_country1
+        user_contest.extra_country2 = extra_country2
+        user_contest.frozen = True
+        user_contest.save()
+
+        if not_translating_check == "checked":
+            # For Monitor udpates:
+            try:
+                response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.username)
+                response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.username, extra_country1, extra_country2))
+            except Exception as e:
+                print(type(e))
+            return redirect(to=reverse('home'))
+			
+        task_names = []
+        for task in Task.objects.order_by('order'):
+            if not user.is_editor() and not (task.is_published() and task.contest.public):
+                continue
+            task_names.append(task.name)
+        pdf_file_path = merge_final_pdfs(task_names, user.username)
+
+        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants )
+
+        # For Monitor udpates:
+        try:
+           response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.country.code)
+           response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.country.code, extra_country1, extra_country2))
+        except Exception as e:
+            print(type(e))
+
+#        return FreezeUserContest().post(request, user.username, contest.id, note)
+        return redirect(to=reverse('home'))

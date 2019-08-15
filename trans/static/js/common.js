@@ -22,7 +22,7 @@ $(document).ready(function(){
 function sendPrint(print_task_url) {
     bootbox.confirm({
         title: 'Confirm',
-        message: "Are you sure to print this version?",
+        message: "Are you sure to print ONE copy of this version?",
         buttons: {
             confirm: {label: 'Print'},
         },
@@ -43,7 +43,7 @@ function sendPrintJob(print_task_url) {
         type: "POST",
         success: function (response) {
             ToastrUtil.success(
-                    'Printouts will be delivered to you shortly.',
+                    'Printouts will be put to the DRAFTs desk for YOUR PICK-UP shortly.',
                     'Print job submitted.'
             ).css('width', '400px');;
         },
@@ -51,4 +51,38 @@ function sendPrintJob(print_task_url) {
             ToastrUtil.error('Print request failed.');
         }
     });
+}
+
+// Added by Emil Abbasov IOI2019
+function validateFinalizeTranslation(form, n) {
+	
+	check = document.getElementById('not_translating');
+	
+	if(check.checked) {
+		return confirm('Are you sure?');
+	}
+	
+    if(document.getElementsByName('reopen').length!= n) {
+        alert('All tasks must be finalized before this action!');
+        return false;
+    }
+    else {
+        return confirm('Are you sure?');
+    }
+}
+
+
+// Added by Emil Abbasov IOI2019
+function toggle_buttons() {
+	
+	me = document.getElementById('not_translating');
+	
+	if(me.checked) {
+		document.getElementById('not_translating').value = "checked";
+		document.getElementById('final_submit').innerHTML = "SUBMIT Request";
+	} 
+	else {
+		document.getElementById('not_translating').value = "unchecked";
+		document.getElementById('final_submit').innerHTML = "SUBMIT Your Translations for PRINTING";
+	}
 }

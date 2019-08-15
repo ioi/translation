@@ -8,26 +8,42 @@
         <div class="col-md-12 col-lg-10 col-lg-offset-1">
             
             <h2>Users</h2>
-            <table class="table">
+            <table class="table" style="width: auto;">
                 <thead>
                     <tr>
-                        <th width="20%">User</th>
-                        <th width="30%">Translations</th>
-                        <th>Country</th>
+						<th style="text-align: left;">Country</th>
+                        <th>User</th>
+                        <th width="20%">Translations</th>
                         <th>Language</th>
+						<th>Contestants</th>
                         <th>Frozen</th>
-                        <th>Note</th>
+                        <!--th>Note</th-->
+						<th>Merged</th>
+						<th>Extra_Country_Copy1</th>
+						<th>Extra_Country_Copy2</th>
                     </tr>
                 </thead>
                 <tbody>
-                {% for user in users %}
+                {% for user in users|dictsort:"country_name" %}
                     <tr>
-                        <td>{{ user.username}}</td>
+                        <td style="text-align: left;">{{user.country_name}}</td>
+						<td>{{ user.username}}</td>
                         <td><a href="{% url 'user_trans' username=user.username %}">Translations</a></td>
-                        <td>{{user.country}}</td>
                         <td>{{user.language}}</td>
+						<td>{{user.num_of_contestants}}</td>
                         <td>{% if user.is_frozen %} <span style="color:blue">Yes</span> {% endif %}</td>
-                        <td>{{user.frozen_note}}</td>
+                        <!--td>{{user.frozen_note}}</td-->
+						<td>{% if user.file_exists%}<a href="../{{user.merged_pdf_url}}" class="btn btn-default" title="Final Merged PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>{%endif%}</td>
+						
+						<td>{{user.extra_country1}}
+						{% if user.ec1_file_exists%}<a href="../{{user.ec1_merged_pdf_url}}" class="btn btn-default" title="Final Merged PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+						<button onclick="sendPrint('{% url 'staff_extra_print' user.ec1_merged_pdf_url user.username user.extra_country1%}')" class="btn btn-default" title="Print ALL copies"><i class="fa fa-btn fa-print fa-lg"></i></button>
+						 {%endif%}</td>
+						 
+						<td>{{user.extra_country2}}
+						{% if user.ec2_file_exists%}<a href="../{{user.ec2_merged_pdf_url}}" class="btn btn-default" title="Final Merged PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+						<button onclick="sendPrint('{% url 'staff_extra_print' user.ec2_merged_pdf_url user.username user.extra_country2%}')" class="btn btn-default" title="Print ALL copies"><i class="fa fa-btn fa-print fa-lg"></i></button>
+						 {%endif%}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

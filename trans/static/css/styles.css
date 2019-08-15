@@ -90,6 +90,11 @@ a:hover {
     vertical-align: middle;
 }
 
+/* ioi2019 */
+.table td,  th {
+    text-align: center;
+}
+
 .modal-header {
     background-color: #f5f5f5;
 }
@@ -264,4 +269,8 @@ code, pre {
 
 .rendered_content[lang="zh"] {
     font-family: CustomTextFont, 'PMingLiU', Arial, serif;
+}
+
+.rendered_content[lang="si"] {
+    font-family: CustomTextFont, 'NotoSansSinhala-Regular', Arial, serif;
 }

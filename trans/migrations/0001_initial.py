@@ -105,6 +105,7 @@ class Migration(migrations.Migration):
                 ('text_font_base64', models.TextField(default='')),
                 ('digit_font_base64', models.TextField(default='')),
                 ('raw_password', models.CharField(default='', max_length=255)),
+                ('num_of_contestants', models.IntegerField(default=0)),
                 ('country', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='trans.Country')),
                 ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='trans.Language')),
             ],

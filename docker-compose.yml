@@ -20,7 +20,10 @@ services:
       REDIS_HOST: redis
       REDIS_DB: 1
       GUNICORN_WORKERS: 2
-      PRINT_SYSTEM_URL: http://localhost
+      PRINT_SYSTEM_URL: http://192.168.10.21:5000
+      MONITOR_URL: http://192.168.110.5:8080 #JAVA app
+      DRAFT_PRINTER: draft_printer  # Printer or class name used for DRAFT Translations Printing
+      FINAL_PRINTER: final_printer  # Printer or class name used for FINAL Translations Printing
 
 
   nginx:

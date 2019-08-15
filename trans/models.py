@@ -14,6 +14,7 @@ class User(DjangoUser):
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
+    num_of_contestants = models.IntegerField(default=0)
 
     def __str__(self):
         return self.username
@@ -167,6 +168,8 @@ class UserContest(models.Model):
     contest = models.ForeignKey('Contest', default=None)
     frozen = models.BooleanField(default=False)
     note = models.TextField(default='')
+    extra_country1 = models.CharField(max_length=6, blank=True)
+    extra_country2 = models.CharField(max_length=6, blank=True)
 
 
 class Version(models.Model):

@@ -4,6 +4,17 @@ cd /usr/src/app
 export DJANGO_SETTINGS_MODULE=Translation.settings
 export LANG=C.UTF-8
 
+# added by Emil Abbasov (IOI2019) to fix the container timezone issue
+# set noninteractive installation
+export DEBIAN_FRONTEND=noninteractive
+
+#install tzdata package
+apt-get install -y tzdata
+
+# set your timezone
+ln -fs /usr/share/zoneinfo/Asia/Baku /etc/localtime
+dpkg-reconfigure --frontend noninteractive tzdata 
+
 fc-cache
 
 if [[ -n $DB_HOST ]]; then
@@ -27,3 +38,5 @@ if [[ $# -eq 0 ]]; then
 fi
 
 exec "$@"
+
+

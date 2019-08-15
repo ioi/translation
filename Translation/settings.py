@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 USE_X_FORWARDED_HOST = True
@@ -189,6 +189,10 @@ USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
 PRINT_SYSTEM_ADDRESS=os.environ.get('PRINT_SYSTEM_URL')
+MONITOR_ADDRESS=os.environ.get('MONITOR_URL')
+
+DRAFT_PRINTER=os.environ.get('DRAFT_PRINTER')
+FINAL_PRINTER=os.environ.get('FINAL_PRINTER')
 
 
 STATIC_URL = '/static/'
@@ -197,3 +201,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 HOST_URL = 'http://127.0.0.1:9000/'
 
+PRINT_ENABLED = True
+CUSTOM_PRINT_ENABLED = PRINT_ENABLED and False

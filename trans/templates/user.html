@@ -11,20 +11,20 @@
 
         {% for contest in tasks_lists %}
         <h2>{{ contest.title }}</h2>
-        {% if contest.user_contest %}
-        <h3>This contest has been frozen for this user</h3>
-        {% if contest.user_contest.note %}
-        <b>Note:</b>
-        {{contest.user_contest.note}}
-        {% endif %}
-        <form class="form-inline" method="post" onsubmit="return confirm('Are you sure to unfreeze?');"
+			{% if contest.user_contest %}
+			<h3>This contest has been frozen for this user</h3>
+				{% if contest.user_contest.note %}
+					<b>Note:</b>
+					{{contest.user_contest.note}}
+				{% endif %}
+				<form class="form-inline" method="post" onsubmit="return confirm('Are you sure to unfreeze?');"
               action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-default btn-danger ">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-default btn-danger ">
                 Unfreeze
-            </button>
-        </form>
-        {% else %}
+				</button>
+				</form>
+			{% else %}
         <form class="form-inline" method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
             {% csrf_token %}
             <label for="note">Freeze Note:</label>

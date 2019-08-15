@@ -42,7 +42,7 @@
                                 </td>
                                 <td>{{ version.release_note }}</td>
                                 <td style="white-space: nowrap">
-                                    {% if task_type != 'released' and forloop.counter0 > 0%}
+                                    {% if task_type != 'released' and not trans_frozen and forloop.counter0 > 0%}
                                     <button type="button" class="btn btn-default" onclick="revert({{ version.id }})" title="Revert"><i class="fa fa-btn fa-undo fa-lg"></i></button>
                                     {% endif %}
                                     <a href="{% url 'task_md' task_type contest_slug task_name %}?ver={{version.id}}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a>

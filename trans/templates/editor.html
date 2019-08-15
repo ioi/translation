@@ -30,8 +30,8 @@
             <button class="btn btn-default" onclick="saveAndGo('{% url 'revisions' 'task' contest_slug task_name %}')" title="History"><i class="fa fa-btn fa-history fa-lg"></i></button>
             <button class="btn btn-default" onclick="saveAndGo('{% url 'task_html' 'task' contest_slug task_name %}')" title="Preview"><i class="fa fa-btn fa-search fa-lg"></i></button>
             <button class="btn btn-default" onclick="saveAndGo('{% url 'task_pdf' 'task' contest_slug task_name %}')" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></button>
-            {% if settings.PRINT_ENABLED and is_editor %}
-            <button onclick="autoSave(); sendPrint('{% url 'task_print' 'task' contest_slug task_name %}')" class="btn btn-default" title="Print"><i class="fa fa-btn fa-print fa-lg"></i></button>
+            {% if settings.PRINT_ENABLED %}
+            <button onclick="autoSave(); sendPrint('{% url 'task_print' 'task' contest_slug task_name %}')" class="btn btn-default" title="Print ONE copy"><i class="fa fa-btn fa-print fa-lg"></i></button>
             {% endif %}
             {% if is_editor %}
             <button class="btn btn-default" onclick="autoSave(); release();" title="Release"><i class="fa fa-btn fa-upload fa-lg"></i></button>

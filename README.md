@@ -5,7 +5,7 @@ The IOI Translation System provides a web interface for translating the tasks (p
 into various languages during the International Olympiads in Informatics.
 The system has been developed and first used in the IOI 2017 in Tehran, Iran.
 
-This fork, used in IOI 2019 Baku.
+This fork is used in IOI 2020, Singapore.
 
 Features
 --------
@@ -27,7 +27,7 @@ Deployment
 
 ioi-translation is designed to be deployed on a Docker-compatible container platform. PostgreSQL and Redis are required for persistent storage and session store, respectively. Deployment behind reverse proxy such as nginx is recommended.
 
-See `docker-compose.yml` for example deployment configurations (Note that `docker-compose.yml` in this repository is for development and not intended for use in production deployment). For the actual deployment in IOI 2019, refer to <https://github.com/ioi-2019>.
+See `docker-compose.yml` for example deployment configurations (Note that `docker-compose.yml` in this repository is for development and not intended for use in production deployment).
 
 
 Development Installation
@@ -44,15 +44,20 @@ and running at `http://your_server_address:9000/`.
 You may optionally perform the following tasks:
 
 * To create essential data for the system such as admin users and groups,
-  run `docker-compose exec web bash` after the system has been started,
+  run `docker-compose exec app bash` after the system has been started,
   and then in the shell, execute `python3 manage.py loaddata initial_data.json`
   for the very first time.
   Then exit from the shell by typing `exit`.
+* The default users are:
+  * admin:ioipassword
+  * staff:ioipassword
+  * ISC:ioipassword
+  * Usernames and passwords are case-sensitive.
 * For importing data such as countries, languages, and sample tasks,
   use the CSV importer in the admin console.
-* You can get access to the system logs by running `dokcer-compose logs`.
+* You can get access to the system logs by running `docker-compose logs`.
   To follow the logs from now on, run `docker-compose logs -f --tail=0`.
-* To stop the system, run `dokcer-compose stop`.
+* To stop the system, run `docker-compose stop`.
 
 For using docker in development settings, add `--reload` option
 to the execution line of gunicorn in `docker-entrypoint.sh` file.

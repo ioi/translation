@@ -27,4 +27,6 @@ RUN chmod +x /root/docker-entrypoint.sh
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
+EXPOSE 9000
+
 ENTRYPOINT ["/root/docker-entrypoint.sh"]

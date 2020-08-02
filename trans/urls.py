@@ -62,4 +62,4 @@ urlpatterns = [
           url(r'^staff_extra_print/(?P<pdf_file_path>[\S]*)/(?P<username>[\w-]*)/(?P<extra_name>[\w-]*)$', StaffExtraPrint.as_view(), name='staff_extra_print')
 
 
-      ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+      ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

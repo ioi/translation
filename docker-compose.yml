@@ -10,6 +10,8 @@ services:
     depends_on:
     - postgres
     - redis
+    ports:
+    - 9000:9000
     environment:
       SECRET_KEY: 'secret_key_for_development_3969b4b149439648a52aa663bd740a4f'
       SESSION_COOKIE_SECURE: 0
@@ -24,18 +26,6 @@ services:
       MONITOR_URL: http://127.0.0.1:9000 #JAVA app for monitoring user status on the big screen
       DRAFT_PRINTER: draft_printer  # Printer or class name used for DRAFT Translations Printing
       FINAL_PRINTER: final_printer  # Printer or class name used for FINAL Translations Printing
-
-
-  nginx:
-    restart: always
-    build: ./nginx/
-    ports:
-    - 9000:80
-    depends_on:
-    - app
-    volumes:
-    - ioi_static:/usr/src/app/static/:ro
-    - ioi_media:/usr/src/app/media/:ro
 
   postgres:
     restart: always

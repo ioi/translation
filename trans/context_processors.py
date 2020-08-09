@@ -2,11 +2,11 @@ from django.conf import settings
 
 def ioi_settings(request):
     return {'settings': {
-        'SITE_TITLE': 'IOI 2019 Translation Home Page',
-        'CONTEST_TITLE': 'IOI 2019',
-        'CONTEST_FULL_TITLE': 'International Olympiad in Informatics 2019',
-        'CONTEST_DATE': 'August 4\u201311th, 2019',
-        'CONTEST_PLACE': 'Baku, Azerbaijan',
+        'SITE_TITLE': 'IOI 2020 Translation Home Page',
+        'CONTEST_TITLE': 'IOI 2020',
+        'CONTEST_FULL_TITLE': 'International Olympiad in Informatics 2020',
+        'CONTEST_DATE': 'September 13\u201319 2020',
+        'CONTEST_PLACE': 'Singapore',
 #        'PRINT_ENABLED': settings.PRINT_SYSTEM_ADDRESS is not None,
         'PRINT_ENABLED': settings.PRINT_ENABLED,
         'CUSTOM_PRINT_ENABLED': settings.CUSTOM_PRINT_ENABLED,

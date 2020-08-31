@@ -18,7 +18,7 @@ from trans.forms import UploadFileForm
 from trans.models import User, Task, Translation, Contest, UserContest, Country
 from trans.utils import is_translate_in_editing, unleash_edit_token
 from trans.utils.pdf import build_final_pdf, send_pdf_to_printer
-from trans.utils.translation import get_trans_by_user_and_task
+from trans.utils.translation import get_trans_by_user_and_task, get_task_by_contest_and_name
 
 
 
@@ -100,10 +100,11 @@ class UserTranslations(StaffCheckMixin, View):
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.frozen
             translation_id = translation.id if translation else None
+            not_translating = translation and translation.not_translating
             final_pdf_url = translation.final_pdf.url if translation and translation.final_pdf else None
             tasks_by_contest[task.contest].append(
                 {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
-                 'frozen': frozen, 'final_pdf_url': final_pdf_url})
+                 'frozen': frozen, 'not_translating': not_translating, 'final_pdf_url': final_pdf_url})
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
                         'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
                         'tasks': tasks_by_contest[c]} for c in
@@ -119,41 +120,46 @@ class UserTranslations(StaffCheckMixin, View):
 
 class UsersList(StaffCheckMixin, View):
     def get(self, request):
-        users = (User.get_translators() | User.objects.filter(username='ISC')).\
-            distinct().values('country', 'language', 'username', 'num_of_contestants')
-        returned_users = []
-        user_contest_notes = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'note')
-        user_contest_ec1s = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'extra_country1')
-        user_contest_ec2s = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'extra_country2')
-        user_notes = defaultdict(str)
-        user_ec1s = defaultdict(str)
-        user_ec2s = defaultdict(str)
-        for user_name, note in user_contest_notes:
-            user_notes[user_name] += note
+        all_user_contests = UserContest.objects.all()
+        contests = Contest.objects.filter(public=True, frozen=False).order_by('-order')
+        all_users = (User.get_translators() | User.objects.filter(username='ISC'))
 
-        for user_name, extra_country1 in user_contest_ec1s:
-            user_ec1s[user_name] += extra_country1			
 
-        for user_name, extra_country2 in user_contest_ec2s:
-            user_ec2s[user_name] += extra_country2
+        all_results = []
+        for contest in contests:
+            all_tasks = Task.objects.filter(contest=contest).order_by('order')
+            contest_data = {
+                'tasks': [task.name for task in all_tasks],
+                'users': []
+            }
+            for user in all_users:
+                user_contest = UserContest.objects.filter(user=user, contest=contest).first()
+                return_user = {'user': user, 'frozen': False}
+                if user_contest is not None:
+                    # User still working on something.
+                    return_user['frozen'] = user_contest.frozen
 
-        for user in users:
-            user['is_frozen'] = (user['username'] in user_notes.keys())
-            user['frozen_note'] = user_notes[user['username']]
-            user['country_name'] = Country.objects.get(code=user['country']).name
-            user['merged_pdf_url'] = 'media/merged/{}-merged.pdf'.format(user['username'])
-            user['file_exists'] = os.path.isfile(user['merged_pdf_url'])
+                for task in all_tasks:
+                    translation = Translation.objects.filter(user=user, task=task).first()
+                    if translation:
+                        if translation.not_translating:
+                            final_pdf_url = 'Not Translating'
+                        elif translation.final_pdf:
+                            final_pdf_url = translation.final_pdf.url
+                        else:
+                            final_pdf_url = None
+                    else:
+                        final_pdf_url = None
+                    return_user[task.name] = final_pdf_url
+                
+                contest_data['users'].append(return_user)
 
-            user['extra_country1'] = user_ec1s[user['username']]
-            user['ec1_merged_pdf_url'] = 'media/merged/{}-merged.pdf'.format(user['extra_country1'])
-            user['ec1_file_exists'] = os.path.isfile(user['ec1_merged_pdf_url'])
+            all_results.append({
+                'name': contest.title,
+                'data': contest_data
+            })
 
-            user['extra_country2'] = user_ec2s[user['username']]
-            user['ec2_merged_pdf_url'] = 'media/merged/{}-merged.pdf'.format(user['extra_country2'])
-            user['ec2_file_exists'] = os.path.isfile(user['ec2_merged_pdf_url'])
-
-            returned_users.append(user)
-        return render(request, 'users.html', context={'users': returned_users})
+        return render(request, 'users.html', context={'contests': all_results})
 
 
 class AddFinalPDF(StaffCheckMixin, View):
@@ -176,42 +182,68 @@ class AddFinalPDF(StaffCheckMixin, View):
         return redirect(request.META.get('HTTP_REFERER'))
 
 
-class FreezeTranslation(LoginRequiredMixin, View):
-    def post(self, request, id):
-        frozen = request.POST['freeze'] == 'True'
-        trans = Translation.objects.filter(id=id).first()
-        if trans is None:
-            return HttpResponseNotFound("There is no task")
+class StaffFreezeTranslation(StaffRequiredMixin, View):
+    def post(self, request, username, contest_slug, task_name):
+        user = User.objects.get(username=username)
+        task = get_task_by_contest_and_name(contest_slug, task_name)
+        trans = get_trans_by_user_and_task(user, task) # If not exists, one will be created.
 
-        trans.frozen = frozen
-        if frozen:
-            pdf_path = build_final_pdf(trans)
-            with open(pdf_path, 'rb') as f:
-                trans.final_pdf = File(f)
+        trans.frozen = 'freeze' in request.POST or 'not_translating' in request.POST
+        trans.not_translating = 'not_translating' in request.POST
+
+        if trans.frozen:
+            if not trans.not_translating:
+                pdf_path = build_final_pdf(trans)
+                with open(pdf_path, 'rb') as f:
+                    trans.final_pdf = File(f)
+                    trans.save()
+            else:
                 trans.save()
         else:
             trans.final_pdf.delete()
             trans.save()
 
-#        trans.notify_final_pdf_change()
-#        return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
         return redirect(request.META.get('HTTP_REFERER'))
 
+class UserFreezeTranslation(LoginRequiredMixin, View):
+    def post(self, request, contest_slug, task_name):
+        user = User.objects.get(username=request.user.username)
+        task = get_task_by_contest_and_name(contest_slug, task_name)
+        trans = get_trans_by_user_and_task(user, task) # If not exists, one will be created.
 
+        trans.frozen = 'freeze' in request.POST or 'not_translating' in request.POST
+        trans.not_translating = 'not_translating' in request.POST
+
+        if trans.frozen:
+            if not trans.not_translating:
+                pdf_path = build_final_pdf(trans)
+                with open(pdf_path, 'rb') as f:
+                    trans.final_pdf = File(f)
+                    trans.save()
+            else:
+                trans.save()
+                    
+        else:
+            trans.final_pdf.delete()
+            trans.save()
+
+        return redirect(request.META.get('HTTP_REFERER'))
+
+# Modified by Si Jie / IOI 2020
 class FreezeUserContest(LoginRequiredMixin, View):
     def post(self, request, username, contest_id):
-        note = request.POST.get('note', '')
         user = User.objects.get(username=username)
         contest = Contest.objects.filter(id=contest_id).first()
         if contest is None:
             return HttpResponseNotFound("There is no contest")
+
         user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
         user_contest.frozen = True
-        user_contest.note = note
         user_contest.save()
+
         for task in contest.task_set.all():
             get_trans_by_user_and_task(user, task)
-#        return redirect(to=reverse('user_trans', kwargs={'username': username}))
+        
         return redirect(request.META.get('HTTP_REFERER'))
 
 

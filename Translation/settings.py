@@ -201,5 +201,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 HOST_URL = 'http://127.0.0.1:9000/'
 
-PRINT_ENABLED = True
-CUSTOM_PRINT_ENABLED = PRINT_ENABLED and False
+CUSTOM_PRINT_ENABLED = False

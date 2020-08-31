@@ -53,36 +53,14 @@ function sendPrintJob(print_task_url) {
     });
 }
 
-// Added by Emil Abbasov IOI2019
-function validateFinalizeTranslation(form, n) {
-	
-	check = document.getElementById('not_translating');
-	
-	if(check.checked) {
-		return confirm('Are you sure?');
-	}
-	
-    if(document.getElementsByName('reopen').length!= n) {
+// Added by Emil Abbasov IOI2019. Modified by Si Jie IOI 2020
+function validateFinalizeTranslation(form, tableID, n) {
+    
+    if (document.querySelectorAll(`#${tableID} [name='reopen']`).length != n) {
+        console.log(document.querySelectorAll(`#${tableID} [name='reopen']`))
         alert('All tasks must be finalized before this action!');
         return false;
     }
-    else {
-        return confirm('Are you sure?');
-    }
-}
-
-
-// Added by Emil Abbasov IOI2019
-function toggle_buttons() {
-	
-	me = document.getElementById('not_translating');
-	
-	if(me.checked) {
-		document.getElementById('not_translating').value = "checked";
-		document.getElementById('final_submit').innerHTML = "SUBMIT Request";
-	} 
-	else {
-		document.getElementById('not_translating').value = "unchecked";
-		document.getElementById('final_submit').innerHTML = "SUBMIT Your Translations for PRINTING";
-	}
+    
+    return confirm('Are you sure?');
 }

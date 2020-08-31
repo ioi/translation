@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load getattr_filter %}
 
 {% block title %} Home {% endblock %}
 
@@ -7,47 +8,46 @@
     <div class="container">
         <div class="col-md-12 col-lg-10 col-lg-offset-1">
             
-            <h2>Users</h2>
-            <table class="table" style="width: auto;">
-                <thead>
-                    <tr>
-						<th style="text-align: left;">Country</th>
-                        <th>User</th>
-                        <th width="20%">Translations</th>
-                        <th>Language</th>
-						<th>Contestants</th>
-                        <th>Frozen</th>
-                        <!--th>Note</th-->
-						<th>Merged</th>
-						<th>Extra_Country_Copy1</th>
-						<th>Extra_Country_Copy2</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for user in users|dictsort:"country_name" %}
-                    <tr>
-                        <td style="text-align: left;">{{user.country_name}}</td>
-						<td>{{ user.username}}</td>
-                        <td><a href="{% url 'user_trans' username=user.username %}">Translations</a></td>
-                        <td>{{user.language}}</td>
-						<td>{{user.num_of_contestants}}</td>
-                        <td>{% if user.is_frozen %} <span style="color:blue">Yes</span> {% endif %}</td>
-                        <!--td>{{user.frozen_note}}</td-->
-						<td>{% if user.file_exists%}<a href="../{{user.merged_pdf_url}}" class="btn btn-default" title="Final Merged PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>{%endif%}</td>
-						
-						<td>{{user.extra_country1}}
-						{% if user.ec1_file_exists%}<a href="../{{user.ec1_merged_pdf_url}}" class="btn btn-default" title="Final Merged PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-						<button onclick="sendPrint('{% url 'staff_extra_print' user.ec1_merged_pdf_url user.username user.extra_country1%}')" class="btn btn-default" title="Print ALL copies"><i class="fa fa-btn fa-print fa-lg"></i></button>
-						 {%endif%}</td>
-						 
-						<td>{{user.extra_country2}}
-						{% if user.ec2_file_exists%}<a href="../{{user.ec2_merged_pdf_url}}" class="btn btn-default" title="Final Merged PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
-						<button onclick="sendPrint('{% url 'staff_extra_print' user.ec2_merged_pdf_url user.username user.extra_country2%}')" class="btn btn-default" title="Print ALL copies"><i class="fa fa-btn fa-print fa-lg"></i></button>
-						 {%endif%}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            {% for contest in contests %}
+                <h2>{{ contest.name }}</h2>
+                <table class="table" style="width: auto;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Country</th>
+                            <th>User</th>
+                            <th width="20%">Translations</th>
+                            <th>Language</th>
+                            <th>Frozen</th>
+                            {% for task_name in contest.data.tasks %}
+                                <th>{{ task_name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in contest.data.users|dictsort:"user.country.name" %}
+                        <tr>
+                            <td style="text-align: left;">{{user.user.country.name}}</td>
+                            <td>{{ user.user.username}}</td>
+                            <td><a href="{% url 'user_trans' username=user.user.username %}">Translations</a></td>
+                            <td>{{user.user.language}}</td>
+                            <td>{% if user.frozen %} <span style="color:blue">Yes</span> {% endif %}</td>
+                            {% for task_name in contest.data.tasks %}
+                                {% with pdf_url=user|get_dict_attr:task_name %} 
+                                {% if pdf_url == "Not Translating" %}
+                                    <td>Not Translating</td>
+                                {% elif pdf_url is not None %}
+                                    <td><a href="../{{pdf_url}}" class="btn btn-default" title="{{user.user.country.name}}: {{task_name}}"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a></td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                            
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
 
         </div>
     </div>

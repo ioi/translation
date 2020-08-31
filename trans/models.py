@@ -113,7 +113,8 @@ class Translation(models.Model):
     task = models.ForeignKey('Task', default=0)
     frozen = models.BooleanField(default=False)
     final_pdf = models.FileField(upload_to=final_pdf_path, null=True)
-
+    not_translating = models.BooleanField(default=False)
+    
     class Meta:
         unique_together = (
             ('user', 'task',),
@@ -168,9 +169,6 @@ class UserContest(models.Model):
     contest = models.ForeignKey('Contest', default=None)
     frozen = models.BooleanField(default=False)
     note = models.TextField(default='')
-    extra_country1 = models.CharField(max_length=6, blank=True)
-    extra_country2 = models.CharField(max_length=6, blank=True)
-
 
 class Version(models.Model):
     translation = models.ForeignKey('Translation')

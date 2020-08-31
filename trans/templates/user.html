@@ -57,7 +57,8 @@
                 <td> {{ task.name | capfirst }}</td>
                 <td>
                     {% if task.is_editing %} Is editing
-                    {% elif task.frozen %} Finalized
+                    {% elif task.frozen %}
+                        {% if task.not_translating %} Not Translating {% else %} Frozen {% endif %}
                     {% elif task.trans_id == None %} Not started
                     {% else %} Started {% endif %}
                 </td>
@@ -85,16 +86,21 @@
                 </td>
                 {% endif %}
                 <td>
-                    {% if task.trans_id %}
-                        {% if task.frozen and can_upload_final_pdf or not contest.user_contest.frozen%}
-                            <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
-                                <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}" onclick="return confirm('Are you sure?');">
-                                    {% if task.frozen %} Reopen {% else %} Finalize {% endif %}
-                                </button>
-                            </form>
-                        {% endif %}
+                    {% if task.frozen and can_upload_final_pdf or not contest.user_contest.frozen%}
+                        <form method="post" action="{% url 'staff_freeze_trans' username=user_name contest_slug=contest.slug task_name=task.name %}">
+                            {% csrf_token %}
+                            {% if task.frozen %}
+                                <button type="submit" name="reopen" class="btn btn-default" onclick="return confirm('Are you sure?');">Reopen </button>
+                                {% else %}
+                                    {% if task.trans_id %}
+                                    <button type="submit" name="freeze" class="btn btn-info" onclick="return confirm('Finalizing! Are you sure?');" >Finalize</button>
+                                    {% else %}
+                                    <button name="freeze" class="btn btn-info" disabled>Not Started</button>
+                                    {% endif %}
+                                <button type="submit" name="not_translating" class="btn btn-danger" onclick="return confirm('Not translating! Are you sure?');" >Not Translating</button>
+                            {% endif %}
+                        </form>
+                    
                     {% endif %}
                 </td>
                 <td>

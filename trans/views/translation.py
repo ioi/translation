@@ -21,7 +21,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf, merge_final_pdfs
+from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf
 from trans.views.admin import FreezeUserContest
 
 
@@ -38,9 +38,11 @@ class Home(LoginRequiredMixin, View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.is_editable_by(user)
+            not_translating = translation and translation.not_translating
+            final_pdf_url = translation.final_pdf.url if (translation and translation.final_pdf) else None
             translation_id = translation.id if translation else None    # neo added
             tasks_by_contest[task.contest].append(
-                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing, 'frozen': frozen})
+                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing, 'frozen': frozen, 'not_translating': not_translating, 'final_pdf_url': final_pdf_url})
         tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
                         'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
                         'tasks': tasks_by_contest[c]} for c in
@@ -319,49 +321,3 @@ class PrintCustomFile(LoginRequiredMixin, View):
         response = redirect('printcustomfile')
         response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name, safe='=?&')
         return response
-
-
-# ADDED by Emil Abbasov, IOI2019
-
-class TranslationSubmitFreezeContest(LoginRequiredMixin, View):
-    def post(self, request, contest_id):
-        not_translating_check = request.POST.get('not_translating', 'unchecked')
-        extra_country1 = request.POST.get('extra_country1', 'None')
-        extra_country2 = request.POST.get('extra_country2', 'None')
-
-        user = User.objects.get(username=request.user)
-        contest = Contest.objects.filter(id=contest_id).first()
-
-        user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
-        user_contest.extra_country1 = extra_country1
-        user_contest.extra_country2 = extra_country2
-        user_contest.frozen = True
-        user_contest.save()
-
-        if not_translating_check == "checked":
-            # For Monitor udpates:
-            try:
-                response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.username)
-                response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.username, extra_country1, extra_country2))
-            except Exception as e:
-                print(type(e))
-            return redirect(to=reverse('home'))
-			
-        task_names = []
-        for task in Task.objects.order_by('order'):
-            if not user.is_editor() and not (task.is_published() and task.contest.public):
-                continue
-            task_names.append(task.name)
-        pdf_file_path = merge_final_pdfs(task_names, user.username)
-
-        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants )
-
-        # For Monitor udpates:
-        try:
-           response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.country.code)
-           response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.country.code, extra_country1, extra_country2))
-        except Exception as e:
-            print(type(e))
-
-#        return FreezeUserContest().post(request, user.username, contest.id, note)
-        return redirect(to=reverse('home'))

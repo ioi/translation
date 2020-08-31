@@ -42,7 +42,8 @@ urlpatterns = [
           url(r'^users/$', UsersList.as_view(), name='users_list'),
           url(r'^user/(?P<username>[\w-]*)/$', UserTranslations.as_view(), name='user_trans'),
           url(r'^upload_final_pdf/$', AddFinalPDF.as_view(), name='upload_final_pdf'),
-          url(r'^freeze_trans/(?P<id>[\w]*)/$', FreezeTranslation.as_view(), name='freeze_trans'),
+          url(r'^staff_freeze_trans/(?P<username>[\w-]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', StaffFreezeTranslation.as_view(), name='staff_freeze_trans'),
+          url(r'^user_freeze_trans/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/$', UserFreezeTranslation.as_view(), name='user_freeze_trans'),
           url(r'^freeze_user_contest/(?P<username>[\w-]*)/(?P<contest_id>[\w]*)/$', FreezeUserContest.as_view(),
               name='freeze_user_contest'),
           url(r'^unfreeze_user_contest/(?P<username>[\w-]*)/(?P<contest_id>[\w]*)/$',
@@ -57,8 +58,6 @@ urlpatterns = [
           url(r'^send_notification/$', SendNotification.as_view(), name='send_notif'),
           url(r'^user/(?P<username>[\w-]*)/font.css', UserFont.as_view(), name='userfontcss'),
 
-          url(r'^merge_print_and_freeze_contest/(?P<contest_id>[\w]*)/$', TranslationSubmitFreezeContest.as_view(), name='merge_print_and_freeze_contest'),
-		  
           url(r'^staff_extra_print/(?P<pdf_file_path>[\S]*)/(?P<username>[\w-]*)/(?P<extra_name>[\w-]*)$', StaffExtraPrint.as_view(), name='staff_extra_print')
 
 

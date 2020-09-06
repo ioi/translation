@@ -267,6 +267,10 @@ code, pre {
     font-family: CustomTextFont, 'Loma', Arial, serif;
 }
 
+.rendered_content[lang="zh-Hans"] {
+    font-family: CustomTextFont, 'Source Han Serif CN', Arial, serif;
+}
+
 .rendered_content[lang="zh"] {
     font-family: CustomTextFont, 'PMingLiU', Arial, serif;
 }

@@ -13,6 +13,7 @@ RUN chmod +x /usr/local/bin/cpdf
 
 COPY trans/static/fonts/IRANSans/ttf/* /usr/local/share/fonts/
 COPY trans/static/fonts/SourceSansPro/ttf/* /usr/local/share/fonts/
+COPY trans/static/fonts/SourceHanSerif/* /usr/local/share/fonts/
 COPY trans/static/fonts/Korean/* /usr/local/share/fonts/
 COPY trans/static/fonts/Thai/* /usr/local/share/fonts/
 COPY trans/static/fonts/Taiwan/* /usr/local/share/fonts/

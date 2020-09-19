@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['*']
 USE_X_FORWARDED_HOST = True
 
 WKHTMLTOPDF_CMD_OPTIONS = {
+    'enable-local-file-access': '',
+    'encoding': 'utf-8',
     'page-size': 'A4',
     'margin-left': '0.75in',
     'margin-right': '0.75in',
@@ -37,7 +39,7 @@ WKHTMLTOPDF_CMD_OPTIONS = {
     'margin-bottom': '1in',
     'print-media-type': '',
     'no-stop-slow-scripts': '',
-    'javascript-delay': '30000',  # max wait until rendering finishes
+    'javascript-delay': '5000',  # max wait until rendering finishes
 }
 
 

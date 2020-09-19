@@ -3,18 +3,17 @@ Global
 ============================= */
 
 @import url(../fonts/SourceSansPro/SourceSansPro.css);
-@import url(../fonts/IRANSans/IRANSans.css);
 
 /*@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);*/
 
 
 body {
-    font-family: Arial, serif;
+    font-family: Arial, sans-serif;
     color: #666;
     font-size: 16px;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
+    font-smooth: antialiased;
 }
 
 p {
@@ -30,7 +29,7 @@ a:hover {
 }
 
 .container h1, .container h2, .container h3, .container h4 {
-    font-family: 'Source Sans Pro', arial, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 .container h1 {
@@ -81,7 +80,7 @@ a:hover {
 }
 
 .table th {
-    font-family: "Source Sans Pro", arial, sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 1.2em;
     font-weight: 400;
 }
@@ -210,7 +209,7 @@ div.CodeMirror {
 }
 
 #left_rtl_plain_text_box .editor-content {
-    font-family: IRANSans, Tahoma, Arial;
+    font-family: Arial, sans-serif;
     font-size: 90%;
     color: #333;
 }
@@ -242,11 +241,13 @@ code, pre {
 /* Default text fonts */
 
 .rendered_content {
-    font-family: CustomTextFont, Arial, serif;
+    font-family: "CustomTextFont", Arial, "Noto Sans", sans-serif;
+    font-weight: normal;
 }
 
 .rendered_content[dir="rtl"] {
-    font-family: CustomTextFont, IRANSans, Tahoma, Arial;
+    font-family: "CustomTextFont", Arial, "Noto Sans", sans-serif;
+    font-weight: normal;
 }
 
 .rendered_content[dir="rtl"] th {
@@ -255,26 +256,34 @@ code, pre {
 
 /* Default text fonts per language */
 
+.rendered_content[lang="ar"] {
+    font-family: "CustomTextFont", Arial, "Noto Naskh Arabic", "Noto Sans", serif;
+}
+
+.rendered_content[lang="fa"] {
+    font-family: "CustomTextFont", Arial, "Noto Sans", serif;
+}
+
 .rendered_content[lang="ja"] {
-    font-family: CustomTextFont, 'TakaoPGothic', Arial, serif;
+    font-family: "CustomTextFont", 'TakaoPGothic', Arial, "Noto Sans", "Noto Sans CJK JP", serif;
 }
 
 .rendered_content[lang="kr"] {
-    font-family: CustomTextFont, 'NanumMyeongjo', Arial, serif;
+    font-family: "CustomTextFont", 'NanumMyeongjo', Arial, "Noto Sans", "Noto Sans CJK KR", serif;
 }
 
 .rendered_content[lang="th"] {
-    font-family: CustomTextFont, 'Loma', Arial, serif;
+    font-family: "CustomTextFont", 'Loma', Arial, "Noto Sans", serif;
 }
 
 .rendered_content[lang="zh-Hans"] {
-    font-family: CustomTextFont, 'Source Han Serif CN', Arial, serif;
+    font-family: "CustomTextFont", 'Source Han Serif CN', Arial, "Noto Sans", "Noto Sans CJK SC", serif;
 }
 
 .rendered_content[lang="zh"] {
-    font-family: CustomTextFont, 'PMingLiU', Arial, serif;
+    font-family: "CustomTextFont", 'PMingLiU', Arial, "Noto Sans", "Noto Sans CJK", serif;
 }
 
 .rendered_content[lang="si"] {
-    font-family: CustomTextFont, 'NotoSansSinhala-Regular', Arial, serif;
+    font-family: "CustomTextFont", Arial, 'NotoSansSinhala-Regular', "Noto Sans", serif;
 }

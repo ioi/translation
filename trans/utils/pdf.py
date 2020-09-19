@@ -10,7 +10,6 @@ from django.template.loader import render_to_string
 
 import pdfkit
 from shutil import copyfile
-from xvfbwrapper import Xvfb
 
 from trans.context_processors import ioi_settings
 
@@ -69,17 +68,18 @@ def build_pdf(translation, task_type):
 
     last_edit_time = translation.get_latest_change_time()
     rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
-    if not rebuild_needed:
-        return pdf_file_path
+    #if not rebuild_needed:
+    #    return pdf_file_path # DEBUG !!!!!!!!!!!!!!!!!!!!!!!
 
     html = render_pdf_template(
         translation, task_type,
         static_path=settings.STATIC_ROOT,
         images_path=settings.MEDIA_ROOT + 'images/',
-        pdf_output=True,
+        pdf_output=False,
     )
     convert_html_to_pdf(html, pdf_file_path)
     add_page_numbers_to_pdf(pdf_file_path, task.name)
+
     return pdf_file_path
 
 
@@ -105,8 +105,7 @@ def convert_html_to_pdf(html, pdf_file_path):
         html_file_path = '/tmp/{}.html'.format(str(uuid4()))
         with open(html_file_path, 'wb') as f:
             f.write(html.encode('utf-8'))
-        with Xvfb():
-            pdfkit.from_file(html_file_path, pdf_file_path, options=settings.WKHTMLTOPDF_CMD_OPTIONS)
+        pdfkit.from_file(html_file_path, pdf_file_path, options=settings.WKHTMLTOPDF_CMD_OPTIONS)
         os.remove(html_file_path)
     except Exception as e:
         logger.error(e)

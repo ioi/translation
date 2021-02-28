@@ -196,6 +196,10 @@ MONITOR_ADDRESS=os.environ.get('MONITOR_URL')
 DRAFT_PRINTER=os.environ.get('DRAFT_PRINTER')
 FINAL_PRINTER=os.environ.get('FINAL_PRINTER')
 
+CONTEST_TITLE = 'IOI 2020'
+CONTEST_FULL_TITLE = 'International Olympiad in Informatics 2020'
+CONTEST_DATE = 'September 13\u201319 2020'
+CONTEST_PLACE = 'Singapore'
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
@@ -204,3 +208,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 HOST_URL = 'http://127.0.0.1:9000/'
 
 CUSTOM_PRINT_ENABLED = False
+

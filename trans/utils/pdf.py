@@ -102,11 +102,30 @@ def pdf_response(pdf_file_path, file_name):
 
 def convert_html_to_pdf(html, pdf_file_path):
     try:
-        html_file_path = '/tmp/{}.html'.format(str(uuid4()))
+        html_file_path = '/tmp/ioi-translation/puppeteer/{}.html'.format(str(uuid4()))
         with open(html_file_path, 'wb') as f:
             f.write(html.encode('utf-8'))
-        pdfkit.from_file(html_file_path, pdf_file_path, options=settings.WKHTMLTOPDF_CMD_OPTIONS)
+        execute_puppeteer(html_file_path, pdf_file_path)
         os.remove(html_file_path)
+    except Exception as e:
+        logger.error(e)
+
+
+def execute_puppeteer(html_file_path, pdf_file_path):
+    context = {
+        'html_file_path': html_file_path,
+        'pdf_file_path': pdf_file_path
+    }
+    context.update(ioi_settings(None))
+    phantom_script = render_to_string('puppeteer.js', context=context)
+
+    try:
+        phantom_script_path = '/tmp/ioi-translation/puppeteer/{}.js'.format(str(uuid4()))
+        with open(phantom_script_path, 'wb') as f:
+            f.write(phantom_script.encode('utf-8'))
+        cmd = ('node {0}').format(phantom_script_path)
+        os.system(cmd)
+        os.remove(phantom_script_path)
     except Exception as e:
         logger.error(e)
 

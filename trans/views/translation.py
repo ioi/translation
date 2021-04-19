@@ -352,7 +352,7 @@ class TranslationSubmitFreezeContest(LoginRequiredMixin, View):
             if not user.is_editor() and not (task.is_published() and task.contest.public):
                 continue
             task_names.append(task.name)
-        pdf_file_path = merge_final_pdfs(task_names, user.username)
+        pdf_file_path = merge_final_pdfs(task_names, user.language_code)
 
         send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants )
 

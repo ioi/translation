@@ -79,10 +79,8 @@ function toggle_buttons() {
 	
 	if(me.checked) {
 		document.getElementById('not_translating').value = "checked";
-		document.getElementById('final_submit').innerHTML = "SUBMIT Request";
 	} 
 	else {
 		document.getElementById('not_translating').value = "unchecked";
-		document.getElementById('final_submit').innerHTML = "SUBMIT Your Translations for PRINTING";
 	}
 }

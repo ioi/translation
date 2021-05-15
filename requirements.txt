@@ -3,7 +3,7 @@ gunicorn==19.3.0
 psycopg2-binary
 redis==2.10.3
 requests==2.7.0
-six==1.10.0
+six==1.12.0
 websocket-client==0.35.0
 django-storages==1.6.6
 boto3==1.7.67
@@ -15,6 +15,5 @@ ipython
 pytz
 django-websocket-redis
 openpyxl
-pdfkit==0.6.1
-xvfbwrapper==0.2.9
 raven
+pyppeteer==0.2.5

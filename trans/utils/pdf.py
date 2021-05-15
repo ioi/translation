@@ -8,10 +8,12 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-import pdfkit
 from shutil import copyfile
 
 from trans.context_processors import ioi_settings
+
+import asyncio
+from pyppeteer import launch
 
 logger = logging.getLogger(__name__)
 
@@ -101,15 +103,11 @@ def pdf_response(pdf_file_path, file_name):
 
 
 def convert_html_to_pdf(html, pdf_file_path):
-    try:
-        html_file_path = '/tmp/ioi-translation/puppeteer/{}.html'.format(str(uuid4()))
-        with open(html_file_path, 'wb') as f:
-            f.write(html.encode('utf-8'))
-        execute_puppeteer(html_file_path, pdf_file_path)
-        os.remove(html_file_path)
-    except Exception as e:
-        logger.error(e)
-
+    html_file_path = '/tmp/ioi-translation/puppeteer/{}.html'.format(str(uuid4()))
+    with open(html_file_path, 'wb') as f:
+        f.write(html.encode('utf-8'))
+    execute_puppeteer(html_file_path, pdf_file_path)
+    os.remove(html_file_path)
 
 def execute_puppeteer(html_file_path, pdf_file_path):
     context = {
@@ -117,17 +115,47 @@ def execute_puppeteer(html_file_path, pdf_file_path):
         'pdf_file_path': pdf_file_path
     }
     context.update(ioi_settings(None))
-    phantom_script = render_to_string('puppeteer.js', context=context)
 
-    try:
-        phantom_script_path = '/tmp/ioi-translation/puppeteer/{}.js'.format(str(uuid4()))
-        with open(phantom_script_path, 'wb') as f:
-            f.write(phantom_script.encode('utf-8'))
-        cmd = ('node {0}').format(phantom_script_path)
-        os.system(cmd)
-        os.remove(phantom_script_path)
-    except Exception as e:
-        logger.error(e)
+    async def run():
+
+        browser = await launch();
+        page = await browser.newPage();
+        await page.goto(f"file://{html_file_path}", {
+            'waitUntil': 'networkidle2',
+        })
+        await page.pdf({ 
+            'path': pdf_file_path,
+            'format': 'a4',
+            'printBackground': True,
+            'margin': {
+                'top': '0.62in',
+                'left': '0.75in',
+                'right': '0.75in',
+                'bottom': '1in'
+            }
+        })
+
+        await browser.close();
+
+    asyncio.get_event_loop().run_until_complete(run())
+
+# def execute_puppeteer(html_file_path, pdf_file_path):
+#     context = {
+#         'html_file_path': html_file_path,
+#         'pdf_file_path': pdf_file_path
+#     }
+#     context.update(ioi_settings(None))
+#     phantom_script = render_to_string('puppeteer.js', context=context)
+
+#     try:
+#         phantom_script_path = '/tmp/ioi-translation/puppeteer/{}.js'.format(str(uuid4()))
+#         with open(phantom_script_path, 'wb') as f:
+#             f.write(phantom_script.encode('utf-8'))
+#         cmd = ('node {0}').format(phantom_script_path)
+#         os.system(cmd)
+#         os.remove(phantom_script_path)
+#     except Exception as e:
+#         logger.error(e)
 
 
 def add_page_numbers_to_pdf(pdf_file_path, task_name):

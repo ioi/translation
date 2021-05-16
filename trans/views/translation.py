@@ -151,16 +151,18 @@ class TranslationView(LoginRequiredMixin, View):
         return get_trans_by_user_and_task(requested_user, task)
 
 
-class TranslationHTML(TranslationView):
-    def get(self, request, contest_slug, task_name, task_type):
-        user = User.objects.get(username=request.user)
-        translation = self._get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
-        return HttpResponse(render_pdf_template(
-            translation, task_type,
-            static_path='/static',
-            images_path='/media/images/',
-            pdf_output=False
-        ))
+# Removed since IOI 2021, where we changed to use new PyPuppeteer as rendering engine.
+# This HTML is no longer necessary as PDF build is fast, and having 2 different views makes it confusing for editors.
+# class TranslationHTML(TranslationView):
+#     def get(self, request, contest_slug, task_name, task_type):
+#         user = User.objects.get(username=request.user)
+#         translation = self._get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
+#         return HttpResponse(render_pdf_template(
+#             translation, task_type,
+#             static_path='/static',
+#             images_path='/media/images/',
+#             pdf_output=False
+#         ))
 
 
 class TranslationPDF(TranslationView):

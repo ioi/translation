@@ -47,7 +47,6 @@
                         </td>
                         <td> 
                             <a href="{% url 'revisions' 'task' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
-                            <a href="{% url 'task_html' 'task' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                             <!-- <a href="{% url 'task_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
                             <a href="{% url 'task_pdf' 'task' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                             {% if settings.PRINT_ENABLED and not task.frozen %}
@@ -83,7 +82,6 @@
                             {% if not is_editor %}
                             <a href="{% url 'revisions' 'released' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
                             {% endif %}
-                            <a href="{% url 'task_html' 'released' contest.slug task.name %}" class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                             <!-- <a href="{% url 'task_md' 'released' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
                             <a href="{% url 'task_pdf' 'released' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                             {% if settings.PRINT_ENABLED and is_editor %}

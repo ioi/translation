@@ -241,12 +241,12 @@ code, pre {
 /* Default text fonts */
 
 .rendered_content {
-    font-family: "CustomTextFont", Arial, "Noto Sans", sans-serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", Arial, "Noto Sans", sans-serif;
     font-weight: normal;
 }
 
 .rendered_content[dir="rtl"] {
-    font-family: "CustomTextFont", Arial, "Noto Sans", sans-serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", Arial, "Noto Sans", sans-serif;
     font-weight: normal;
 }
 
@@ -256,34 +256,34 @@ code, pre {
 
 /* Default text fonts per language */
 
-.rendered_content[lang="ar"] {
-    font-family: "CustomTextFont", Arial, "Noto Naskh Arabic", "Noto Sans", serif;
+/* .rendered_content[lang="ar"] {
+    font-family: "CustomSingleFont", "CustomFontFamily", Arial, "Noto Naskh Arabic", "Noto Sans", serif;
 }
 
 .rendered_content[lang="fa"] {
-    font-family: "CustomTextFont", Arial, "Noto Sans", serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", Arial, "Noto Sans", serif;
 }
 
 .rendered_content[lang="ja"] {
-    font-family: "CustomTextFont", 'TakaoPGothic', Arial, "Noto Sans", "Noto Sans CJK JP", serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", 'TakaoPGothic', Arial, "Noto Sans", "Noto Sans CJK JP", serif;
 }
 
-.rendered_content[lang="kr"] {
-    font-family: "CustomTextFont", 'NanumMyeongjo', Arial, "Noto Sans", "Noto Sans CJK KR", serif;
+.rendered_content[lang="ko"] {
+    font-family: "CustomSingleFont", "CustomFontFamily", 'NanumMyeongjo', Arial, "Noto Sans", "Noto Sans CJK KR", serif;
 }
 
 .rendered_content[lang="th"] {
-    font-family: "CustomTextFont", 'Loma', Arial, "Noto Sans", serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", 'Loma', Arial, "Noto Sans", serif;
 }
 
 .rendered_content[lang="zh-Hans"] {
-    font-family: "CustomTextFont", 'Source Han Serif CN', Arial, "Noto Sans", "Noto Sans CJK SC", serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", 'Source Han Serif CN', Arial, "Noto Sans", "Noto Sans CJK SC", serif;
 }
 
 .rendered_content[lang="zh"] {
-    font-family: "CustomTextFont", 'PMingLiU', Arial, "Noto Sans", "Noto Sans CJK", serif;
+    font-family: "CustomSingleFont", "CustomFontFamily", 'PMingLiU', Arial, "Noto Sans", "Noto Sans CJK", serif;
 }
 
 .rendered_content[lang="si"] {
-    font-family: "CustomTextFont", Arial, 'NotoSansSinhala-Regular', "Noto Sans", serif;
-}
+    font-family: "CustomSingleFont", "CustomFontFamily", Arial, 'NotoSansSinhala-Regular', "Noto Sans", serif;
+} */

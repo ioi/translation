@@ -14,6 +14,7 @@ class User(DjangoUser):
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
+    text_family = models.CharField(max_length=255, default='', blank=True)
     num_of_contestants = models.IntegerField(default=0)
 
     def __str__(self):

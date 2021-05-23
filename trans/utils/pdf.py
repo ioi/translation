@@ -39,7 +39,8 @@ def render_pdf_template(translation, task_type,
         'pdf_output': pdf_output,
         'static_path': static_path,
         'images_path': images_path,
-        'text_font_base64': requested_user.text_font_base64
+        'text_font_base64': requested_user.text_font_base64,
+        'text_family': requested_user.text_family
     }
     context.update(ioi_settings(None))
     return render_to_string('pdf-template.html', context=context)
@@ -107,7 +108,7 @@ def convert_html_to_pdf(html, pdf_file_path):
     with open(html_file_path, 'wb') as f:
         f.write(html.encode('utf-8'))
     execute_puppeteer(html_file_path, pdf_file_path)
-    os.remove(html_file_path)
+    # os.remove(html_file_path)
 
 def execute_puppeteer(html_file_path, pdf_file_path):
     context = {

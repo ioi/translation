@@ -30,7 +30,7 @@ class CustomUserResource(ModelResource):
 
     class Meta:
         model = User
-        fields = ('username', 'country', 'language', 'raw_password', 'num_of_contestants',)
+        fields = ('username', 'country', 'language', 'font', 'raw_password', 'num_of_contestants',)
         import_id_fields = ('username',)
 
 
@@ -44,7 +44,7 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
     fieldsets = (
-        (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country', 'num_of_contestants')}),
+        (None, {'fields': ('username', 'text_font_base64', 'text_font_name', 'text_family', 'password', 'language','country', 'num_of_contestants')}),
         )
     add_fieldsets = (
         (None, {

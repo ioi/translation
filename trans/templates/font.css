@@ -1,6 +1,13 @@
 {% if text_font_base64 %}
 @font-face {
-    font-family: 'CustomTextFont';
+    font-family: 'CustomSingleFont';
     src: url(data:font/truetype;charset=utf-8;base64,{{text_font_base64}})
 }
+{% endif %}
+{% if text_family %}
+    @font-face {
+        font-family: 'CustomFontFamily';
+        font-weight: normal;
+        src: local("{{ text_family }}"); 
+    }
 {% endif %}

@@ -21,9 +21,18 @@
     {% if text_font_base64 %}
     <style>
         @font-face {
-            font-family: 'CustomTextFont';
+            font-family: 'CustomSingleFont';
 	        font-weight: normal;
             src: url(data:font/truetype;charset=utf-8;base64,{{ text_font_base64 }})
+        }
+    </style>
+    {% endif %}
+    {% if text_family %}
+    <style>
+        @font-face {
+            font-family: 'CustomFontFamily';
+	        font-weight: normal;
+            src: local("{{ text_family }}"); 
         }
     </style>
     {% endif %}

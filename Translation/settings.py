@@ -181,8 +181,6 @@ LOGGING = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Singapore'
-
 USE_I18N = True
 
 USE_L10N = True
@@ -190,16 +188,22 @@ USE_L10N = True
 USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
+
+# Contest Specific Information unique to each IOI
+
+TIME_ZONE = 'Asia/Singapore'
 PRINT_SYSTEM_ADDRESS=os.environ.get('PRINT_SYSTEM_URL')
 MONITOR_ADDRESS=os.environ.get('MONITOR_URL')
 
 DRAFT_PRINTER=os.environ.get('DRAFT_PRINTER')
 FINAL_PRINTER=os.environ.get('FINAL_PRINTER')
 
-CONTEST_TITLE = 'IOI 2021 - ISC Prep'
-CONTEST_FULL_TITLE = 'International Olympiad in Informatics 2021 - ISC Prep'
-CONTEST_DATE = 'June 20\u201330 2021'
-CONTEST_PLACE = 'Singapore'
+CONTEST_TITLE = os.environ.get('CONTEST_TITLE', 'IOI 2021')
+CONTEST_FULL_TITLE = os.environ.get('CONTEST_FULL_TITLE', 'International Olympiad in Informatics 2021')
+CONTEST_DATE = os.environ.get('CONTEST_DATE', 'June 20\u201330 2021')
+CONTEST_PLACE = os.environ.get('CONTEST_PLACE', 'Singapore')
+
+# Directory information
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'

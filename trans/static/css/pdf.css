@@ -101,7 +101,6 @@ div.pdf {
 @media print {
 
     body {
-        zoom: 1.2;
         margin: 0;
         background-color: white;
     }

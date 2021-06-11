@@ -30,7 +30,7 @@ class CustomUserResource(ModelResource):
 
     class Meta:
         model = User
-        fields = ('username', 'country', 'language', 'font', 'raw_password', 'num_of_contestants',)
+        fields = ('username', 'country', 'language', 'text_family', 'raw_password', 'num_of_contestants',)
         import_id_fields = ('username',)
 
 

@@ -11,6 +11,7 @@ from trans.forms import UploadFileForm
 from trans.models import User, Translation
 from trans.utils.pdf import released_pdf_path, unreleased_pdf_path
 
+from fclist import fclist, fcmatch
 
 class FirstPage(View):
     def get(self, request, *args, **kwargs):
@@ -48,23 +49,45 @@ class Settings(LoginRequiredMixin,View):
     def get(self, request):
         user = User.objects.get(username=request.user)
         form = UploadFileForm()
-        return render(request, 'settings.html', {'form': form, 'text_font_name': user.text_font_name})
+        available_fonts = sorted(set([font.family for font in fclist(fontformat='TrueType')]))
+        return render(request, 'settings.html', {'form': form, 'text_font_name': user.text_font_name, 'available_fonts': available_fonts, 'text_family': user.text_family})
 
     def post(self, request):
-        form = UploadFileForm(request.POST, request.FILES)
-        if not form.is_valid():
-            return HttpResponseBadRequest("You should attach a file")
-        font_file = request.FILES['uploaded_file']
-        if not font_file:
-            return HttpResponseBadRequest("You should attach a file")
-        import base64
-        text_font_base64 = base64.b64encode(font_file.read())
         user = User.objects.get(username=request.user.username)
-        self.__remove_user_related_pdfs(user)
-        user.text_font_base64 = text_font_base64
-        user.text_font_name = font_file.name
-        user.save()
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+        if 'font_upload' in request.POST:
+            form = UploadFileForm(request.POST, request.FILES)
+            if not form.is_valid():
+                return HttpResponseBadRequest("You should attach a file")
+            font_file = request.FILES['uploaded_file']
+            if not font_file:
+                return HttpResponseBadRequest("You should attach a file")
+            import base64
+            text_font_base64 = base64.b64encode(font_file.read())
+            
+            self.__remove_user_related_pdfs(user)
+            user.text_font_base64 = text_font_base64
+            user.text_font_name = font_file.name
+            user.save()
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        elif 'font_select' in request.POST:
+            if 'text_family' not in request.POST:
+                return HttpResponseBadRequest("You should select a font")
+
+            if not request.POST['text_family']:
+                self.__remove_user_related_pdfs(user)
+                user.text_family = ''
+                user.save()
+                return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+            available_fonts = set([font.family for font in fclist(fontformat='TrueType')])
+            if request.POST['text_family'] not in available_fonts:
+                return HttpResponseBadRequest("Selected font not available.")
+            self.__remove_user_related_pdfs(user)
+            user.text_family = request.POST['text_family']
+            user.save()
+
+            return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
     def delete(self, request):
         user = User.objects.get(username=request.user)

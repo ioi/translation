@@ -17,3 +17,4 @@ django-websocket-redis
 openpyxl
 raven
 pyppeteer==0.2.5
+fclist-cffi==1.1.2

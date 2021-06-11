@@ -7,13 +7,14 @@
     <div class="container">
         <div class="col-sm-8 col-sm-offset-2">
             <h1>Settings</h1> 
-            <form class="form-horizontal" action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Custom Font</div>
-                    <div class="panel-body">
-                        <span class="help-block" style="margin: 10px 0 20px;">
-                            A true-type font can be uploaded here to be used in the translation.
-                        </span>
+            <div class="panel panel-default">
+                <div class="panel-heading">Custom Font</div>
+                <div class="panel-body">
+                    <span class="help-block" style="margin: 10px 0 20px;">
+                        A true-type font can be uploaded here to be used in the translation. This supersedes all other font settings.
+                    </span>
+                    <form class="form-horizontal" action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="font_upload" id="font_upload" value="font_upload" />
                         <div class="form-group">
                             {% if text_font_name %}
                             <label class="control-label col-sm-3" for="email">Uploaded Font:</label>
@@ -35,9 +36,44 @@
                             </div>
                             {% endif %}
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
+                <div class="panel-body">
+                    <span class="help-block" style="margin: 10px 0 20px;">
+                        Alternatively, these fonts are already installed in Translation App. If you see a font you like, you can use it directly.
+                    </span>
+                    <form class="form-horizontal" action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="font_select" id="font_select" value="font_select" />
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="control-label col-sm-3" for="text_family">Select Font:</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" name="text_family" id="text_family">
+                                    {% if not text_family %}
+                                    <option value="">Default (Arial) (Currently selected)</option>
+                                    {% else %}
+                                    <option value="">Default (Arial)</option>
+                                    {% endif %}
+                                    {% for font in available_fonts %}
+                                    {% if text_family and font == text_family %}
+                                    <option selected value="{{ font }}">{{ font }} (Currently selected)</option>
+                                    {% else %}
+                                    <option value="{{ font }}">{{ font }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                {% if text_font_name %}
+                                <input type="submit" id="form-submit" class="btn btn-warning" disabled value="&times; Clear custom font first">
+                                {% else %}
+                                <input type="submit" id="form-submit" class="btn btn-primary" value="Use font">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     

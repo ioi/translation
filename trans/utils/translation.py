@@ -45,8 +45,15 @@ def get_translate_edit_permission(translation, user_token=None):
         edit_token.cache_edit_token(translation, new_edit_token)
         return True, new_edit_token.token
 
-    if user_token == cached_edit_token.token or edit_token.is_edit_token_expired(cached_edit_token, current_time):
+    if user_token == cached_edit_token.token:
         new_edit_token = edit_token.EditToken(user_token, datetime.datetime.now())
+        edit_token.cache_edit_token(translation, new_edit_token)
+        return True, new_edit_token.token
+
+    # Older token shouldn't be reused once another token has been issued. Frontend can use this information
+    # to determine whether another translation editing session has happened.
+    if edit_token.is_edit_token_expired(cached_edit_token, current_time):
+        new_edit_token = edit_token.EditToken(edit_token.generate_random_token(), datetime.datetime.now())
         edit_token.cache_edit_token(translation, new_edit_token)
         return True, new_edit_token.token
 

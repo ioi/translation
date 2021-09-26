@@ -162,6 +162,7 @@ function saveVersion(autosave=false, on_unleash=false, callback=null) {
 
 function getEditTranslateAccess(callback) {
     var edit_token = sessionStorage.getItem('edit_translate_token_' + task_id)
+    var originalTranslationText = currentTranslationText();
     $.ajax({
         // TODO: remove async = false
 //        async: false,
@@ -175,12 +176,30 @@ function getEditTranslateAccess(callback) {
         success: function(response) {
             if (response.can_edit == false) {
                 handleAccessDenied();
-            } else {
-                setEditToken(response.edit_token)
-                loadTranslationText(response.content);
-                if (callback)
-                    callback();
+                return;
             }
+
+            setEditToken(response.edit_token);
+
+            // Translation might've changed since this ajax call is done asynchronously.
+            var translationText = currentTranslationText();
+
+            if (originalTranslationText.length === 0 && translationText.length === 0) {
+                // Initial load or refresh (without further update), just load the content.
+                loadTranslationText(response.content);
+            } else if (edit_token !== response.edit_token) {
+                // If token stays the same, no other session has tried to edit the translation since
+                // older token can't be reused once another token has been issued. Hence, the more
+                // expensive translation comparison doesn't need to be done as often.
+
+                var canKeepCurrentTranslationState = originalTranslationText === response.content;
+                if (!canKeepCurrentTranslationState) {
+                    ToastrUtil.info('Translation has changed since last edit. Refreshing translation.');
+                    loadTranslationText(response.content);
+                }
+            }
+
+            if (callback) callback();
         },
         error: function () {
             handleAccessDenied('Connection error!');

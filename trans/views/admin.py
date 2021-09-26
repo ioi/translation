@@ -16,7 +16,7 @@ from django.http import HttpResponseNotFound
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest, Country
-from trans.utils import is_translate_in_editing, unleash_edit_token
+from trans.utils import is_translate_in_editing, release_edit_token
 from trans.utils.pdf import build_final_pdf, send_pdf_to_printer
 from trans.utils.translation import get_trans_by_user_and_task
 

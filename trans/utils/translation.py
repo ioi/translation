@@ -1,13 +1,6 @@
 import datetime
-import random
-import string
 
-from django.conf import settings
-from django.core.cache import cache
-
-
-def get_trans_edit_cache_key(translation):
-    return "TRANS_ET-%d" % translation.id
+from trans.utils import edit_token
 
 
 def get_task_by_contest_and_name(contest_slug, task_name, is_editor=False):
@@ -43,34 +36,39 @@ def get_requested_user(request, task_type):
     return user
 
 
-def get_translate_edit_permission(translation, my_token=None):
-    edit_token = cache.get(get_trans_edit_cache_key(translation))
+def get_translate_edit_permission(translation, user_token=None):
+    cached_edit_token = edit_token.fetch_cached_edit_token(translation)
     current_time = datetime.datetime.now()
 
-    if edit_token is None:
-        my_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
-        cache.set(get_trans_edit_cache_key(translation), (my_token, datetime.datetime.now()))
-        return True, my_token
-    elif my_token == edit_token[0] or edit_token[1] + datetime.timedelta(
-            seconds=settings.TRANSLATION_EDIT_TIME_OUT) < current_time:
-        cache.set(get_trans_edit_cache_key(translation), (my_token, datetime.datetime.now()))
-        return True, my_token
+    if cached_edit_token is None:
+        new_edit_token = edit_token.EditToken(edit_token.generate_random_token(), datetime.datetime.now())
+        edit_token.cache_edit_token(translation, new_edit_token)
+        return True, new_edit_token.token
+
+    if user_token == cached_edit_token.token or edit_token.is_edit_token_expired(cached_edit_token, current_time):
+        new_edit_token = edit_token.EditToken(user_token, datetime.datetime.now())
+        edit_token.cache_edit_token(translation, new_edit_token)
+        return True, new_edit_token.token
 
     return False, None
 
 
-def can_save_translate(translation, my_token):
-    edit_token = cache.get(get_trans_edit_cache_key(translation))
+def can_save_translate(translation, user_token):
+    cached_edit_token = edit_token.fetch_cached_edit_token(translation)
+    if cached_edit_token is None:
+        return True
+
     current_time = datetime.datetime.now()
-    return (edit_token is None) or my_token == edit_token[0] or edit_token[1] + datetime.timedelta(
-        seconds=settings.TRANSLATION_EDIT_TIME_OUT) < current_time
+    return user_token == cached_edit_token.token or edit_token.is_edit_token_expired(cached_edit_token, current_time)
 
 
 def is_translate_in_editing(translation):
     current_time = datetime.datetime.now()
-    edit_token = cache.get(get_trans_edit_cache_key(translation))
-    return (edit_token is not None) and (edit_token[1] + datetime.timedelta(seconds=settings.TRANSLATION_EDIT_TIME_OUT) > current_time)
+    cached_edit_token = edit_token.fetch_cached_edit_token(translation)
+    if cached_edit_token is None:
+        return False
+    return not edit_token.is_edit_token_expired(cached_edit_token, current_time)
 
 
-def unleash_edit_token(translation):
-    cache.set(get_trans_edit_cache_key(translation), None)
+def release_edit_token(translation):
+    edit_token.clear_cached_edit_token(translation)

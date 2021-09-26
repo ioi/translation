@@ -1,6 +1,6 @@
 Django~=1.11.14
 gunicorn==19.5.0
-psycopg2-binary
+psycopg2-binary>=2.8,<2.9
 redis==2.10.3
 requests==2.7.0
 six==1.14.0

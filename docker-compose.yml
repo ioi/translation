@@ -4,6 +4,8 @@ services:
   app:
     restart: always
     build: ./
+    ports:
+    - 9001:8000 # Debugging
     volumes:
     - ioi_static:/usr/src/app/static/
     - ioi_media:/usr/src/app/media/

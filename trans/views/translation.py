@@ -1,4 +1,5 @@
 import errno
+import logging
 import urllib
 
 from django.http.response import HttpResponseNotFound
@@ -23,6 +24,8 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
 from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf, merge_final_pdfs
 from trans.views.admin import FreezeUserContest
+
+logger = logging.getLogger(__name__)
 
 
 class Home(LoginRequiredMixin, View):
@@ -78,11 +81,14 @@ class Translations(LoginRequiredMixin, View):
         task_text = task.get_published_text
         contests = Contest.objects.order_by('order')
 		
-        # For Monitor udpates:
-        try:
-            response = requests.get(settings.MONITOR_ADDRESS + '/status/translate/' + user.country.code)
-        except Exception as e:
-            print(type(e))
+        # For Monitor updates:
+        if settings.MONITOR_ADDRESS:
+            try:
+                response = requests.get(settings.MONITOR_ADDRESS + '/status/translate/' + user.country.code)
+            except Exception as e:
+                print(type(e))
+        else:
+            logger.debug('Skipping monitor update')
         return render(request, 'editor.html',
                       context={'trans': trans.get_latest_text(), 'task': task_text,
                                'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
@@ -190,11 +196,14 @@ class TranslationPrint(TranslationView):
             translation.save_last_version(release_note='Printed', saved=True)
         os.remove(output_pdf_path)
         
-        # For Monitor udpates:
-        try:
-           response = requests.get(settings.MONITOR_ADDRESS + '/status/printdraft/' + user.country.code)
-        except Exception as e:
-            print(type(e))
+        # For Monitor updates:
+        if settings.MONITOR_ADDRESS:
+            try:
+               response = requests.get(settings.MONITOR_ADDRESS + '/status/printdraft/' + user.country.code)
+            except Exception as e:
+                print(type(e))
+        else:
+            logger.debug('Skipping monitor update')
 
         return JsonResponse({'success': True})
 
@@ -339,12 +348,15 @@ class TranslationSubmitFreezeContest(LoginRequiredMixin, View):
         user_contest.save()
 
         if not_translating_check == "checked":
-            # For Monitor udpates:
-            try:
-                response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.username)
-                response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.username, extra_country1, extra_country2))
-            except Exception as e:
-                print(type(e))
+            # For Monitor updates:
+            if settings.MONITOR_ADDRESS:
+                try:
+                    response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.username)
+                    response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.username, extra_country1, extra_country2))
+                except Exception as e:
+                    print(type(e))
+            else:
+                logger.debug('Skipping monitor update')
             return redirect(to=reverse('home'))
 			
         task_names = []
@@ -356,12 +368,15 @@ class TranslationSubmitFreezeContest(LoginRequiredMixin, View):
 
         send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants )
 
-        # For Monitor udpates:
-        try:
-           response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.country.code)
-           response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.country.code, extra_country1, extra_country2))
-        except Exception as e:
-            print(type(e))
+        # For Monitor updates:
+        if settings.MONITOR_ADDRESS:
+            try:
+               response = requests.get(settings.MONITOR_ADDRESS + '/status/printfinal/' + user.country.code)
+               response = requests.get('{}/extra?countrycode={}&extra1={}&extra2={}'.format(settings.MONITOR_ADDRESS, user.country.code, extra_country1, extra_country2))
+            except Exception as e:
+                print(type(e))
+        else:
+            logger.debug('Skipping monitor update')
 
 #        return FreezeUserContest().post(request, user.username, contest.id, note)
         return redirect(to=reverse('home'))

@@ -17,8 +17,6 @@ urlpatterns = [
               TranslationMarkdown.as_view(), name='task_md'),
           url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/pdf$',
               TranslationPDF.as_view(), name='task_pdf'),
-          url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/preview$',
-              TranslationHTML.as_view(), name='task_html'),
           url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/print$',
               TranslationPrint.as_view(), name='task_print'),
           url(r'^(?P<task_type>[\w]*)/(?P<contest_slug>[\w]*)/(?P<task_name>[\w]*)/revisions$',

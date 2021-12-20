@@ -71,15 +71,11 @@
                 </td>
                 {% if user_name == "ISC" %}
                 <td>
-                    <a href="{% url 'task_html' 'released' contest.slug task.name %}"
-                       class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                     <a href="{% url 'task_pdf' 'released' contest.slug task.name %}"
                        class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                 </td>
                 {% else %}
                 <td>
-                    <a href="{% url 'task_html' 'task' contest.slug task.name %}?user={{user_name}}"
-                       class="btn btn-default" title="Preview"><i class="fa fa-btns fa-search fa-lg"></i></a>
                     <a href="{% url 'task_pdf' 'task' contest.slug task.name %}?user={{user_name}}"
                        class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                 </td>

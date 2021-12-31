@@ -47,7 +47,7 @@
                 {% else %}
                 <th>Translation</th>
                 {% endif %}
-                <th width="15%">Finalize</th>
+                <th>Finalize</th>
                 <th>Final PDF</th>
             </tr>
             </thead>
@@ -81,17 +81,47 @@
                 </td>
                 {% endif %}
                 <td>
-                    {% if task.trans_id %}
-                        {% if task.frozen and can_upload_final_pdf or not contest.user_contest.frozen%}
-                            <form method="post" action="{% url 'staff_freeze_trans' task_name=task.name username=user_name %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
-                                <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}" onclick="return confirm('Are you sure?');">
-                                    {% if task.frozen %} Reopen {% else %} Finalize {% endif %}
-                                </button>
-                            </form>
-                        {% endif %}
-                    {% endif %}
+		  <form method="post" action="{% url 'staff_freeze_trans' task_name=task.name username=user_name %}">
+		    {% csrf_token %}
+		    <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}" />
+
+		    {% if task.frozen %}
+		      <button
+			type="submit"
+			class="btn btn-default"
+			name="reopen"
+			onclick="return confirm('Are you sure?')">
+			Reopen
+		      </button>
+		    {% else %}
+		      {% if task.trans_id is None %}
+		        <button
+			  type="submit"
+			  class="btn btn-default" disabled>
+			  Not started
+		        </button>
+		      {% else %}
+		        <button
+			  type="submit"
+			  name="translating"
+			  class="btn btn-success"
+			  value="true"
+			  onclick="return confirm('Finalizing translation for {{ task.name }}. Are you sure?')"
+			  >
+			  Finalize
+			</button>
+		      {% endif %}
+		      <button
+			type="submit"
+			class="btn btn-danger"
+			name="translating"
+			value="false"
+			onclick="return confirm('Not translating {{ task.name }}. Are you sure?')"
+			>
+			Not translating
+		      </button>
+		    {% endif %}
+		  </form>
                 </td>
                 <td>
                 {% if task.final_pdf_url %}

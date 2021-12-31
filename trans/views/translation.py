@@ -42,17 +42,31 @@ class Home(LoginRequiredMixin, View):
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.is_editable_by(user)
             translation_id = translation.id if translation else None    # neo added
-            tasks_by_contest[task.contest].append(
-                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing, 'frozen': frozen})
-        tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
-                        'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
-                        'tasks': tasks_by_contest[c]} for c in
-                       Contest.objects.order_by('-order') if
-                       len(tasks_by_contest[c]) > 0]
+            tasks_by_contest[task.contest].append({
+                'id': task.id,
+                'name': task.name,
+                'trans_id': translation_id,
+                'is_editing': is_editing,
+                'frozen': frozen,
+            })
+        tasks_lists = [
+            {
+                'title': c.title,
+                'slug': c.slug,
+                'id': c.id,
+                'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+                'tasks': tasks_by_contest[c]
+            }
+            for c in Contest.objects.order_by('-order')
+            if len(tasks_by_contest[c]) > 0
+        ]
         contests = Contest.objects.order_by('order')
-#        return render(request, 'home.html', context={'tasks_lists': tasks_lists, 'home_content': home_content,
-#                                                     'contests': contests, 'is_editor': user.is_editor()})
-        return render(request, 'home.html', context={'user': user, 'tasks_lists': tasks_lists, 'home_content': home_content,'contests': contests, 'is_editor': user.is_editor()})
+        return render(request, 'home.html', context={
+            'user': user,
+            'tasks_lists': tasks_lists,
+            'home_content': home_content,'contests': contests,
+            'is_editor': user.is_editor()
+        })
 
 
 class Healthcheck(View):

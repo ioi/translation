@@ -118,42 +118,68 @@ class UserTranslations(StaffCheckMixin, View):
 
 
 class UsersList(StaffCheckMixin, View):
-    def get(self, request):
-        users = (User.get_translators() | User.objects.filter(username='ISC')).\
-            distinct().values('country', 'language', 'username', 'num_of_contestants')
-        returned_users = []
-        user_contest_notes = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'note')
-        user_contest_ec1s = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'extra_country1')
-        user_contest_ec2s = UserContest.objects.filter(contest__frozen=False).values_list('user__username', 'extra_country2')
-        user_notes = defaultdict(str)
-        user_ec1s = defaultdict(str)
-        user_ec2s = defaultdict(str)
-        for user_name, note in user_contest_notes:
-            user_notes[user_name] += note
-
-        for user_name, extra_country1 in user_contest_ec1s:
-            user_ec1s[user_name] += extra_country1			
-
-        for user_name, extra_country2 in user_contest_ec2s:
-            user_ec2s[user_name] += extra_country2
-
+    def _fetch_users(self):
+        users = list((User.get_translators() | User.objects.filter(username='ISC')).\
+            distinct().values('country', 'language', 'username', 'num_of_contestants'))
         for user in users:
-            user['is_frozen'] = (user['username'] in user_notes.keys())
-            user['frozen_note'] = user_notes[user['username']]
             user['country_name'] = Country.objects.get(code=user['country']).name
-            user['merged_pdf_url'] = 'media/merged/{}-merged.pdf'.format(user['username'])
-            user['file_exists'] = os.path.isfile(user['merged_pdf_url'])
+        return users
 
-            user['extra_country1'] = user_ec1s[user['username']]
-            user['ec1_merged_pdf_url'] = 'media/merged/{}-merged.pdf'.format(user['extra_country1'])
-            user['ec1_file_exists'] = os.path.isfile(user['ec1_merged_pdf_url'])
+    def _fetch_translations(self, usernames):
+        contests = []
+        contest_tasks = defaultdict(list)
+        for task in Task.objects.filter(contest__public=True, contest__frozen=False).order_by('-contest__order', 'order'):
+            contest = task.contest
+            contest_tasks[contest.id].append(task)
 
-            user['extra_country2'] = user_ec2s[user['username']]
-            user['ec2_merged_pdf_url'] = 'media/merged/{}-merged.pdf'.format(user['extra_country2'])
-            user['ec2_file_exists'] = os.path.isfile(user['ec2_merged_pdf_url'])
+            if not contests or contests[-1]['id'] != contest.id:
+                contests.append({
+                    'title': contest.title,
+                    'slug': contest.slug,
+                    'id': contest.id,
+                })
+        # Django template doesn't play well with defaultdicts.
+        contest_tasks = dict(contest_tasks)
 
-            returned_users.append(user)
-        return render(request, 'users.html', context={'users': returned_users})
+        user_translations = {username: {} for username in usernames}
+        for translation in Translation.objects.filter(task__contest__public=True, task__contest__frozen=False):
+            user = translation.user
+            task = translation.task
+            # Task.name is unique, so translation does not need to be keyed by contest.
+            if user.username not in user_translations:
+                continue
+            user_translations[user.username][task.name] = {
+                'id': translation.id,
+                'is_editing': is_translate_in_editing(translation),
+                'frozen': translation.frozen,
+                'final_pdf_url': translation.final_pdf.url if translation.final_pdf else None,
+            }
+
+        user_contests = {username: {} for username in usernames}
+        for user_contest in UserContest.objects.filter(contest__public=True, contest__frozen=False):
+            user = user_contest.user
+            contest = user_contest.contest
+            if user.username not in user_contests or not contest:
+                continue
+            user_contests[user.username][contest.id] = {
+                'frozen': user_contest.frozen,
+                'note': user_contest.note,
+            }
+
+        return (contests, contest_tasks, user_translations, user_contests)
+
+    def get(self, request):
+        users = self._fetch_users()
+        (contests, contest_tasks, user_translations, user_contests) = \
+            self._fetch_translations([user['username'] for user in users])
+
+        return render(request, 'users.html', context={
+            'users': users,
+            'contests': contests,
+            'contest_tasks': contest_tasks,
+            'user_translations': user_translations,
+            'user_contests': user_contests,
+        })
 
 
 class AddFinalPDF(StaffCheckMixin, View):

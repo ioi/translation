@@ -99,3 +99,7 @@ ENV/
 
 # media
 media/
+
+# tag files
+tags
+TAGS

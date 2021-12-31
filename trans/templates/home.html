@@ -153,9 +153,6 @@
             method="post"
             action="{% url 'freeze_user_contest' username=user.username contest_id=contest.id%}">
             {% csrf_token %}
-            Not going to translate? Then check this <input type="checkbox" name="not_translating" id="not_translating" value="unchecked" onclick="toggle_buttons()"> (You still receive <b>ISC (English) version</b> anyways.)<br>
-            <br><br>
-            
             <!--label for="note">Freeze Note:</label-->
             <!--input type="text" class="form-control" id="note" name="note"-->
             <button
@@ -163,8 +160,9 @@
               id="final_submit"
               class="btn btn-success"
               style="margin:0 auto;display:block;"
-              onclick="return validateFinalizeTranslation(this, {{contest.tasks|length}});" >
-              Submit Finalized Translations </button>
+              onclick="return validateFinalizeTranslation('{{ contest.slug }}', {{ contest.tasks|length }});" >
+              Submit Finalized Translations
+            </button>
           </form>
         {% endif %}
       {% endif %} 

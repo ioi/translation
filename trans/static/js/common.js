@@ -53,34 +53,20 @@ function sendPrintJob(print_task_url) {
     });
 }
 
-// Added by Emil Abbasov IOI2019
-function validateFinalizeTranslation(form, n) {
-	
-	check = document.getElementById('not_translating');
-	
-	if(check.checked) {
-		return confirm('Are you sure?');
-	}
-	
-    if(document.getElementsByName('reopen').length!= n) {
-        alert('All tasks must be finalized before this action!');
-        return false;
-    }
-    else {
+function validateFinalizeTranslation(contest_slug, tasks_length) {
+    const frozen_tasks = document.querySelectorAll(
+        `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="True"]`
+    );
+    if (frozen_tasks.length === tasks_length) {
         return confirm('Are you sure?');
     }
+
+    const unfrozen_tasks = document.querySelectorAll(
+        `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="False"]`
+    );
+    const unfrozen_task_names = Array.from(unfrozen_tasks)
+          .map((el) => { return el.dataset.taskName});
+    alert(`Please freeze the following task(s) first: ${unfrozen_task_names}`);
+    return false;
 }
 
-
-// Added by Emil Abbasov IOI2019
-function toggle_buttons() {
-	
-	me = document.getElementById('not_translating');
-	
-	if(me.checked) {
-		document.getElementById('not_translating').value = "checked";
-	} 
-	else {
-		document.getElementById('not_translating').value = "unchecked";
-	}
-}

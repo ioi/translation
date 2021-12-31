@@ -153,6 +153,7 @@ class UsersList(StaffCheckMixin, View):
                 'is_editing': is_translate_in_editing(translation),
                 'frozen': translation.frozen,
                 'final_pdf_url': translation.final_pdf.url if translation.final_pdf else None,
+                'translating': translation.translating
             }
 
         user_contests = {username: {} for username in usernames}

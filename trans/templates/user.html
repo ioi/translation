@@ -83,7 +83,7 @@
                 <td>
                     {% if task.trans_id %}
                         {% if task.frozen and can_upload_final_pdf or not contest.user_contest.frozen%}
-                            <form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
+                            <form method="post" action="{% url 'staff_freeze_trans' task_name=task.name username=user_name %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
                                 <button type="submit" class="btn {% if task.frozen %} btn-default {% else %} btn-info {% endif %}" onclick="return confirm('Are you sure?');">

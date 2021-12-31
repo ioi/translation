@@ -112,6 +112,7 @@ class Translation(models.Model):
     user = models.ForeignKey('User')
     task = models.ForeignKey('Task', default=0)
     frozen = models.BooleanField(default=False)
+    translating = models.NullBooleanField()
     final_pdf = models.FileField(upload_to=final_pdf_path, null=True)
 
     class Meta:

@@ -91,7 +91,13 @@ class UserTranslations(StaffCheckMixin, View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             if translation:
-                translations.append((task.id, task.name, True, translation.id, translation.frozen, is_editing))
+                translations.append((
+                    task.id,
+                    task.name,
+                    True,
+                    translation.id,
+                    translation.frozen,
+                    is_editing))
             else:
                 translations.append((task.id, task.name, False, 'None', False, False))
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
@@ -101,20 +107,36 @@ class UserTranslations(StaffCheckMixin, View):
             frozen = translation and translation.frozen
             translation_id = translation.id if translation else None
             final_pdf_url = translation.final_pdf.url if translation and translation.final_pdf else None
-            tasks_by_contest[task.contest].append(
-                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
-                 'frozen': frozen, 'final_pdf_url': final_pdf_url})
-        tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
-                        'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
-                        'tasks': tasks_by_contest[c]} for c in
-                       Contest.objects.order_by('-order') if
-                       len(tasks_by_contest[c]) > 0]
+            tasks_by_contest[task.contest].append({
+                'id': task.id,
+                'name': task.name,
+                'trans_id': translation_id,
+                'is_editing': is_editing,
+                'frozen': frozen,
+                'final_pdf_url': final_pdf_url
+            })
+        tasks_lists = [
+            {
+                'title': c.title,
+                'slug': c.slug,
+                'id': c.id,
+                'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+                'tasks': tasks_by_contest[c]
+            }
+            for c in Contest.objects.order_by('-order')
+            if len(tasks_by_contest[c]) > 0
+        ]
         can_upload_final_pdf = request.user.has_perm('trans.change_translation')
         form = UploadFileForm()
-        return render(request, 'user.html', context={'user_name': username, 'country': user.country.name,
-                                                    'is_editor': user.is_editor,
-                                                     'tasks_lists': tasks_lists, 'language': user.credentials(),
-                                                     'can_upload_final_pdf': can_upload_final_pdf, 'form': form})
+        return render(request, 'user.html', context={
+            'user_name': username,
+            'country': user.country.name,
+            'is_editor': user.is_editor,
+            'tasks_lists': tasks_lists,
+            'language': user.credentials(),
+            'can_upload_final_pdf': can_upload_final_pdf,
+            'form': form
+        })
 
 
 class UsersList(StaffCheckMixin, View):

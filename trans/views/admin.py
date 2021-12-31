@@ -204,7 +204,7 @@ class AddFinalPDF(StaffCheckMixin, View):
 
 
 class FreezeTranslationView(View):
-    def _freeze_translation(self, username, task_name, frozen):
+    def _freeze_translation(self, username, task_name, frozen, translating):
         user = User.objects.filter(username=username).first()
         if user is None:
             return HttpResponseNotFound('No such user')
@@ -217,19 +217,27 @@ class FreezeTranslationView(View):
 
         trans.frozen = frozen
         if frozen:
-            pdf_path = build_final_pdf(trans)
-            with open(pdf_path, 'rb') as f:
-                trans.final_pdf = File(f)
+            if translating:
+                trans.translating = True
+                pdf_path = build_final_pdf(trans)
+                with open(pdf_path, 'rb') as f:
+                    trans.final_pdf = File(f)
+                    # Needs to be called while the file is open.
+                    trans.save()
+            else:
+                trans.translating = False
                 trans.save()
         else:
             trans.final_pdf.delete()
+            trans.translating = None
             trans.save()
 
 
 class UserFreezeTranslation(LoginRequiredMixin, FreezeTranslationView):
     def post(self, request, task_name):
         frozen = request.POST['freeze'] == 'True'
-        self._freeze_translation(request.user.username, task_name, frozen)
+        translating = request.POST.get('translating') != 'False'
+        self._freeze_translation(request.user.username, task_name, frozen, translating)
 
         # trans.notify_final_pdf_change()
         # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
@@ -239,7 +247,8 @@ class UserFreezeTranslation(LoginRequiredMixin, FreezeTranslationView):
 class StaffFreezeTranslation(StaffCheckMixin, FreezeTranslationView):
     def post(self, request, username, task_name):
         frozen = request.POST['freeze'] == 'True'
-        self._freeze_translation(username, task_name, frozen)
+        translating = request.POST.get('translating') != 'False'
+        self._freeze_translation(username, task_name, frozen, translating)
 
         # trans.notify_final_pdf_change()
         # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))

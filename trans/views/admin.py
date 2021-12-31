@@ -202,12 +202,17 @@ class AddFinalPDF(StaffCheckMixin, View):
         return redirect(request.META.get('HTTP_REFERER'))
 
 
-class FreezeTranslation(LoginRequiredMixin, View):
-    def post(self, request, id):
-        frozen = request.POST['freeze'] == 'True'
-        trans = Translation.objects.filter(id=id).first()
-        if trans is None:
-            return HttpResponseNotFound("There is no task")
+class FreezeTranslationView(View):
+    def _freeze_translation(self, username, task_name, frozen):
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            return HttpResponseNotFound('No such user')
+
+        task = Task.objects.filter(name=task_name).first()
+        if task is None:
+            return HttpResponseNotFound('No such task')
+
+        trans = get_trans_by_user_and_task(user, task)
 
         trans.frozen = frozen
         if frozen:
@@ -219,8 +224,24 @@ class FreezeTranslation(LoginRequiredMixin, View):
             trans.final_pdf.delete()
             trans.save()
 
-#        trans.notify_final_pdf_change()
-#        return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+
+class UserFreezeTranslation(LoginRequiredMixin, FreezeTranslationView):
+    def post(self, request, task_name):
+        frozen = request.POST['freeze'] == 'True'
+        self._freeze_translation(request.user.username, task_name, frozen)
+
+        # trans.notify_final_pdf_change()
+        # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+        return redirect(request.META.get('HTTP_REFERER'))
+
+
+class StaffFreezeTranslation(StaffCheckMixin, FreezeTranslationView):
+    def post(self, request, username, task_name):
+        frozen = request.POST['freeze'] == 'True'
+        self._freeze_translation(username, task_name, frozen)
+
+        # trans.notify_final_pdf_change()
+        # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
         return redirect(request.META.get('HTTP_REFERER'))
 
 

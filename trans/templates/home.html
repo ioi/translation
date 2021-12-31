@@ -56,7 +56,7 @@
 						<td>
 							{% if task.trans_id %}
 								{% if not contest.user_contest.frozen%}
-									<form method="post" action="{% url 'freeze_trans' id=task.trans_id %}">
+									<form method="post" action="{% url 'user_freeze_trans' task_name=task.name %}">
 										{% csrf_token %}
 										<input type="hidden" name="freeze" value="{{ task.frozen|yesno:'False,True' }}"/>
 										{% if task.frozen %}

@@ -15,7 +15,7 @@
         <tr>
           <th style="text-align: left;">Country</td>
             <th>User</th>
-	    <th>Status</th>
+            <th>Status</th>
             {% for task in contest_tasks|get_dict:contest.id %}
               <th>{{ task.name }}</th>
             {% endfor %}
@@ -27,39 +27,42 @@
             <tr>
               <td style="text-align: left;">{{ user.country_name }}</td>
               <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username }}</a></td>
-	      <td>
-		{% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
-		  {% if user_contest is not None and user_contest.frozen %}
-		    <span style="color: green">Finalized</span>
-		  {% else %}
-		    In progress
-		  {% endif %}
-		{% endwith %}
-	      </td>
+              <td>
+                {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
+                  {% if user_contest is not None and user_contest.frozen %}
+                    <span style="color: green">Finalized</span>
+                  {% else %}
+                    In progress
+                  {% endif %}
+                {% endwith %}
+              </td>
               {% for task in contest_tasks|get_dict:contest.id %}
                 {% with translation=user_translations|get_dict:user.username|get_dict:task.name %}
-	        {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
-		  <td>
-                    {% if translation is None %}
-		      <span style="color: brown">
-                        <i class="fa fa-question fa-lg"></i>
-		      </span>
-                    {% elif translation.final_pdf_url is None %}
-		      {% if user_contest is not None and user_contest.frozen %}
-		        <span style="color: red">
-                          <i class="fa fa-times fa-lg"></i>
-		        </span>
-		      {% else %}
-		        <span style="color: brown">
+                {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
+                  <td>
+                    {% if translation is not None and translation.final_pdf_url is not None %}
+                      <a class="btn btn-default" href="{{translation.final_pdf_url}}"><i class="fa fa-file-pdf-o fa-lg"></i></a>
+                    {% else %}
+                      {% if translation is None %}
+                        <span style="color: brown">
+                          <i class="fa fa-question fa-lg"></i>
+                        </span>
+                      {% elif translation.translating is None %}
+                        <span style="color: brown">
                           <i class="fa fa-pencil fa-lg"></i>
-		        </span>
-		      {% endif %}
-		    {% else %}
-		      <a class="btn btn-default" href="{{translation.final_pdf_url}}"><i class="fa fa-file-pdf-o fa-lg"></i></a>
+                        </span>
+                      {% elif not translation.translation %}
+                        <span style="color: red">
+                          <i class="fa fa-times fa-lg"></i>
+                        </span>
+                      {% else %}
+                        <!-- Where's the PDF file? -->
+                        <i class="fa fa-file-pdf-o fa-lg"></i>
+                      {% endif %}
                     {% endif %}
                   </td>
-		{% endwith %}
-		{% endwith %}
+                {% endwith %}
+                {% endwith %}
               {% endfor %}
             </tr>
           {% endfor %}

@@ -91,7 +91,13 @@ class UserTranslations(StaffCheckMixin, View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             if translation:
-                translations.append((task.id, task.name, True, translation.id, translation.frozen, is_editing))
+                translations.append((
+                    task.id,
+                    task.name,
+                    True,
+                    translation.id,
+                    translation.frozen,
+                    is_editing))
             else:
                 translations.append((task.id, task.name, False, 'None', False, False))
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
@@ -101,20 +107,36 @@ class UserTranslations(StaffCheckMixin, View):
             frozen = translation and translation.frozen
             translation_id = translation.id if translation else None
             final_pdf_url = translation.final_pdf.url if translation and translation.final_pdf else None
-            tasks_by_contest[task.contest].append(
-                {'id': task.id, 'name': task.name, 'trans_id': translation_id, 'is_editing': is_editing,
-                 'frozen': frozen, 'final_pdf_url': final_pdf_url})
-        tasks_lists = [{'title': c.title, 'slug': c.slug, 'id': c.id,
-                        'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
-                        'tasks': tasks_by_contest[c]} for c in
-                       Contest.objects.order_by('-order') if
-                       len(tasks_by_contest[c]) > 0]
+            tasks_by_contest[task.contest].append({
+                'id': task.id,
+                'name': task.name,
+                'trans_id': translation_id,
+                'is_editing': is_editing,
+                'frozen': frozen,
+                'final_pdf_url': final_pdf_url
+            })
+        tasks_lists = [
+            {
+                'title': c.title,
+                'slug': c.slug,
+                'id': c.id,
+                'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+                'tasks': tasks_by_contest[c]
+            }
+            for c in Contest.objects.order_by('-order')
+            if len(tasks_by_contest[c]) > 0
+        ]
         can_upload_final_pdf = request.user.has_perm('trans.change_translation')
         form = UploadFileForm()
-        return render(request, 'user.html', context={'user_name': username, 'country': user.country.name,
-                                                    'is_editor': user.is_editor,
-                                                     'tasks_lists': tasks_lists, 'language': user.credentials(),
-                                                     'can_upload_final_pdf': can_upload_final_pdf, 'form': form})
+        return render(request, 'user.html', context={
+            'user_name': username,
+            'country': user.country.name,
+            'is_editor': user.is_editor,
+            'tasks_lists': tasks_lists,
+            'language': user.credentials(),
+            'can_upload_final_pdf': can_upload_final_pdf,
+            'form': form
+        })
 
 
 class UsersList(StaffCheckMixin, View):
@@ -153,6 +175,7 @@ class UsersList(StaffCheckMixin, View):
                 'is_editing': is_translate_in_editing(translation),
                 'frozen': translation.frozen,
                 'final_pdf_url': translation.final_pdf.url if translation.final_pdf else None,
+                'translating': translation.translating
             }
 
         user_contests = {username: {} for username in usernames}
@@ -202,25 +225,55 @@ class AddFinalPDF(StaffCheckMixin, View):
         return redirect(request.META.get('HTTP_REFERER'))
 
 
-class FreezeTranslation(LoginRequiredMixin, View):
-    def post(self, request, id):
-        frozen = request.POST['freeze'] == 'True'
-        trans = Translation.objects.filter(id=id).first()
-        if trans is None:
-            return HttpResponseNotFound("There is no task")
+class FreezeTranslationView(View):
+    def _freeze_translation(self, username, task_name, frozen, translating):
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            return HttpResponseNotFound('No such user')
+
+        task = Task.objects.filter(name=task_name).first()
+        if task is None:
+            return HttpResponseNotFound('No such task')
+
+        trans = get_trans_by_user_and_task(user, task)
 
         trans.frozen = frozen
         if frozen:
-            pdf_path = build_final_pdf(trans)
-            with open(pdf_path, 'rb') as f:
-                trans.final_pdf = File(f)
+            if translating:
+                trans.translating = True
+                pdf_path = build_final_pdf(trans)
+                with open(pdf_path, 'rb') as f:
+                    trans.final_pdf = File(f)
+                    # Needs to be called while the file is open.
+                    trans.save()
+            else:
+                trans.translating = False
                 trans.save()
         else:
             trans.final_pdf.delete()
+            trans.translating = None
             trans.save()
 
-#        trans.notify_final_pdf_change()
-#        return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+
+class UserFreezeTranslation(LoginRequiredMixin, FreezeTranslationView):
+    def post(self, request, task_name):
+        frozen = request.POST['freeze'] == 'True'
+        translating = request.POST.get('translating') != 'False'
+        self._freeze_translation(request.user.username, task_name, frozen, translating)
+
+        # trans.notify_final_pdf_change()
+        # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
+        return redirect(request.META.get('HTTP_REFERER'))
+
+
+class StaffFreezeTranslation(StaffCheckMixin, FreezeTranslationView):
+    def post(self, request, username, task_name):
+        frozen = request.POST['freeze'] == 'True'
+        translating = request.POST.get('translating') != 'False'
+        self._freeze_translation(username, task_name, frozen, translating)
+
+        # trans.notify_final_pdf_change()
+        # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
         return redirect(request.META.get('HTTP_REFERER'))
 
 

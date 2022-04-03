@@ -44,7 +44,7 @@ and running at `http://your_server_address:9000/`.
 You may optionally perform the following tasks:
 
 * To create essential data for the system such as admin users and groups,
-  run `docker-compose exec web bash` after the system has been started,
+  run `docker-compose exec app bash` after the system has been started,
   and then in the shell, execute `python3 manage.py loaddata initial_data.json`
   for the very first time.
   Then exit from the shell by typing `exit`.

@@ -78,13 +78,13 @@ class LanguageAdmin(ImportExportModelAdmin):
 class CountryResource(ModelResource):
     class Meta:
         model = Country
-        fields = ('code', 'code2', 'name',)
+        fields = ('code', 'code2', 'name', 'online')
         import_id_fields = ('code',)
 
 
 class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
-    list_display = ['code', 'code2', 'name']
+    list_display = ['code', 'code2', 'name', 'online']
     ordering = ['code']
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage

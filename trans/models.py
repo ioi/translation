@@ -206,6 +206,7 @@ class Country(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(primary_key=True, max_length=255)
     code2 = models.CharField(max_length=255, null=True, default=None)
+    online = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

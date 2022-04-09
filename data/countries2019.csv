@@ -1,88 +1,89 @@
-name,code,code2
-Argentina,ARG,AR
-Australia,AUS,AU
-Austria,AUT,AT
-Azerbaijan,AZE,AZ
-Belgium,BEL,BE
-Bangladesh,BGD,BD
-Bulgaria,BGR,BG
-Bosnia and Herzegovina,BIH,BA
-Belarus,BLR,BY
-Bolivia,BOL,BO
-Brazil,BRA,BR
-Canada,CAN,CA
-Switzerland,CHE,CH
-Chile,CHL,CL
-China,CHN,CN
-Colombia,COL,CO
-Cuba,CUB,CU
-Cyprus,CYP,CY
-Czech Republic,CZE,CZ
-Germany,DEU,DE
-Denmark,DNK,DK
-Dominican Republic,DOM,DO
-Egypt,EGY,EG
-Spain,ESP,ES
-Estonia,EST,EE
-Finland,FIN,FI
-France,FRA,FR
-United Kingdom,GBR,GB
-Georgia,GEO,GE
-Greece,GRC,GR
-Hong Kong,HKG,HK
-Croatia,HRV,HR
-Hungary,HUN,HU
-Indonesia,IDN,ID
-India,IND,IN
-Ireland,IRL,IE
-Iran,IRN,IR
-Iceland,ISL,IS
-Israel,ISR,IL
-Italy,ITA,IT
-Jordan,JOR,JO
-Japan,JPN,JP
-Kazakhstan,KAZ,KZ
-Kyrgyzstan,KGZ,KG
-Korea,KOR,KR
-Sri Lanka,LKA,LK
-Lithuania,LTU,LT
-Luxembourg,LUX,LU
-Latvia,LVA,LV
-Macau,MAC,MO
-Morocco,MAR,MA
-Moldova,MDA,MD
-Mexico,MEX,MX
-Macedonia,MKD,MK
-Montenegro,MNE,ME
-Mongolia,MNG,MN
-Malaysia,MYS,MY
-Nigeria,NGA,NG
-Netherlands,NLD,NL
-Norway,NOR,NO
-New Zealand,NZL,NZ
-Philippines,PHL,PH
-Poland,POL,PL
-Portugal,PRT,PT
-Palestine,PSE,PS
-Romania,ROU,RO
-Russian Federation,RUS,RU
-Saudi Arabia,SAU,SA
-Singapore,SGP,SG
-El Salvador,SLV,SV
-Serbia,SRB,RS
-Slovakia,SVK,SK
-Slovenia,SVN,SI
-Sweden,SWE,SE
-Syria,SYR,SY
-Thailand,THA,TH
-Tajikistan,TJK,TJ
-Turkmenistan,TKM,TM
-Tunisia,TUN,TN
-Turkey,TUR,TR
-Taiwan,TWN,TW
-Ukraine,UKR,UA
-United States of America,USA,US
-Uzbekistan,UZB,UZ
-Venezuela,VEN,VE
-Vietnam,VNM,VN
-South Africa,ZAF,ZA
+name,code,code2,0
+Argentina,ARG,AR,1
+Australia,AUS,AU,1
+Austria,AUT,AT,0
+Azerbaijan,AZE,AZ,0
+Belgium,BEL,BE,0
+Bangladesh,BGD,BD,0
+Bulgaria,BGR,BG,0
+Bosnia and Herzegovina,BIH,BA,0
+Belarus,BLR,BY,0
+Bolivia,BOL,BO,0
+Brazil,BRA,BR,0
+Canada,CAN,CA,0
+Switzerland,CHE,CH,0
+Chile,CHL,CL,0
+China,CHN,CN,0
+Colombia,COL,CO,0
+Cuba,CUB,CU,0
+Cyprus,CYP,CY,0
+Czech Republic,CZE,CZ,0
+Germany,DEU,DE,0
+Denmark,DNK,DK,0
+Dominican Republic,DOM,DO,0
+Egypt,EGY,EG,0
+Spain,ESP,ES,0
+Estonia,EST,EE,0
+Finland,FIN,FI,0
+France,FRA,FR,0
+United Kingdom,GBR,GB,0
+Georgia,GEO,GE,0
+Greece,GRC,GR,0
+Hong Kong,HKG,HK,0
+Croatia,HRV,HR,0
+Hungary,HUN,HU,0
+Indonesia,IDN,ID,0
+India,IND,IN,0
+Ireland,IRL,IE,0
+Iran,IRN,IR,0
+Iceland,ISL,IS,0
+Israel,ISR,IL,0
+Italy,ITA,IT,0
+Jordan,JOR,JO,0
+Japan,JPN,JP,0
+Kazakhstan,KAZ,KZ,0
+Kyrgyzstan,KGZ,KG,0
+Korea,KOR,KR,0
+Sri Lanka,LKA,LK,0
+Lithuania,LTU,LT,0
+Luxembourg,LUX,LU,0
+Latvia,LVA,LV,0
+Macau,MAC,MO,0
+Morocco,MAR,MA,0
+Moldova,MDA,MD,0
+Mexico,MEX,MX,0
+Macedonia,MKD,MK,0
+Montenegro,MNE,ME,0
+Mongolia,MNG,MN,0
+Malaysia,MYS,MY,0
+Nigeria,NGA,NG,0
+Netherlands,NLD,NL,0
+Norway,NOR,NO,0
+New Zealand,NZL,NZ,0
+Philippines,PHL,PH,0
+Poland,POL,PL,0
+Portugal,PRT,PT,0
+Palestine,PSE,PS,0
+Romania,ROU,RO,0
+Russian Federation,RUS,RU,0
+Saudi Arabia,SAU,SA,0
+Singapore,SGP,SG,0
+El Salvador,SLV,SV,0
+Serbia,SRB,RS,0
+Slovakia,SVK,SK,0
+Slovenia,SVN,SI,0
+Sweden,SWE,SE,0
+Syria,SYR,SY,0
+Thailand,THA,TH,0
+Tajikistan,TJK,TJ,0
+Turkmenistan,TKM,TM,0
+Tunisia,TUN,TN,0
+Turkey,TUR,TR,0
+Taiwan,TWN,TW,0
+Ukraine,UKR,UA,0
+United States of America,USA,US,0
+Uzbekistan,UZB,UZ,0
+Venezuela,VEN,VE,0
+Vietnam,VNM,VN,0
+South Africa,ZAF,ZA,0
+,0

@@ -2,6 +2,7 @@ version: '2.1'
 
 services:
   app:
+    platform: linux/x86_64
     restart: always
     build: ./
     ports:

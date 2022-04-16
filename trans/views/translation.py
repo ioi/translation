@@ -188,11 +188,10 @@ class TranslationPrint(TranslationView):
         else:
             #info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
             info_line = 'Printed at {}'.format(datetime.datetime.now().strftime("%H:%M"))
-        output_pdf_path = add_info_line_to_pdf(pdf_file_path, info_line)
+        output_pdf_path = add_info_line_to_pdf(
+            settings.PRINTED_DRAFT_TRANSLATIONS_ROOT, pdf_file_path, info_line)
 
-#        send_pdf_to_printer(output_pdf_path, user.country.code, user.country.name, cover_page=False)
-        send_pdf_to_printer(output_pdf_path, user.country.code, user.country.name, settings.DRAFT_PRINTER)	
-
+        # TODO(raisfathin): Send output_pdf_path to the job queue.
 
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)

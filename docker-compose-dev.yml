@@ -23,12 +23,13 @@ services:
       DB_NAME: &db_name ioitrans
       REDIS_HOST: redis
       REDIS_DB: 1
-      GUNICORN_WORKERS: 2
+      GUNICORN_WORKERS: 1
       PRINT_SYSTEM_URL: ''
       MONITOR_URL: '' # JAVA app for monitoring user status on the big screen
       DRAFT_PRINTER: '' # Printer or class name used for DRAFT Translations Printing (e.g. draft_printer)
       FINAL_PRINTER: '' # Printer or class name used for FINAL Translations Printing (e.g. final_printer)
       LOG_HANDLERS: 'file,stderr'
+      TRANS_LOG_HANDLERS: 'trans,stderr'
 
 
   nginx:

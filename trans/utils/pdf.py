@@ -126,9 +126,10 @@ def add_page_numbers_to_pdf(pdf_file_path, task_name):
     os.system(cmd)
 
 
-def add_info_line_to_pdf(pdf_file_path, info):
+def add_info_line_to_pdf(result_dir_path, pdf_file_path, info):
     color =  '-color "0.4 0.4 0.4" '
-    output_pdf_path = '/tmp/{}.pdf'.format(str(uuid4()))
+    output_pdf_path = '{}/{}.pdf'.format(result_dir_path, str(uuid4()))
+    os.makedirs(result_dir_path, exist_ok=True)
     cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
         info, pdf_file_path, output_pdf_path, color)
     os.system(cmd)

@@ -11,6 +11,7 @@ services:
     - .:/usr/src/app/ # Debugging
     - ioi_static:/usr/src/app/static/
     - ioi_media:/usr/src/app/media/
+    - ioi_draft_translations:/usr/src/app/draft_translations/
     depends_on:
     - postgres
     - redis
@@ -42,6 +43,7 @@ services:
     volumes:
     - ioi_static:/usr/src/app/static/:ro
     - ioi_media:/usr/src/app/media/:ro
+    - ioi_draft_translations:/usr/src/app/draft_translations/:ro
 
   postgres:
     restart: always
@@ -61,3 +63,4 @@ volumes:
   ioi_pgdata:
   ioi_static:
   ioi_media:
+  ioi_draft_translations:

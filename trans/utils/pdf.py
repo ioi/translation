@@ -173,9 +173,9 @@ def send_pdf_to_printer(pdf_file_path, country_code, country_name, printer_type,
 
 # ADDED by Emil Abbasov, IOI2019
 
-def merge_final_pdfs(task_names, language_code):
-    os.system('mkdir -p media/merged') # create dir silently if doeesnt exist
-    output_pdf_path = 'media/merged/{}-merged.pdf'.format(language_code)
+def merge_final_pdfs(task_names, contest_slug, language_code):
+    os.system('mkdir -p media/merged/{}'.format(contest_slug)) # create dir silently if doeesnt exist
+    output_pdf_path = 'media/merged/{}/{}-merged.pdf'.format(contest_slug, language_code)
     
     cmd = 'cpdf '
 	

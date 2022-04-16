@@ -362,11 +362,11 @@ class TranslationSubmitFreezeContest(LoginRequiredMixin, View):
             return redirect(to=reverse('home'))
 			
         task_names = []
-        for task in Task.objects.order_by('order'):
+        for task in Task.objects.filter(contest=contest).order_by('order'):
             if not user.is_editor() and not (task.is_published() and task.contest.public):
                 continue
             task_names.append(task.name)
-        pdf_file_path = merge_final_pdfs(task_names, user.language_code)
+        pdf_file_path = merge_final_pdfs(task_names, contest.slug, user.language_code)
 
         send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants )
 

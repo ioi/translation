@@ -191,11 +191,10 @@ class TranslationPrint(TranslationView):
         output_pdf_path = add_info_line_to_pdf(
             settings.PRINTED_DRAFT_TRANSLATIONS_ROOT, pdf_file_path, info_line)
 
-        # TODO(raisfathin): Send output_pdf_path to the job queue.
+        # TODO(raisfathin): Send output_pdf_path to the job queue (and remove the pdf later?).
 
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)
-        os.remove(output_pdf_path)
         
         # For Monitor updates:
         if settings.MONITOR_ADDRESS:

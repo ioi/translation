@@ -5,7 +5,10 @@ services:
     platform: linux/x86_64
     restart: always
     build: ./
+    ports:
+    - 9001:8000 # Debugging
     volumes:
+    - .:/usr/src/app/ # Debugging
     - ioi_static:/usr/src/app/static/
     - ioi_media:/usr/src/app/media/
     depends_on:

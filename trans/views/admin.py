@@ -17,7 +17,7 @@ from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest, Country
 from trans.utils import is_translate_in_editing, unleash_edit_token
-from trans.utils.pdf import build_final_pdf, send_pdf_to_printer
+from trans.utils.pdf import build_final_pdf, send_pdf_to_printer, merge_final_pdfs
 from trans.utils.translation import get_trans_by_user_and_task
 
 
@@ -284,12 +284,22 @@ class FreezeUserContest(LoginRequiredMixin, View):
         contest = Contest.objects.filter(id=contest_id).first()
         if contest is None:
             return HttpResponseNotFound("There is no contest")
+
         user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
         user_contest.frozen = True
         user_contest.note = note
         user_contest.save()
+
+        translated_tasks = []
         for task in contest.task_set.all():
-            get_trans_by_user_and_task(user, task)
+            translation = get_trans_by_user_and_task(user, task)
+            if translation.final_pdf and translation.translating != False:
+                translated_tasks.append(task)
+        merge_final_pdfs(
+            [task.name for task in translated_tasks],
+            contest.slug,
+            user.language_code)
+
 #        return redirect(to=reverse('user_trans', kwargs={'username': username}))
         return redirect(request.META.get('HTTP_REFERER'))
 

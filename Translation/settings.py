@@ -155,6 +155,11 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
         },
+        'trans': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/trans.log'),
+        },
         'stderr': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -171,6 +176,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'trans': {
+            'handlers': os.environ.get('TRANS_LOG_HANDLERS', 'stderr').split(','),
+            'level': 'DEBUG',
+            'propagate': True,
+        }
     },
 }
 

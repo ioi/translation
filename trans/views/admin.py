@@ -254,6 +254,11 @@ class FreezeTranslationView(View):
             trans.translating = None
             trans.save()
 
+        # No one should be editing anyway once the translation is frozen. This
+        # helps make the translation immediately editable if it gets thawed
+        # before the last edit timeout.
+        unleash_edit_token(trans)
+
 
 class UserFreezeTranslation(LoginRequiredMixin, FreezeTranslationView):
     def post(self, request, task_name):

@@ -17,7 +17,7 @@
           {{ home_content | safe }}
       </div>
     {% endif %}
-    
+
     {% for contest in tasks_lists %}
       <h2>{{ contest.title }}</h2>
       <table class="table table-hover">
@@ -34,7 +34,7 @@
               <th>ISC Version</th>
             {% endif %}
             </tr>
-        </thead>                
+        </thead>
         <tbody>
           {% for task in contest.tasks %}
             <tr
@@ -48,7 +48,7 @@
                 {% elif task.frozen %} Frozen
                 {% else %}<a href="{% url 'edit' contest.slug task.name %}">Edit</a>{% endif %}
               </td>
-              <td> 
+              <td>
                 <a href="{% url 'revisions' 'task' contest.slug task.name %}"
                    class="btn btn-default"
                    title="History">
@@ -117,12 +117,27 @@
               {% endif %}
               <td>
                 {% if not is_editor %}
-                  <a href="{% url 'revisions' 'released' contest.slug task.name %}" class="btn btn-default" title="History"><i class="fa fa-btns fa-history fa-lg"></i></a>
+                  <a
+                    href="{% url 'revisions' 'released' contest.slug task.name %}"
+                    class="btn btn-default"
+                    title="History">
+                    <i class="fa fa-btns fa-history fa-lg"></i>
+                  </a>
                 {% endif %}
                   <!-- <a href="{% url 'task_md' 'released' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
-                  <a href="{% url 'task_pdf' 'released' contest.slug task.name %}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
+                  <a
+                    href="{% url 'task_pdf' 'released' contest.slug task.name %}"
+                    class="btn btn-default"
+                    title="PDF">
+                    <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
+                  </a>
                   {% if settings.PRINT_ENABLED and is_editor %}
-                    <button onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')" class="btn btn-default" title="Print ONE copy"><i class="fa fa-btn fa-print fa-lg"></i></button>
+                      <button
+                        onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')"
+                        class="btn btn-default"
+                        title="Print ONE copy">
+                        <i class="fa fa-btn fa-print fa-lg"></i>
+                      </button>
                   {% endif %}
               </td>
             </tr>
@@ -153,6 +168,43 @@
             method="post"
             action="{% url 'freeze_user_contest' username=user.username contest_id=contest.id%}">
             {% csrf_token %}
+
+            {% if not is_online %}
+              Select any other <b>EXTRA</b> country translations you want for your contestants and click Submit.<br><br>
+
+              Additional copy #1:
+              <select name="extra_country1">
+                <option value="NONE">None</option>
+                {% for user in translating_users %}
+                  <option value="{{ user.country.code }}">{{ user.country.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
+                {% endfor %}
+              </select>
+              with
+              <select name="extra_country1_count">
+                <option value="0">0</option>
+                {% for copy in ''|center:user.num_of_contestants %}
+                  <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                {% endfor %}
+              </select>
+              copies.
+      				<br>
+      				Additional copy #2:
+              <select name="extra_country2">
+                <option value="NONE">None</option>
+                {% for user in translating_users %}
+                  <option value="{{ user.country.code }}">{{ user.country.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
+                {% endfor %}
+      				</select>
+              with
+              <select name="extra_country2_count">
+                <option value="0">0</option>
+                {% for copy in ''|center:user.num_of_contestants %}
+                  <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                {% endfor %}
+              </select>
+              copies.
+            {% endif %}
+            
             <!--label for="note">Freeze Note:</label-->
             <!--input type="text" class="form-control" id="note" name="note"-->
             <button
@@ -165,7 +217,7 @@
             </button>
           </form>
         {% endif %}
-      {% endif %} 
+      {% endif %}
     {% endfor %}
   </div>
 </div>

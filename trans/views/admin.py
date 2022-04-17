@@ -290,8 +290,17 @@ class FreezeUserContest(LoginRequiredMixin, View):
         if contest is None:
             return HttpResponseNotFound("There is no contest")
 
+        extra_country1 = request.POST.get('extra_country1', 'None')
+        extra_country2 = request.POST.get('extra_country2', 'None')
+        extra_country1_count = request.POST.get('extra_country1_count', 0)
+        extra_country2_count = request.POST.get('extra_country2_count', 0)
+
         user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
         user_contest.frozen = True
+        user_contest.extra_country1 = extra_country1
+        user_contest.extra_country2 = extra_country2
+        user_contest.extra_country1_count = extra_country1_count
+        user_contest.extra_country2_count = extra_country2_count
         user_contest.note = note
         user_contest.save()
 
@@ -332,7 +341,7 @@ class UnleashEditTranslationToken(StaffCheckMixin, View):
 class StaffExtraPrint(StaffCheckMixin, View):
     def post(self, request, pdf_file_path, username, extra_name):
         user = User.objects.get(username=username)
-       
+
         send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants)
 
         # For Monitor udpates:

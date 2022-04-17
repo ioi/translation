@@ -14,7 +14,8 @@ class User(DjangoUser):
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
-    num_of_contestants = models.IntegerField(default=0)
+    num_of_contestants = models.PositiveIntegerField(default=0)
+    online = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
@@ -171,6 +172,8 @@ class UserContest(models.Model):
     note = models.TextField(default='')
     extra_country1 = models.CharField(max_length=6, blank=True)
     extra_country2 = models.CharField(max_length=6, blank=True)
+    extra_country1_count = models.PositiveIntegerField(default=0)
+    extra_country2_count = models.PositiveIntegerField(default=0)
 
 
 class Version(models.Model):

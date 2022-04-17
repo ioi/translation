@@ -30,7 +30,7 @@ class CustomUserResource(ModelResource):
 
     class Meta:
         model = User
-        fields = ('username', 'country', 'language', 'raw_password', 'num_of_contestants',)
+        fields = ('username', 'country', 'language', 'raw_password', 'num_of_contestants', 'online')
         import_id_fields = ('username',)
 
 
@@ -38,18 +38,18 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
     resource_class = CustomUserResource
-    list_display = ("username", "translate_versions", "country", "language", 'num_of_contestants')
+    list_display = ("username", "translate_versions", "country", "language", 'num_of_contestants', 'online')
     ordering = ("username",)
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
     fieldsets = (
-        (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country', 'num_of_contestants')}),
+        (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country', 'num_of_contestants', 'online')}),
         )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username','password','language','country', 'num_of_contestants', 'is_superuser', 'is_staff', 'is_active')}
+            'fields': ('username','password','language','country', 'num_of_contestants', 'online', 'is_superuser', 'is_staff', 'is_active')}
             ),
         )
 
@@ -75,12 +75,24 @@ class LanguageAdmin(ImportExportModelAdmin):
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
+class UserContestResource(ModelResource):
+    class Meta:
+        model = UserContest
+        fields = ('user', 'contest', 'frozen', 'note', 'extra_country1', 'extra_country2', 'extra_country1_count', 'extra_country2_count')
+        import_id_fields = ('contest',)
+
+class UserContestAdmin(ImportExportModelAdmin):
+    resource_class = UserContestResource
+    list_display = ['user', 'contest', 'frozen', 'note', 'extra_country1', 'extra_country2', 'extra_country1_count', 'extra_country2_count']
+    ordering = ['contest']
+
+    tmp_storage_class = import_export.tmp_storages.MediaStorage
+
 class CountryResource(ModelResource):
     class Meta:
         model = Country
-        fields = ('code', 'code2', 'name',)
+        fields = ('code', 'code2', 'name')
         import_id_fields = ('code',)
-
 
 class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
@@ -99,6 +111,7 @@ admin.site.register(FlatPage)
 admin.site.register(Task)
 admin.site.register(Translation)
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(UserContest, UserContestAdmin)
 admin.site.register(Language, LanguageAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Notification, NotificationAdmin)

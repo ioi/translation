@@ -8,7 +8,7 @@ from django.forms.models import model_to_dict
 from django.views.generic import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from trans.models import User, Task, Translation, Version, Contest, FlatPage, UserContest
+from trans.models import User, Task, Translation, Version, Contest, Country, FlatPage, UserContest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -34,6 +34,9 @@ class Home(LoginRequiredMixin, View):
         home_flat_page_slug = 'home-editor' if user.is_editor() else 'home'
         home_flat_page = FlatPage.objects.filter(slug=home_flat_page_slug).first()
         home_content = home_flat_page.content if home_flat_page else ''
+        translating_users = User.objects.exclude(groups__name__exact=['staff', 'editor'])
+        if not user.is_editor():
+            translating_users = translating_users.select_related('language', 'country').exclude(language__code__exact='en').exclude(country__user=user).order_by('country__name')
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.order_by('order'):
             if not user.is_editor() and not (task.is_published() and task.contest.public):
@@ -64,10 +67,12 @@ class Home(LoginRequiredMixin, View):
         return render(request, 'home.html', context={
             'user': user,
             'tasks_lists': tasks_lists,
-            'home_content': home_content,'contests': contests,
-            'is_editor': user.is_editor()
+            'home_content': home_content,
+            'translating_users': translating_users,
+            'contests': contests,
+            'is_editor': user.is_editor(),
+            'is_online': getattr(user, 'online')
         })
-
 
 class Healthcheck(View):
     def get(self, request):
@@ -94,7 +99,7 @@ class Translations(LoginRequiredMixin, View):
             return HttpResponseForbidden("This task is frozen")
         task_text = task.get_published_text
         contests = Contest.objects.order_by('order')
-		
+
         # For Monitor updates:
         if settings.MONITOR_ADDRESS:
             try:
@@ -195,7 +200,7 @@ class TranslationPrint(TranslationView):
 
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)
-        
+
         # For Monitor updates:
         if settings.MONITOR_ADDRESS:
             try:
@@ -206,6 +211,7 @@ class TranslationPrint(TranslationView):
             logger.debug('Skipping monitor update')
 
         return JsonResponse({'success': True})
+
 
 
 class AccessTranslationEdit(LoginRequiredMixin, View):
@@ -321,7 +327,7 @@ class PrintCustomFile(LoginRequiredMixin, View):
         with open(pdf_file_path, 'wb') as f:
             for chunk in pdf_file.chunks():
                 f.write(chunk)
-				
+
 #        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, cover_page=True)
         send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name)
 

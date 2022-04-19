@@ -23,6 +23,9 @@ class User(DjangoUser):
     def credentials(self):
         return self.country.name + '_' + self.language.name
 
+    def is_online(self):
+        return self.online
+
     @property
     def raw_password(self):
         return '****'

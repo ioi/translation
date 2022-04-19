@@ -71,7 +71,7 @@ class Home(LoginRequiredMixin, View):
             'translating_users': translating_users,
             'contests': contests,
             'is_editor': user.is_editor(),
-            'is_online': getattr(user, 'online')
+            'is_online': user.is_online()
         })
 
 class Healthcheck(View):
@@ -108,12 +108,20 @@ class Translations(LoginRequiredMixin, View):
                 print(type(e))
         else:
             logger.debug('Skipping monitor update')
-        return render(request, 'editor.html',
-                      context={'trans': trans.get_latest_text(), 'task': task_text,
-                               'text_font_base64': user.text_font_base64, 'contest_slug': contest_slug,
-                               'contests': contests, 'task_name': task_name, 'is_editor': user.is_editor(),
-                               'taskID': task.id, 'language_code': user.language.code, 'username': user.username,
-                               'direction': user.language.direction()})
+        return render(request, 'editor.html', context={
+            'trans': trans.get_latest_text(),
+            'task': task_text,
+            'text_font_base64': user.text_font_base64,
+            'contest_slug': contest_slug,
+            'contests': contests,
+            'task_name': task_name,
+            'is_editor': user.is_editor(),
+            'is_online': user.is_online(),
+            'taskID': task.id,
+            'language_code': user.language.code,
+            'username': user.username,
+            'direction': user.language.direction()
+        })
 
 
 class SaveTranslation(LoginRequiredMixin, View):
@@ -138,7 +146,9 @@ class SaveTranslation(LoginRequiredMixin, View):
 class UserFont(View):
     def get(self, request, username):
         user = User.objects.get(username=username)
-        return render(request, 'font.css', content_type='text/css', context={'text_font_base64': user.text_font_base64})
+        return render(request, 'font.css', content_type='text/css', context={
+            'text_font_base64': user.text_font_base64
+        })
 
 
 class TranslationMarkdown(LoginRequiredMixin, View):
@@ -283,9 +293,15 @@ class Versions(LoginRequiredMixin, View):
         # versions_values = versions.values('id', 'text', 'create_time', 'release_note')
         if request.is_ajax():
             return JsonResponse(dict(versions=list(versions_list)))
-        return render(request, 'revisions.html', context={'task_name': task.name, 'trans_frozen': trans.frozen, 'contest_slug': contest_slug,
-                                                          'versions': versions_list, 'direction': direction,
-                                                          'task_type': task_type, 'view_all': view_all})
+        return render(request, 'revisions.html', context={
+            'task_name': task.name,
+            'trans_frozen': trans.frozen,
+            'contest_slug': contest_slug,
+            'versions': versions_list,
+            'direction': direction,
+            'task_type': task_type,
+            'view_all': view_all
+        })
 
 
 class GetVersion(LoginRequiredMixin, View):
@@ -312,7 +328,9 @@ class GetLatestTranslation(LoginRequiredMixin, View):
 class PrintCustomFile(LoginRequiredMixin, View):
     def get(self, request):
         form = UploadFileForm()
-        return render(request, 'custom-print.html', {'form': form})
+        return render(request, 'custom-print.html', {
+            'form': form
+        })
 
     def post(self, request):
         user = User.objects.get(username=request.user)

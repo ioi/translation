@@ -36,7 +36,7 @@ class Home(LoginRequiredMixin, View):
         home_content = home_flat_page.content if home_flat_page else ''
         translating_users = User.objects.exclude(groups__name__exact=['staff', 'editor'])
         if not user.is_editor():
-            translating_users = translating_users.select_related('language', 'country').exclude(language__code__exact='en').exclude(country__user=user).order_by('country__name')
+            translating_users = translating_users.select_related('language', 'country').exclude(language__code__exact='en').exclude(country__user=user).order_by('language__name')
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.order_by('order'):
             if not user.is_editor() and not (task.is_published() and task.contest.public):

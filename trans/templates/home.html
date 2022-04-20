@@ -20,6 +20,12 @@
 
     {% for contest in tasks_lists %}
       <h2>{{ contest.title }}</h2>
+
+      {% if user.language.code != 'en' and not is_editor %}
+        <h4> You are translating into <b>{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</b></h4>
+      <br>
+      {% endif %}
+
       <table class="table table-hover">
         <thead>
           <tr>
@@ -176,7 +182,7 @@
               <select name="extra_country1">
                 <option value="NONE">None</option>
                 {% for user in translating_users %}
-                  <option value="{{ user.country.code }}">{{ user.country.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
+                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
                 {% endfor %}
               </select>
               with
@@ -192,7 +198,7 @@
               <select name="extra_country2">
                 <option value="NONE">None</option>
                 {% for user in translating_users %}
-                  <option value="{{ user.country.code }}">{{ user.country.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
+                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
                 {% endfor %}
       				</select>
               with

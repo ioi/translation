@@ -154,6 +154,10 @@ a:hover {
     border-radius: 0;
 }
 
+.navbar-logo {
+    height: 40px;
+}
+
 .panel {
     border-radius: 0;
 }

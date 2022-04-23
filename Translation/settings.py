@@ -189,7 +189,7 @@ LOGGING = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Baku'
+TIME_ZONE = 'Asia/Jakarta'
 
 USE_I18N = True
 

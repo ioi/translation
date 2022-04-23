@@ -3,7 +3,6 @@ html {
 }
 
 .container {
-    height: 505px;
     margin-top: 130px;
     margin-bottom: 150px;
 }
@@ -21,7 +20,7 @@ html {
 }
 
 .panel-body {
-    padding: 0 10%;
+    padding: 50px;
     height: 100%;
 }
 

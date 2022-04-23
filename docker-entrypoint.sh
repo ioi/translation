@@ -12,7 +12,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get install -y tzdata
 
 # set your timezone
-ln -fs /usr/share/zoneinfo/Asia/Baku /etc/localtime
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 dpkg-reconfigure --frontend noninteractive tzdata 
 
 fc-cache

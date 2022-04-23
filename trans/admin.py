@@ -78,12 +78,30 @@ class LanguageAdmin(ImportExportModelAdmin):
 class UserContestResource(ModelResource):
     class Meta:
         model = UserContest
-        fields = ('user', 'contest', 'frozen', 'note', 'extra_country1', 'extra_country2', 'extra_country1_count', 'extra_country2_count')
+        fields = (
+            'user',
+            'contest',
+            'frozen',
+            'note',
+            'extra_country_1_code',
+            'extra_country_2_code',
+            'extra_country_1_count',
+            'extra_country_2_count',
+        )
         import_id_fields = ('contest',)
 
 class UserContestAdmin(ImportExportModelAdmin):
     resource_class = UserContestResource
-    list_display = ['user', 'contest', 'frozen', 'note', 'extra_country1', 'extra_country2', 'extra_country1_count', 'extra_country2_count']
+    list_display = [
+        'user',
+        'contest',
+        'frozen',
+        'note',
+        'extra_country_1_code',
+        'extra_country_2_code',
+        'extra_country_1_count',
+        'extra_country_2_count',
+    ]
     ordering = ['contest']
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage

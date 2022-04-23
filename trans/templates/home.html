@@ -179,30 +179,32 @@
               Select any other <b>EXTRA</b> country translations you want for your contestants and click Submit.<br><br>
 
               Additional copy #1:
-              <select name="extra_country1">
-                <option value="NONE">None</option>
+              <select name="extra_country_1_code">
+                <option value="">None</option>
                 {% for user in translating_users %}
                   <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
                 {% endfor %}
               </select>
               with
-              <select name="extra_country1_count">
+              <select name="extra_country_1_count">
                 <option value="0">0</option>
                 {% for copy in ''|center:user.num_of_contestants %}
                   <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
                 {% endfor %}
               </select>
               copies.
-      				<br>
-      				Additional copy #2:
-              <select name="extra_country2">
-                <option value="NONE">None</option>
+
+              <br>
+
+              Additional copy #2:
+              <select name="extra_country_2_code">
+                <option value="">None</option>
                 {% for user in translating_users %}
                   <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
                 {% endfor %}
       				</select>
               with
-              <select name="extra_country2_count">
+              <select name="extra_country_2_count">
                 <option value="0">0</option>
                 {% for copy in ''|center:user.num_of_contestants %}
                   <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>

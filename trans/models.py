@@ -173,10 +173,10 @@ class UserContest(models.Model):
     contest = models.ForeignKey('Contest', default=None)
     frozen = models.BooleanField(default=False)
     note = models.TextField(default='')
-    extra_country1 = models.CharField(max_length=6, blank=True)
-    extra_country2 = models.CharField(max_length=6, blank=True)
-    extra_country1_count = models.PositiveIntegerField(default=0)
-    extra_country2_count = models.PositiveIntegerField(default=0)
+    extra_country_1_code = models.CharField(max_length=6, blank=True)
+    extra_country_2_code = models.CharField(max_length=6, blank=True)
+    extra_country_1_count = models.PositiveIntegerField(default=0)
+    extra_country_2_count = models.PositiveIntegerField(default=0)
 
 
 class Version(models.Model):

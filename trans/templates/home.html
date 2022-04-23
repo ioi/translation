@@ -172,6 +172,7 @@
           <form
             class="form-inline"
             method="post"
+	    data-contest-slug="{{ contest.slug }}"
             action="{% url 'freeze_user_contest' username=user.username contest_id=contest.id%}">
             {% csrf_token %}
 

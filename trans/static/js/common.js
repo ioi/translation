@@ -54,19 +54,81 @@ function sendPrintJob(print_task_url) {
 }
 
 function validateFinalizeTranslation(contest_slug, tasks_length) {
+    // Check tasks frozenness.
     const frozen_tasks = document.querySelectorAll(
         `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="True"]`
     );
-    if (frozen_tasks.length === tasks_length) {
-        return confirm('Are you sure?');
+    if (frozen_tasks.length !== tasks_length) {
+        const unfrozen_tasks = document.querySelectorAll(
+            `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="False"]`
+        );
+        const unfrozen_task_names = Array.from(unfrozen_tasks)
+              .map((el) => el.dataset.taskName);
+        alert(`Please freeze the following task(s) first: ${unfrozen_task_names}`);
+        return false;
     }
 
-    const unfrozen_tasks = document.querySelectorAll(
-        `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="False"]`
-    );
-    const unfrozen_task_names = Array.from(unfrozen_tasks)
-          .map((el) => { return el.dataset.taskName});
-    alert(`Please freeze the following task(s) first: ${unfrozen_task_names}`);
-    return false;
-}
+    // It doesn't make sense for the two extra countries to be the same.
+    const querySelectElementValue = (name) =>
+          document.querySelector(
+              `form[data-contest-slug="${contest_slug}"] select[name="${name}"]`
+          ).value;
+    const queryOptionElementText = (name, value) =>
+          document.querySelector(
+              `form[data-contest-slug="${contest_slug}"] select[name="${name}"] ` +
+                  `option[value="${value}"]`
+          ).text;
+    const extra_country_1_code =
+          querySelectElementValue('extra_country_1_code');
+    const extra_country_1_count =
+          parseInt(querySelectElementValue('extra_country_1_count'));
+    const extra_country_1_text =
+          queryOptionElementText('extra_country_1_code', extra_country_1_code);
+    const extra_country_2_code =
+          querySelectElementValue('extra_country_2_code');
+    const extra_country_2_count =
+          parseInt(querySelectElementValue('extra_country_2_count'));
+    const extra_country_2_text =
+          queryOptionElementText('extra_country_2_code', extra_country_2_code);
+    if (extra_country_1_count > 0 && extra_country_2_count > 0 &&
+        extra_country_1_code === extra_country_2_code &&
+        extra_country_1_code.length > 0) {
+        alert('Additional copy #1 & #2 should be different!');
+        return false;
+    }
 
+    // Build final confirmation / error message.
+    const confirmation_messages = [];
+    const error_messages = [];
+    if (extra_country_1_code.length > 0) {
+        const detail = `${extra_country_1_text}: ${extra_country_1_count}`;
+        if (extra_country_1_count === 0) {
+            error_messages.push(
+                `${detail}\n  Did you forget to specify the number of copies?`
+            );
+        } else {
+            confirmation_messages.push(detail);
+        }
+    } else if (extra_country_1_count > 0) {
+        error_messages.push('Did you forget to specify additional copy #1?');
+    }
+    if (extra_country_2_code.length > 0 && extra_country_1_code !== extra_country_2_code) {
+        const detail = `${extra_country_2_text}: ${extra_country_2_count}`;
+        if (extra_country_2_count === 0) {
+            error_messages.push(
+                `${detail}\n  Did you forget to specify the number of copies?`
+            );
+        } else {
+            confirmation_messages.push(detail);
+        }
+    } else if (extra_country_2_code.length === 0 && extra_country_2_count > 0) {
+        error_messages.push('Did you forget to specify additional copy #2?');
+    }
+    confirmation_messages.push('Are you sure?');
+
+    if (error_messages.length > 0) {
+        alert(error_messages.join('\n\n'));
+        return false;
+    }
+    return confirm(confirmation_messages.join('\n\n'));
+}

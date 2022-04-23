@@ -295,6 +295,19 @@ class FreezeUserContest(LoginRequiredMixin, View):
         extra_country_1_count = int(request.POST.get('extra_country_1_count', 0))
         extra_country_2_count = int(request.POST.get('extra_country_2_count', 0))
 
+        if extra_country_1_count > 0 and extra_country_2_count > 0 and\
+            extra_country_1_code == extra_country_2_code and\
+            extra_country_1_code:
+            return HttpResponseBadRequest(
+                'The extra countries cannot be the same.')
+        if extra_country_1_code and extra_country_1_count == 0 or\
+            extra_country_2_code and extra_country_2_count == 0:
+            return HttpResponseBadRequest('Number of copies should be positive.')
+        if not extra_country_1_code and extra_country_1_count > 0 or\
+            not extra_country_2_code and extra_country_2_count > 0:
+            return HttpResponseBadRequest(
+                'Extra countries (with copies) must be non-empty.')
+
         user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
         user_contest.frozen = True
         user_contest.extra_country_1_code = extra_country_1_code

@@ -17,7 +17,7 @@ from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest, Country
 from trans.utils import is_translate_in_editing, unleash_edit_token
-from trans.utils.pdf import build_final_pdf, send_pdf_to_printer, merge_final_pdfs
+from trans.utils.pdf import build_final_pdf, merge_final_pdfs
 from trans.utils.translation import get_trans_by_user_and_task
 
 
@@ -335,19 +335,3 @@ class UnleashEditTranslationToken(StaffCheckMixin, View):
             return HttpResponseNotFound("There is no task")
         unleash_edit_token(trans)
         return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
-
-# ADDED by Emil Abbasov, IOI2019
-
-class StaffExtraPrint(StaffCheckMixin, View):
-    def post(self, request, pdf_file_path, username, extra_name):
-        user = User.objects.get(username=username)
-
-        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, settings.FINAL_PRINTER, user.num_of_contestants)
-
-        # For Monitor udpates:
-        try:
-            response = requests.get('{}/extra/done?countrycode={}&extra={}'.format(settings.MONITOR_ADDRESS, user.country.code, extra_name))
-        except Exception as e:
-            print(type(e))
-
-        return redirect(request.META.get('HTTP_REFERER'))

@@ -135,54 +135,16 @@ def add_info_line_to_pdf(result_dir_path, pdf_file_path, info):
     os.system(cmd)
     return output_pdf_path
 
-# This is Iranian version of printing, edited by Emil Abbasov (IOI2019):
-def send_pdf_to_printer(pdf_file_path, country_code, country_name, printer_type, count=1):
-    pdf_file = open(pdf_file_path, 'rb')
-    upload_response = requests.post(
-        '%s/upload' % settings.PRINT_SYSTEM_ADDRESS,
-        files={'pdf': pdf_file},
-        data={'type': 'translation'}
-    )
-    upload_response.raise_for_status()
-    filename = upload_response.content
-    response = requests.post(
-        '%s/translation' % settings.PRINT_SYSTEM_ADDRESS,
-        data={
-            'filename': filename,
-            'country_code': country_code,
-            'country_name': country_name,
-            'count': count,
-            'printer_type': printer_type
-        }
-    )
-    response.raise_for_status()
-	
-# This is Japan's version, not working with Iranian printing:
-#def send_pdf_to_printer(pdf_file_path, country_code, country_name, cover_page=False, count=1):
-#    with open(pdf_file_path, 'rb') as pdf_file:
-#        response = requests.post(
-#            urljoin(settings.PRINT_SYSTEM_ADDRESS, '/translation'),
-#            files={'pdf': pdf_file},
-#            data={
-#                'country_code': country_code,
-#                'country_name': country_name,
-#                'cover_page': (1 if cover_page else 0),
-#                'count': count,
-#            },
-#        )
-#    response.raise_for_status()
-
-# ADDED by Emil Abbasov, IOI2019
 
 def merge_final_pdfs(task_names, contest_slug, language_code):
     os.system('mkdir -p media/merged/{}'.format(contest_slug)) # create dir silently if doeesnt exist
     output_pdf_path = 'media/merged/{}/{}-merged.pdf'.format(contest_slug, language_code)
-    
+
     cmd = 'cpdf '
-	
+
     for task_name in task_names:
         cmd = cmd + 'media/final_pdf/{}/{}.pdf '.format(task_name, language_code)
     cmd = cmd + '-o {}'.format(output_pdf_path)
-	
+
     os.system(cmd)
     return output_pdf_path

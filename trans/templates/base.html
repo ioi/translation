@@ -32,7 +32,7 @@
     <script type="text/javascript" src="/static/js/toastrUtil.js"></script>
 
     {% block statics %}{% endblock %}
-    
+
 </head>
 
 <body>
@@ -53,12 +53,6 @@
             <ul class="nav navbar-nav">
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                {% if settings.CUSTOM_PRINT_ENABLED or user.is_staff and settings.PRINT_ENABLED%}
-                <li class="nav-item">
-                    <a class="nav-link" href="/print" title="Print PDF"><i class="fa fa-btn fa-print fa-lg"></i></a>
-                </li>
-                {% endif %}
-
                 <li class="dropdown">
                     <span class="notif-badge" id="notif-badge" style="display: none"></span>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>
@@ -91,7 +85,7 @@
 
 <div class="main-content container-fluid">
     {% block content %}{% endblock %}
-    
+
     {% if is_editor %}
         {% include "modals.html" %}
     {% endif %}
@@ -103,7 +97,7 @@
     notification_url = "{% url 'notifications' %}";
     csrf_token = "{{csrf_token}}"
 </script>
-    
+
 {% block script %}{% endblock %}
 
 </html>

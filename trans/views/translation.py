@@ -22,7 +22,7 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
-from trans.utils.pdf import send_pdf_to_printer, get_file_name_from_path, build_pdf, merge_final_pdfs
+from trans.utils.pdf import get_file_name_from_path, build_pdf, merge_final_pdfs
 from trans.views.admin import FreezeUserContest
 
 logger = logging.getLogger(__name__)
@@ -100,14 +100,6 @@ class Translations(LoginRequiredMixin, View):
         task_text = task.get_published_text
         contests = Contest.objects.order_by('order')
 
-        # For Monitor updates:
-        if settings.MONITOR_ADDRESS:
-            try:
-                response = requests.get(settings.MONITOR_ADDRESS + '/status/translate/' + user.country.code)
-            except Exception as e:
-                print(type(e))
-        else:
-            logger.debug('Skipping monitor update')
         return render(request, 'editor.html', context={
             'trans': trans.get_latest_text(),
             'task': task_text,
@@ -211,17 +203,7 @@ class TranslationPrint(TranslationView):
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)
 
-        # For Monitor updates:
-        if settings.MONITOR_ADDRESS:
-            try:
-               response = requests.get(settings.MONITOR_ADDRESS + '/status/printdraft/' + user.country.code)
-            except Exception as e:
-                print(type(e))
-        else:
-            logger.debug('Skipping monitor update')
-
         return JsonResponse({'success': True})
-
 
 
 class AccessTranslationEdit(LoginRequiredMixin, View):
@@ -323,32 +305,3 @@ class GetLatestTranslation(LoginRequiredMixin, View):
         if trans.user != user:
             return HttpResponseForbidden()
         return HttpResponse(trans.get_latest_text())
-
-
-class PrintCustomFile(LoginRequiredMixin, View):
-    def get(self, request):
-        form = UploadFileForm()
-        return render(request, 'custom-print.html', {
-            'form': form
-        })
-
-    def post(self, request):
-        user = User.objects.get(username=request.user)
-        form = UploadFileForm(request.POST, request.FILES)
-        if not form.is_valid():
-            return HttpResponseBadRequest("You should attach a file")
-
-        pdf_file = request.FILES.get('uploaded_file', None)
-        if not pdf_file or pdf_file.name.split('.')[-1] != 'pdf':
-            return HttpResponseBadRequest("You should attach a pdf file")
-        pdf_file_path = '/tmp/{}_{}'.format(user.country.code, pdf_file.name)
-        with open(pdf_file_path, 'wb') as f:
-            for chunk in pdf_file.chunks():
-                f.write(chunk)
-
-#        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name, cover_page=True)
-        send_pdf_to_printer(pdf_file_path, user.country.code, user.country.name)
-
-        response = redirect('printcustomfile')
-        response['Location'] += urllib.parse.quote('?pdf_file=%s' % pdf_file.name, safe='=?&')
-        return response

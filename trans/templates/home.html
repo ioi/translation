@@ -66,7 +66,7 @@
                    title="PDF">
                   <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
                 </a>
-                {% if settings.PRINT_ENABLED and not task.frozen and not is_online %}
+                {% if not task.frozen and not is_online %}
                   <button
                     onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')"
                     class="btn btn-default"
@@ -137,7 +137,7 @@
                     title="PDF">
                     <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
                   </a>
-                  {% if settings.PRINT_ENABLED and is_editor and not is_online %}
+                  {% if is_editor and not is_online %}
                       <button
                         onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')"
                         class="btn btn-default"

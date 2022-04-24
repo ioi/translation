@@ -198,12 +198,6 @@ USE_L10N = True
 USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
-PRINT_SYSTEM_ADDRESS=os.environ.get('PRINT_SYSTEM_URL')
-MONITOR_ADDRESS=os.environ.get('MONITOR_URL')
-
-DRAFT_PRINTER=os.environ.get('DRAFT_PRINTER')
-FINAL_PRINTER=os.environ.get('FINAL_PRINTER')
-
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
@@ -211,6 +205,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 PRINTED_DRAFT_TRANSLATIONS_ROOT = os.path.join(BASE_DIR, 'draft_translations/')
 HOST_URL = 'http://127.0.0.1:9000/'
-
-PRINT_ENABLED = PRINT_SYSTEM_ADDRESS is not None
-CUSTOM_PRINT_ENABLED = PRINT_ENABLED and False

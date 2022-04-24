@@ -29,7 +29,7 @@
             <button class="btn btn-default" onclick="saveVersion()" title="Save"><i class="fa fa-btn fa-save fa-lg"></i></button>
             <button class="btn btn-default" onclick="saveAndGo('{% url 'revisions' 'task' contest_slug task_name %}')" title="History"><i class="fa fa-btn fa-history fa-lg"></i></button>
             <button class="btn btn-default" onclick="saveAndGo('{% url 'task_pdf' 'task' contest_slug task_name %}')" title="PDF"><i class="fa fa-btn fa-file-pdf-o fa-lg"></i></button>
-            {% if settings.PRINT_ENABLED and not is_online %}
+            {% if not is_online %}
             <button onclick="autoSave(); sendPrint('{% url 'task_print' 'task' contest_slug task_name %}')" class="btn btn-default" title="Print ONE copy"><i class="fa fa-btn fa-print fa-lg"></i></button>
             {% endif %}
             {% if is_editor %}

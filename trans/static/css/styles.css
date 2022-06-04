@@ -249,6 +249,22 @@ code, pre {
     font-family: CustomTextFont, 'Noto Sans', Arial, sans-serif;
 }
 
+.rendered_content[lang="zh"] {
+    font-family: CustomTextFont, 'Noto Sans CJK TC', Arial, sans-serif;
+}
+
+.rendered_content[lang="zh_Hans"] {
+    font-family: CustomTextFont, 'Noto Sans CJK SC', Arial, sans-serif;
+}
+
+.rendered_content[lang="ja"] {
+    font-family: CustomTextFont, 'Noto Sans CJK JP', Arial, sans-serif;
+}
+
+.rendered_content[lang="ko"] {
+    font-family: CustomTextFont, 'Noto Sans CJK KR', Arial, sans-serif;
+}
+
 .rendered_content[dir="rtl"] {
     font-family: CustomTextFont, 'Noto Sans', Arial, sans-serif;
     font-weight: normal;

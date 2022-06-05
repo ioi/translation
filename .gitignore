@@ -103,3 +103,6 @@ media/
 # tag files
 tags
 TAGS
+
+# Emacs config files
+*.el

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'raven.contrib.django.raven_compat',
     'import_export',
     'trans',
+    'print_job_queue',
 ]
 
 WEBSOCKET_URL = '/ws3/'

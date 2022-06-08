@@ -5,7 +5,7 @@ RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula selec
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         python3 python3-pip python3-setuptools \
-        libfontconfig wkhtmltopdf xvfb libpq-dev ttf-mscorefonts-installer fonts-takao-pgothic \
+        libfontconfig wkhtmltopdf xvfb libpq-dev ttf-mscorefonts-installer fonts-noto \
         chromium-chromedriver libxcomposite1 libxdamage1 libxtst6 libnss3 libcups2 libxss1 libxrandr2 libasound2 \
         libpangocairo-1.0-0 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 && \
     pip3 install -U pip

@@ -8,6 +8,8 @@ from django.conf import settings
 
 from trans.utils.notification import add_notification_to_users_cache, remove_notification
 
+from print_job_queue import models as print_job_queue_models
+
 
 class User(DjangoUser):
     language = models.ForeignKey('Language', on_delete=models.deletion.CASCADE)
@@ -177,6 +179,12 @@ class UserContest(models.Model):
     extra_country_2_code = models.CharField(max_length=6, blank=True)
     extra_country_1_count = models.PositiveIntegerField(default=0)
     extra_country_2_count = models.PositiveIntegerField(default=0)
+
+    # The print job that corresponds to the latest state, if it is frozen.
+    # If the UserContest is not frozen, this is null.
+    final_print_job = models.ForeignKey(print_job_queue_models.FinalPrintJob,
+                                        null=True,
+                                        on_delete=models.PROTECT)
 
 
 class Version(models.Model):

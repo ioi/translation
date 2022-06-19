@@ -16,7 +16,7 @@ from django.http import HttpResponseNotFound
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest, Country
-from trans.utils import is_translate_in_editing, unleash_edit_token
+from trans.utils import is_translate_in_editing, unleash_edit_token, print_job_queue
 from trans.utils.pdf import build_final_pdf, merge_final_pdfs
 from trans.utils.translation import get_trans_by_user_and_task
 
@@ -327,6 +327,8 @@ class FreezeUserContest(LoginRequiredMixin, View):
             contest.slug,
             user.language_code)
 
+        print_job_queue.handle_user_contest_frozen_change(user_contest)
+
 #        return redirect(to=reverse('user_trans', kwargs={'username': username}))
         return redirect(request.META.get('HTTP_REFERER'))
 
@@ -337,7 +339,11 @@ class UnfreezeUserContest(LoginRequiredMixin, View):
         contest = Contest.objects.filter(id=contest_id).first()
         if contest is None:
             return HttpResponseNotFound("There is no contest")
-        UserContest.objects.filter(contest=contest, user=user).delete()
+        user_contest = UserContest.objects.filter(contest=contest, user=user).first()
+        if user_contest is not None:
+            user_contest.frozen = False
+            print_job_queue.handle_user_contest_frozen_change(user_contest)
+            user_contest.delete()
 #        return redirect(to=reverse('user_trans', kwargs={'username': username}))
         return redirect(request.META.get('HTTP_REFERER'))
 

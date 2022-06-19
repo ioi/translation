@@ -25,6 +25,8 @@ from trans.utils import get_translate_edit_permission, can_save_translate, is_tr
 from trans.utils.pdf import get_file_name_from_path, build_pdf, merge_final_pdfs
 from trans.views.admin import FreezeUserContest
 
+from print_job_queue import queue
+
 logger = logging.getLogger(__name__)
 
 
@@ -198,7 +200,9 @@ class TranslationPrint(TranslationView):
         output_pdf_path = add_info_line_to_pdf(
             settings.PRINTED_DRAFT_TRANSLATIONS_ROOT, pdf_file_path, info_line)
 
-        # TODO(raisfathin): Send output_pdf_path to the job queue (and remove the pdf later?).
+        queue.enqueue_draft_print_job(output_pdf_path,
+                                      print_count=1,
+                                      owner=request.user)
 
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)

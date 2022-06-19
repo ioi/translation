@@ -1,6 +1,7 @@
 from enum import Enum, unique
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -34,8 +35,16 @@ class PrintJob(models.Model):
     # either PROCESSING or DONE state.
     worker = models.CharField(max_length=25, blank=True)
 
+    # The user who owns the printed documents. A user with a print job should
+    # not be deleted. This is nullable for backwards compatibility.
+    owner = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+
     class Meta:
         abstract = True
+
+    @classmethod
+    def make_pending(cls, owner):
+        return cls(state=PrintJobState.PENDING.value, owner=owner)
 
 
 class PrintedDocument(models.Model):
@@ -61,7 +70,8 @@ class DraftPrintJob(PrintJob):
 
 class PrintedDraftDocument(PrintedDocument):
     # The print job that contains this document.
-    job = models.ForeignKey(DraftPrintJob, on_delete=models.CASCADE)
+    job = models.ForeignKey(
+        DraftPrintJob, on_delete=models.CASCADE, related_name='document_set')
 
 
 class FinalPrintJob(PrintJob):
@@ -74,4 +84,5 @@ class FinalPrintJob(PrintJob):
 
 class PrintedFinalDocument(PrintedDocument):
     # The print job that contains this document.
-    job = models.ForeignKey(FinalPrintJob, on_delete=models.CASCADE)
+    job = models.ForeignKey(
+        FinalPrintJob, on_delete=models.CASCADE, related_name='document_set')

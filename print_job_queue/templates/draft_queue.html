@@ -4,6 +4,32 @@
   </head>
   <body>
 
+    <h2>In progress</h2>
+    <ul>
+      {% for job in in_progress_jobs %}
+      <li>
+	Owner: {{ job.owner }}
+	<ul>
+	  {% for file_path, count in job.documents %}
+	  <li>
+	    <a href="/draft_translations/{{ file_path }}">
+	      {{ file_path }}
+	    </a>
+	    x
+	    {{ count }}
+	  </li>
+	  {% endfor %}
+	</ul>
+	<form method="post"
+	      action="{% url 'draft_job_mark_completion' job_id=job.id %}">
+	  {% csrf_token %}
+	  <input type="hidden" name="worker_name" value="JohnWorker" />
+	  <button>Mark as complete</button>
+	</form>
+      </li>
+      {% endfor %}
+    </ul>
+
     <h2>Pending</h2>
     <ul>
       {% for job in pending_jobs %}

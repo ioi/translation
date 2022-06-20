@@ -52,6 +52,22 @@ class DraftJobPickUp(View):
         return redirect(reverse('draft_queue'))
 
 
+class DraftJobMarkCompletion(View):
+
+    def post(self, request, job_id):
+        worker_name = request.POST.get('worker_name', '')
+
+        if not worker_name:
+            return HttpResponseBadRequest('Worker name must be non-empty.')
+
+        if not queue.mark_draft_job_complete(job_id=job_id,
+                                             worker_name=worker_name):
+            return HttpResponseBadRequest(
+                'Could not mark job as complete. Check log for more details.')
+
+        return redirect(reverse('draft_queue'))
+
+
 def final_queue(request):
     jobs = queue.query_all_final_print_jobs()
 

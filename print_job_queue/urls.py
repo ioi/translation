@@ -10,6 +10,9 @@ urlpatterns = [
     url(r'^draft_job_pick_up/(?P<job_id>[\w]*)/$',
         DraftJobPickUp.as_view(),
         name='draft_job_pick_up'),
+    url(r'^draft_job_mark_completion/(?P<job_id>[\w]*)/$',
+        DraftJobMarkCompletion.as_view(),
+        name='draft_job_mark_completion'),
 
     # Final job routes.
     url(r'^final/$', final_queue, name='final_queue'),

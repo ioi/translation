@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Draft queue</title>
+  </head>
+  <body>
+
+    <h2>Pending</h2>
+    <ul>
+      {% for job in pending_jobs %}
+      <li>
+	Owner: {{ job.owner }}
+	<form method="post"
+	      action="{% url 'draft_job_pick_up' job_id=job.id %}">
+	  {% csrf_token %}
+	  <input type="hidden" name="worker_name" value="JohnWorker" />
+	  <button>Pick up job</button>
+	</form>
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

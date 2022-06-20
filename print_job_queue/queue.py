@@ -12,8 +12,8 @@ def enqueue_draft_print_job(file_path, print_count, owner):
 
 
 def query_all_draft_print_jobs():
-    return list(
-        models.DraftPrintJob.objects.all().prefetch_related('document_set'))
+    return list(models.DraftPrintJob.objects.all().prefetch_related(
+        'document_set').order_by('job_id'))
 
 
 def pick_up_draft_job(job_id, worker_name):

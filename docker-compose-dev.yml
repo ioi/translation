@@ -27,6 +27,7 @@ services:
       GUNICORN_WORKERS: 1
       LOG_HANDLERS: 'file,stderr'
       TRANS_LOG_HANDLERS: 'trans,stderr'
+      PRINT_JOB_QUEUE_LOG_HANDLERS: 'print_job_queue,stderr'
 
 
   nginx:

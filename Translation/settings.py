@@ -161,6 +161,11 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/trans.log'),
         },
+        'print_job_queue': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/print_job_queue.log'),
+        },
         'stderr': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -181,7 +186,12 @@ LOGGING = {
             'handlers': os.environ.get('TRANS_LOG_HANDLERS', 'stderr').split(','),
             'level': 'DEBUG',
             'propagate': True,
-        }
+        },
+        'print_job_queue': {
+            'handlers': os.environ.get('PRINT_JOB_QUEUE_LOG_HANDLERS', 'stderr').split(','),
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 

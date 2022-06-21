@@ -4,9 +4,9 @@
   </head>
   <body>
 
-    <h2>Pending</h2>
+    <h2>In progress</h2>
     <ul>
-      {% for job in pending_jobs %}
+      {% for job in in_progress_jobs %}
       <li>
 	Owner: {{ job.owner }}
 	<ul>
@@ -18,6 +18,21 @@
 	  </li>
 	  {% endfor %}
 	</ul>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h2>Pending</h2>
+    <ul>
+      {% for job in pending_jobs %}
+      <li>
+	Owner: {{ job.owner }}
+	<form method="post"
+	      action="{% url 'final_job_pick_up' job_id=job.id %}">
+	  {% csrf_token %}
+	  <input type="hidden" name="worker_name" value="JohnWorker" />
+	  <button>Pick up job</button>
+	</form>
       </li>
       {% endfor %}
     </ul>

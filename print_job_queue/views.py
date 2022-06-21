@@ -62,18 +62,37 @@ def final_queue(request):
         })
 
 
-class DraftJobPickUp(View):
+class _PrintJobPickUpView(View):
+
+    print_job_model_cls = None
+    redirect_to = None
 
     def post(self, request, job_id):
+        assert self.print_job_model_cls is not None
+        assert self.redirect_to is not None
+
         worker_name = request.POST.get('worker_name', '')
         if not worker_name:
             return HttpResponseBadRequest('Worker name must be non-empty.')
 
-        if not queue.pick_up_draft_job(job_id=job_id, worker_name=worker_name):
+        if not queue.pick_up_print_job(
+                print_job_model_cls=self.print_job_model_cls,
+                job_id=job_id,
+                worker_name=worker_name):
             return HttpResponseBadRequest(
                 'Could not pick up job. Check log for more details.')
 
-        return redirect(reverse('draft_queue'))
+        return redirect(reverse(self.redirect_to))
+
+
+class DraftJobPickUp(_PrintJobPickUpView):
+    print_job_model_cls = models.DraftPrintJob
+    redirect_to = 'draft_queue'
+
+
+class FinalJobPickUp(_PrintJobPickUpView):
+    print_job_model_cls = models.FinalPrintJob
+    redirect_to = 'final_queue'
 
 
 class DraftJobMarkCompletion(View):

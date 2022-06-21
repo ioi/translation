@@ -43,5 +43,23 @@
       {% endfor %}
     </ul>
 
+    <h2>Completed</h2>
+    <ul>
+      {% for job in completed_jobs %}
+      <li>
+	Owner: {{ job.owner }}
+	<ul>
+	  {% for file_path, count in job.documents %}
+	  <li>
+	    <a href="/{{ file_path }}">{{ file_path }}</a>
+	    x
+	    {{ count }}
+	  </li>
+	  {% endfor %}
+	</ul>
+      </li>
+      {% endfor %}
+    </ul>
+
   </body>
 </html>

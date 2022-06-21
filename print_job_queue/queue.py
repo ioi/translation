@@ -13,12 +13,13 @@ def enqueue_draft_print_job(file_path, print_count, owner):
     return job
 
 
-def query_draft_print_jobs(worker_name, worker_mod, worker_count):
+def query_print_jobs(print_job_model_cls, worker_name, worker_mod,
+                     worker_count):
     assert worker_name != '', 'Blank string is the default value used in the db.'
 
     # Fake comments so yapf can format the following statement nicely :(
     return list(
-        models.DraftPrintJob.objects  #
+        print_job_model_cls.objects  #
         .all()  #
         .prefetch_related('document_set')  #
         .annotate(job_mod=F('job_id') % worker_count)  #
@@ -80,11 +81,6 @@ def enqueue_final_print_job(file_paths_with_counts, owner):
                                           print_count=count)
         doc.save()
     return job
-
-
-def query_all_final_print_jobs():
-    return list(models.FinalPrintJob.objects.all().prefetch_related(
-        'document_set').order_by('job_id'))
 
 
 def invalidate_print_job(job):

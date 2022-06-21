@@ -16,8 +16,8 @@ def query_all_draft_print_jobs():
         'document_set').order_by('job_id'))
 
 
-def pick_up_draft_job(job_id, worker_name):
-    job = models.DraftPrintJob.objects.filter(job_id=job_id).first()
+def pick_up_print_job(print_job_model_cls, job_id, worker_name):
+    job = print_job_model_cls.objects.filter(job_id=job_id).first()
     if job is None:
         logger.warning(
             'worker `%s` attempted to pick up non-existent job with id %s',

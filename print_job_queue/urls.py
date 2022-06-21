@@ -16,4 +16,7 @@ urlpatterns = [
 
     # Final job routes.
     url(r'^final/$', final_queue, name='final_queue'),
+    url(r'^final_job_pick_up/(?P<job_id>[\w]*)/$',
+        FinalJobPickUp.as_view(),
+        name='final_job_pick_up'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

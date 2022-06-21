@@ -1,3 +1,5 @@
+from django.db.models import F, Q
+
 from print_job_queue import models
 
 
@@ -11,9 +13,20 @@ def enqueue_draft_print_job(file_path, print_count, owner):
     return job
 
 
-def query_all_draft_print_jobs():
-    return list(models.DraftPrintJob.objects.all().prefetch_related(
-        'document_set').order_by('job_id'))
+def query_draft_print_jobs(worker_name, worker_mod, worker_count):
+    assert worker_name != '', 'Blank string is the default value used in the db.'
+
+    # Fake comments so yapf can format the following statement nicely :(
+    return list(
+        models.DraftPrintJob.objects  #
+        .all()  #
+        .prefetch_related('document_set')  #
+        .annotate(job_mod=F('job_id') % worker_count)  #
+        .filter(
+            # Either a job that this worker has already claimed or an unclaimed
+            # job that is in the worker's queue based on the worker's mod.
+            Q(worker=worker_name) | (Q(worker='') & Q(job_mod=worker_mod)))  #
+        .order_by('job_id'))
 
 
 def pick_up_print_job(print_job_model_cls, job_id, worker_name):

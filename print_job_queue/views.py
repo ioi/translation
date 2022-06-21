@@ -90,6 +90,7 @@ def final_queue(request):
             'in_progress_jobs': jobs[models.PrintJobState.IN_PROGRESS.value],
             'pending_jobs': jobs[models.PrintJobState.PENDING.value],
             'completed_jobs': jobs[models.PrintJobState.DONE.value],
+            'worker_name': worker_name,
         })
 
 

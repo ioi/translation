@@ -18,6 +18,12 @@
 	  </li>
 	  {% endfor %}
 	</ul>
+	<form method="post"
+	      action="{% url 'final_job_mark_completion' job_id=job.id %}">
+	  {% csrf_token %}
+	  <input type="hidden" name="worker_name" value="JohnWorker" />
+	  <button>Mark as complete</button>
+	</form>
       </li>
       {% endfor %}
     </ul>

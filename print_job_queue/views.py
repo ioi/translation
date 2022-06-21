@@ -14,8 +14,22 @@ logger = logging.getLogger(__name__)
 
 
 def draft_queue(request):
+    worker_name = request.GET.get('name', '')
+    if not worker_name:
+        return HttpResponseBadRequest('Worker name must be non-empty.')
+
+    worker_count = _try_parse_int(request.GET.get('count'), 0)
+    if worker_count <= 0:
+        return HttpResponseBadRequest('Worker count must be positive.')
+
+    worker_mod = _try_parse_int(request.GET.get('mod'), -1)
+    if worker_mod < 0 or worker_mod >= worker_count:
+        return HttpResponseBadRequest('Worker mod is out of range.')
+
     jobs = defaultdict(list)
-    for job in queue.query_all_draft_print_jobs():
+    for job in queue.query_draft_print_jobs(worker_name=worker_name,
+                                            worker_mod=worker_mod,
+                                            worker_count=worker_count):
         jobs[job.state].append({
             'id':
                 job.job_id,
@@ -125,3 +139,10 @@ class DraftJobMarkCompletion(_PrintJobMarkCompletionView):
 
 class FinalJobMarkCompletion(_PrintJobMarkCompletionView):
     print_job_model_cls = models.FinalPrintJob
+
+
+def _try_parse_int(s, default=None):
+    try:
+        return int(s)
+    except ValueError:
+        return default

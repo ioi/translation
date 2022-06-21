@@ -65,11 +65,9 @@ def final_queue(request):
 class _PrintJobPickUpView(View):
 
     print_job_model_cls = None
-    redirect_to = None
 
     def post(self, request, job_id):
         assert self.print_job_model_cls is not None
-        assert self.redirect_to is not None
 
         worker_name = request.POST.get('worker_name', '')
         if not worker_name:
@@ -82,27 +80,26 @@ class _PrintJobPickUpView(View):
             return HttpResponseBadRequest(
                 'Could not pick up job. Check log for more details.')
 
-        return redirect(reverse(self.redirect_to))
+        http_referer = request.META.get('HTTP_REFERER')
+        if http_referer:
+            return redirect(http_referer)
+        return HttpResponse('Ok!')
 
 
 class DraftJobPickUp(_PrintJobPickUpView):
     print_job_model_cls = models.DraftPrintJob
-    redirect_to = 'draft_queue'
 
 
 class FinalJobPickUp(_PrintJobPickUpView):
     print_job_model_cls = models.FinalPrintJob
-    redirect_to = 'final_queue'
 
 
 class _PrintJobMarkCompletionView(View):
 
     print_job_model_cls = None
-    redirect_to = None
 
     def post(self, request, job_id):
         assert self.print_job_model_cls is not None
-        assert self.redirect_to is not None
 
         worker_name = request.POST.get('worker_name', '')
 
@@ -116,14 +113,15 @@ class _PrintJobMarkCompletionView(View):
             return HttpResponseBadRequest(
                 'Could not mark job as complete. Check log for more details.')
 
-        return redirect(reverse(self.redirect_to))
+        http_referer = request.META.get('HTTP_REFERER')
+        if http_referer:
+            return redirect(http_referer)
+        return HttpResponse('Ok!')
 
 
 class DraftJobMarkCompletion(_PrintJobMarkCompletionView):
     print_job_model_cls = models.DraftPrintJob
-    redirect_to = 'draft_queue'
 
 
 class FinalJobMarkCompletion(_PrintJobMarkCompletionView):
     print_job_model_cls = models.FinalPrintJob
-    redirect_to = 'final_queue'

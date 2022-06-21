@@ -35,8 +35,8 @@ def pick_up_print_job(print_job_model_cls, job_id, worker_name):
     return True
 
 
-def mark_draft_job_complete(job_id, worker_name):
-    job = models.DraftPrintJob.objects.filter(job_id=job_id).first()
+def mark_print_job_complete(print_job_model_cls, job_id, worker_name):
+    job = print_job_model_cls.objects.filter(job_id=job_id).first()
     if job is None:
         logger.warning(
             'worker `%s` attempted to complete non-existent job with id %s',

@@ -8,7 +8,7 @@
     <ul>
       {% for job in in_progress_jobs %}
       <li>
-	Owner: {{ job.owner }}
+	Owner: {{ job.owner }} (id: {{ job.id }})
 	<ul>
 	  {% for file_path, count in job.documents %}
 	  <li>
@@ -21,7 +21,7 @@
 	<form method="post"
 	      action="{% url 'final_job_mark_completion' job_id=job.id %}">
 	  {% csrf_token %}
-	  <input type="hidden" name="worker_name" value="JohnWorker" />
+	  <input type="hidden" name="worker_name" value="{{ worker_name }}" />
 	  <button>Mark as complete</button>
 	</form>
       </li>
@@ -32,11 +32,11 @@
     <ul>
       {% for job in pending_jobs %}
       <li>
-	Owner: {{ job.owner }}
+	Owner: {{ job.owner }} (id: {{ job.id }})
 	<form method="post"
 	      action="{% url 'final_job_pick_up' job_id=job.id %}">
 	  {% csrf_token %}
-	  <input type="hidden" name="worker_name" value="JohnWorker" />
+	  <input type="hidden" name="worker_name" value="{{ worker_name }}" />
 	  <button>Pick up job</button>
 	</form>
       </li>
@@ -47,7 +47,7 @@
     <ul>
       {% for job in completed_jobs %}
       <li>
-	Owner: {{ job.owner }}
+	Owner: {{ job.owner }} (id: {{ job.id }})
 	<ul>
 	  {% for file_path, count in job.documents %}
 	  <li>

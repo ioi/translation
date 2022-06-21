@@ -70,8 +70,8 @@ def enqueue_final_print_job(file_paths_with_counts, owner):
 
 
 def query_all_final_print_jobs():
-    return list(
-        models.FinalPrintJob.objects.all().prefetch_related('document_set'))
+    return list(models.FinalPrintJob.objects.all().prefetch_related(
+        'document_set').order_by('job_id'))
 
 
 def invalidate_print_job(job):

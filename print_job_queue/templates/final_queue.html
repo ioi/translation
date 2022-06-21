@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>Final queue</title>
+  </head>
+  <body>
+
+    <h2>Pending</h2>
+    <ul>
+      {% for job in pending_jobs %}
+      <li>
+	Owner: {{ job.owner }}
+	<ul>
+	  {% for file_path, count in job.documents %}
+	  <li>
+	    <a href="/{{ file_path }}">{{ file_path }}</a>
+	    x
+	    {{ count }}
+	  </li>
+	  {% endfor %}
+	</ul>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </body>
+</html>

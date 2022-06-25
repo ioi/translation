@@ -85,9 +85,11 @@ def _enqueue_final_print_job_if_completed(user_contest):
         return
 
     logger.info('enqueueing %s', file_paths_with_counts)
+    user = user_contest.user
     user_contest.final_print_job = queue.enqueue_final_print_job(
         file_paths_with_counts=file_paths_with_counts,
-        owner=user_contest.user,
+        owner=user,
+        owner_country=user.country.code,
         group=contest_slug)
     user_contest.save()
 

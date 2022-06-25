@@ -31,6 +31,9 @@ class PrintJob(models.Model):
     # See PrintJobState.
     state = models.IntegerField(choices=STATE)
 
+    # The group which this job belongs to.
+    group = models.CharField(max_length=25, blank=False, default='default_group')
+
     # The worker that is handling this job. Should be set when the job is in
     # either PROCESSING or DONE state.
     worker = models.CharField(max_length=25, blank=True)

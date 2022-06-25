@@ -30,7 +30,7 @@ class CustomUserResource(ModelResource):
 
     class Meta:
         model = User
-        fields = ('username', 'country', 'language', 'raw_password', 'num_of_contestants', 'online')
+        fields = ('username', 'country', 'language', 'raw_password', 'num_of_contestants')
         import_id_fields = ('username',)
 
 
@@ -38,18 +38,18 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
     resource_class = CustomUserResource
-    list_display = ("username", "translate_versions", "country", "language", 'num_of_contestants', 'online')
+    list_display = ("username", "translate_versions", "country", "language", 'num_of_contestants')
     ordering = ("username",)
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
     fieldsets = (
-        (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country', 'num_of_contestants', 'online')}),
+        (None, {'fields': ('username', 'text_font_base64', 'text_font_name','password', 'language','country', 'num_of_contestants')}),
         )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username','password','language','country', 'num_of_contestants', 'online', 'is_superuser', 'is_staff', 'is_active')}
+            'fields': ('username','password','language','country', 'num_of_contestants', 'is_superuser', 'is_staff', 'is_active')}
             ),
         )
 

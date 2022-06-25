@@ -73,7 +73,7 @@ class Home(LoginRequiredMixin, View):
             'translating_users': translating_users,
             'contests': contests,
             'is_editor': user.is_editor(),
-            'is_online': user.is_online()
+            'has_contestants': user.has_contestants()
         })
 
 class Healthcheck(View):
@@ -110,7 +110,7 @@ class Translations(LoginRequiredMixin, View):
             'contests': contests,
             'task_name': task_name,
             'is_editor': user.is_editor(),
-            'is_online': user.is_online(),
+            'has_contestants': user.has_contestants(),
             'taskID': task.id,
             'language_code': user.language.code,
             'username': user.username,

@@ -66,7 +66,7 @@
                    title="PDF">
                   <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
                 </a>
-                {% if not task.frozen and not is_online %}
+                {% if not task.frozen and has_contestants %}
                   <button
                     onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')"
                     class="btn btn-default"
@@ -137,7 +137,7 @@
                     title="PDF">
                     <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
                   </a>
-                  {% if is_editor and not is_online %}
+                  {% if is_editor and has_contestants %}
                       <button
                         onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')"
                         class="btn btn-default"
@@ -206,7 +206,7 @@
             action="{% url 'freeze_user_contest' username=user.username contest_id=contest.id%}">
             {% csrf_token %}
 
-            {% if not is_online %}
+            {% if has_contestants %}
               Select any other <b>EXTRA</b> country translations you want for your contestants and click Submit.<br><br>
 
               Additional copy #1:

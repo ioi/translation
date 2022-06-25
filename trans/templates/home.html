@@ -21,22 +21,28 @@
     {% for contest in tasks_lists %}
       <h2>{{ contest.title }}</h2>
 
-      {% if user.language.code != 'en' and not is_editor %}
+      {% if is_translating and not is_editor %}
         <h4> You are translating into <b>{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</b></h4>
-      <br>
+      {% else %}
+        <h4> You are not translating</h4>
       {% endif %}
+      <br>
 
       <table class="table table-hover">
         <thead>
           <tr>
             <th>Task</th>
-            <th>Edit</th>
+            {% if is_editor or is_translating %}
+              <th>Edit</th>
+            {% endif %}
             {% if is_editor %}
               <th>Current Version</th>
               <th>Latest Release</th>
             {% else %}
-              <th>Translation</th>
-              <th>Finalize</th>
+              {% if is_translating %}
+                <th>Translation</th>
+                <th>Finalize</th>
+              {% endif %}
               <th>ISC Version</th>
             {% endif %}
             </tr>
@@ -49,33 +55,39 @@
               data-task-name="{{ task.name }}"
               data-task-frozen="{{ task.frozen|yesno:'True,False' }}">
               <td> {{ task.name }} </td>
-              <td>
-                {% if task.is_editing %} Is editing
-                {% elif task.frozen %} Frozen
-                {% else %}<a href="{% url 'edit' contest.slug task.name %}">Edit</a>{% endif %}
-              </td>
-              <td>
-                <a href="{% url 'revisions' 'task' contest.slug task.name %}"
-                   class="btn btn-default"
-                   title="History">
-                  <i class="fa fa-btns fa-history fa-lg"></i>
-                </a>
-                <!-- <a href="{% url 'task_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
-                <a href="{% url 'task_pdf' 'task' contest.slug task.name %}"
-                   class="btn btn-default"
-                   title="PDF">
-                  <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
-                </a>
-                {% if not task.frozen and has_contestants %}
-                  <button
-                    onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')"
-                    class="btn btn-default"
-                    title="Print ONE copy">
-                    <i class="fa fa-btn fa-print fa-lg"></i>
-                  </button>
-                {% endif %}
-              </td>
-              {% if not is_editor %}
+              {% if is_translating or is_editor %}
+                <td>
+                  {% if task.is_editing %}
+                    Is editing
+                  {% elif task.frozen %}
+                    Frozen
+                  {% else %}
+                    <a href="{% url 'edit' contest.slug task.name %}">Edit</a>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'revisions' 'task' contest.slug task.name %}"
+                     class="btn btn-default"
+                     title="History">
+                    <i class="fa fa-btns fa-history fa-lg"></i>
+                  </a>
+                  <!-- <a href="{% url 'task_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
+                  <a href="{% url 'task_pdf' 'task' contest.slug task.name %}"
+                     class="btn btn-default"
+                     title="PDF">
+                    <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
+                  </a>
+                  {% if not task.frozen and has_contestants %}
+                    <button
+                      onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')"
+                      class="btn btn-default"
+                      title="Print ONE copy">
+                      <i class="fa fa-btn fa-print fa-lg"></i>
+                    </button>
+                  {% endif %}
+                </td>
+              {% endif %}
+              {% if not is_editor and is_translating %}
                 <td>
                   {% if contest.user_contest is None or not contest.user_contest.frozen %}
                     <form method="post" action="{% url 'user_freeze_trans' task_name=task.name %}">
@@ -251,7 +263,10 @@
               id="final_submit"
               class="btn btn-success"
               style="margin:0 auto;display:block;"
-              onclick="return validateFinalizeTranslation('{{ contest.slug }}', {{ contest.tasks|length }});" >
+              onclick="return validateFinalizeTranslation(
+                      '{{ contest.slug }}',
+                       {{ contest.tasks|length }},
+                      '{{ is_translating }}');" >
               Submit Finalized Translations
             </button>
           </form>

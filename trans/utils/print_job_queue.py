@@ -41,7 +41,6 @@ def _enqueue_final_print_job_if_completed(user_contest):
             return True
 
         # There must be a user with the extra country code.
-        # TODO: Should we check if there are multiple such users?
         user = models.User.objects.filter(
             country__code=extra_country_code).first()
         if user is None:
@@ -49,12 +48,11 @@ def _enqueue_final_print_job_if_completed(user_contest):
         language_code = user.language.code
         country_code2 = user.country.code2
 
-        # There should only be one UserContest as well with the corresponding
-        # language & country code.
-        # TODO: Should we check if there are multiple such UserContests?
+        # There must be a UserContest as well with the corresponding
+        # contest & extra country code.
         dependency = models.UserContest.objects.filter(
-            user__language__code=language_code,
-            user__country__code2=country_code2).first()
+            contest__slug=contest_slug,
+            user__country__code=extra_country_code).first()
         if not dependency or not dependency.frozen:
             return False
 
@@ -93,10 +91,11 @@ def _enqueue_final_print_job_if_completed(user_contest):
 
 
 def _enqueue_dependent_final_print_jobs_if_completed(user_contest):
+    contest_slug = user_contest.contest.slug
     country_code = user_contest.user.country.code
     dependents = models.UserContest.objects.filter(
-        Q(extra_country_1_code=country_code) |
-        Q(extra_country_2_code=country_code)).exclude(id=user_contest.id)
+        Q(contest__slug=contest_slug) & (
+            Q(extra_country_1_code=country_code) | Q(extra_country_2_code=country_code))).exclude(id=user_contest.id)
     for dependent in dependents:
         _enqueue_final_print_job_if_completed(dependent)
 

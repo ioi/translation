@@ -28,9 +28,11 @@ def query_worker_print_jobs(print_job_model_cls, group, worker_name, worker_mod,
         .prefetch_related('document_set')  #
         .annotate(job_mod=F('job_id') % worker_count)  #
         .filter(
-            # Either a job that this worker has already claimed or an unclaimed
-            # job that is in the worker's queue based on the worker's mod.
-            Q(worker=worker_name) | (Q(worker='') & Q(job_mod=worker_mod)))  #
+            # Either a job that this worker has already claimed, completed job,
+            # or an unclaimed job that is in the worker's queue based on the
+            # worker's mod.
+            Q(worker=worker_name) | Q(state=models.PrintJobState.DONE.value) |
+            (Q(worker='') & Q(job_mod=worker_mod)))  #
         .order_by('job_id'))
 
 

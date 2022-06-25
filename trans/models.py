@@ -17,7 +17,6 @@ class User(DjangoUser):
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
     num_of_contestants = models.PositiveIntegerField(default=0)
-    online = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
@@ -25,8 +24,8 @@ class User(DjangoUser):
     def credentials(self):
         return self.country.name + '_' + self.language.name
 
-    def is_online(self):
-        return self.online
+    def has_contestants(self):
+        return self.num_of_contestants > 0
 
     @property
     def raw_password(self):

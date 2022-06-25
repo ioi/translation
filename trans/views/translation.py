@@ -73,7 +73,8 @@ class Home(LoginRequiredMixin, View):
             'translating_users': translating_users,
             'contests': contests,
             'is_editor': user.is_editor(),
-            'has_contestants': user.has_contestants()
+            'has_contestants': user.has_contestants(),
+            'is_translating': user.is_translating(),
         })
 
 class Healthcheck(View):

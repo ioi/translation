@@ -27,6 +27,9 @@ class User(DjangoUser):
     def has_contestants(self):
         return self.num_of_contestants > 0
 
+    def is_translating(self):
+        return self.language.code != 'en'
+
     @property
     def raw_password(self):
         return '****'

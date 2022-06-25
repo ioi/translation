@@ -53,21 +53,22 @@ function sendPrintJob(print_task_url) {
     });
 }
 
-function validateFinalizeTranslation(contest_slug, tasks_length) {
-    // Check tasks frozenness.
-    const frozen_tasks = document.querySelectorAll(
-        `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="True"]`
-    );
-    if (frozen_tasks.length !== tasks_length) {
-        const unfrozen_tasks = document.querySelectorAll(
-            `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="False"]`
+function validateFinalizeTranslation(contest_slug, tasks_length, is_translating) {
+    // Check tasks frozenness. Skip check for all not translating.
+    if (is_translating == 'True') {
+        const frozen_tasks = document.querySelectorAll(
+            `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="True"]`
         );
-        const unfrozen_task_names = Array.from(unfrozen_tasks)
-              .map((el) => el.dataset.taskName);
-        alert(`Please freeze the following task(s) first: ${unfrozen_task_names}`);
-        return false;
+        if (frozen_tasks.length !== tasks_length) {
+            const unfrozen_tasks = document.querySelectorAll(
+                `.task-row[data-contest-slug="${contest_slug}"][data-task-frozen="False"]`
+            );
+            const unfrozen_task_names = Array.from(unfrozen_tasks)
+                  .map((el) => el.dataset.taskName);
+            alert(`Please freeze the following task(s) first: ${unfrozen_task_names}`);
+            return false;
+        }
     }
-
     // It doesn't make sense for the two extra countries to be the same.
     const querySelectElementValue = (name) =>
           document.querySelector(

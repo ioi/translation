@@ -46,8 +46,8 @@ class PrintJob(models.Model):
         abstract = True
 
     @classmethod
-    def make_pending(cls, owner):
-        return cls(state=PrintJobState.PENDING.value, owner=owner)
+    def make_pending(cls, owner, group):
+        return cls(state=PrintJobState.PENDING.value, owner=owner, group=group)
 
 
 class PrintedDocument(models.Model):

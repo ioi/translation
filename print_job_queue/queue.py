@@ -17,14 +17,14 @@ def enqueue_draft_print_job(file_path, print_count, owner):
     return job
 
 
-def query_print_jobs(print_job_model_cls, worker_name, worker_mod,
+def query_print_jobs(print_job_model_cls, group, worker_name, worker_mod,
                      worker_count):
     assert worker_name != '', 'Blank string is the default value used in the db.'
 
     # Fake comments so yapf can format the following statement nicely :(
     return list(
         print_job_model_cls.objects  #
-        .all()  #
+        .filter(group=group)  #
         .prefetch_related('document_set')  #
         .annotate(job_mod=F('job_id') % worker_count)  #
         .filter(

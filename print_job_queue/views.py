@@ -18,7 +18,7 @@ class _PrintJobQueueView(View):
     print_job_model_cls = None
     template_file = None
 
-    def get(self, request):
+    def get(self, request, group):
         assert self.print_job_model_cls is not None
         assert self.template_file is not None
 
@@ -37,6 +37,7 @@ class _PrintJobQueueView(View):
         jobs = defaultdict(list)
         for job in queue.query_print_jobs(
                 print_job_model_cls=self.print_job_model_cls,
+                group=group,
                 worker_name=worker_name,
                 worker_mod=worker_mod,
                 worker_count=worker_count):

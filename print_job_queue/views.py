@@ -24,8 +24,8 @@ class _PrintJobQueueView(View):
             job_view_models[job_db_model.state].append({
                 'id':
                     job_db_model.job_id,
-                'owner':
-                    job_db_model.owner.username,
+                'owner_country':
+                    job_db_model.owner_country,
                 'documents': [(document.file_path, document.print_count)
                               for document in job_db_model.document_set.all()],
                 'worker': job_db_model.worker,

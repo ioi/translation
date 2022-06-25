@@ -21,7 +21,7 @@ from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
-    pdf_response, get_requested_user, add_info_line_to_pdf, render_pdf_template
+    pdf_response, get_requested_user, build_printed_draft_pdf, render_pdf_template
 from trans.utils.pdf import get_file_name_from_path, build_pdf, merge_final_pdfs
 from trans.views.admin import FreezeUserContest
 
@@ -200,8 +200,7 @@ class TranslationPrint(TranslationView):
         else:
             #info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
             info_line = 'Printed at {}'.format(datetime.datetime.now().strftime("%H:%M"))
-        output_pdf_path = add_info_line_to_pdf(
-            settings.PRINTED_DRAFT_TRANSLATIONS_ROOT, pdf_file_path, info_line)
+        output_pdf_path = build_printed_draft_pdf(contest_slug, pdf_file_path, info_line)
 
         queue.enqueue_draft_print_job(output_pdf_path,
                                       print_count=1,

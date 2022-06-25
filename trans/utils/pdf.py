@@ -126,13 +126,10 @@ def add_page_numbers_to_pdf(pdf_file_path, task_name):
     os.system(cmd)
 
 
-def add_info_line_to_pdf(result_dir_path, pdf_file_path, info):
-    color =  '-color "0.4 0.4 0.4" '
-    output_pdf_path = '{}/{}.pdf'.format(result_dir_path, str(uuid4()))
-    os.makedirs(result_dir_path, exist_ok=True)
-    cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
-        info, pdf_file_path, output_pdf_path, color)
-    os.system(cmd)
+def build_printed_draft_pdf(contest_slug, pdf_file_path, info):
+    os.system('mkdir -p media/draft/{}'.format(contest_slug))
+    output_pdf_path = 'media/draft/{}/{}.pdf'.format(contest_slug, str(uuid4()))
+    _add_info_line_to_pdf(output_pdf_path, pdf_file_path, info)
     return output_pdf_path
 
 
@@ -148,3 +145,10 @@ def merge_final_pdfs(task_names, contest_slug, language_code):
 
     os.system(cmd)
     return output_pdf_path
+
+
+def _add_info_line_to_pdf(output_pdf_path, pdf_file_path, info):
+    color =  '-color "0.4 0.4 0.4" '
+    cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
+        info, pdf_file_path, output_pdf_path, color)
+    os.system(cmd)

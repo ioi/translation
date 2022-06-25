@@ -36,8 +36,7 @@ def draft_queue(request):
                 job.job_id,
             'owner':
                 job.owner.username,
-            'documents': [(os.path.basename(document.file_path),
-                           document.print_count)
+            'documents': [(document.file_path, document.print_count)
                           for document in job.document_set.all()],
         })
 

@@ -28,6 +28,7 @@ class _PrintJobQueueView(View):
                     job_db_model.owner.username,
                 'documents': [(document.file_path, document.print_count)
                               for document in job_db_model.document_set.all()],
+                'worker': job_db_model.worker,
             })
         return job_view_models
 

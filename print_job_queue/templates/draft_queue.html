@@ -23,7 +23,7 @@
       table#in-progress-tbl tbody td:nth-child(1) {
           text-align: center;
       }
-      /* User */
+      /* Country */
       table#in-progress-tbl thead th:nth-child(2) {
           width: 75px;
       }
@@ -48,7 +48,7 @@
       table#pending-tbl tbody td:nth-child(1) {
           text-align: center;
       }
-      /* User */
+      /* Country */
       table#pending-tbl thead th:nth-child(2) {
           width: 75px;
       }
@@ -73,7 +73,7 @@
       table#completed-tbl tbody td:nth-child(1) {
           text-align: center;
       }
-      /* User */
+      /* Country */
       table#completed-tbl thead th:nth-child(2) {
           width: 75px;
       }
@@ -95,7 +95,7 @@
     <table id="in-progress-tbl">
       <thead>
         <th>ID</th>
-        <th>User</th>
+        <th>Country</th>
         <th>Files</th>
         {% if worker_name %} <th>Action</th> {% endif %}
       </thead>
@@ -103,7 +103,7 @@
         {% for job in in_progress_jobs %}
         <tr>
           <td>{{ job.id }}</td>
-          <td>{{ job.owner }}</td>
+          <td>{{ job.owner_country }}</td>
           <td>
             <ul>
               {% for file_path, _ in job.documents %}
@@ -132,14 +132,14 @@
     <table id="pending-tbl">
       <thead>
         <th>ID</th>
-        <th>User</th>
+        <th>Country</th>
         {% if worker_name %} <th>Action</th> {% endif %}
       </thead>
       <tbody>
         {% for job in pending_jobs %}
         <tr>
           <td>{{ job.id }}</td>
-          <td>{{ job.owner }}</td>
+          <td>{{ job.owner_country }}</td>
           {% if worker_name %}
           <td>
             <form method="post"
@@ -159,7 +159,7 @@
     <table id="completed-tbl">
       <thead>
         <th>ID</th>
-        <th>User</th>
+        <th>Country</th>
         <th>Files</th>
         <th>Printed by</th>
       </thead>
@@ -167,7 +167,7 @@
         {% for job in completed_jobs %}
         <tr>
           <td>{{ job.id }}</td>
-          <td>{{ job.owner }}</td>
+          <td>{{ job.owner_country }}</td>
           <td>
             <ul>
               {% for file_path, _ in job.documents %}

@@ -205,6 +205,7 @@ class TranslationPrint(TranslationView):
         queue.enqueue_draft_print_job(output_pdf_path,
                                       print_count=1,
                                       owner=request.user,
+                                      owner_country=user.country.code,
                                       group=contest_slug)
 
         if translation.user == user and user.username != 'ISC':

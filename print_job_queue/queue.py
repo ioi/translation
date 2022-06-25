@@ -7,8 +7,11 @@ from print_job_queue import models
 logger = logging.getLogger(__name__)
 
 
-def enqueue_draft_print_job(file_path, print_count, owner, group):
-    job = models.DraftPrintJob.make_pending(owner=owner, group=group)
+def enqueue_draft_print_job(file_path, print_count, owner, owner_country,
+                            group):
+    job = models.DraftPrintJob.make_pending(owner=owner,
+                                            owner_country=owner_country,
+                                            group=group)
     job.save()
     doc = models.PrintedDraftDocument(job=job,
                                       file_path=file_path,
@@ -86,8 +89,11 @@ def mark_print_job_complete(print_job_model_cls, job_id, worker_name):
     return True
 
 
-def enqueue_final_print_job(file_paths_with_counts, owner, group):
-    job = models.FinalPrintJob.make_pending(owner=owner, group=group)
+def enqueue_final_print_job(file_paths_with_counts, owner, owner_country,
+                            group):
+    job = models.FinalPrintJob.make_pending(owner=owner,
+                                            owner_country=owner_country,
+                                            group=group)
     job.save()
     for file_path, count in file_paths_with_counts.items():
         doc = models.PrintedFinalDocument(job=job,

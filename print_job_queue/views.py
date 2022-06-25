@@ -30,6 +30,8 @@ class _PrintJobQueueView(View):
                               for document in job_db_model.document_set.all()],
                 'worker': job_db_model.worker,
             })
+        if models.PrintJobState.DONE.value in job_view_models:
+            job_view_models[models.PrintJobState.DONE.value].reverse()
         return job_view_models
 
     def get(self, request, group):

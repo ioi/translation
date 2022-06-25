@@ -46,6 +46,7 @@ class Home(LoginRequiredMixin, View):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.is_editable_by(user)
+            translating = translation and translation.translating
             translation_id = translation.id if translation else None    # neo added
             tasks_by_contest[task.contest].append({
                 'id': task.id,
@@ -53,6 +54,7 @@ class Home(LoginRequiredMixin, View):
                 'trans_id': translation_id,
                 'is_editing': is_editing,
                 'frozen': frozen,
+                'translating': translating,
             })
         tasks_lists = [
             {

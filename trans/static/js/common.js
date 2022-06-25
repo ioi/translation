@@ -22,7 +22,7 @@ $(document).ready(function(){
 function sendPrint(print_task_url) {
     bootbox.confirm({
         title: 'Confirm',
-        message: "Are you sure to print ONE copy of this version?",
+        message: "Are you sure to print a copy of this version?",
         buttons: {
             confirm: {label: 'Print'},
         },
@@ -43,7 +43,7 @@ function sendPrintJob(print_task_url) {
         type: "POST",
         success: function (response) {
             ToastrUtil.success(
-                    'Printouts will be put to the DRAFTs desk for YOUR PICK-UP shortly.',
+                    'Your printout will be delivered to you shortly.',
                     'Print job submitted.'
             ).css('width', '400px');;
         },
@@ -65,7 +65,7 @@ function validateFinalizeTranslation(contest_slug, tasks_length, is_translating)
             );
             const unfrozen_task_names = Array.from(unfrozen_tasks)
                   .map((el) => el.dataset.taskName);
-            alert(`Please freeze the following task(s) first: ${unfrozen_task_names}`);
+            alert(`Please finalize the following task(s) first: ${unfrozen_task_names}`);
             return false;
         }
     }
@@ -94,7 +94,7 @@ function validateFinalizeTranslation(contest_slug, tasks_length, is_translating)
     if (extra_country_1_count > 0 && extra_country_2_count > 0 &&
         extra_country_1_code === extra_country_2_code &&
         extra_country_1_code.length > 0) {
-        alert('Additional copy #1 & #2 should be different!');
+        alert('Additional translations #1 & #2 should be different!');
         return false;
     }
 
@@ -105,27 +105,32 @@ function validateFinalizeTranslation(contest_slug, tasks_length, is_translating)
         const detail = `${extra_country_1_text}: ${extra_country_1_count}`;
         if (extra_country_1_count === 0) {
             error_messages.push(
-                `${detail}\n  Did you forget to specify the number of copies?`
+                `${detail}\n  Did you forget to specify the number of contestants?`
             );
         } else {
             confirmation_messages.push(detail);
         }
     } else if (extra_country_1_count > 0) {
-        error_messages.push('Did you forget to specify additional copy #1?');
+        error_messages.push('Did you forget to specify additional translation #1?');
     }
     if (extra_country_2_code.length > 0 && extra_country_1_code !== extra_country_2_code) {
         const detail = `${extra_country_2_text}: ${extra_country_2_count}`;
         if (extra_country_2_count === 0) {
             error_messages.push(
-                `${detail}\n  Did you forget to specify the number of copies?`
+                `${detail}\n  Did you forget to specify the number of contestants?`
             );
         } else {
             confirmation_messages.push(detail);
         }
     } else if (extra_country_2_code.length === 0 && extra_country_2_count > 0) {
-        error_messages.push('Did you forget to specify additional copy #2?');
+        error_messages.push('Did you forget to specify additional translation #2?');
     }
-    confirmation_messages.push('Are you sure?');
+
+    if (extra_country_1_count > 0 || extra_country_2_count > 0) {
+        confirmation_messages.unshift('Requested additional translations:');
+    }
+
+    confirmation_messages.push('Are you sure you want to submit your translation? This CANNOT be undone!');
 
     if (error_messages.length > 0) {
         alert(error_messages.join('\n\n'));

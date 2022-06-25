@@ -1,6 +1,10 @@
+import logging
+
 from django.db.models import F, Q
 
 from print_job_queue import models
+
+logger = logging.getLogger(__name__)
 
 
 def enqueue_draft_print_job(file_path, print_count, owner):

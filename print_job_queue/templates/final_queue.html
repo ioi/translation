@@ -1,65 +1,190 @@
 <html>
   <head>
     <title>Final queue</title>
+    <style>
+      table {
+          table-layout: fixed;
+          border-collapse: collapse;
+          border: 1px solid;
+      }
+
+      th, td {
+          padding: 2px;
+          border: 1px solid;
+      }
+
+      table#in-progress-tbl {
+          width: calc(50% + {% if worker_name %}300px{% else %}150px{% endif %});
+      }
+      /* ID */
+      table#in-progress-tbl thead th:nth-child(1) {
+          width: 75px;
+      }
+      table#in-progress-tbl tbody td:nth-child(1) {
+          text-align: center;
+      }
+      /* User */
+      table#in-progress-tbl thead th:nth-child(2) {
+          width: 75px;
+      }
+      table#in-progress-tbl tbody td:nth-child(2) {
+          text-align: center;
+      }
+      /* Action */
+      /* The guard isn't actually necessary. Added for clarity. */
+      {% if worker_name %}
+      table#in-progress-tbl thead th:nth-child(4) {
+          width: 150px;
+      }
+      {% endif %}
+
+      table#pending-tbl {
+          width: {% if worker_name %}300px{% else %}150px{% endif %};
+      }
+      /* ID */
+      table#pending-tbl thead th:nth-child(1) {
+          width: 75px;
+      }
+      table#pending-tbl tbody td:nth-child(1) {
+          text-align: center;
+      }
+      /* User */
+      table#pending-tbl thead th:nth-child(2) {
+          width: 75px;
+      }
+      table#pending-tbl tbody td:nth-child(2) {
+          text-align: center;
+      }
+      /* Action */
+      /* The guard isn't actually necessary. Added for clarity. */
+      {% if worker_name %}
+      table#pending-tbl thead th:nth-child(3) {
+          width: 150px;
+      }
+      {% endif %}
+
+      table#completed-tbl {
+          width: calc(50% + 300px);
+      }
+      /* ID */
+      table#completed-tbl thead th:nth-child(1) {
+          width: 75px;
+      }
+      table#completed-tbl tbody td:nth-child(1) {
+          text-align: center;
+      }
+      /* User */
+      table#completed-tbl thead th:nth-child(2) {
+          width: 75px;
+      }
+      table#completed-tbl tbody td:nth-child(2) {
+          text-align: center;
+      }
+      /* Worker */
+      table#completed-tbl thead th:nth-child(4) {
+          width: 150px;
+      }
+      table#completed-tbl tbody td:nth-child(4) {
+          text-align: center;
+      }
+    </style>
   </head>
   <body>
 
     <h2>In progress</h2>
-    <ul>
-      {% for job in in_progress_jobs %}
-      <li>
-	Owner: {{ job.owner }} (id: {{ job.id }})
-	<ul>
-	  {% for file_path, count in job.documents %}
-	  <li>
-	    <a href="/{{ file_path }}">{{ file_path }}</a>
-	    x
-	    {{ count }}
-	  </li>
-	  {% endfor %}
-	</ul>
-	<form method="post"
-	      action="{% url 'final_job_mark_completion' job_id=job.id %}">
-	  {% csrf_token %}
-	  <input type="hidden" name="worker_name" value="{{ worker_name }}" />
-	  <button>Mark as complete</button>
-	</form>
-      </li>
-      {% endfor %}
-    </ul>
+    <table id="in-progress-tbl">
+      <thead>
+        <th>ID</th>
+        <th>User</th>
+        <th>Files</th>
+        {% if worker_name %} <th>Action</th> {% endif %}
+      </thead>
+      <tbody>
+        {% for job in in_progress_jobs %}
+        <tr>
+          <td>{{ job.id }}</td>
+          <td>{{ job.owner }}</td>
+          <td>
+            <ul>
+              {% for file_path, count in job.documents %}
+              <li>
+                <a href="/{{ file_path }}">{{ file_path }}</a>
+                x
+                {{ count }}
+              </li>
+              {% endfor %}
+            </ul>
+          </td>
+          {% if worker_name %}
+          <td>
+            <form method="post"
+                  action="{% url 'final_job_mark_completion' job_id=job.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="worker_name" value="{{ worker_name }}" />
+              <button>Mark as complete</button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
     <h2>Pending</h2>
-    <ul>
-      {% for job in pending_jobs %}
-      <li>
-	Owner: {{ job.owner }} (id: {{ job.id }})
-	<form method="post"
-	      action="{% url 'final_job_pick_up' job_id=job.id %}">
-	  {% csrf_token %}
-	  <input type="hidden" name="worker_name" value="{{ worker_name }}" />
-	  <button>Pick up job</button>
-	</form>
-      </li>
-      {% endfor %}
-    </ul>
+    <table id="pending-tbl">
+      <thead>
+        <th>ID</th>
+        <th>User</th>
+        {% if worker_name %} <th>Action</th> {% endif %}
+      </thead>
+      <tbody>
+        {% for job in pending_jobs %}
+        <tr>
+          <td>{{ job.id }}</td>
+          <td>{{ job.owner }}</td>
+          {% if worker_name %}
+          <td>
+            <form method="post"
+                  action="{% url 'final_job_pick_up' job_id=job.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="worker_name" value="{{ worker_name }}" />
+              <button>Pick up job</button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
     <h2>Completed</h2>
-    <ul>
-      {% for job in completed_jobs %}
-      <li>
-	Owner: {{ job.owner }} (id: {{ job.id }})
-	<ul>
-	  {% for file_path, count in job.documents %}
-	  <li>
-	    <a href="/{{ file_path }}">{{ file_path }}</a>
-	    x
-	    {{ count }}
-	  </li>
-	  {% endfor %}
-	</ul>
-      </li>
-      {% endfor %}
-    </ul>
-
+    <table id="completed-tbl">
+      <thead>
+        <th>ID</th>
+        <th>User</th>
+        <th>Files</th>
+        <th>Printed by</th>
+      </thead>
+      <tbody>
+        {% for job in completed_jobs %}
+        <tr>
+          <td>{{ job.id }}</td>
+          <td>{{ job.owner }}</td>
+          <td>
+            <ul>
+              {% for file_path, count in job.documents %}
+              <li>
+                <a href="/{{ file_path }}">{{ file_path }}</a>
+                x
+                {{ count }}
+              </li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td>{{ job.worker }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </body>
 </html>

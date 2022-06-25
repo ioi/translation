@@ -204,7 +204,8 @@ class TranslationPrint(TranslationView):
 
         queue.enqueue_draft_print_job(output_pdf_path,
                                       print_count=1,
-                                      owner=request.user)
+                                      owner=request.user,
+                                      group=contest_slug)
 
         if translation.user == user and user.username != 'ISC':
             translation.save_last_version(release_note='Printed', saved=True)

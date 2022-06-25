@@ -86,7 +86,9 @@ def _enqueue_final_print_job_if_completed(user_contest):
 
     logger.info('enqueueing %s', file_paths_with_counts)
     user_contest.final_print_job = queue.enqueue_final_print_job(
-        file_paths_with_counts, user_contest.user)
+        file_paths_with_counts=file_paths_with_counts,
+        owner=user_contest.user,
+        group=contest_slug)
     user_contest.save()
 
 
@@ -94,8 +96,9 @@ def _enqueue_dependent_final_print_jobs_if_completed(user_contest):
     contest_slug = user_contest.contest.slug
     country_code = user_contest.user.country.code
     dependents = models.UserContest.objects.filter(
-        Q(contest__slug=contest_slug) & (
-            Q(extra_country_1_code=country_code) | Q(extra_country_2_code=country_code))).exclude(id=user_contest.id)
+        Q(contest__slug=contest_slug) &
+        (Q(extra_country_1_code=country_code) |
+         Q(extra_country_2_code=country_code))).exclude(id=user_contest.id)
     for dependent in dependents:
         _enqueue_final_print_job_if_completed(dependent)
 

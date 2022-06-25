@@ -42,6 +42,10 @@ class PrintJob(models.Model):
     # not be deleted. This is nullable for backwards compatibility.
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
+    # The country of the user that owns this job. Not a foreign key as users
+    # can't change country anyway.
+    owner_country = models.CharField(max_length=25, blank=True, default='Nowhere')
+
     class Meta:
         abstract = True
 

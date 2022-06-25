@@ -154,7 +154,7 @@ function saveVersion(autosave=false, on_unleash=false, callback=null) {
                 if (callback)
                     callback();
                 else if (!autosave)
-                    ToastrUtil.success('Successfully Saved ...');
+                    ToastrUtil.success('Successfully saved!');
             }
         }
     });
@@ -300,7 +300,7 @@ function sendRelease(note) {
         type: "POST",
         success: function (response) {
             last_saved_content = simplemde.value();
-            ToastrUtil.success('Task Released...');
+            ToastrUtil.success('Task released!');
         },
         error: function (response) {
             ToastrUtil.error('Release failed.');

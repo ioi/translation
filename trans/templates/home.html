@@ -21,10 +21,12 @@
     {% for contest in tasks_lists %}
       <h2>{{ contest.title }}</h2>
 
-      {% if is_translating and not is_editor %}
-        <h4> You are translating into <b>{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</b></h4>
-      {% else %}
-        <h4> You are not translating</h4>
+      {% if not is_editor %}
+        {% if is_translating %}
+          <h4>Your team is translating into <b>{{ user.language.name }} ({{ user.language_code }})</b>.</h4>
+        {% else %}
+          <h4> Your team is not translating.</h4>
+        {% endif %}
       {% endif %}
       <br>
 
@@ -60,7 +62,11 @@
                   {% if task.is_editing %}
                     Is editing
                   {% elif task.frozen %}
-                    Frozen
+                    {% if task.translating %}
+                      Finalized
+                    {% else %}
+                      Not translating
+                    {% endif %}
                   {% else %}
                     <a href="{% url 'edit' contest.slug task.name %}">Edit</a>
                   {% endif %}
@@ -71,17 +77,18 @@
                      title="History">
                     <i class="fa fa-btns fa-history fa-lg"></i>
                   </a>
-                  <!-- <a href="{% url 'task_md' 'task' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
-                  <a href="{% url 'task_pdf' 'task' contest.slug task.name %}"
-                     class="btn btn-default"
-                     title="PDF">
-                    <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
+                  {% if not task.frozen or task.translating %}
+                    <a href="{% url 'task_pdf' 'task' contest.slug task.name %}"
+                      class="btn btn-default"
+                      title="PDF">
+                      <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
                   </a>
+                  {% endif %}
                   {% if not task.frozen and has_contestants %}
                     <button
                       onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')"
                       class="btn btn-default"
-                      title="Print ONE copy">
+                      title="Print a copy">
                       <i class="fa fa-btn fa-print fa-lg"></i>
                     </button>
                   {% endif %}
@@ -113,7 +120,7 @@
                         {% else %}
                           <button
                             type="submit"
-                            class="btn btn-success"
+                            class="btn btn-info"
                             name="translating"
                             value="True"
                             onclick="return confirm('Finalizing translation for {{ task.name }}. Are you sure?')">
@@ -153,7 +160,7 @@
                       <button
                         onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')"
                         class="btn btn-default"
-                        title="Print ONE copy">
+                        title="Print a copy">
                         <i class="fa fa-btn fa-print fa-lg"></i>
                       </button>
                   {% endif %}
@@ -165,25 +172,31 @@
 
       {% if not is_editor %}
         {% if contest.user_contest %}
-          <h3 style="color:green">
-            All translations for {{ contest.title }} have been finalized for team {{ user.username }}. If this is an error, please contact a member of the HTC/ITC.
-          </h3>
+          {% if is_translating %}
+            <div class="alert alert-success">
+              Your translation has been submitted.
+            </div>
+          {% endif %}
+
+          {% if has_contestants %}
+            <div class="alert alert-warning">
+              We are preparing your contestant envelopes. Please wait until your are called to verify them.
+            </div>
+          {% endif %}
+
           {% with extra_country_1_code=contest.user_contest.extra_country_1_code %}
           {% with extra_country_1_count=contest.user_contest.extra_country_1_count %}
           {% with extra_country_2_code=contest.user_contest.extra_country_2_code %}
           {% with extra_country_2_count=contest.user_contest.extra_country_2_count %}
-          {% if extra_country_1_count == 0 and extra_country_2_count == 0 %}
-            <h4>Requested additional copies: None</h4>
-          {% else %}
-            <h4>Requested additional copies:</h4>
+          {% if extra_country_1_count > 0 or extra_country_2_count > 0 %}
+            <p>Requested additional translations:</p>
             <ul>
               {% if extra_country_1_count > 0 and extra_country_1_code %}
                 {% for user in translating_users %}
                   {% if user.country.code == extra_country_1_code %}
                     <li>
-                      {{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})
-                      :
-                      {{ extra_country_1_count }}
+                      {{ user.language.name }} ({{ user.language_code }})
+                      for {{ extra_country_1_count }} contestants
                     </li>
                   {% endif %}
                 {% endfor %}
@@ -192,9 +205,8 @@
                 {% for user in translating_users %}
                   {% if user.country.code == extra_country_2_code %}
                     <li>
-                      {{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})
-                      :
-                      {{ extra_country_2_count }}
+                      {{ user.language.name }} ({{ user.language_code }})
+                      for {{ extra_country_2_count }} contestants
                     </li>
                   {% endif %}
                 {% endfor %}
@@ -219,56 +231,69 @@
             {% csrf_token %}
 
             {% if has_contestants %}
-              Select any other <b>EXTRA</b> country translations you want for your contestants and click Submit.<br><br>
+              {% if is_translating %}
+                <p>Your contestants will receive printed <b>English</b> statements and <b>{{ user.language.name }}</b> translation above.</p>
+              {% else %}
+                <p>Your contestants will receive printed <b>English</b> statements.</p>
+              {% endif %}
 
-              Additional copy #1:
+              <p>You can also request up to two additonal printed translations:</p>
+
+              Additional translation #1:
               <select name="extra_country_1_code">
                 <option value="">None</option>
                 {% for user in translating_users %}
-                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
+                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language_code }})</option>
                 {% endfor %}
               </select>
-              with
+              for
               <select name="extra_country_1_count">
                 <option value="0">0</option>
                 {% for copy in ''|center:user.num_of_contestants %}
                   <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
                 {% endfor %}
               </select>
-              copies.
+              contestants.
 
               <br>
 
-              Additional copy #2:
+              Additional translation #2:
               <select name="extra_country_2_code">
                 <option value="">None</option>
                 {% for user in translating_users %}
-                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language.code }}_{{ user.country.code2 }})</option>
+                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language_code }})</option>
                 {% endfor %}
       				</select>
-              with
+              for
               <select name="extra_country_2_count">
                 <option value="0">0</option>
                 {% for copy in ''|center:user.num_of_contestants %}
                   <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
                 {% endfor %}
               </select>
-              copies.
+              contestants.
+              
+              <br>
+              <br>
             {% endif %}
 
-            <!--label for="note">Freeze Note:</label-->
-            <!--input type="text" class="form-control" id="note" name="note"-->
-            <button
-              type="submit"
-              id="final_submit"
-              class="btn btn-success"
-              style="margin:0 auto;display:block;"
-              onclick="return validateFinalizeTranslation(
-                      '{{ contest.slug }}',
-                       {{ contest.tasks|length }},
-                      '{{ is_translating }}');" >
-              Submit Finalized Translations
-            </button>
+            {% if has_contestants or is_translating %}
+              <button
+                type="submit"
+                id="final_submit"
+                class="btn btn-success"
+                style="margin:0 auto;display:block;"
+                onclick="return validateFinalizeTranslation(
+                        '{{ contest.slug }}',
+                        {{ contest.tasks|length }},
+                        '{{ is_translating }}');" >
+                {% if is_translating %}
+                  Submit my finalized translation
+                {% else %}
+                  Submit
+                {% endif %}
+              </button>
+            {% endif %}
           </form>
         {% endif %}
       {% endif %}

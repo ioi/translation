@@ -18,10 +18,42 @@ class _PrintJobQueueView(View):
     print_job_model_cls = None
     template_file = None
 
+    def _make_print_job_view_model(self, job_db_models):
+        job_view_models = defaultdict(list)
+        for job_db_model in job_db_models:
+            job_view_models[job_db_model.state].append({
+                'id':
+                    job_db_model.job_id,
+                'owner':
+                    job_db_model.owner.username,
+                'documents': [(document.file_path, document.print_count)
+                              for document in job_db_model.document_set.all()],
+            })
+        return job_view_models
+
     def get(self, request, group):
         assert self.print_job_model_cls is not None
         assert self.template_file is not None
 
+        # Return a read-only (i.e. non-worker's) view of the jobs.
+        if not request.GET:
+            jobs = self._make_print_job_view_model(
+                job_db_models=queue.query_group_print_jobs(
+                    print_job_model_cls=self.print_job_model_cls, group=group))
+            return render(request,
+                          self.template_file,
+                          context={
+                              'in_progress_jobs':
+                                  jobs[models.PrintJobState.IN_PROGRESS.value],
+                              'pending_jobs':
+                                  jobs[models.PrintJobState.PENDING.value],
+                              'completed_jobs':
+                                  jobs[models.PrintJobState.DONE.value],
+                              'worker_name':
+                                  None,
+                          })
+
+        # Return a worker's view of the jobs.
         worker_name = request.GET.get('name', '')
         if not worker_name:
             return HttpResponseBadRequest('Worker name must be non-empty.')
@@ -34,21 +66,13 @@ class _PrintJobQueueView(View):
         if worker_mod < 0 or worker_mod >= worker_count:
             return HttpResponseBadRequest('Worker mod is out of range.')
 
-        jobs = defaultdict(list)
-        for job in queue.query_print_jobs(
+        jobs = self._make_print_job_view_model(
+            job_db_models=queue.query_worker_print_jobs(
                 print_job_model_cls=self.print_job_model_cls,
                 group=group,
                 worker_name=worker_name,
                 worker_mod=worker_mod,
-                worker_count=worker_count):
-            jobs[job.state].append({
-                'id':
-                    job.job_id,
-                'owner':
-                    job.owner.username,
-                'documents': [(document.file_path, document.print_count)
-                              for document in job.document_set.all()],
-            })
+                worker_count=worker_count))
 
         logger.info('jobs = %s', jobs)
 

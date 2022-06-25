@@ -18,12 +18,14 @@
 	  </li>
 	  {% endfor %}
 	</ul>
+	{% if worker_name %}
 	<form method="post"
 	      action="{% url 'draft_job_mark_completion' job_id=job.id %}">
 	  {% csrf_token %}
 	  <input type="hidden" name="worker_name" value="{{ worker_name }}" />
 	  <button>Mark as complete</button>
 	</form>
+	{% endif %}
       </li>
       {% endfor %}
     </ul>
@@ -33,12 +35,14 @@
       {% for job in pending_jobs %}
       <li>
 	Owner: {{ job.owner }} (id: {{ job.id }})
+	{% if worker_name %}
 	<form method="post"
 	      action="{% url 'draft_job_pick_up' job_id=job.id %}">
 	  {% csrf_token %}
 	  <input type="hidden" name="worker_name" value="{{ worker_name }}" />
 	  <button>Pick up job</button>
 	</form>
+	{% endif %}
       </li>
       {% endfor %}
     </ul>

@@ -17,8 +17,8 @@ def enqueue_draft_print_job(file_path, print_count, owner, group):
     return job
 
 
-def query_print_jobs(print_job_model_cls, group, worker_name, worker_mod,
-                     worker_count):
+def query_worker_print_jobs(print_job_model_cls, group, worker_name, worker_mod,
+                            worker_count):
     assert worker_name != '', 'Blank string is the default value used in the db.'
 
     # Fake comments so yapf can format the following statement nicely :(
@@ -32,6 +32,14 @@ def query_print_jobs(print_job_model_cls, group, worker_name, worker_mod,
             # job that is in the worker's queue based on the worker's mod.
             Q(worker=worker_name) | (Q(worker='') & Q(job_mod=worker_mod)))  #
         .order_by('job_id'))
+
+
+def query_group_print_jobs(print_job_model_cls, group):
+    # Fake comments so yapf can format the following statement nicely :(
+    return list(print_job_model_cls.objects  #
+                .filter(group=group)  #
+                .prefetch_related('document_set')  #
+                .order_by('job_id'))
 
 
 def pick_up_print_job(print_job_model_cls, job_id, worker_name):

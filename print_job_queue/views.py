@@ -13,84 +13,66 @@ from print_job_queue import models, queue
 logger = logging.getLogger(__name__)
 
 
-def draft_queue(request):
-    worker_name = request.GET.get('name', '')
-    if not worker_name:
-        return HttpResponseBadRequest('Worker name must be non-empty.')
+class _PrintJobQueueView(View):
 
-    worker_count = _try_parse_int(request.GET.get('count'), 0)
-    if worker_count <= 0:
-        return HttpResponseBadRequest('Worker count must be positive.')
+    print_job_model_cls = None
+    template_file = None
 
-    worker_mod = _try_parse_int(request.GET.get('mod'), -1)
-    if worker_mod < 0 or worker_mod >= worker_count:
-        return HttpResponseBadRequest('Worker mod is out of range.')
+    def get(self, request):
+        assert self.print_job_model_cls is not None
+        assert self.template_file is not None
 
-    jobs = defaultdict(list)
-    for job in queue.query_print_jobs(print_job_model_cls=models.DraftPrintJob,
-                                      worker_name=worker_name,
-                                      worker_mod=worker_mod,
-                                      worker_count=worker_count):
-        jobs[job.state].append({
-            'id':
-                job.job_id,
-            'owner':
-                job.owner.username,
-            'documents': [(document.file_path, document.print_count)
-                          for document in job.document_set.all()],
-        })
+        worker_name = request.GET.get('name', '')
+        if not worker_name:
+            return HttpResponseBadRequest('Worker name must be non-empty.')
 
-    logger.info('jobs = %s', jobs)
+        worker_count = _try_parse_int(request.GET.get('count'), 0)
+        if worker_count <= 0:
+            return HttpResponseBadRequest('Worker count must be positive.')
 
-    return render(
-        request,
-        'draft_queue.html',
-        context={
-            'in_progress_jobs': jobs[models.PrintJobState.IN_PROGRESS.value],
-            'pending_jobs': jobs[models.PrintJobState.PENDING.value],
-            'completed_jobs': jobs[models.PrintJobState.DONE.value],
-            'worker_name': worker_name,
-        })
+        worker_mod = _try_parse_int(request.GET.get('mod'), -1)
+        if worker_mod < 0 or worker_mod >= worker_count:
+            return HttpResponseBadRequest('Worker mod is out of range.')
+
+        jobs = defaultdict(list)
+        for job in queue.query_print_jobs(
+                print_job_model_cls=self.print_job_model_cls,
+                worker_name=worker_name,
+                worker_mod=worker_mod,
+                worker_count=worker_count):
+            jobs[job.state].append({
+                'id':
+                    job.job_id,
+                'owner':
+                    job.owner.username,
+                'documents': [(document.file_path, document.print_count)
+                              for document in job.document_set.all()],
+            })
+
+        logger.info('jobs = %s', jobs)
+
+        return render(request,
+                      self.template_file,
+                      context={
+                          'in_progress_jobs':
+                              jobs[models.PrintJobState.IN_PROGRESS.value],
+                          'pending_jobs':
+                              jobs[models.PrintJobState.PENDING.value],
+                          'completed_jobs':
+                              jobs[models.PrintJobState.DONE.value],
+                          'worker_name':
+                              worker_name,
+                      })
 
 
-def final_queue(request):
-    worker_name = request.GET.get('name', '')
-    if not worker_name:
-        return HttpResponseBadRequest('Worker name must be non-empty.')
+class DraftJobQueue(_PrintJobQueueView):
+    print_job_model_cls = models.DraftPrintJob
+    template_file = 'draft_queue.html'
 
-    worker_count = _try_parse_int(request.GET.get('count'), 0)
-    if worker_count <= 0:
-        return HttpResponseBadRequest('Worker count must be positive.')
 
-    worker_mod = _try_parse_int(request.GET.get('mod'), -1)
-    if worker_mod < 0 or worker_mod >= worker_count:
-        return HttpResponseBadRequest('Worker mod is out of range.')
-
-    jobs = defaultdict(list)
-    for job in queue.query_print_jobs(print_job_model_cls=models.FinalPrintJob,
-                                      worker_name=worker_name,
-                                      worker_mod=worker_mod,
-                                      worker_count=worker_count):
-        jobs[job.state].append({
-            'id':
-                job.job_id,
-            'owner':
-                job.owner.username,
-            'documents': [(document.file_path, document.print_count)
-                          for document in job.document_set.all()],
-        })
-
-    logger.info('jobs = %s', jobs)
-
-    return render(
-        request,
-        'final_queue.html',
-        context={
-            'in_progress_jobs': jobs[models.PrintJobState.IN_PROGRESS.value],
-            'pending_jobs': jobs[models.PrintJobState.PENDING.value],
-            'completed_jobs': jobs[models.PrintJobState.DONE.value],
-            'worker_name': worker_name,
-        })
+class FinalJobQueue(_PrintJobQueueView):
+    print_job_model_cls = models.FinalPrintJob
+    template_file = 'final_queue.html'
 
 
 class _PrintJobPickUpView(View):

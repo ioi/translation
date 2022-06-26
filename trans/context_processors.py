@@ -2,7 +2,7 @@ from django.conf import settings
 
 def ioi_settings(request):
     return {'settings': {
-        'SITE_TITLE': 'IOI 2022 Translation System',
+        'SITE_TITLE': 'IOI 2022 Task Translation System',
         'CONTEST_TITLE': 'IOI 2022',
         'CONTEST_FULL_TITLE': 'International Olympiad in Informatics 2022',
         'CONTEST_DATE': 'August 7\u201315th, 2022',

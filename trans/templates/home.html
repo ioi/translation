@@ -33,7 +33,7 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Task</th>
+            <th width="15%">Task</th>
             {% if is_editor or is_translating %}
               <th>Edit</th>
             {% endif %}
@@ -180,49 +180,50 @@
 
           {% if has_contestants %}
             <div class="alert alert-warning">
-              We are preparing your contestant envelopes. Please wait until your are called to verify them.
+              <p>We are preparing your contestant envelopes. <b>Please wait until your are called to verify them</b>.</p>
+
+              {% with extra_country_1_code=contest.user_contest.extra_country_1_code %}
+              {% with extra_country_1_count=contest.user_contest.extra_country_1_count %}
+              {% with extra_country_2_code=contest.user_contest.extra_country_2_code %}
+              {% with extra_country_2_count=contest.user_contest.extra_country_2_count %}
+              {% if extra_country_1_count > 0 or extra_country_2_count > 0 %}
+                <p>Requested additional translations:</p>
+                <ul>
+                  {% if extra_country_1_count > 0 and extra_country_1_code %}
+                    {% for user in translating_users %}
+                      {% if user.country.code == extra_country_1_code %}
+                        <li>
+                          <b>{{ user.language.name }} ({{ user.language_code }})</b>
+                          for {{ extra_country_1_count }} contestants
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                  {% if extra_country_2_count > 0 and extra_country_1_code %}
+                    {% for user in translating_users %}
+                      {% if user.country.code == extra_country_2_code %}
+                        <li>
+                          <b>{{ user.language.name }} ({{ user.language_code }})</b>
+                          for {{ extra_country_2_count }} contestants
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                </ul>
+              {% endif %}
+              {% endwith %}
+              {% endwith %}
+              {% endwith %}
+              {% endwith %}
             </div>
           {% endif %}
-
-          {% with extra_country_1_code=contest.user_contest.extra_country_1_code %}
-          {% with extra_country_1_count=contest.user_contest.extra_country_1_count %}
-          {% with extra_country_2_code=contest.user_contest.extra_country_2_code %}
-          {% with extra_country_2_count=contest.user_contest.extra_country_2_count %}
-          {% if extra_country_1_count > 0 or extra_country_2_count > 0 %}
-            <p>Requested additional translations:</p>
-            <ul>
-              {% if extra_country_1_count > 0 and extra_country_1_code %}
-                {% for user in translating_users %}
-                  {% if user.country.code == extra_country_1_code %}
-                    <li>
-                      {{ user.language.name }} ({{ user.language_code }})
-                      for {{ extra_country_1_count }} contestants
-                    </li>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-              {% if extra_country_2_count > 0 and extra_country_1_code %}
-                {% for user in translating_users %}
-                  {% if user.country.code == extra_country_2_code %}
-                    <li>
-                      {{ user.language.name }} ({{ user.language_code }})
-                      for {{ extra_country_2_count }} contestants
-                    </li>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            </ul>
-          {% endif %}
-          {% endwith %}
-          {% endwith %}
-          {% endwith %}
-          {% endwith %}
 	  <br>
           {% if contest.user_contest.note %}
             <b>Note:</b>
             {{contest.user_contest.note}}
           {% endif %}
         {% else %}
+          <br>
           <form
             class="form-inline"
             method="post"

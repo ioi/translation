@@ -24,6 +24,11 @@ html {
     height: 100%;
 }
 
+.site-title {
+    margin: 25px 0 25px !important;
+    text-align: center;
+}
+
 .remember-me {
     width: 100%;
     margin-bottom: 20px;

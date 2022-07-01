@@ -141,10 +141,17 @@ class UserTranslations(StaffCheckMixin, View):
 
 class UsersList(StaffCheckMixin, View):
     def _fetch_users(self):
-        users = list((User.get_translators() | User.objects.filter(username='ISC')).\
-            distinct().values('country', 'language', 'username', 'num_of_contestants'))
-        for user in users:
-            user['country_name'] = Country.objects.get(code=user['country']).name
+        users = []
+        for user in (User.get_translators() | User.objects.filter(username='ISC')).distinct():
+            users.append({
+                'username': user.username,
+                'country_code': user.country.code,
+                'country_name': user.country,
+                'language_code': user.language_code,
+                'num_of_contestants': user.num_of_contestants,
+                'has_contestants': user.has_contestants(),
+                'is_translating': user.is_translating()
+            })
         return users
 
     def _fetch_translations(self, usernames):
@@ -187,6 +194,10 @@ class UsersList(StaffCheckMixin, View):
             user_contests[user.username][contest.id] = {
                 'frozen': user_contest.frozen,
                 'note': user_contest.note,
+                'extra_country_1_code': user_contest.extra_country_1_code,
+                'extra_country_1_count': user_contest.extra_country_1_count,
+                'extra_country_2_code': user_contest.extra_country_2_code,
+                'extra_country_2_count': user_contest.extra_country_2_count
             }
 
         return (contests, contest_tasks, user_translations, user_contests)

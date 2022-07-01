@@ -12,9 +12,11 @@
       <h2>{{ contest.title }}</h2>
       <table class="table table-hover">
         <thead>
-        <tr>
-          <th style="text-align: left;">Country</td>
+          <tr>
             <th>User</th>
+            <th style="text-align: left;">Country</td>
+            <th>Language</th>
+            <th>Contestants</th>
             <th>Status</th>
             {% for task in contest_tasks|get_dict:contest.id %}
               <th>{{ task.name }}</th>
@@ -23,16 +25,61 @@
         </thead>
 
         <tbody>
-          {% for user in users|dictsort:"country_name" %}
+          {% for user in users|dictsort:"username" %}
             <tr>
-              <td style="text-align: left;">{{ user.country_name }}</td>
               <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username }}</a></td>
+              <td style="text-align: left;">{{ user.country_name }}</td>
+              <td>
+                {% if user.is_translating %}
+                  {{ user.language_code }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if user.has_contestants %}
+                  {{ user.num_of_contestants }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
               <td>
                 {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
-                  {% if user_contest is not None and user_contest.frozen %}
-                    <span style="color: green">Finalized</span>
+                  {% if not user.has_contestants and not user.is_translating %}
+                    <span style="color: green"><b>Done</b></span>
+                  {% elif user_contest is not None and user_contest.frozen %}
+                    <span style="color: green"><b>Done</b></span>
                   {% else %}
                     In progress
+                  {% endif %}
+                {% endwith %}
+
+                {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
+                  {% if user_contest %}
+                    {% with extra_country_1_code=user_contest.extra_country_1_code %}
+                    {% with extra_country_1_count=user_contest.extra_country_1_count %}
+                    {% with extra_country_2_code=user_contest.extra_country_2_code %}
+                    {% with extra_country_2_count=user_contest.extra_country_2_count %}
+                      {% if extra_country_1_count > 0 %}
+                        {% for user in users %}
+                          {% if user.country_code == extra_country_1_code %}
+                            <br>
+                            <small>+ {{ user.language_code }}: {{ extra_country_1_count }}</small>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                      {% if extra_country_2_count > 0 %}
+                        {% for user in users %}
+                          {% if user.country_code == extra_country_2_code %}
+                            <br>
+                            <small>+ {{ user.language_code }}: {{ extra_country_2_count }}</small>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
                   {% endif %}
                 {% endwith %}
               </td>
@@ -43,7 +90,11 @@
                     {% if translation is not None and translation.final_pdf_url is not None %}
                       <a class="btn btn-default" href="{{translation.final_pdf_url}}"><i class="fa fa-file-pdf-o fa-lg"></i></a>
                     {% else %}
-                      {% if translation is None %}
+                      {% if not user.is_translating %}
+                        <span style="color: red">
+                          <i class="fa fa-minus fa-lg"></i>
+                        </span>
+                      {% elif translation is None %}
                         <span style="color: brown">
                           <i class="fa fa-question fa-lg"></i>
                         </span>

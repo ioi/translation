@@ -29,6 +29,11 @@ def handle_user_contest_frozen_change(user_contest):
 
 def _enqueue_final_print_job_if_completed(user_contest):
     assert user_contest.frozen
+
+    if not user_contest.user.has_contestants():
+        # There are no onsite contestants, no print job needs to be created.
+        return
+
     if user_contest.final_print_job:
         # There is already a print job, no print job needs to be created.
         return

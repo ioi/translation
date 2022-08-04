@@ -176,6 +176,7 @@ class UserContest(models.Model):
     user = models.ForeignKey('User')
     contest = models.ForeignKey('Contest', default=None)
     frozen = models.BooleanField(default=False)
+    sealed = models.BooleanField(default=False)
     note = models.TextField(default='')
     extra_country_1_code = models.CharField(max_length=6, blank=True)
     extra_country_2_code = models.CharField(max_length=6, blank=True)

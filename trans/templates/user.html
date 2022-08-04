@@ -17,13 +17,32 @@
 					<b>Note:</b>
 					{{contest.user_contest.note}}
 				{% endif %}
-				<form class="form-inline" method="post" onsubmit="return confirm('Are you sure to unfreeze?');"
-              action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
+				<form class="form-inline" method="post" onsubmit="return confirm('Are you sure to unfreeze? Once unfrozen, existing prints for the team should be considered old and discarded.');"
+                    action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
 				{% csrf_token %}
 				<button type="submit" class="btn btn-default btn-danger ">
                 Unfreeze
 				</button>
 				</form>
+
+                {% if has_contestants %}
+                    <!-- only applicable if team has contestants. Otherwise, it's only a matter of freezing / unfreezing, no print/sign needed. -->
+                    {% if not contest.user_contest.sealed %}
+                        <!-- not yet contest.user_contest.sealed, so prompt staff to collect, prepare envelopes and bring to TL for checking -->
+                        <h3>Please inform Team Leader to verify and seal the contestant envelopes</h3>
+                        <form class="form-inline" method="post" onsubmit="return confirm('Are you sure to mark as sealed? This cannot be undone.');"
+                            action="{% url 'seal_user_contest' username=user_name contest_id=contest.id%}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-default btn-info">
+                        Mark as sealed
+                        </button>
+                        </form>
+                    {% else %}
+                        <!-- Print has been printed, verified and sealed -->
+                        <h3>All set. Contestant envelopes have been verified and sealed.</h3>
+                    {% endif %}
+                {% endif %}
+
 			{% else %}
         <form class="form-inline" method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
             {% csrf_token %}

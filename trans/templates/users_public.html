@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% load dict_filter %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <div class="col-md-12 col-lg-12 row">
+    {% for contest in contests %}
+    {% for userpart in users_public %}
+    <div class="col-md-3 col-lg-3">
+      <h2>{{ contest.title }}</h2>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th style="text-align: left;">Country (On-site Pax)</td>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for user in userpart|dictsort:"username" %}
+            <tr>
+              <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username }}</a></td>
+              <td style="text-align: left;">
+                {{ user.country_name }}
+                {% if user.has_contestants %}
+                  ({{ user.num_of_contestants }})
+                {% else %}
+                  (-)
+                {% endif %}
+              </td>
+              <td>
+                {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
+                  {% if not user.has_contestants %}
+                    <!-- Team is fully remote -->
+                    {% if not user.is_translating or user_contest is not none and user_contest.frozen %}
+                      <!-- If team is not translating, or has finished translation -->
+                      <span style="color: green">
+                        <b>
+                          <i class="fa fa-file-pdf-o fa-lg"></i>
+                          Done (PDF Only)
+                        </b>
+                      </span>
+                    {% else %}
+                      <span>
+                        <i class="fa fa-pencil fa-lg"></i>
+                        In Progress
+                      </span>
+                    {% endif %}
+
+                  {% else %}
+                    <!-- Team has some on-site contestants. Workflow:
+                         1A. (If translating) Submit own country translations + request other countries translations = "freeze"
+                         1B. (If not translating) Request other countries translations = "freeze"
+                         2. HTC collects printed translations and brings to TL for checking and sealing into envelope
+                    -->
+                    {% if user_contest is none or not user_contest.frozen %}
+                      <!-- Team is at step (1): haven't frozen -->
+                      {% if user.is_translating %}
+                        <!-- 1A: supposed to translate but not yet done -->
+                        <span>
+                          <i class="fa fa-pencil fa-lg"></i>
+                          In Progress
+                        </span>
+                      {% else %}
+                        <!-- 1B: awaiting request other countries translations -->
+                        <span>
+                          <i class="fa fa-list fa-lg"></i>
+                          Choosing Copies
+                        </span>
+                      {% endif %}
+                    {% elif not user_contest.sealed %}
+                      <!-- Team is at step (2): awaiting TL seal -->
+                      <span style="color: orange">
+                        <b>
+                          <i class="fa fa-user fa-lg"></i>
+                          Pending TL Seal
+                        </b>
+                      </span>
+                    {% else %}
+                      <!-- Done: At this point, should be printed and sealed -->
+                      <span style="color: green">
+                        <b>
+                          <i class="fa fa-envelope fa-lg"></i>
+                          Done (Sealed)
+                        </b>
+                      </span>
+                    {% endif %}
+                      
+                  {% endif %}
+
+                {% endwith %}
+            </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+{% include "autorefresh.html" %}
+
+{% endblock %}

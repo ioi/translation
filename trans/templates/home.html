@@ -179,8 +179,14 @@
           {% endif %}
 
           {% if has_contestants %}
-            <div class="alert alert-warning">
-              <p>We are preparing your contestant envelopes. <b>Please wait for a runner to approach your desk to verify the envelopes.</b></p>
+            {% if contest.user_contest.sealed %}
+            <div class="alert alert-success">
+              <p><b>All set!</b> You have verified and sealed your contestant envelopes.<br>
+                If this is an error, please look for a staff member immediately.</p>
+            {% else %}
+            <div class="alert alert-info">
+              <p><b>We are preparing your contestant envelopes.</b> Please wait for a runner to approach your desk to verify and seal the envelopes.</p>
+            {% endif %}
 
               {% with extra_country_1_code=contest.user_contest.extra_country_1_code %}
               {% with extra_country_1_count=contest.user_contest.extra_country_1_count %}

@@ -130,6 +130,7 @@ class UserTranslations(StaffCheckMixin, View):
         form = UploadFileForm()
         return render(request, 'user.html', context={
             'user_name': username,
+            'has_contestants': user.has_contestants,
             'country': user.country.name,
             'is_editor': user.is_editor,
             'tasks_lists': tasks_lists,
@@ -194,6 +195,7 @@ class UsersList(StaffCheckMixin, View):
             user_contests[user.username][contest.id] = {
                 'frozen': user_contest.frozen,
                 'note': user_contest.note,
+                'sealed': user_contest.sealed,
                 'extra_country_1_code': user_contest.extra_country_1_code,
                 'extra_country_1_count': user_contest.extra_country_1_count,
                 'extra_country_2_code': user_contest.extra_country_2_code,
@@ -202,13 +204,19 @@ class UsersList(StaffCheckMixin, View):
 
         return (contests, contest_tasks, user_translations, user_contests)
 
-    def get(self, request):
+    def _chunks(self, xs, n):
+        return (xs[i:len(xs):n] for i in range(n))
+
+    def get(self, request, public=False):
         users = self._fetch_users()
         (contests, contest_tasks, user_translations, user_contests) = \
             self._fetch_translations([user['username'] for user in users])
 
-        return render(request, 'users.html', context={
+        render_page = 'users_public.html' if public else 'users.html'
+        users_public = self._chunks(sorted(users, key=lambda u: u['username']), 4)
+        return render(request, render_page, context={
             'users': users,
+            'users_public': users_public,
             'contests': contests,
             'contest_tasks': contest_tasks,
             'user_translations': user_translations,
@@ -321,6 +329,7 @@ class FreezeUserContest(LoginRequiredMixin, View):
 
         user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
         user_contest.frozen = True
+        user_contest.sealed = False
         user_contest.extra_country_1_code = extra_country_1_code
         user_contest.extra_country_2_code = extra_country_2_code
         user_contest.extra_country_1_count = extra_country_1_count
@@ -356,6 +365,18 @@ class UnfreezeUserContest(LoginRequiredMixin, View):
             print_job_queue.handle_user_contest_frozen_change(user_contest)
             user_contest.delete()
 #        return redirect(to=reverse('user_trans', kwargs={'username': username}))
+        return redirect(request.META.get('HTTP_REFERER'))
+
+class SealUserContest(LoginRequiredMixin, View):
+    def post(self, request, username, contest_id):
+        user = User.objects.get(username=username)
+        contest = Contest.objects.filter(id=contest_id).first()
+        if contest is None:
+            return HttpResponseNotFound("There is no contest")
+        user_contest = UserContest.objects.filter(contest=contest, user=user).first()
+        if user_contest is not None:
+            user_contest.sealed = True
+            user_contest.save()
         return redirect(request.META.get('HTTP_REFERER'))
 
 class UnleashEditTranslationToken(StaffCheckMixin, View):

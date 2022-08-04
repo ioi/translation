@@ -38,6 +38,7 @@ urlpatterns = [
           url(r'^revert/$', Revert.as_view(), name='revert'),
 
           url(r'^users/$', UsersList.as_view(), name='users_list'),
+          url(r'^users/(?P<public>[\w]*)/$', UsersList.as_view(), name='public_users_list'),
           url(r'^user/(?P<username>[\w-]*)/$', UserTranslations.as_view(), name='user_trans'),
           url(r'^upload_final_pdf/$', AddFinalPDF.as_view(), name='upload_final_pdf'),
           url(r'^user_freeze_trans/(?P<task_name>[\w]*)/$', UserFreezeTranslation.as_view(), name='user_freeze_trans'),
@@ -46,6 +47,8 @@ urlpatterns = [
               name='freeze_user_contest'),
           url(r'^unfreeze_user_contest/(?P<username>[\w-]*)/(?P<contest_id>[\w]*)/$',
               UnfreezeUserContest.as_view(), name='unfreeze_user_contest'),
+          url(r'^seal_user_contest/(?P<username>[\w-]*)/(?P<contest_id>[\w]*)/$',
+              SealUserContest.as_view(), name='seal_user_contest'),
           url(r'^unleash_edit_token/(?P<id>[\w]*)/$', UnleashEditTranslationToken.as_view(),
               name='unleash_edit_token'),
 

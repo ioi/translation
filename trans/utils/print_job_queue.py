@@ -63,7 +63,7 @@ def _enqueue_final_print_job_if_completed(user_contest):
 
         merged_pdf_path = os.path.join(
             'media', 'merged', contest_slug,
-            f'{language_code}_{country_code2}-merged.pdf')
+            f'{user.language_code}-merged.pdf')
         if os.path.isfile(merged_pdf_path):
             file_paths_with_counts[merged_pdf_path] += count
         else:

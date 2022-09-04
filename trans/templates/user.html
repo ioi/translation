@@ -12,10 +12,12 @@
         {% for contest in tasks_lists %}
         <h2>{{ contest.title }}</h2>
 			{% if contest.user_contest %}
-			<h3>This contest has been frozen for this user</h3>
+			<h3>This contest has been frozen for this user.</h3>
 				{% if contest.user_contest.note %}
-					<b>Note:</b>
-					{{contest.user_contest.note}}
+					<p>
+						<b>Note:</b>
+						{{contest.user_contest.note}}
+					</p>
 				{% endif %}
 				<form class="form-inline" method="post" onsubmit="return confirm('Are you sure to unfreeze? Once unfrozen, existing prints for the team should be considered old and discarded.');"
                     action="{% url 'unfreeze_user_contest' username=user_name contest_id=contest.id%}">
@@ -29,7 +31,7 @@
                     <!-- only applicable if team has contestants. Otherwise, it's only a matter of freezing / unfreezing, no print/sign needed. -->
                     {% if not contest.user_contest.sealed %}
                         <!-- not yet contest.user_contest.sealed, so prompt staff to collect, prepare envelopes and bring to TL for checking -->
-                        <h3>Please inform Team Leader to verify and seal the contestant envelopes</h3>
+                        <h3>The contestant envelopes are being verified.</h3>
                         <form class="form-inline" method="post" onsubmit="return confirm('Are you sure to mark as sealed? This cannot be undone.');"
                             action="{% url 'seal_user_contest' username=user_name contest_id=contest.id%}">
                         {% csrf_token %}
@@ -37,16 +39,13 @@
                         Mark as sealed
                         </button>
                         </form>
-                    {% else %}
-                        <!-- Print has been printed, verified and sealed -->
-                        <h3>All set. Contestant envelopes have been verified and sealed.</h3>
                     {% endif %}
                 {% endif %}
 
 			{% else %}
         <form class="form-inline" method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
             {% csrf_token %}
-            <label for="note">Freeze Note:</label>
+            <label for="note">Freeze Note</label>
             <input type="text" class="form-control" id="note" name="note">
             <button type="submit" class="btn btn-success ">
                 Freeze
@@ -123,7 +122,7 @@
 		        <button
 			  type="submit"
 			  name="translating"
-			  class="btn btn-success"
+			  class="btn btn-info"
 			  value="true"
 			  onclick="return confirm('Finalizing translation for {{ task.name }}. Are you sure?')"
 			  >

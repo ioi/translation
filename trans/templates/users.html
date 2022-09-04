@@ -14,9 +14,9 @@
         <thead>
           <tr>
             <th>User</th>
-            <th style="text-align: left;">Country</td>
+            <th style="text-align: left;">Team</td>
             <th>Language</th>
-            <th>Contestants</th>
+            <th>Copies</th>
             <th>Status</th>
             {% for task in contest_tasks|get_dict:contest.id %}
               <th>{{ task.name }}</th>
@@ -88,7 +88,7 @@
                       <span style="color: orange">
                         <b>
                           <i class="fa fa-user fa-lg"></i>
-                          Pending TL Seal
+                          Pending Seal
                         </b>
                       </span>
                     {% else %}

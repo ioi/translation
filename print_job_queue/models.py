@@ -57,6 +57,9 @@ class PrintJob(models.Model):
                    owner=owner,
                    owner_country=owner_country,
                    group=group)
+    
+    def __str__(self):
+        return '{}'.format(self.job_id)
 
 
 class PrintedDocument(models.Model):

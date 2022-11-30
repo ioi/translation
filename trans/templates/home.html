@@ -184,7 +184,8 @@
               <p><b>All set!</b> You have verified and sealed your contestant envelopes.</p>
             {% else %}
             <div class="alert alert-info">
-              <p><b>We are preparing your contestant envelopes.</b> Please wait for a runner to approach your desk to verify and seal the envelopes.</p>
+              <p><b>We are preparing your contestant envelopes.</b></p>
+              <p>Please wait for a runner to approach your desk to verify and seal the envelopes.</p>
             {% endif %}
 
               {% with extra_country_1_code=contest.user_contest.extra_country_1_code %}
@@ -237,6 +238,7 @@
             {% csrf_token %}
 
             {% if has_contestants %}
+              <br>
               {% if is_translating %}
                 <p>Your contestants will receive printed <b>English</b> statements and <b>{{ user.language.name }}</b> translation above.</p>
               {% else %}

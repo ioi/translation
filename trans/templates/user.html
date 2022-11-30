@@ -12,10 +12,10 @@
         {% for contest in tasks_lists %}
         <h2>{{ contest.title }}</h2>
 			{% if contest.user_contest %}
-			<h3>This contest has been frozen for this user.</h3>
+			    <h4>This contest has been frozen for this user.</h4>
 				{% if contest.user_contest.note %}
 					<p>
-						<b>Note:</b>
+						<b>Freeze Note:</b>
 						{{contest.user_contest.note}}
 					</p>
 				{% endif %}
@@ -30,8 +30,9 @@
                 {% if has_contestants %}
                     <!-- only applicable if team has contestants. Otherwise, it's only a matter of freezing / unfreezing, no print/sign needed. -->
                     {% if not contest.user_contest.sealed %}
+                        <br>
                         <!-- not yet contest.user_contest.sealed, so prompt staff to collect, prepare envelopes and bring to TL for checking -->
-                        <h3>The contestant envelopes are being verified.</h3>
+                        <h4>The contestant envelopes are being verified.</h4>
                         <form class="form-inline" method="post" onsubmit="return confirm('Are you sure to mark as sealed? This cannot be undone.');"
                             action="{% url 'seal_user_contest' username=user_name contest_id=contest.id%}">
                         {% csrf_token %}
@@ -43,16 +44,16 @@
                 {% endif %}
 
 			{% else %}
-        <form class="form-inline" method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
-            {% csrf_token %}
-            <label for="note">Freeze Note</label>
-            <input type="text" class="form-control" id="note" name="note">
-            <button type="submit" class="btn btn-success ">
-                Freeze
-            </button>
-        </form>
+                <form class="form-inline" method="post" action="{% url 'freeze_user_contest' username=user_name contest_id=contest.id%}">
+                    {% csrf_token %}
+                    <label for="note">Freeze Note:</label>
+                    <input type="text" class="form-control" id="note" name="note">
+                    <button type="submit" class="btn btn-success ">
+                        Force Freeze
+                    </button>
+                </form>
         {% endif %}
-        <h3></h3>
+        <br>
 
         <table class="table table-hover">
             <thead>

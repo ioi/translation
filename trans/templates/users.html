@@ -10,6 +10,8 @@
   <div class="col-md-12 col-lg-10 col-lg-offset-1">
     {% for contest in contests %}
       <h2>{{ contest.title }}</h2>
+      <p>Print Job Queue: <a href="/queue/draft/{{ contest.slug }}">Draft Translations</a> | <a href="/queue/final/{{ contest.slug }}">Final Translations</a></p>
+      <hr>
       <table class="table table-hover">
         <thead>
           <tr>

@@ -46,6 +46,8 @@ class _PrintJobQueueView(View):
             return render(request,
                           self.template_file,
                           context={
+                              'group':
+                                  group,
                               'in_progress_jobs':
                                   jobs[models.PrintJobState.IN_PROGRESS.value],
                               'pending_jobs':
@@ -57,17 +59,15 @@ class _PrintJobQueueView(View):
                           })
 
         # Return a worker's view of the jobs.
-        worker_name = request.GET.get('name', '')
-        if not worker_name:
-            return HttpResponseBadRequest('Worker name must be non-empty.')
+        worker_name = request.GET.get('name', 'default')
 
         worker_count = _try_parse_int(request.GET.get('count'), 0)
         if worker_count <= 0:
-            return HttpResponseBadRequest('Worker count must be positive.')
+            worker_count = 1
 
         worker_mod = _try_parse_int(request.GET.get('mod'), -1)
         if worker_mod < 0 or worker_mod >= worker_count:
-            return HttpResponseBadRequest('Worker mod is out of range.')
+            worker_mod = 0
 
         jobs = self._make_print_job_view_model(
             job_db_models=queue.query_worker_print_jobs(
@@ -82,6 +82,14 @@ class _PrintJobQueueView(View):
         return render(request,
                       self.template_file,
                       context={
+                          'group':
+                              group,
+                          'worker_name':
+                              worker_name,
+                          'worker_count':
+                              worker_count,
+                          'worker_mod':
+                              worker_mod,
                           'in_progress_jobs':
                               jobs[models.PrintJobState.IN_PROGRESS.value],
                           'pending_jobs':
@@ -171,5 +179,5 @@ class FinalJobMarkCompletion(_PrintJobMarkCompletionView):
 def _try_parse_int(s, default=None):
     try:
         return int(s)
-    except ValueError:
+    except (ValueError, TypeError):
         return default

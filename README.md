@@ -1,11 +1,7 @@
-IOI Translation System
-======================
+IOI Task Translation System
+===========================
 
-The IOI Translation System provides a web interface for translating the tasks (problems)
-into various languages during the International Olympiads in Informatics.
-The system has been developed and first used in the IOI 2017 in Tehran, Iran.
-
-This fork, used in IOI 2019 Baku.
+The IOI Task Translation System provides a web interface for translating the tasks (problems) into various languages during the International Olympiads in Informatics. The system was initially developed and first used in IOI 2017 in Tehran, Iran.
 
 Features
 --------
@@ -22,53 +18,35 @@ Features
 * Dockerized and easy to develop and deploy
 
 
-Deployment
-----------
+Documentation
+-------------
 
-ioi-translation is designed to be deployed on a Docker-compatible container platform. PostgreSQL and Redis are required for persistent storage and session store, respectively. Deployment behind reverse proxy such as nginx is recommended.
+Read the documentation [here](./docs/README.md).
 
-See `docker-compose.yml` for example deployment configurations (Note that `docker-compose.yml` in this repository is for development and not intended for use in production deployment). For the actual deployment in IOI 2019, refer to <https://github.com/ioi-2019>.
+Local Dev Setup
+---------------
 
-
-Development Installation
---------------------
-
-You can install the translation system in just three steps:
-1. Install [docker](https://docs.docker.com/engine/installation/) and
-   [docker-compose](https://docs.docker.com/compose/install/).
-2. Clone the project on your machine.
+1. Install Docker and Docker Compose.
+2. Clone the project to your machine.
 3. Run `docker-compose up -d`.
 
-At this point, you will have a copy of the translation system up
-and running at `http://your_server_address:9000/`.
-You may optionally perform the following tasks:
+At this point, the app will be running at `http://localhost:9000/`. You may optionally perform the following tasks:
 
-* To create essential data for the system such as admin users and groups,
-  run `docker-compose exec app bash` after the system has been started,
-  and then in the shell, execute `python3 manage.py loaddata initial_data.json`
-  for the very first time.
-  Then exit from the shell by typing `exit`.
-* For importing data such as countries, languages, and sample tasks,
-  use the CSV importer in the admin console.
-* You can get access to the system logs by running `dokcer-compose logs`.
-  To follow the logs from now on, run `docker-compose logs -f --tail=0`.
-* To stop the system, run `dokcer-compose stop`.
+* To create initial administrator users and groups, run `docker-compose exec app bash`, and then in the shell, run `python3 manage.py loaddata initial_data.json`. Then, exit from the shell by typing `exit`.
+* To add countries, languages, and users, use the CSV importer in the admin interface. Sample data is provided in `data/`.
+* You can get access to the system logs by running `docker-compose logs`. To follow the logs from now on, run `docker-compose logs -f --tail=0`.
+* To stop the app, run `docker-compose stop`.
 
-For using docker in development settings, add `--reload` option
-to the execution line of gunicorn in `docker-entrypoint.sh` file.
-Then run docker by `docker-compose up --build`.
-
-Screenshots
-----------------
-![Editing panel](https://raw.githubusercontent.com/ioi-2017/translation/master/docs/screenshots/edit.png)
-See more screenshots [here](https://github.com/ioi-2017/translation/tree/master/docs/screenshots).
+To use docker in development settings, add `--reload` option to the execution line of gunicorn in `docker-entrypoint.sh` file. Then run docker by `docker-compose up --build`.
 
 License
 -------
 This software is distributed under the MIT license,
 and uses third party libraries that are distributed under their own terms
-(see LICENSE-3RD-PARTY.txt).
+(see [LICENSE-3RD-PARTY.txt](./LICENSE-3RD-PARTY.txt)).
 
 Copyright
 ---------
-Copyright (c) 2017, IOI 2017 Host Technical Committee
+Copyright (c), IOI International Technical Committee.
+
+Initiated by the IOI 2017 Host Technical Committee.

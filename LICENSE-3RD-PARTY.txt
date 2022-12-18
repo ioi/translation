@@ -120,19 +120,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 
 -----------------------------------------------------------------------------
-    IranSans Proprietary License
-    applies to:
-        - IRAN Sans Font (Files: trans/static/fonts/IRANSans/*)
------------------------------------------------------------------------------
-
-IRAN Sans-serif fonts are considered a proprietary software.
-To gain information about the laws regarding the use of these fonts,
-please visit www.fontiran.com 
-
-This set of fonts are used in this project under the license: LVGZC
-
-
------------------------------------------------------------------------------
     Software License Agreement (BSD License)
     applies to:
         - Diff (Files: trans/static/libs/diff/*)
@@ -254,5 +241,3 @@ files are not distributed without this file; that all modifications to this
 file or any of the AFM files are prominently noted in the modified file(s); and
 that this paragraph is not modified. Adobe Systems has no responsibility or
 obligation to support the use of the AFM files.
-
-

@@ -58,7 +58,7 @@ class Settings(LoginRequiredMixin,View):
         if not font_file:
             return HttpResponseBadRequest("You should attach a file")
         import base64
-        text_font_base64 = base64.b64encode(font_file.read())
+        text_font_base64 = base64.b64encode(font_file.read()).decode('ascii')
         user = User.objects.get(username=request.user.username)
         self.__remove_user_related_pdfs(user)
         user.text_font_base64 = text_font_base64

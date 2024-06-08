@@ -21,6 +21,8 @@ from trans.utils.pdf import get_file_name_from_path, build_pdf, convert_html_to_
 
 from print_job_queue import queue
 
+import autotranslate
+
 logger = logging.getLogger(__name__)
 
 
@@ -93,6 +95,18 @@ class Home(LoginRequiredMixin, View):
             'home_content': home_content,
             'is_onsite': user.is_onsite,
             'is_translating': user.is_translating,
+        })
+
+class AutoTranslate(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(username=request.user)
+        contests = Contest.objects.order_by('order')
+        return render(request, 'autotranslate.html', {
+            "languages": autotranslate.get_supported_languages(),
+            'user': user,
+            'is_editor': user.is_editor(),
+            'has_contestants': user.has_contestants(),
+            'is_translating': user.is_translating(),
         })
 
 

@@ -7,6 +7,7 @@ def ioi_settings(request):
         'CONTEST_TITLE': 'IOI',
         'TIME_ZONE': settings.TIME_ZONE,
         'IMAGES_URL': '/media/images/',
+        'ENABLE_AUTO_TRANSLATE': settings.ENABLE_AUTO_TRANSLATE,
     }}
 
 

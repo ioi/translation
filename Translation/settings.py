@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'import_export',
     'trans',
     'print_job_queue',
+    'autotranslate',
 ]
 
 WEBSOCKET_URL = '/ws3/'
@@ -219,3 +220,7 @@ USE_X_FORWARDED_HOST = True
 XFF_TRUSTED_PROXY_DEPTH = 1
 XFF_STRICT = True
 CSRF_TRUSTED_ORIGINS = [HOST_URL + '*']
+
+ENABLE_AUTO_TRANSLATE = 'autotranslate' in INSTALLED_APPS
+GCLOUD_PROJECT_ID = None
+GCLOUD_SERVICE_ACCOUNT_JSON_PATH = None

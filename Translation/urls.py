@@ -8,4 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('queue/', include('print_job_queue.urls')),
     path('' , include('trans.urls')),
+    path('' , include('autotranslate.urls')),
 ]

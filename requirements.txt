@@ -21,3 +21,4 @@ moratab
 inotify
 django-xff
 pycairo
+google-cloud-translate==2.0.1

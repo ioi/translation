@@ -45,3 +45,6 @@ urlpatterns = [
           path('send_notification/', SendNotification.as_view(), name='send_notif'),
           path('user/<str:username>/font.css', UserFont.as_view(), name='userfontcss'),
       ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+if settings.ENABLE_AUTO_TRANSLATE:
+    urlpatterns.append(url(r'^autotranslate/', AutoTranslate.as_view(), name='auto_translate'))
+

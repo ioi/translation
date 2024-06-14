@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from trans.models import User, Task, Translation, Version, Contest, Country, FlatPage, UserContest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 
 import os

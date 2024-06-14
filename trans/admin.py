@@ -34,6 +34,7 @@ class CustomUserResource(ModelResource):
         import_id_fields = ('username',)
 
 
+@admin.register(User)
 class CustomUserAdmin(ImportExportMixin, UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
@@ -58,7 +59,6 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     def translate_versions(self, obj):
         return '<a href="%s">%s</a>' % (reverse('user_trans', kwargs={'username': obj.username}), 'Translations')
 
-    translate_versions.allow_tags = True
 
 
 class LanguageResource(ModelResource):
@@ -68,6 +68,7 @@ class LanguageResource(ModelResource):
         import_id_fields = ('code',)
 
 
+@admin.register(Language)
 class LanguageAdmin(ImportExportModelAdmin):
     resource_class = LanguageResource
     list_display = ['code', 'name', 'direction']
@@ -91,6 +92,7 @@ class UserContestResource(ModelResource):
         )
         import_id_fields = ('contest',)
 
+@admin.register(UserContest)
 class UserContestAdmin(ImportExportModelAdmin):
     resource_class = UserContestResource
     list_display = [
@@ -114,6 +116,7 @@ class CountryResource(ModelResource):
         fields = ('code', 'code2', 'name')
         import_id_fields = ('code',)
 
+@admin.register(Country)
 class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
     list_display = ['code', 'code2', 'name']
@@ -121,6 +124,7 @@ class CountryAdmin(ImportExportModelAdmin):
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
+@admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'description', 'create_time']
     ordering = ['create_time']
@@ -130,10 +134,5 @@ admin.site.register(Contest)
 admin.site.register(FlatPage)
 admin.site.register(Task)
 admin.site.register(Translation)
-admin.site.register(User, CustomUserAdmin)
-admin.site.register(UserContest, UserContestAdmin)
-admin.site.register(Language, LanguageAdmin)
-admin.site.register(Country, CountryAdmin)
-admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Attachment)
 admin.site.register(Version)

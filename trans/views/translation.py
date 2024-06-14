@@ -281,7 +281,7 @@ class Versions(LoginRequiredMixin, View):
 
         direction = 'rtl' if user.language.rtl else 'ltr'
         # versions_values = versions.values('id', 'text', 'create_time', 'release_note')
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse(dict(versions=list(versions_list)))
         return render(request, 'revisions.html', context={
             'task_name': task.name,

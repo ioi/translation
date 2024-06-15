@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django import forms
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse
+from django.utils.html import mark_safe
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from import_export.resources import ModelResource
 from import_export.fields import Field
@@ -57,7 +58,7 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     filter_horizontal = ()
 
     def translate_versions(self, obj):
-        return '<a href="%s">%s</a>' % (reverse('user_trans', kwargs={'username': obj.username}), 'Translations')
+        return mark_safe('<a href="%s">%s</a>' % (reverse('user_trans', kwargs={'username': obj.username}), 'Translations'))
 
 
 

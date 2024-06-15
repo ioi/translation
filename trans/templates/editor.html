@@ -72,6 +72,7 @@
 {% block script %}
 
 <script type="text/javascript">
+    release_task_url = "{% url 'release_task' contest_slug=contest_slug task_name=task_name %}";
     task_id = "{{taskID}}";
     home_page_url = "{% url 'firstpage' %}";
     access_edit_translate_url = "{% url 'access_edit_translate' id=taskID %}";

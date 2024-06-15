@@ -14,7 +14,7 @@ ipython
 pytz
 django-websocket-redis
 openpyxl
-pyppeteer~=0.2.5
+pyppeteer
 raven
 tablib
 moratab

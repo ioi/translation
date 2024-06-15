@@ -37,9 +37,9 @@ prompt_toolkit==3.0.47
 psycopg2==2.9.9
 ptyprocess==0.7.0
 pure-eval==0.2.2
-pyee==8.2.2
+pyee==11.1.0
 Pygments==2.18.0
-pyppeteer==0.2.6
+pyppeteer==2.0.0
 python-dateutil==2.9.0.post0
 python-markdown-math==0.8
 pytz==2024.1
@@ -58,7 +58,7 @@ typing_extensions==4.12.2
 urllib3==1.26.18
 wcwidth==0.2.13
 websocket-client==1.8.0
-websockets==9.1
+websockets==10.4
 zipp==3.19.2
 zope.event==5.0
 zope.interface==6.4.post2

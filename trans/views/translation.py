@@ -290,7 +290,8 @@ class Versions(LoginRequiredMixin, View):
             'versions': versions_list,
             'direction': direction,
             'task_type': task_type,
-            'view_all': view_all
+            'view_all': view_all,
+            'is_editor': user.is_editor(),
         })
 
 

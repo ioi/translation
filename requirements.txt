@@ -18,3 +18,4 @@ pyppeteer
 raven
 tablib
 moratab
+inotify

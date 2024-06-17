@@ -60,6 +60,7 @@ WEBSOCKET_URL = '/ws3/'
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 MIDDLEWARE = [
+    'xff.middleware.XForwardedForMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

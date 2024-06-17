@@ -19,3 +19,4 @@ raven
 tablib
 moratab
 inotify
+django-xff

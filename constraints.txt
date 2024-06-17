@@ -14,6 +14,7 @@ django-redis==5.4.0
 django-storages==1.14.3
 django-upgrade==1.18.0
 django-websocket-redis==0.6.0
+django-xff==1.4.0
 docutils==0.21.2
 et-xmlfile==1.1.0
 executing==2.0.1

@@ -199,7 +199,7 @@ class TranslationPrint(TranslationView):
             info_line = 'Release {}, deliver to {}'.format(translation.get_published_versions_count(), user.country.code)
         else:
             #info_line = 'Printed at {}'.format(translation.get_latest_version().create_time.strftime("%H:%M"))
-            info_line = 'Printed at {}'.format(datetime.datetime.now().strftime("%H:%M"))
+            info_line = 'Draft printed at {}'.format(datetime.datetime.now().strftime("%H:%M"))
         output_pdf_path = build_printed_draft_pdf(contest_slug, pdf_file_path, info_line)
 
         queue.enqueue_draft_print_job(output_pdf_path,

@@ -19,7 +19,7 @@ class FirstPage(View):
         if request.user.groups.filter(name="staff").exists():
             return redirect(to=reverse('users_list'))
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return redirect(to=reverse('home'))
         else:
             return render(request, 'login.html')

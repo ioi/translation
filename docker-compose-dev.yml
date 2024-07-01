@@ -27,6 +27,9 @@ services:
       LOG_HANDLERS: 'file,stderr'
       TRANS_LOG_HANDLERS: 'trans,stderr'
       PRINT_JOB_QUEUE_LOG_HANDLERS: 'print_job_queue,stderr'
+      TRANS_URL: 'http://127.0.0.1:9001/'
+      TRANS_DEBUG: 1
+      TRANS_TIME_ZONE: 'UTC'
 
 
   nginx:

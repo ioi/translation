@@ -6,10 +6,9 @@ cd /opt/translate/app
 export DJANGO_SETTINGS_MODULE=Translation.settings
 export LANG=C.UTF-8
 
-# TODO: change this to your time zone
-ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+ln -fs /usr/share/zoneinfo/${TRANS_TIME_ZONE:-UTC} /etc/localtime
 
-dpkg-reconfigure --frontend noninteractive tzdata 
+dpkg-reconfigure --frontend noninteractive tzdata
 
 fc-cache
 
@@ -28,7 +27,7 @@ if [[ $# -eq 0 ]]; then
     python3 manage.py migrate
 
     echo "Starting Gunicorn"
-	
+
 #	For using docker in development settings, add `--reload` option below to the execution line of gunicorn
     exec gunicorn Translation.wsgi:application -w "${GUNICORN_WORKERS:-1}" -b :9000
 fi

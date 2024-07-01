@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-cd /usr/src/app
+. /opt/translate/venv/bin/activate
+cd /opt/translate/app
+
 export DJANGO_SETTINGS_MODULE=Translation.settings
 export LANG=C.UTF-8
-
-export DEBIAN_FRONTEND=noninteractive
-apt-get install -y tzdata
 
 # TODO: change this to your time zone
 ln -fs /usr/share/zoneinfo/UTC /etc/localtime
@@ -31,7 +30,7 @@ if [[ $# -eq 0 ]]; then
     echo "Starting Gunicorn"
 	
 #	For using docker in development settings, add `--reload` option below to the execution line of gunicorn
-    exec /usr/local/bin/gunicorn Translation.wsgi:application -w "${GUNICORN_WORKERS:-1}" -b :9000
+    exec gunicorn Translation.wsgi:application -w "${GUNICORN_WORKERS:-1}" -b :9000
 fi
 
 exec "$@"

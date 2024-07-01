@@ -8,9 +8,10 @@ services:
     ports:
     - 9001:8000 # Debugging
     volumes:
-    - .:/usr/src/app/ # Debugging
-    - ioi_static:/usr/src/app/static/
-    - ioi_media:/usr/src/app/media/
+    - .:/opt/translate/app/ # Debugging
+    - ioi_static:/opt/translate/app/static/
+    - ioi_media:/opt/translate/app/media/
+    - ioi_logs:/opt/translate/app/logs/
     depends_on:
     - postgres
     - redis
@@ -40,8 +41,8 @@ services:
     depends_on:
     - app
     volumes:
-    - ioi_static:/usr/src/app/static/:ro
-    - ioi_media:/usr/src/app/media/:ro
+    - ioi_static:/opt/translate/app/static/:ro
+    - ioi_media:/opt/translate/app/media/:ro
 
   postgres:
     restart: always
@@ -61,3 +62,4 @@ volumes:
   ioi_pgdata:
   ioi_static:
   ioi_media:
+  ioi_logs:

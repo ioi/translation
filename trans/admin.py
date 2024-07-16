@@ -7,6 +7,7 @@ from django.utils.html import mark_safe
 from import_export.admin import ImportExportMixin, ImportExportModelAdmin
 from import_export.resources import ModelResource
 from import_export.fields import Field
+from import_export.widgets import ForeignKeyWidget
 import import_export.tmp_storages
 from trans.utils import reset_notification_cache
 from .models import *
@@ -77,39 +78,16 @@ class LanguageAdmin(ImportExportModelAdmin):
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
-class UserContestResource(ModelResource):
-    class Meta:
-        model = UserContest
-        fields = (
-            'user',
-            'contest',
-            'frozen',
-            'sealed',
-            'note',
-            'extra_country_1_code',
-            'extra_country_2_code',
-            'extra_country_1_count',
-            'extra_country_2_count',
-        )
-        import_id_fields = ('contest',)
-
 @admin.register(UserContest)
-class UserContestAdmin(ImportExportModelAdmin):
-    resource_class = UserContestResource
+class UserContestAdmin(admin.ModelAdmin):
     list_display = [
         'user',
         'contest',
         'frozen',
         'sealed',
         'note',
-        'extra_country_1_code',
-        'extra_country_2_code',
-        'extra_country_1_count',
-        'extra_country_2_count',
     ]
-    ordering = ['contest']
-
-    tmp_storage_class = import_export.tmp_storages.MediaStorage
+    ordering = ['contest', 'user']
 
 class CountryResource(ModelResource):
     class Meta:
@@ -130,10 +108,31 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'description', 'create_time']
     ordering = ['create_time']
 
+class ContestantResource(ModelResource):
+    user = Field(
+        column_name='user',
+        attribute='user',
+        widget=ForeignKeyWidget(User, 'username'),
+    )
 
+    class Meta:
+        model = Contestant
+        fields = ('code', 'name', 'on_site', 'user')
+        import_id_fields = ('code',)
+
+@admin.register(Contestant)
+class ContestantAdmin(ImportExportModelAdmin):
+    resource_class = ContestantResource
+    list_display = ['code', 'name', 'on_site', 'user']
+    ordering = ['code']
+
+    tmp_storage_class = import_export.tmp_storages.MediaStorage
+
+
+admin.site.register(Attachment)
 admin.site.register(Contest)
+admin.site.register(ContestantContest)
 admin.site.register(FlatPage)
 admin.site.register(Task)
 admin.site.register(Translation)
-admin.site.register(Attachment)
 admin.site.register(Version)

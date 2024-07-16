@@ -12,6 +12,9 @@ from print_job_queue import models as print_job_queue_models
 
 
 class User(DjangoUser):
+    # User name "ISC" is reserved for the main editor and matched
+    # explicitly at various places throught the code.
+
     language = models.ForeignKey('Language', on_delete=models.deletion.CASCADE)
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)

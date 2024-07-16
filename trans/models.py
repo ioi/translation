@@ -16,6 +16,7 @@ class User(DjangoUser):
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
+    # FIXME: Remove
     num_of_contestants = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -124,9 +125,9 @@ class Translation(models.Model):
     final_pdf = models.FileField(upload_to=final_pdf_path, null=True)
 
     class Meta:
-        unique_together = (
-            ('user', 'task',),
-        )
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'task'], name='unique_user_task'),
+        ]
 
     def add_version(self, text, release_note='', saved=True):
         if text.strip() == '':
@@ -172,12 +173,23 @@ class Translation(models.Model):
         return "{} ({})".format(self.task.name, self.user.username)
 
 
+class Contestant(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, blank=True)
+    on_site = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.code
+
+
 class UserContest(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
-    contest = models.ForeignKey('Contest', on_delete=models.CASCADE, default=None)
+    contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
     frozen = models.BooleanField(default=False)
     sealed = models.BooleanField(default=False)
     note = models.TextField(default='')
+    # FIXME: To be removed
     extra_country_1_code = models.CharField(max_length=6, blank=True)
     extra_country_2_code = models.CharField(max_length=6, blank=True)
     extra_country_1_count = models.PositiveIntegerField(default=0)
@@ -188,6 +200,24 @@ class UserContest(models.Model):
     final_print_job = models.ForeignKey(print_job_queue_models.FinalPrintJob,
                                         null=True,
                                         on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'contest'], name='unique_user_contest'),
+        ]
+
+
+
+class ContestantContest(models.Model):
+    contestant = models.ForeignKey('Contestant', on_delete=models.CASCADE)
+    contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
+    translation_by_user = models.ForeignKey('User', on_delete=models.PROTECT, null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['contestant', 'contest'], name='unique_ctant_contest'),
+        ]
+
 
 
 class Version(models.Model):

@@ -52,7 +52,7 @@ class StaffCheckMixin(LoginRequiredMixin, object):
         return super(StaffCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
-class ISCEditorCheckMixin(LoginRequiredMixin, object):
+class EditorCheckMixin(LoginRequiredMixin, object):
     user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
 
     def check_user(self, user):
@@ -64,7 +64,7 @@ class ISCEditorCheckMixin(LoginRequiredMixin, object):
     def dispatch(self, request, *args, **kwargs):
         if not self.check_user(request.user):
             return self.user_check_failed(request, *args, **kwargs)
-        return super(ISCEditorCheckMixin, self).dispatch(request, *args, **kwargs)
+        return super(EditorCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
 class StaffRequiredMixin(LoginRequiredMixin, object):

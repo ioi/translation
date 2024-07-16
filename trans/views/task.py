@@ -7,10 +7,10 @@ from django.http import HttpResponse, HttpResponseBadRequest
 
 from trans.utils import get_trans_by_user_and_task
 from trans.models import Task, User, Contest
-from trans.views.admin import ISCEditorCheckMixin
+from trans.views.admin import EditorCheckMixin
 
 
-class AddTask(ISCEditorCheckMixin, View):
+class AddTask(EditorCheckMixin, View):
     def post(self, request):
         if request.user.username != "ISC":
             return HttpResponseForbidden("You don't have access to this page")
@@ -26,7 +26,7 @@ class AddTask(ISCEditorCheckMixin, View):
         return redirect(to=reverse('edit', kwargs={'contest_slug': contest.slug, 'task_name': name}))
 
 
-class ReleaseTask(ISCEditorCheckMixin, View):
+class ReleaseTask(EditorCheckMixin, View):
     def post(self, request, contest_slug, task_name):
         release_note = request.POST.get('release_note', '')
         task = Task.objects.get(name=task_name, contest__slug=contest_slug)

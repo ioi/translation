@@ -35,7 +35,14 @@ if [[ $# -eq 0 ]]; then
             GUNICORN_OPTIONS=--preload
         fi
     fi
-    exec gunicorn Translation.wsgi:application -w "${GUNICORN_WORKERS:-1}" -b :9000 $GUNICORN_OPTIONS
+    exec gunicorn \
+        Translation.wsgi:application \
+        --workers "${GUNICORN_WORKERS:-1}" \
+        --bind :9000 \
+        --access-logfile logs/gunicorn-access.log \
+        --error-logfile logs/gunicorn-error.log \
+        $GUNICORN_OPTIONS \
+        >>logs/gunicorn.log 2>&1
 fi
 
 exec "$@"

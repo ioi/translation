@@ -28,6 +28,7 @@ COPY docker-entrypoint.sh /root/docker-entrypoint.sh
 RUN chmod +x /root/docker-entrypoint.sh
 
 COPY . /opt/translate/app
+RUN sed -i '1s@.*@#!/opt/translate/venv/bin/python3@' /opt/translate/app/manage.py
 
 WORKDIR /opt/translate/app
 ENTRYPOINT ["/root/docker-entrypoint.sh"]

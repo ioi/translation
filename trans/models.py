@@ -186,7 +186,7 @@ class UserContest(models.Model):
     frozen = models.BooleanField(default=False)
     sealed = models.BooleanField(default=False)
     skip_verification = models.BooleanField(default=False)
-    note = models.TextField(default='')
+    note = models.TextField(default='', blank=True)
     # FIXME: To be removed
     extra_country_1_code = models.CharField(max_length=6, blank=True)
     extra_country_2_code = models.CharField(max_length=6, blank=True)

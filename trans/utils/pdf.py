@@ -1,9 +1,13 @@
 import asyncio
+from dataclasses import dataclass, field
 import os
 from urllib.parse import urljoin
 from uuid import uuid4
 import logging
 import requests
+from typing import List
+from pathlib import Path
+import subprocess
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -13,6 +17,7 @@ from shutil import copyfile
 from pyppeteer import launch
 
 from trans.context_processors import ioi_settings
+from trans.models import Translation, Contestant, Contest, User
 
 logger = logging.getLogger(__name__)
 
@@ -147,3 +152,43 @@ def _add_info_line_to_pdf(output_pdf_path, pdf_file_path, info):
     cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
         info, pdf_file_path, output_pdf_path, color)
     os.system(cmd)
+
+
+@dataclass
+class RecipeContestant:
+    contestant: Contestant
+    translations: List[Translation] = field(default_factory=list)
+
+    def build_parts(self):
+        parts = []
+        # parts.append(self.build_banner_page())
+        for trans in self.translations:
+            assert trans.final_pdf
+            parts.append(f'media/{trans.final_pdf.name}')
+        return parts
+
+    def build_banner_page(self):
+        pass
+
+
+@dataclass
+class BatchRecipe:
+    contest: Contest
+    for_user: User
+    contestants: List[RecipeContestant] = field(default_factory=list)
+
+    def build_pdf(self):
+        parts = []
+        for ct_recipe in self.contestants:
+            parts.extend(ct_recipe.build_parts())
+
+        if not parts:
+            return None
+
+        output_path = Path('media/batch') / self.contest.slug
+        output_path.mkdir(parents=True, exist_ok=True)
+        output_pdf_path = output_path / f'{self.for_user.username}.pdf'
+        cmd = ['cpdf'] + parts + ['-o', str(output_pdf_path)]
+        subprocess.run(cmd, check=True)
+
+        return str(output_pdf_path)

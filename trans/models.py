@@ -188,6 +188,7 @@ class UserContest(models.Model):
     contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
     frozen = models.BooleanField(default=False)
     sealed = models.BooleanField(default=False)
+    skip_verification = models.BooleanField(default=False)
     note = models.TextField(default='')
     # FIXME: To be removed
     extra_country_1_code = models.CharField(max_length=6, blank=True)

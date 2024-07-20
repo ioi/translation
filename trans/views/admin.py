@@ -1,7 +1,6 @@
 from collections import defaultdict
 
-import os
-import requests
+from django import forms
 from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, Http404
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -11,10 +10,11 @@ from django.shortcuts import render, redirect
 from django.urls.base import reverse
 from django.views.generic import View
 from django.conf import settings
+from django.db import transaction
 
 from trans.forms import UploadFileForm
 
-from trans.models import User, Task, Translation, Contest, UserContest, Country
+from trans.models import User, Task, Translation, Contest, Contestant, UserContest, ContestantContest, Country
 from trans.utils import is_translate_in_editing, unleash_edit_token, print_job_queue
 from trans.utils.pdf import build_final_pdf, merge_final_pdfs
 from trans.utils.translation import get_trans_by_user_and_task
@@ -392,3 +392,54 @@ class UnleashEditTranslationToken(LoginRequiredMixin, View):
             return HttpResponseNotFound("There is no task")
         unleash_edit_token(trans)
         return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
+
+
+class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
+    @transaction.atomic
+    def _handle(self, request, username, contest_id, is_post):
+        self.init_user(request, username)
+        self.init_contest(request, contest_id)
+
+        contestants = Contestant.objects.filter(user=self.user).order_by('code')
+
+        translating_users = User.objects.filter(is_translating=True).select_related('language', 'country').order_by('language__name', 'country__name')
+        trans_choices = [
+            (u.id, f'{u.language.name} ({u.country.name})')
+            for u in translating_users
+        ]
+
+        class TransSettingsForm(forms.BaseForm):
+            base_fields = {}
+
+        for c in contestants:
+            if c.on_site:
+                TransSettingsForm.base_fields[f'trans_{c.id}'] = forms.ChoiceField(choices=trans_choices)
+
+        if is_post:
+            form = TransSettingsForm(request.POST)
+            if form.is_valid():
+                for c in contestants:
+                    if c.on_site:
+                        cc, _ = ContestantContest.objects.get_or_create(contest=self.contest, contestant=c)
+                        cc.translation_by_user_id = form.cleaned_data[f'trans_{c.id}']
+                        cc.save()
+                return redirect('home')
+        else:
+            form_init = {f'trans_{c.id}': request.user.id for c in contestants if c.on_site}
+            for cc in ContestantContest.objects.filter(contestant__in=contestants, contest=self.contest):
+                form_init[f'trans_{cc.contestant_id}'] = cc.translation_by_user_id
+            form = TransSettingsForm(initial=form_init)
+
+        return render(request, 'edit_user_contest.html', context={
+            'form': form,
+            'contest': self.contest,
+            'for_user': self.user,
+            'user': request.user,
+            'contestant_table': [(c, form[f'trans_{c.id}'] if c.on_site else None) for c in contestants],
+        })
+
+    def get(self, request, username, contest_id):
+        return self._handle(request, username, contest_id, False)
+
+    def post(self, request, username, contest_id):
+        return self._handle(request, username, contest_id, True)

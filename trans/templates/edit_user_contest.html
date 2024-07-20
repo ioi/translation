@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %} Edit contest: {{ contest.title }} ({{ for_user.country.code }}) {% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="col-md-12 col-lg-10 col-lg-offset-1">
+    <h2>{{ contest.title }} ({{ for_user.country.name }})</h2>
+
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Translation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ctant, field in contestant_table %}
+            <tr>
+              <td>{{ ctant.code }}</td>
+              <td>{{ ctant.name }}</td>
+              <td>
+                {% if field %}
+                  {{ field }}
+                {% else %}
+                  <i>online contestants receive all translations in CMS</i>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class='button-row'>
+        <button type="submit" class="btn btn-success">Save</button>
+        <a href="{% url 'home' %}" class="btn btn-danger">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

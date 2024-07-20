@@ -27,7 +27,7 @@
 				</button>
 				</form>
 
-                {% if has_contestants %}
+                {% if is_onsite %}
                     <!-- only applicable if team has contestants. Otherwise, it's only a matter of freezing / unfreezing, no print/sign needed. -->
                     {% if not contest.user_contest.sealed %}
                         <br>

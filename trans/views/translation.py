@@ -113,7 +113,7 @@ class Translations(LoginRequiredMixin, View):
             'contests': contests,
             'task_name': task_name,
             'is_editor': user.is_editor(),
-            'has_contestants': user.has_contestants(),
+            'is_onsite': user.is_onsite,
             'taskID': task.id,
             'language_code': user.language.code,
             'username': user.username,

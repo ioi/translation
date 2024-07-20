@@ -113,7 +113,7 @@ class UserTranslations(StaffCheckMixin, View):
         form = UploadFileForm()
         return render(request, 'user.html', context={
             'user_name': username,
-            'has_contestants': user.has_contestants,
+            'is_onsite': user.is_onsite,
             'country': user.country.name,
             'is_editor': user.is_editor,
             'tasks_lists': tasks_lists,
@@ -132,9 +132,8 @@ class UsersList(StaffCheckMixin, View):
                 'country_code': user.country.code,
                 'country_name': user.country,
                 'language_code': user.language_code,
-                'num_of_contestants': user.num_of_contestants,
-                'has_contestants': user.has_contestants(),
-                'is_translating': user.is_translating()
+                'is_onsite': user.is_onsite,
+                'is_translating': user.is_translating,
             })
         return users
 

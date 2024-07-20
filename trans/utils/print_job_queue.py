@@ -30,7 +30,7 @@ def handle_user_contest_frozen_change(user_contest):
 def _enqueue_final_print_job_if_completed(user_contest):
     assert user_contest.frozen
 
-    if not user_contest.user.has_contestants():
+    if not user_contest.user.is_onsite:
         # There are no onsite contestants, no print job needs to be created.
         return
 
@@ -86,7 +86,7 @@ def _enqueue_final_print_job_if_completed(user_contest):
 
     if not add_completed_dependency_pdf(contest_slug,
                                         user_contest.user.country.code,
-                                        user_contest.user.num_of_contestants):
+                                        99):
         return
 
     logger.info('enqueueing %s', file_paths_with_counts)

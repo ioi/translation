@@ -50,7 +50,7 @@ class User(DjangoUser):
         # Check if the user is an editor of the official English version.
         # Typically, there is only one editor named "ISC" (CAVEAT: there are
         # checks in the code for the particular name!).
-        return self.groups.filter(name='editor').exists() or self.is_superuser
+        return self.is_staff and self.groups.filter(name='editor').exists() or self.is_superuser
 
 
 class Contest(models.Model):

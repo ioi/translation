@@ -1,4 +1,5 @@
 from collections import defaultdict
+import logging
 
 from django import forms
 from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, Http404
@@ -15,9 +16,12 @@ from django.db import transaction
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, Contestant, UserContest, ContestantContest, Country
-from trans.utils.pdf import build_final_pdf, merge_final_pdfs, BatchRecipe, RecipeContestant
+from trans.utils.pdf import build_final_pdf, merge_final_pdfs
+from trans.utils.batch import BatchRecipe, RecipeContestant
 from trans.utils.translation import get_trans_by_user_and_task, is_translate_in_editing, unleash_edit_token
 import trans.utils.print_job_queue as print_job_queue
+
+logger = logging.getLogger(__name__)
 
 
 class AdminCheckMixin(LoginRequiredMixin, object):
@@ -307,56 +311,93 @@ class StaffFreezeTranslation(StaffCheckMixin, FreezeTranslationView):
         return redirect(request.META.get('HTTP_REFERER'))
 
 
-class FreezeUserContest(LoginRequiredMixin, View):
+class FreezeForm(forms.ModelForm):
+    class Meta:
+        model = UserContest
+        fields = ['skip_verification', 'note']
+        widgets = {
+            'note': forms.Textarea(attrs={'cols': 80, 'rows': 3}),
+        }
+
+
+class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
+    @transaction.atomic
+    def _handle(self, request, username, contest_id, is_post):
+        self.init_user(request, username)
+        self.init_contest(request, contest_id)
+
+        self.tasks = self.contest.task_set.order_by('order')
+        self.errors = []
+        user_contest, _ = UserContest.objects.get_or_create(contest=self.contest, user=self.user)
+        self.batch_recipe = BatchRecipe(contest=self.contest, for_user=self.user, user_contest=user_contest)
+
+        if self.user.is_staff:
+            self.errors.append('Staff does not have translations')
+        elif self.user.is_onsite or self.user.is_translating:
+            if self.user.is_translating:
+                self.check_own_translations()
+            if self.user.is_onsite:
+                self.make_recipe()
+        else:
+            self.errors.append('You neither have on-site contestants nor you are translating')
+
+        if self.errors:
+            form = None
+        else:
+            if is_post:
+                form = FreezeForm(request.POST, instance=user_contest)
+                if form.is_valid() and not self.errors:
+                    pdf = self.batch_recipe.build_pdf()
+                    user_contest.frozen = True
+                    user_contest.sealed = False
+                    user_contest.save()
+                    print_job_queue.handle_user_contest_frozen(user_contest, pdf)
+                    return redirect('home')
+            else:
+                form = FreezeForm(instance=user_contest)
+
+        return render(request, 'freeze_user_contest.html', context={
+            'form': form,
+            'contest': self.contest,
+            'for_user': self.user,
+            'user': request.user,
+            'errors': self.errors,
+        })
+
+    def check_own_translations(self):
+        for task in self.tasks:
+            trans = Translation.objects.filter(user=self.user, task=task).first()
+            if not trans:
+                self.errors.append(f'Task {task.name} has no translation')
+            elif not trans.frozen:
+                self.errors.append(f'Task {task.name} translation is not frozen')
+
+    def make_recipe(self):
+        for ctant in Contestant.objects.filter(user=self.user).order_by('code'):
+            if not ctant.on_site:
+                continue
+
+            ct_recipe = self.batch_recipe.add_contestant(ctant)
+            cc = ContestantContest.obtain(ctant, self.contest, self.user)
+            by_user = cc.translation_by_user
+            if by_user is not None:
+                for task in self.tasks:
+                    trans = Translation.objects.filter(user=cc.translation_by_user, task=task).first()
+                    err = None
+                    if not trans:
+                        err = 'which does not exist'
+                    elif not trans.frozen:
+                        err = 'which is not frozen'
+                    elif trans.translating:
+                        ct_recipe.translations.append(trans)
+                    if err is not None and by_user != self.user:
+                        self.errors.append(f'Contestant {ctant.code} requests translation of {task.name} to {by_user.language.name} ({by_user.country.name}) {err}')
+
+    def get(self, request, username, contest_id):
+        return self._handle(request, username, contest_id, False)
+
     def post(self, request, username, contest_id):
-        note = request.POST.get('note', '')
-        user = User.objects.get(username=username)
-        contest = Contest.objects.filter(id=contest_id).first()
-        if contest is None:
-            return HttpResponseNotFound('There is no contest')
-
-        extra_country_1_code = request.POST.get('extra_country_1_code', '')
-        extra_country_2_code = request.POST.get('extra_country_2_code', '')
-        extra_country_1_count = int(request.POST.get('extra_country_1_count', 0))
-        extra_country_2_count = int(request.POST.get('extra_country_2_count', 0))
-
-        if extra_country_1_count > 0 and extra_country_2_count > 0 and\
-            extra_country_1_code == extra_country_2_code and\
-            extra_country_1_code:
-            return HttpResponseBadRequest(
-                'The extra countries cannot be the same.')
-        if extra_country_1_code and extra_country_1_count == 0 or\
-            extra_country_2_code and extra_country_2_count == 0:
-            return HttpResponseBadRequest('Number of copies should be positive.')
-        if not extra_country_1_code and extra_country_1_count > 0 or\
-            not extra_country_2_code and extra_country_2_count > 0:
-            return HttpResponseBadRequest(
-                'Extra countries (with copies) must be non-empty.')
-
-        user_contest, created = UserContest.objects.get_or_create(contest=contest, user=user)
-        user_contest.frozen = True
-        user_contest.sealed = False
-        user_contest.extra_country_1_code = extra_country_1_code
-        user_contest.extra_country_2_code = extra_country_2_code
-        user_contest.extra_country_1_count = extra_country_1_count
-        user_contest.extra_country_2_count = extra_country_2_count
-        user_contest.note = note
-        user_contest.save()
-
-        translated_tasks = []
-        for task in contest.task_set.all():
-            translation = get_trans_by_user_and_task(user, task)
-            if translation.final_pdf and translation.translating != False:
-                translated_tasks.append(task)
-        merge_final_pdfs(
-            [task.name for task in translated_tasks],
-            contest.slug,
-            user.language_code)
-
-        print_job_queue.handle_user_contest_frozen_change(user_contest)
-
-#        return redirect(to=reverse('user_trans', kwargs={'username': username}))
-        return redirect(request.META.get('HTTP_REFERER'))
+        return self._handle(request, username, contest_id, True)
 
 
 class UnfreezeUserContest(LoginRequiredMixin, View):
@@ -368,7 +409,7 @@ class UnfreezeUserContest(LoginRequiredMixin, View):
         user_contest = UserContest.objects.filter(contest=contest, user=user).first()
         if user_contest is not None:
             user_contest.frozen = False
-            print_job_queue.handle_user_contest_frozen_change(user_contest)
+            print_job_queue.handle_user_contest_unfrozen(user_contest)
             user_contest.delete()
 #        return redirect(to=reverse('user_trans', kwargs={'username': username}))
         return redirect(request.META.get('HTTP_REFERER'))
@@ -407,6 +448,7 @@ class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
             (u.id, f'{u.language.name} ({u.country.name})')
             for u in translating_users
         ]
+        trans_choices.insert(0, ("-", "No translation"))
 
         class TransSettingsForm(forms.BaseForm):
             base_fields = {}
@@ -421,13 +463,19 @@ class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
                 for c in contestants:
                     if c.on_site:
                         cc, _ = ContestantContest.objects.get_or_create(contest=self.contest, contestant=c)
-                        cc.translation_by_user_id = form.cleaned_data[f'trans_{c.id}']
+                        trans_by = form.cleaned_data[f'trans_{c.id}']
+                        if trans_by == "-":
+                            cc.translation_by_user_id = None
+                        else:
+                            cc.translation_by_user_id = trans_by
                         cc.save()
                 return redirect('home')
         else:
-            form_init = {f'trans_{c.id}': request.user.id for c in contestants if c.on_site}
-            for cc in ContestantContest.objects.filter(contestant__in=contestants, contest=self.contest):
-                form_init[f'trans_{cc.contestant_id}'] = cc.translation_by_user_id
+            form_init = {}
+            for c in contestants:
+                if c.on_site:
+                    cc = ContestantContest.obtain(c, self.contest, self.user)
+                    form_init[f'trans_{c.id}'] = cc.translation_by_user_id or "-"
             form = TransSettingsForm(initial=form_init)
 
         return render(request, 'edit_user_contest.html', context={

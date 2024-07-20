@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %} Freeze contest: {{ contest.title }} ({{ for_user.country.code }}) {% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="col-md-12 col-lg-10 col-lg-offset-1">
+    <h2>{{ contest.title }} ({{ for_user.country.name }})</h2>
+
+    {% if errors %}
+      <div class="alert alert-danger">
+        <p>Your translation cannot be submitted:</p>
+        <ul>
+          {% for err in errors %}
+            <li>{{ err }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="button-row">
+        <a class="btn btn-default" href="{% url 'home' %}">
+          Back
+        </a>
+      </div>
+    {% endif %}
+
+    {% if form %}
+      <p>Your translation is ready to be submitted.</p>
+
+      <form method="POST" action="">
+        {% csrf_token %}
+        <table class="table-form">
+          {{ form.as_table }}
+        </table>
+
+        <div class="button-row">
+          <button type="submit" class="btn btn-success">
+            Submit
+          </button>
+          <a class="btn btn-danger" href="{% url 'home' %}">
+            Cancel
+          </a>
+        </div>
+      </form>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

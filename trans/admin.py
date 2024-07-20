@@ -9,7 +9,7 @@ from import_export.resources import ModelResource
 from import_export.fields import Field
 from import_export.widgets import ForeignKeyWidget
 import import_export.tmp_storages
-from trans.utils import reset_notification_cache
+from trans.utils.notification import reset_notification_cache
 from .models import *
 from django.shortcuts import render
 

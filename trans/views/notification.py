@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadReque
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from trans.models import Notification, User
-from trans.utils import get_all_notifs, read_this_notif, read_all_notifs, reset_notification_cache
+from trans.utils.notification import get_all_notifs, read_this_notif, read_all_notifs, reset_notification_cache
 from trans.views.admin import StaffCheckMixin
 
 

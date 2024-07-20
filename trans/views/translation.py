@@ -13,11 +13,11 @@ from django.urls import reverse
 
 import datetime
 
-from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
+from trans.utils.translation import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
-    can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
-    pdf_response, get_requested_user, build_printed_draft_pdf, render_pdf_template
-from trans.utils.pdf import get_file_name_from_path, build_pdf
+    can_user_change_translation, get_requested_user
+from trans.utils.pdf import get_file_name_from_path, build_pdf, convert_html_to_pdf, add_page_numbers_to_pdf, \
+    pdf_response, build_printed_draft_pdf, render_pdf_template
 
 from print_job_queue import queue
 

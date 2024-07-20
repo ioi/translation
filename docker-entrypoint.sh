@@ -42,7 +42,7 @@ if [[ $# -eq 0 ]]; then
         --access-logfile logs/gunicorn-access.log \
         --error-logfile logs/gunicorn-error.log \
         $GUNICORN_OPTIONS \
-        >>logs/gunicorn.log 2>&1
+        >>logs/gunicorn-error.log 2>&1
 fi
 
 exec "$@"

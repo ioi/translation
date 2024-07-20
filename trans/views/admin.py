@@ -2,8 +2,6 @@ from collections import defaultdict
 
 import os
 import requests
-from django.contrib.auth.decorators import permission_required
-from django.http.response import HttpResponseBadRequest
 
 from django.core.files import File
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -225,7 +223,6 @@ class UsersList(StaffCheckMixin, View):
 
 
 class AddFinalPDF(StaffCheckMixin, View):
-    # @permission_required('trans.change_translation')
     def post(self, request):
         id = request.POST['trans_id']
         trans = Translation.objects.filter(id=id).first()

@@ -4,8 +4,6 @@ Global
 
 @import url(../fonts/SourceSansPro/SourceSansPro.css);
 
-/*@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600);*/
-
 
 body {
     font-family: Arial, sans-serif;
@@ -71,6 +69,10 @@ a:hover {
     text-align: right;
 }
 
+.button-row {
+    text-align: center;
+}
+
 .btn:focus {
     outline: none !important;
 }
@@ -89,7 +91,6 @@ a:hover {
     vertical-align: middle;
 }
 
-/* ioi2019 */
 .table td,  th {
     text-align: center;
 }
@@ -112,6 +113,10 @@ a:hover {
 
 .fa-btn {
     cursor: pointer;
+}
+
+.form-inline {
+    display: inline;
 }
 
 #diff-selectbox {

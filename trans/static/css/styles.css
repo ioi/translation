@@ -69,6 +69,11 @@ a:hover {
     text-align: right;
 }
 
+.table-form>tbody>tr>th {
+    padding: 1em;
+    text-align: right;
+}
+
 .button-row {
     text-align: center;
 }

@@ -287,26 +287,16 @@
         {% if is_onsite or is_translating %}
           {% if not cinfo.user_contest or not cinfo.user_contest.frozen %}
             <div class="button-row">
-              {# Settings #}
               <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
                 Edit contestants
               </a>
-
-              {# Submit #}
-              <form
-                class="form-inline"
-                method="post"
-                action="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
-                {% csrf_token %}
-
-                <button type="submit" class="btn btn-success">
-                  {% if is_translating %}
-                    Submit my finalized translation
-                  {% else %}
-                    Submit
-                  {% endif %}
-                </button>
-              </form>
+              <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
+                {% if is_translating %}
+                  Submit finalized translation
+                {% else %}
+                  Submit
+                {% endif %}
+              </a>
             </div>
           {% endif %}
         {% endif %}

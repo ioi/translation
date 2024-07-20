@@ -12,27 +12,21 @@ from print_job_queue import models as print_job_queue_models
 
 
 class User(DjangoUser):
-    # User name "ISC" is reserved for the main editor and matched
-    # explicitly at various places throught the code.
-
     language = models.ForeignKey('Language', on_delete=models.deletion.CASCADE)
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)
     text_font_name = models.CharField(max_length=255, default='', blank=True)
-    # FIXME: Remove
-    num_of_contestants = models.PositiveIntegerField(default=0)
+    is_onsite = models.BooleanField(default=True,
+                                    verbose_name='Is on-site',
+                                    help_text='User is present on-site (e.g., this allows printing)')
+    is_translating = models.BooleanField(default=True,
+                                         verbose_name='Is translating')
 
     def __str__(self):
         return self.username
 
     def credentials(self):
         return self.country.name + '_' + self.language.name
-
-    def has_contestants(self):
-        return self.num_of_contestants > 0
-
-    def is_translating(self):
-        return self.language.code != 'en'
 
     @property
     def raw_password(self):
@@ -56,6 +50,9 @@ class User(DjangoUser):
         return User.objects.filter(is_staff=False)
 
     def is_editor(self):
+        # Check if the user is an editor of the official English version.
+        # Typically, there is only one editor named "ISC" (CAVEAT: there are
+        # checks in the code for the particular name!).
         return self.groups.filter(name='editor').exists() or self.is_superuser
 
 

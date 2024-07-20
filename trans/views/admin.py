@@ -2,7 +2,9 @@ from collections import defaultdict
 
 import os
 import requests
+from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, Http404
 
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.files import File
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
@@ -10,7 +12,6 @@ from django.urls.base import reverse
 from django.views.generic import View
 from django.conf import settings
 
-from django.http import HttpResponseNotFound
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, UserContest, Country
@@ -19,8 +20,7 @@ from trans.utils.pdf import build_final_pdf, merge_final_pdfs
 from trans.utils.translation import get_trans_by_user_and_task
 
 
-
-class AdminCheckMixin(LoginRequiredMixin,object):
+class AdminCheckMixin(LoginRequiredMixin, object):
     user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
 
     def check_user(self, user):
@@ -63,6 +63,31 @@ class EditorCheckMixin(LoginRequiredMixin, object):
         if not self.check_user(request.user):
             return self.user_check_failed(request, *args, **kwargs)
         return super(EditorCheckMixin, self).dispatch(request, *args, **kwargs)
+
+
+class RightsCheckMixin(object):
+    user = None
+    contest = None
+
+    def init_user(self, request, username):
+        try:
+            self.user = User.objects.get(username=username)
+        except ObjectDoesNotExist:
+            raise Http404('User not found')
+        if self.user.id != request.user.id and not request.user.is_superuser and not request.user.is_staff:
+            raise PermissionDenied('You cannot edit this user')   # Generates HTTP 403
+
+    def init_contest(self, request, contest_id):
+        try:
+            self.contest = Contest.objects.get(id=contest_id)
+        except ObjectDoesNotExist:
+            raise Http404('Contest not found')
+        if self.contest.frozen or not self.contest.public:
+            raise PermissionDenied('You cannot edit this contest')
+
+        uc = UserContest.objects.filter(user=self.user, contest=self.contest).first()
+        if uc and uc.frozen:
+            raise PermissionDenied('You cannot edit this contest after you froze it')
 
 
 class UserTranslations(StaffCheckMixin, View):

@@ -6,8 +6,8 @@
 
 <script type="text/javascript">
     if(performance.navigation.type == 2) {
-		location.reload(true);
-	}
+                location.reload(true);
+        }
 </script>
 
 <div class="container">
@@ -18,19 +18,23 @@
       </div>
     {% endif %}
 
-    {% for contest in tasks_lists %}
-      <h2>{{ contest.title }}</h2>
+    {% for cinfo in contest_infos %}
+      <h2>{{ cinfo.title }}</h2>
 
-      {% if not is_editor %}
+      {% if is_editor %}
+        <h4>You are editing the primary English version.</h4>
+      {% else %}
         {% if is_translating %}
           <h4>Your team is translating into <b>{{ user.language.name }} ({{ user.language_code }})</b>.</h4>
         {% else %}
-          <h4> Your team is not translating.</h4>
+          <h4>Your team is not translating.</h4>
         {% endif %}
       {% endif %}
       <br>
 
+      {# Task table #}
       <table class="table table-hover">
+
         <thead>
           <tr>
             <th width="15%">Task</th>
@@ -47,17 +51,20 @@
               {% endif %}
               <th>ISC Version</th>
             {% endif %}
-            </tr>
+          </tr>
         </thead>
+
         <tbody>
-          {% for task in contest.tasks %}
+          {% for task in cinfo.tasks %}
             <tr
               class="task-row"
-              data-contest-slug="{{ contest.slug }}"
+              data-contest-slug="{{ cinfo.slug }}"
               data-task-name="{{ task.name }}"
               data-task-frozen="{{ task.frozen|yesno:'True,False' }}">
-              <td> {{ task.name }} </td>
-              {% if is_translating or is_editor %}
+              <td>{{ task.name }}</td>
+
+              {% if is_editor or is_translating %}
+                {# Edit #}
                 <td>
                   {% if task.is_editing %}
                     Is editing
@@ -68,47 +75,50 @@
                       Not translating
                     {% endif %}
                   {% else %}
-                    <a href="{% url 'edit' contest.slug task.name %}">Edit</a>
+                    <a href="{% url 'edit' cinfo.slug task.name %}" class="btn btn-default">Edit</a>
                   {% endif %}
                 </td>
+
+                {# Edit buttons #}
                 <td>
-                  <a href="{% url 'revisions' 'task' contest.slug task.name %}"
+                  <a href="{% url 'revisions' 'task' cinfo.slug task.name %}"
                      class="btn btn-default"
                      title="History">
                     <i class="fa fa-btns fa-history fa-lg"></i>
                   </a>
                   {% if not task.frozen or task.translating %}
-                    <a href="{% url 'task_pdf' 'task' contest.slug task.name %}"
+                    <a href="{% url 'task_pdf' 'task' cinfo.slug task.name %}"
                       class="btn btn-default"
                       title="PDF">
                       <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
                   </a>
                   {% endif %}
-                  {% if not task.frozen and has_contestants %}
+                  {% if not task.frozen and is_onsite %}
                     <button
-                      onclick="sendPrint('{% url 'task_print' 'task' contest.slug task.name %}')"
+                      onclick="sendPrint('{% url 'task_print' 'task' cinfo.slug task.name %}')"
                       class="btn btn-default"
                       title="Print a copy">
                       <i class="fa fa-btn fa-print fa-lg"></i>
                     </button>
                   {% endif %}
-		  {% if task.is_editing %}
+                  {% if task.is_editing %}
                     <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}" style="display: inline">
                       {% csrf_token %}
-		      <button
-			type="submit"
-			class="btn btn-danger"
-			title="Break edit lock">
-			<i class="fa fa-btns fa-bolt fa-lg"></i>
-		      </button>
+                      <button
+                        type="submit"
+                        class="btn btn-danger"
+                        title="Break edit lock">
+                        <i class="fa fa-btns fa-bolt fa-lg"></i>
+                      </button>
                     </form>
                   {% endif %}
                 </td>
-                </td>
               {% endif %}
-              {% if not is_editor and is_translating %}
+
+              {% if is_translating %}
+                {# Finalization #}
                 <td>
-                  {% if contest.user_contest is None or not contest.user_contest.frozen %}
+                  {% if cinfo.user_contest is None or not cinfo.user_contest.frozen %}
                     <form method="post" action="{% url 'user_freeze_trans' task_name=task.name %}">
                       {% csrf_token %}
                       <input
@@ -152,172 +162,161 @@
                   {% endif %}
                 </td>
               {% endif %}
+
               <td>
+                {# ISC Version #}
                 {% if not is_editor %}
+                  {# Editors had revision history already displayed among the edit buttons #}
                   <a
-                    href="{% url 'revisions' 'released' contest.slug task.name %}"
+                    href="{% url 'revisions' 'released' cinfo.slug task.name %}"
                     class="btn btn-default"
                     title="History">
                     <i class="fa fa-btns fa-history fa-lg"></i>
                   </a>
                 {% endif %}
-                  <!-- <a href="{% url 'task_md' 'released' contest.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> -->
-                  <a
-                    href="{% url 'task_pdf' 'released' contest.slug task.name %}"
+                {# <a href="{% url 'task_md' 'released' cinfo.slug task.name %}" class="btn btn-default" title="Markdown"><i class="fa fa-btn fa-file-text-o fa-lg"></i></a> #}
+                <a
+                  href="{% url 'task_pdf' 'released' cinfo.slug task.name %}"
+                  class="btn btn-default"
+                  title="PDF">
+                  <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
+                </a>
+                {% if is_onsite %}
+                  <button
+                    onclick="sendPrint('{% url 'task_print' 'released' cinfo.slug task.name %}')"
                     class="btn btn-default"
-                    title="PDF">
-                    <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
-                  </a>
-                  {% if is_editor and has_contestants %}
-                      <button
-                        onclick="sendPrint('{% url 'task_print' 'released' contest.slug task.name %}')"
-                        class="btn btn-default"
-                        title="Print a copy">
-                        <i class="fa fa-btn fa-print fa-lg"></i>
-                      </button>
-                  {% endif %}
+                    title="Print a copy">
+                    <i class="fa fa-btn fa-print fa-lg"></i>
+                  </button>
+                {% endif %}
               </td>
+
+            {# End of task #}
             </tr>
           {% endfor %}
         </tbody>
       </table>
 
       {% if not is_editor %}
-        {% if contest.user_contest %}
+        {# Contestants, sealing etc. #}
+
+        {# Status of finalization #}
+        {% if cinfo.user_contest and cinfo.user_contest.frozen %}
           {% if is_translating %}
             <div class="alert alert-success">
-              Your translation has been submitted.
-            </div>
-          {% endif %}
+              <p>Your translation has been submitted.</p>
 
-          {% if has_contestants %}
-            {% if contest.user_contest.sealed %}
-            <div class="alert alert-success">
-              <p><b>All set!</b> You have verified and sealed your contestant envelopes.</p>
-            {% else %}
-            <div class="alert alert-info">
-              <p><b>We are preparing your contestant envelopes.</b></p>
-              <p>Please wait for a runner to approach your desk to verify and seal the envelopes.</p>
-            {% endif %}
-
-              {% with extra_country_1_code=contest.user_contest.extra_country_1_code %}
-              {% with extra_country_1_count=contest.user_contest.extra_country_1_count %}
-              {% with extra_country_2_code=contest.user_contest.extra_country_2_code %}
-              {% with extra_country_2_count=contest.user_contest.extra_country_2_count %}
-              {% if extra_country_1_count > 0 or extra_country_2_count > 0 %}
-                <p>Requested additional translations:</p>
-                <ul>
-                  {% if extra_country_1_count > 0 and extra_country_1_code %}
-                    {% for user in translating_users %}
-                      {% if user.country.code == extra_country_1_code %}
-                        <li>
-                          <b>{{ user.language.name }} ({{ user.language_code }})</b>
-                          for {{ extra_country_1_count }} contestants
-                        </li>
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
-                  {% if extra_country_2_count > 0 and extra_country_1_code %}
-                    {% for user in translating_users %}
-                      {% if user.country.code == extra_country_2_code %}
-                        <li>
-                          <b>{{ user.language.name }} ({{ user.language_code }})</b>
-                          for {{ extra_country_2_count }} contestants
-                        </li>
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
-                </ul>
+              {% if cinfo.user_contest.note %}
+                <p><b>Note:</b> {{cinfo.user_contest.note}}</p>
               {% endif %}
-              {% endwith %}
-              {% endwith %}
-              {% endwith %}
-              {% endwith %}
             </div>
           {% endif %}
-	  <br>
-          {% if contest.user_contest.note %}
-            <b>Note:</b>
-            {{contest.user_contest.note}}
+
+          {% if is_onsite %}
+            {% if cinfo.user_contest.skip_verification %}
+              {# Simplified protocol with no verification #}
+              <div class="alert alert-success">
+                <p><b>All set!</b> You chose not to verify your contestant envelopes.</p>
+              </div>
+            {% else %}
+              {# Full protocol with verification #}
+              {% if cinfo.user_contest.sealed %}
+                <div class="alert alert-success">
+                  <p><b>All set!</b> You have verified and sealed your contestant envelopes.</p>
+                </div>
+              {% else %}
+                <div class="alert alert-info">
+                  <p><b>We are preparing your contestant envelopes.</b></p>
+                  <p>Please wait for a runner to approach your desk to verify and seal the envelopes.</p>
+                </div>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            {# Remote contestants: submit is enough #}
+            <div class="alert alert-success">
+              <p><b>All set!</b> Your contestants will receive task statements in the CMS.</p>
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {# Summary: what will contestants receive #}
+        {% if is_onsite %}
+          {% if is_translating %}
+            <p>Your contestants will receive printed <b>English</b> statements and the following translations:</p>
+
+            {# Languages for contestants #}
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Translation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ctant, trans in cinfo.contestant_translations %}
+                  <tr>
+                    <td>{{ ctant.code }}</td>
+                    <td>{{ ctant.name }}</td>
+                    <td>
+                      {% if ctant.on_site %}
+                        {% if trans %}
+                          {{ trans }}
+                        {% else %}
+                          <i>no translation requested</i>
+                        {% endif %}
+                      {% else %}
+                        <i>online contestants receive all translations in CMS</i>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+          {% else %}
+            <p>Your contestants will receive printed <b>English</b> statements.</p>
           {% endif %}
         {% else %}
-          <br>
-          <form
-            class="form-inline"
-            method="post"
-	    data-contest-slug="{{ contest.slug }}"
-            action="{% url 'freeze_user_contest' username=user.username contest_id=contest.id%}">
-            {% csrf_token %}
-
-            {% if has_contestants %}
-              <br>
-              {% if is_translating %}
-                <p>Your contestants will receive printed <b>English</b> statements and <b>{{ user.language.name }}</b> translation above.</p>
-              {% else %}
-                <p>Your contestants will receive printed <b>English</b> statements.</p>
-              {% endif %}
-
-              <p>You can also request up to two additonal printed translations:</p>
-
-              Additional translation #1:
-              <select name="extra_country_1_code">
-                <option value="">None</option>
-                {% for user in translating_users %}
-                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language_code }})</option>
-                {% endfor %}
-              </select>
-              for
-              <select name="extra_country_1_count">
-                <option value="0">0</option>
-                {% for copy in ''|center:user.num_of_contestants %}
-                  <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
-                {% endfor %}
-              </select>
-              contestants.
-
-              <br>
-
-              Additional translation #2:
-              <select name="extra_country_2_code">
-                <option value="">None</option>
-                {% for user in translating_users %}
-                  <option value="{{ user.country.code }}">{{ user.language.name }} ({{ user.language_code }})</option>
-                {% endfor %}
-      				</select>
-              for
-              <select name="extra_country_2_count">
-                <option value="0">0</option>
-                {% for copy in ''|center:user.num_of_contestants %}
-                  <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
-                {% endfor %}
-              </select>
-              contestants.
-              
-              <br>
-              <br>
-            {% endif %}
-
-            {% if has_contestants or is_translating %}
-              <button
-                type="submit"
-                id="final_submit"
-                class="btn btn-success"
-                style="margin:0 auto;display:block;"
-                onclick="return validateFinalizeTranslation(
-                        '{{ contest.slug }}',
-                        {{ contest.tasks|length }},
-                        '{{ is_translating }}');" >
-                {% if is_translating %}
-                  Submit my finalized translation
-                {% else %}
-                  Submit
-                {% endif %}
-              </button>
-            {% endif %}
-          </form>
+          {% if is_translating %}
+            <p>Your contestants will receive all translations in the CMS.</p>
+          {% endif %}
         {% endif %}
+
+        {# Buttons for submitting translations and changing settings #}
+        {% if is_onsite or is_translating %}
+          {% if not cinfo.user_contest or not cinfo.user_contest.frozen %}
+            <div class="button-row">
+              {# Settings #}
+              <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
+                Edit contestants
+              </a>
+
+              {# Submit #}
+              <form
+                class="form-inline"
+                method="post"
+                action="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-success">
+                  {% if is_translating %}
+                    Submit my finalized translation
+                  {% else %}
+                    Submit
+                  {% endif %}
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        {% endif %}
+
+      {# End of contestants, sealing etc. #}
       {% endif %}
+
+    {# End of contest #}
     {% endfor %}
+
   </div>
 </div>
 

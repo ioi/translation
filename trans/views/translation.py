@@ -1,6 +1,5 @@
 import errno
 import logging
-import urllib
 
 from django.http.response import HttpResponseNotFound
 from django.forms.models import model_to_dict
@@ -8,22 +7,17 @@ from django.forms.models import model_to_dict
 from django.views.generic import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from trans.models import User, Task, Translation, Version, Contest, Country, FlatPage, UserContest
+from trans.models import User, Task, Translation, Version, Contest, Country, FlatPage, UserContest, Contestant, ContestantContest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.urls import reverse
-from django.conf import settings
 
-import os
-import requests
 import datetime
 
-from trans.forms import UploadFileForm
 from trans.utils import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, convert_html_to_pdf, add_page_numbers_to_pdf, \
     pdf_response, get_requested_user, build_printed_draft_pdf, render_pdf_template
 from trans.utils.pdf import get_file_name_from_path, build_pdf
-from trans.views.admin import FreezeUserContest
 
 from print_job_queue import queue
 
@@ -33,22 +27,36 @@ logger = logging.getLogger(__name__)
 class Home(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user.username)
+        is_editor = user.is_editor()
+
         home_flat_page_slug = 'home-editor' if user.is_editor() else 'home'
         home_flat_page = FlatPage.objects.filter(slug=home_flat_page_slug).first()
         home_content = home_flat_page.content if home_flat_page else ''
-        translating_users = User.objects.exclude(groups__name__exact=['staff', 'editor'])
-        if not user.is_editor():
-            translating_users = translating_users.select_related('language', 'country').exclude(language__code__exact='en').exclude(country__user=user).order_by('language__name')
-        tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
-        for task in Task.objects.order_by('order'):
-            if not user.is_editor() and not (task.is_published() and task.contest.public):
+
+        if is_editor:
+            contests = Contest.objects.order_by('-order')
+            contestants = []
+        else:
+            contests = Contest.objects.filter(public=True).order_by('-order')
+            contestants = Contestant.objects.filter(user=user).order_by('code')
+
+        contest_info = {c: {
+            'title': c.title,
+            'slug': c.slug,
+            'id': c.id,
+            'tasks': [],
+            'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+        } for c in contests}
+
+        for task in Task.objects.filter(contest__in=contests).order_by('order'):
+            if not (is_editor or task.is_published()):
                 continue
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
             frozen = translation and translation.is_editable_by(user)
             translating = translation and translation.translating
-            translation_id = translation.id if translation else None    # neo added
-            tasks_by_contest[task.contest].append({
+            translation_id = translation.id if translation else None
+            contest_info[task.contest]['tasks'].append({
                 'id': task.id,
                 'name': task.name,
                 'trans_id': translation_id,
@@ -56,28 +64,37 @@ class Home(LoginRequiredMixin, View):
                 'frozen': frozen,
                 'translating': translating,
             })
-        tasks_lists = [
-            {
-                'title': c.title,
-                'slug': c.slug,
-                'id': c.id,
-                'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
-                'tasks': tasks_by_contest[c]
-            }
-            for c in Contest.objects.order_by('-order')
-            if len(tasks_by_contest[c]) > 0
-        ]
-        contests = Contest.objects.order_by('order')
+
+        if not is_editor:
+            contest_contestant = {}
+            for cc in ContestantContest.objects.filter(contest__in=contests, contestant__in=contestants).select_related('translation_by_user', 'translation_by_user__language', 'translation_by_user__country'):
+                contest_contestant[cc.contest, cc.contestant] = cc
+
+            for contest, cinfo in contest_info.items():
+                cinfo['contestant_translations'] = contestant_translations = []
+                for ctant in contestants:
+                    cc = contest_contestant.get((contest, ctant), None)
+                    if cc is None:
+                        cc = ContestantContest.obtain(ctant, contest, user)
+                    tu = cc.translation_by_user
+                    if tu:
+                        tr = f'{tu.language.name} ({tu.country.name})'
+                        if tu == user:
+                            tr += ' – your translation'
+                    else:
+                        tr = None
+                    contestant_translations.append((ctant, tr))
+
         return render(request, 'home.html', context={
             'user': user,
-            'tasks_lists': tasks_lists,
+            'contests': contests,   # used by modals.html
+            'contest_infos': [ci for ci in contest_info.values() if ci['tasks']],
             'home_content': home_content,
-            'translating_users': translating_users,
-            'contests': contests,
             'is_editor': user.is_editor(),
-            'has_contestants': user.has_contestants(),
-            'is_translating': user.is_translating(),
+            'is_onsite': user.is_onsite,
+            'is_translating': user.is_translating,
         })
+
 
 class Healthcheck(View):
     def get(self, request):

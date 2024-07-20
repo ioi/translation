@@ -15,9 +15,9 @@ from django.db import transaction
 from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, Contestant, UserContest, ContestantContest, Country
-from trans.utils import is_translate_in_editing, unleash_edit_token, print_job_queue
-from trans.utils.pdf import build_final_pdf, merge_final_pdfs
-from trans.utils.translation import get_trans_by_user_and_task
+from trans.utils.pdf import build_final_pdf, merge_final_pdfs, BatchRecipe, RecipeContestant
+from trans.utils.translation import get_trans_by_user_and_task, is_translate_in_editing, unleash_edit_token
+import trans.utils.print_job_queue as print_job_queue
 
 
 class AdminCheckMixin(LoginRequiredMixin, object):

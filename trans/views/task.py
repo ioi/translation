@@ -5,7 +5,7 @@ from django.views.generic import View
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 
-from trans.utils import get_trans_by_user_and_task
+from trans.utils.translation import get_trans_by_user_and_task
 from trans.models import Task, User, Contest
 from trans.views.admin import EditorCheckMixin
 

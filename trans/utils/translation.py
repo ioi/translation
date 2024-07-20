@@ -1,6 +1,6 @@
 import datetime
 
-from trans.utils import edit_token
+import trans.utils.edit_token as edit_token
 
 
 def get_task_by_contest_and_name(contest_slug, task_name, is_editor=False):

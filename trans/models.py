@@ -216,6 +216,14 @@ class ContestantContest(models.Model):
             models.UniqueConstraint(fields=['contestant', 'contest'], name='unique_ctant_contest'),
         ]
 
+    @classmethod
+    def obtain(cls, contestant, contest, user):
+        cc, created = cls.objects.get_or_create(contestant=contestant, contest=contest)
+        if created:
+            if contestant.on_site and user.is_translating:
+                cc.translation_by_user = user
+            cc.save()
+        return cc
 
 
 class Version(models.Model):

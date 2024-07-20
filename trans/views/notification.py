@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from trans.models import Notification, User
 from trans.utils import get_all_notifs, read_this_notif, read_all_notifs, reset_notification_cache
-from trans.views.admin import StaffRequiredMixin
+from trans.views.admin import StaffCheckMixin
 
 
 class ReadNotifications(LoginRequiredMixin, View):
@@ -34,7 +34,7 @@ class ReadNotifications(LoginRequiredMixin, View):
         return HttpResponse("Success")
 
 
-class SendNotification(StaffRequiredMixin, View):
+class SendNotification(StaffCheckMixin, View):
     def post(self, request):
         title = request.POST['title']
         description = request.POST['description']

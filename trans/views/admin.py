@@ -65,21 +65,6 @@ class EditorCheckMixin(LoginRequiredMixin, object):
         return super(EditorCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
-class StaffRequiredMixin(LoginRequiredMixin, object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
-    def check_user(self, user):
-        return user.is_superuser or user.is_staff
-
-    def user_check_failed(self, request, *args, **kwargs):
-        return redirect(self.user_check_failure_path)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.check_user(request.user):
-            return self.user_check_failed(request, *args, **kwargs)
-        return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
-
-
 class UserTranslations(StaffCheckMixin, View):
     def get(self, request, username):
         user = User.objects.get(username=username)

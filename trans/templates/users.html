@@ -39,15 +39,15 @@
                 {% endif %}
               </td>
               <td>
-                {% if user.has_contestants %}
-                  {{ user.num_of_contestants }}
+                {% if user.is_onsite %}
+                  999
                 {% else %}
                   -
                 {% endif %}
               </td>
               <td>
                 {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
-                  {% if not user.has_contestants %}
+                  {% if not user.is_onsite %}
                     <!-- Team is fully remote -->
                     {% if not user.is_translating or user_contest is not none and user_contest.frozen %}
                       <!-- If team is not translating, or has finished translation -->

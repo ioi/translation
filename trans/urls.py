@@ -35,9 +35,9 @@ urlpatterns = [
           path('upload_final_pdf/', AddFinalPDF.as_view(), name='upload_final_pdf'),
           path('user_freeze_trans/<str:task_name>/', UserFreezeTranslation.as_view(), name='user_freeze_trans'),
           path('staff_freeze_trans/<str:task_name>/<str:username>/', StaffFreezeTranslation.as_view(), name='staff_freeze_trans'),
-          path('freeze_user_contest/<str:username>/<str:contest_id>/', FreezeUserContest.as_view(), name='freeze_user_contest'),
-          path('unfreeze_user_contest/<str:username>/<str:contest_id>/', UnfreezeUserContest.as_view(), name='unfreeze_user_contest'),
-          path('seal_user_contest/<str:username>/<str:contest_id>/', SealUserContest.as_view(), name='seal_user_contest'),
+          path('freeze_user_contest/<str:username>/<int:contest_id>/', FreezeUserContest.as_view(), name='freeze_user_contest'),
+          path('unfreeze_user_contest/<str:username>/<int:contest_id>/', UnfreezeUserContest.as_view(), name='unfreeze_user_contest'),
+          path('seal_user_contest/<str:username>/<int:contest_id>/', SealUserContest.as_view(), name='seal_user_contest'),
           path('unleash_edit_token/<str:id>/', UnleashEditTranslationToken.as_view(), name='unleash_edit_token'),
 
           path('notifications/', ReadNotifications.as_view(), name='notifications'),

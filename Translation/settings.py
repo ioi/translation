@@ -120,25 +120,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 SESSION_COOKIE_SECURE = int(os.environ.get('SESSION_COOKIE_SECURE', 1)) != 0
 
-# Password validation
-# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-
 # RAVEN_CONFIG = {
 #     'dsn': os.environ['RAVEN_DSN'],
 #     # If you are using git, you can also automatically configure the

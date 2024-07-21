@@ -40,6 +40,7 @@ prompt_toolkit==3.0.47
 psycopg2==2.9.9
 ptyprocess==0.7.0
 pure-eval==0.2.2
+pycairo==1.20.1
 pyee==11.1.0
 Pygments==2.18.0
 pyppeteer==2.0.0

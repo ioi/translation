@@ -20,3 +20,4 @@ tablib
 moratab
 inotify
 django-xff
+pycairo

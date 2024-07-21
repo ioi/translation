@@ -131,21 +131,30 @@ SESSION_COOKIE_SECURE = int(os.environ.get('SESSION_COOKIE_SECURE', 1)) != 0
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'timestamped': {
+            'format': '%(asctime)-15s.%(msecs)03d %(levelname)-5.5s [%(process)s] (%(name)s) %(message)s',
+            'style': '%',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'formatter': 'timestamped',
         },
         'trans': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/trans.log'),
+            'formatter': 'timestamped',
         },
         'print_job_queue': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/print_job_queue.log'),
+            'formatter': 'timestamped',
         },
         'stderr': {
             'level': 'DEBUG',

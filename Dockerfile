@@ -6,16 +6,16 @@ RUN sed -i '/^Components:/s/main/main non-free contrib/' /etc/apt/sources.list.d
 
 RUN apt update -qq && \
     DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
-        python3 python3-pip python3-setuptools python3-venv \
+        python3 python3-pip python3-setuptools python3-venv python3-cairo python3-psycopg2 \
         libfontconfig wkhtmltopdf xvfb libpq-dev ttf-mscorefonts-installer fonts-noto \
         libxcomposite1 libxdamage1 libxtst6 libnss3 libcups2 libxss1 libxrandr2 libasound2 \
         libpangocairo-1.0-0 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libx11-xcb1 \
-	tzdata
+        tzdata
 
 COPY binaries/cpdf/cpdf /usr/local/bin/
 RUN chmod +x /usr/local/bin/cpdf
 
-RUN python3 -m venv /opt/translate/venv
+RUN python3 -m venv --system-site-packages /opt/translate/venv
 
 COPY requirements.txt constraints.txt /opt/translate/
 RUN /opt/translate/venv/bin/pip3 install -r /opt/translate/requirements.txt -c /opt/translate/constraints.txt

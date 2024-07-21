@@ -236,7 +236,7 @@ class AccessTranslationEdit(LoginRequiredMixin, View):
         edit_token = request.POST.get('edit_token', '')
         task = Task.objects.get(id=id)
         user = User.objects.get(username=request.user)
-        if not (task.contest.public or user.is_editor):
+        if not (task.contest.public or user.is_editor()):
             return HttpResponseBadRequest("There is no published task")
         translation = Translation.objects.get(user=user, task=task)
         if translation.is_editable_by(user) or user != translation.user:

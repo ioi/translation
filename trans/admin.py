@@ -129,9 +129,20 @@ class ContestantAdmin(ImportExportModelAdmin):
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
 
+@admin.register(ContestantContest)
+class ContestantContestAdmin(admin.ModelAdmin):
+    list_display = ['ident', 'translation_by_user']
+    list_select_related = ['contestant', 'contest']
+    ordering = ['contest__title', 'contestant__code']
+
+    @admin.display(description='Ident')
+    def ident(self, obj):
+        site = ' (remote)' if not obj.contestant.on_site else ""
+        return f'{obj.contest.title}: {obj.contestant.code}{site}'
+
+
 admin.site.register(Attachment)
 admin.site.register(Contest)
-admin.site.register(ContestantContest)
 admin.site.register(FlatPage)
 admin.site.register(Task)
 admin.site.register(Translation, ordering=['task__name', 'user__username'])

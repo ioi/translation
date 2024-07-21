@@ -90,7 +90,6 @@ class Home(LoginRequiredMixin, View):
             'contests': contests,   # used by modals.html
             'contest_infos': [ci for ci in contest_info.values() if ci['tasks']],
             'home_content': home_content,
-            'is_editor': user.is_editor(),
             'is_onsite': user.is_onsite,
             'is_translating': user.is_translating,
         })
@@ -129,7 +128,6 @@ class Translations(LoginRequiredMixin, View):
             'contest_slug': contest_slug,
             'contests': contests,
             'task_name': task_name,
-            'is_editor': user.is_editor(),
             'is_onsite': user.is_onsite,
             'taskID': task.id,
             'language_code': user.language.code,
@@ -308,7 +306,6 @@ class Versions(LoginRequiredMixin, View):
             'direction': direction,
             'task_type': task_type,
             'view_all': view_all,
-            'is_editor': user.is_editor(),
         })
 
 

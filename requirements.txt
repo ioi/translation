@@ -1,6 +1,6 @@
 Django
 gunicorn
-psycopg2-binary
+psycopg2
 redis
 requests
 six==1.14.0

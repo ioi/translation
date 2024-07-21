@@ -462,6 +462,7 @@ class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
         if is_post:
             form = TransSettingsForm(request.POST)
             if form.is_valid():
+                logger.info(f'Editing settings of contest {self.contest.slug} for {self.user.username} by {request.user.username}')
                 for c in contestants:
                     if c.on_site:
                         cc, _ = ContestantContest.objects.get_or_create(contest=self.contest, contestant=c)

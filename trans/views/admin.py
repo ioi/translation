@@ -81,7 +81,9 @@ class RightsCheckMixin(object):
         if self.user.id != request.user.id and not request.user.is_superuser and not request.user.is_staff:
             raise PermissionDenied('You cannot edit this user')   # Generates HTTP 403
 
-    def init_contest(self, request, contest_id):
+    def init_contest(self, request, contest_id, allow_frozen=False):
+        assert self.user is not None
+
         try:
             self.contest = Contest.objects.get(id=contest_id)
         except ObjectDoesNotExist:
@@ -89,67 +91,74 @@ class RightsCheckMixin(object):
         if self.contest.frozen or not self.contest.public:
             raise PermissionDenied('You cannot edit this contest')
 
-        uc = UserContest.objects.filter(user=self.user, contest=self.contest).first()
-        if uc and uc.frozen:
-            raise PermissionDenied('You cannot edit this contest after you froze it')
+        if not allow_frozen:
+            uc = UserContest.objects.filter(user=self.user, contest=self.contest).first()
+            if uc and uc.frozen:
+                raise PermissionDenied('You cannot edit this contest after you froze it')
+
+
+def get_user_page(request, user):
+    if user.id == request.user.id:
+        return reverse('home')
+    else:
+        return reverse('user_trans', kwargs={'username': user.username})
+
+
+def redirect_to_user_page(request, user):
+    return redirect(get_user_page(request, user))
 
 
 class UserTranslations(StaffCheckMixin, View):
     def get(self, request, username):
         user = User.objects.get(username=username)
-        # tasks = Task.objects.filter(contest__public=True).values_list('id', 'title')
-        translations = []
-        for task in Task.objects.filter(contest__public=True):
-            translation = Translation.objects.filter(user=user, task=task).first()
-            is_editing = translation and is_translate_in_editing(translation)
-            if translation:
-                translations.append((
-                    task.id,
-                    task.name,
-                    True,
-                    translation.id,
-                    translation.frozen,
-                    is_editing))
-            else:
-                translations.append((task.id, task.name, False, 'None', False, False))
 
-        tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
-        for task in Task.objects.filter(contest__public=True, contest__frozen=False).order_by('order'):
+        contests = Contest.objects.filter(public=True).order_by('-order')
+        contestants = Contestant.objects.filter(user=user).order_by('code')
+
+        contest_info = {c: {
+            'title': c.title,
+            'slug': c.slug,
+            'id': c.id,
+            'tasks': [],
+            'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
+        } for c in contests}
+
+        for task in Task.objects.filter(contest__in=contests).order_by('order'):
             translation = Translation.objects.filter(user=user, task=task).first()
             is_editing = translation and is_translate_in_editing(translation)
-            frozen = translation and translation.frozen
+            frozen = translation and translation.is_editable_by(user)
+            translating = translation and translation.translating
             translation_id = translation.id if translation else None
-            final_pdf_url = translation.final_pdf.url if translation and translation.final_pdf else None
-            tasks_by_contest[task.contest].append({
+            contest_info[task.contest]['tasks'].append({
                 'id': task.id,
                 'name': task.name,
                 'trans_id': translation_id,
                 'is_editing': is_editing,
                 'frozen': frozen,
-                'final_pdf_url': final_pdf_url
+                'translating': translating,
+                'final_pdf_url': settings.MEDIA_URL + translation.final_pdf.name if translation and translation.final_pdf else None,
             })
 
-        tasks_lists = [
-            {
-                'title': c.title,
-                'slug': c.slug,
-                'id': c.id,
-                'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
-                'tasks': tasks_by_contest[c]
-            }
-            for c in Contest.objects.order_by('-order')
-            if len(tasks_by_contest[c]) > 0
-        ]
+        contest_contestant = {}
+        for cc in ContestantContest.objects.filter(contest__in=contests, contestant__in=contestants).select_related('translation_by_user', 'translation_by_user__language', 'translation_by_user__country'):
+            contest_contestant[cc.contest, cc.contestant] = cc
+
+        for contest, cinfo in contest_info.items():
+            cinfo['contestant_translations'] = contestant_translations = []
+            for ctant in contestants:
+                cc = contest_contestant.get((contest, ctant), None)
+                if cc is None:
+                    cc = ContestantContest.obtain(ctant, contest, user)
+                tu = cc.translation_by_user
+                tr = f'{tu.language.name} ({tu.country.name})' if tu else None
+                contestant_translations.append((ctant, tr))
 
         can_upload_final_pdf = request.user.has_perm('trans.change_translation')
         form = UploadFileForm()
         return render(request, 'user.html', context={
-            'user_name': username,
+            'user': user,
+            'contest_infos': [ci for ci in contest_info.values() if ci['tasks']],
             'is_onsite': user.is_onsite,
-            'country': user.country.name,
-            'is_editor': user.is_editor,
-            'tasks_lists': tasks_lists,
-            'language': user.credentials(),
             'can_upload_final_pdf': can_upload_final_pdf,
             'form': form
         })
@@ -211,10 +220,6 @@ class UsersList(StaffCheckMixin, View):
                 'frozen': user_contest.frozen,
                 'note': user_contest.note,
                 'sealed': user_contest.sealed,
-                'extra_country_1_code': user_contest.extra_country_1_code,
-                'extra_country_1_count': user_contest.extra_country_1_count,
-                'extra_country_2_code': user_contest.extra_country_2_code,
-                'extra_country_2_count': user_contest.extra_country_2_count
             }
 
         return (contests, contest_tasks, user_translations, user_contests)
@@ -251,28 +256,29 @@ class AddFinalPDF(StaffCheckMixin, View):
         if not pdf_file or pdf_file.name.split('.')[-1] != 'pdf':
             return HttpResponseBadRequest("You should attach a pdf file")
 
+        logger.info(f'Uploading final PDF {trans.task.name} for {trans.user.username} by {request.user.username}')
         trans.frozen = True
         trans.final_pdf = pdf_file
         trans.save()
-#        trans.notify_final_pdf_change()
         return redirect(request.META.get('HTTP_REFERER'))
 
 
-class FreezeTranslationView(View):
-    def _freeze_translation(self, username, task_name, frozen, translating):
-        user = User.objects.filter(username=username).first()
-        if user is None:
-            return HttpResponseNotFound('No such user')
+class FreezeTranslation(LoginRequiredMixin, RightsCheckMixin, View):
+    def post(self, request, username, task_name):
+        self.init_user(request, username)
 
         task = Task.objects.filter(name=task_name).first()
         if task is None:
-            return HttpResponseNotFound('No such task')
+            raise Http404('No such task')
+        trans = get_trans_by_user_and_task(self.user, task)
 
-        trans = get_trans_by_user_and_task(user, task)
+        frozen = request.POST['freeze'] == 'True'
+        translating = request.POST.get('translating') != 'False'
 
         trans.frozen = frozen
         if frozen:
             if translating:
+                logger.info(f'Freezing task {trans} by {request.user.username}')
                 trans.translating = True
                 pdf_path = build_final_pdf(trans)
                 with open(pdf_path, 'rb') as f:
@@ -280,11 +286,13 @@ class FreezeTranslationView(View):
                     # Needs to be called while the file is open.
                     trans.save()
             else:
+                logger.info(f'Freezing non-translated task {trans} by {request.user.username}')
                 trans.translating = False
                 trans.save()
         else:
+            logger.info(f'Unfreezing task {trans} by {request.user.username}')
             trans.final_pdf.delete()
-            trans.translating = None
+            trans.translating = False
             trans.save()
 
         # No one should be editing anyway once the translation is frozen. This
@@ -292,27 +300,7 @@ class FreezeTranslationView(View):
         # before the last edit timeout.
         unleash_edit_token(trans)
 
-
-class UserFreezeTranslation(LoginRequiredMixin, FreezeTranslationView):
-    def post(self, request, task_name):
-        frozen = request.POST['freeze'] == 'True'
-        translating = request.POST.get('translating') != 'False'
-        self._freeze_translation(request.user.username, task_name, frozen, translating)
-
-        # trans.notify_final_pdf_change()
-        # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
-        return redirect(request.META.get('HTTP_REFERER'))
-
-
-class StaffFreezeTranslation(StaffCheckMixin, FreezeTranslationView):
-    def post(self, request, username, task_name):
-        frozen = request.POST['freeze'] == 'True'
-        translating = request.POST.get('translating') != 'False'
-        self._freeze_translation(username, task_name, frozen, translating)
-
-        # trans.notify_final_pdf_change()
-        # return redirect(to=reverse('user_trans', kwargs={'username' : trans.user.username}))
-        return redirect(request.META.get('HTTP_REFERER'))
+        return redirect_to_user_page(request, self.user)
 
 
 class FreezeForm(forms.ModelForm):
@@ -358,7 +346,7 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
                     user_contest.save()
                     print_job_queue.handle_user_contest_frozen(user_contest, pdfs)
                     logger.info('Freezing completed')
-                    return redirect('home')
+                    return redirect_to_user_page(request, self.user)
             else:
                 form = FreezeForm(instance=user_contest)
 
@@ -406,39 +394,47 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
         return self._handle(request, username, contest_id, True)
 
 
-class UnfreezeUserContest(LoginRequiredMixin, View):
+class UnfreezeUserContest(StaffCheckMixin, RightsCheckMixin, View):
     def post(self, request, username, contest_id):
-        user = User.objects.get(username=username)
-        contest = Contest.objects.filter(id=contest_id).first()
-        if contest is None:
-            return HttpResponseNotFound("There is no contest")
-        user_contest = UserContest.objects.filter(contest=contest, user=user).first()
+        self.init_user(request, username)
+        self.init_contest(request, contest_id, allow_frozen=True)
+
+        user_contest = UserContest.objects.filter(contest=self.contest, user=self.user).first()
         if user_contest is not None:
+            logger.info(f'Unfreezing contest {self.contest.slug} for {self.user.username} by {request.user.username}')
             user_contest.frozen = False
             print_job_queue.handle_user_contest_unfrozen(user_contest)
-            user_contest.delete()
-#        return redirect(to=reverse('user_trans', kwargs={'username': username}))
-        return redirect(request.META.get('HTTP_REFERER'))
+            user_contest.save()
 
-class SealUserContest(LoginRequiredMixin, View):
+        return redirect_to_user_page(request, self.user)
+
+
+class SealUserContest(StaffCheckMixin, RightsCheckMixin, View):
     def post(self, request, username, contest_id):
-        user = User.objects.get(username=username)
-        contest = Contest.objects.filter(id=contest_id).first()
-        if contest is None:
-            return HttpResponseNotFound("There is no contest")
-        user_contest = UserContest.objects.filter(contest=contest, user=user).first()
+        self.init_user(request, username)
+        self.init_contest(request, contest_id, allow_frozen=True)
+
+        user_contest = UserContest.objects.filter(contest=self.contest, user=self.user).first()
         if user_contest is not None:
+            logger.info(f'Sealing contest {self.contest.slug} for {self.user.username} by {request.user.username}')
             user_contest.sealed = True
             user_contest.save()
-        return redirect(request.META.get('HTTP_REFERER'))
+
+        return redirect_to_user_page(request, self.user)
+
 
 class UnleashEditTranslationToken(LoginRequiredMixin, View):
     def post(self, request, id):
         trans = Translation.objects.get(id=id)
         if trans is None:
-            return HttpResponseNotFound("There is no task")
+            raise Http404("There is no task")
+
+        if trans.user.id != request.user.id and (request.user.is_staff or request.user.is_superuser):
+            raise PermissionDenied("This is not your translation")
+
+        logger.info(f'Unleashing edit token for translation {trans} by {request.user.username}')
         unleash_edit_token(trans)
-        return redirect(to=reverse('user_trans', kwargs={'username': trans.user.username}))
+        return redirect_to_user_page(request, trans.user)
 
 
 class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):

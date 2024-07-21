@@ -5,22 +5,22 @@ from print_job_queue import queue
 logger = logging.getLogger(__name__)
 
 
-def handle_user_contest_frozen(user_contest, pdf):
-    """Manages the print job queue when a user_contest is frozen with a new final PDF."""
+def handle_user_contest_frozen(user_contest, pdfs):
+    """Manages the print job queue when a user_contest is frozen with a new set of final PDF."""
 
     assert user_contest.frozen
 
     user = user_contest.user
     contest = user_contest.contest
 
-    if not pdf:
-        logger.info(f'No final PDF for {contest.slug}/{user.username}')
+    if not pdfs:
+        logger.info(f'No final PDFs for {contest.slug}/{user.username}')
         return
 
-    logger.info(f'Enqueueing {pdf} for {contest.slug}/{user.username}')
+    logger.info(f'Enqueueing final PDFs for {contest.slug}/{user.username}: {" ".join(pdfs)}')
 
     user_contest.final_print_job = queue.enqueue_final_print_job(
-        file_paths_with_counts={pdf: 1},
+        file_paths_with_counts={pdf: 1 for pdf in pdfs},
         owner=user,
         owner_country=user.country.code,
         group=contest.slug)

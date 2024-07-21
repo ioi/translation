@@ -347,11 +347,13 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
             if is_post:
                 form = FreezeForm(request.POST, instance=user_contest)
                 if form.is_valid() and not self.errors:
-                    pdf = self.batch_recipe.build_pdf()
+                    logger.info(f'Freezing contest {self.contest.slug} for {self.user.username} by {request.user.username}')
+                    pdfs = self.batch_recipe.build_pdfs()
                     user_contest.frozen = True
                     user_contest.sealed = False
                     user_contest.save()
-                    print_job_queue.handle_user_contest_frozen(user_contest, pdf)
+                    print_job_queue.handle_user_contest_frozen(user_contest, pdfs)
+                    logger.info('Freezing completed')
                     return redirect('home')
             else:
                 form = FreezeForm(instance=user_contest)

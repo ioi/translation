@@ -119,6 +119,7 @@ class UserTranslations(StaffCheckMixin, View):
             'title': c.title,
             'slug': c.slug,
             'id': c.id,
+            'frozen': c.frozen,
             'tasks': [],
             'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
         } for c in contests}
@@ -220,6 +221,7 @@ class UsersList(StaffCheckMixin, View):
                 'frozen': user_contest.frozen,
                 'note': user_contest.note,
                 'sealed': user_contest.sealed,
+                'skip_verification': user_contest.skip_verification,
             }
 
         return (contests, contest_tasks, user_translations, user_contests)
@@ -472,7 +474,7 @@ class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
                         else:
                             cc.translation_by_user_id = trans_by
                         cc.save()
-                return redirect('home')
+                return redirect_to_user_page(request, self.user)
         else:
             form_init = {}
             for c in contestants:
@@ -487,6 +489,7 @@ class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
             'for_user': self.user,
             'user': request.user,
             'contestant_table': [(c, form[f'trans_{c.id}'] if c.on_site else None) for c in contestants],
+            'return_url': get_user_page(request, self.user),
         })
 
     def get(self, request, username, contest_id):

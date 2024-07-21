@@ -26,6 +26,10 @@ a:hover {
     text-decoration: none;
 }
 
+.smallskip {
+    margin-bottom: 3ex;
+}
+
 .container h1, .container h2, .container h3, .container h4 {
     font-family: 'Source Sans Pro', arial, sans-serif;
 }

@@ -45,7 +45,7 @@ def render_pdf_template(translation, task_type,
 
 # pdf file paths (excepting final pdf path)
 def output_pdf_path(contest_slug, task_name, task_type, user):
-    file_path = '{}/output/{}/{}/{}'.format('/tmp/ioi-translation', contest_slug, task_name, task_type)
+    file_path = '{}/output/{}/{}/{}'.format(settings.CACHE_DIR, contest_slug, task_name, task_type)
     file_name = '{}-{}.pdf'.format(task_name, user.username)
     pdf_file_path = '{}/{}'.format(file_path, file_name)
     os.makedirs(file_path, exist_ok=True)

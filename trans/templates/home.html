@@ -119,7 +119,7 @@
                 {# Finalization #}
                 <td>
                   {% if cinfo.user_contest is None or not cinfo.user_contest.frozen %}
-                    <form method="post" action="{% url 'user_freeze_trans' task_name=task.name %}">
+                    <form method="post" action="{% url 'freeze_trans' task_name=task.name username=user.username %}">
                       {% csrf_token %}
                       <input
                         type="hidden"

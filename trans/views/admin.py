@@ -112,6 +112,7 @@ class UserTranslations(StaffCheckMixin, View):
                     is_editing))
             else:
                 translations.append((task.id, task.name, False, 'None', False, False))
+
         tasks_by_contest = {contest: [] for contest in Contest.objects.all()}
         for task in Task.objects.filter(contest__public=True, contest__frozen=False).order_by('order'):
             translation = Translation.objects.filter(user=user, task=task).first()
@@ -127,6 +128,7 @@ class UserTranslations(StaffCheckMixin, View):
                 'frozen': frozen,
                 'final_pdf_url': final_pdf_url
             })
+
         tasks_lists = [
             {
                 'title': c.title,
@@ -138,6 +140,7 @@ class UserTranslations(StaffCheckMixin, View):
             for c in Contest.objects.order_by('-order')
             if len(tasks_by_contest[c]) > 0
         ]
+
         can_upload_final_pdf = request.user.has_perm('trans.change_translation')
         form = UploadFileForm()
         return render(request, 'user.html', context={
@@ -163,6 +166,7 @@ class UsersList(StaffCheckMixin, View):
                 'language_code': user.language_code,
                 'is_onsite': user.is_onsite,
                 'is_translating': user.is_translating,
+                'is_editor': user.is_editor(),
             })
         return users
 
@@ -350,7 +354,7 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
                     logger.info(f'Freezing contest {self.contest.slug} for {self.user.username} by {request.user.username}')
                     pdfs = self.batch_recipe.build_pdfs()
                     user_contest.frozen = True
-                    user_contest.sealed = False
+                    user_contest.sealed = not self.user.is_onsite
                     user_contest.save()
                     print_job_queue.handle_user_contest_frozen(user_contest, pdfs)
                     logger.info('Freezing completed')

@@ -198,6 +198,8 @@ USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
 
+PRINT_BATCH_WHOLE_TEAM = False
+
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

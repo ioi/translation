@@ -198,6 +198,10 @@ USE_TZ = True
 
 TRANSLATION_EDIT_TIME_OUT = 120
 
+# Should we produce one print job per team (as opposed to one per contestant)?
+# The former prints faster, the latter lets the printer collate paper per contestant.
+PRINT_BATCH_WHOLE_TEAM = False
+
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

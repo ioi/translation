@@ -101,17 +101,27 @@ class BatchRecipe:
     ct_recipes: List[RecipeContestant] = field(default_factory=list)
     when: datetime = field(default_factory=lambda: datetime.now().astimezone(pytz.timezone(settings.TIME_ZONE)))
 
-    def build_pdf(self):
-        parts = []
-        for ct_recipe in self.ct_recipes:
-            parts.extend(ct_recipe.build_parts())
+    def build_pdfs(self):
+        if settings.PRINT_BATCH_WHOLE_TEAM:
+            parts = []
+            for ct_recipe in self.ct_recipes:
+                parts.extend(ct_recipe.build_parts())
+            pdfs = [self.build_batch(parts, self.for_user.username)]
+        else:
+            pdfs = []
+            for ct_recipe in self.ct_recipes:
+                pdf = self.build_batch(ct_recipe.build_parts(), f'{self.for_user.username}-{ct_recipe.contestant.code}')
+                if pdf is not None:
+                    pdfs.append(pdf)
+        return pdfs
 
+    def build_batch(self, parts, name_base):
         if not parts:
             return None
 
         output_path = Path('media/batch') / self.contest.slug
         output_path.mkdir(parents=True, exist_ok=True)
-        output_pdf_path = output_path / f'{self.for_user.username}.pdf'
+        output_pdf_path = output_path / f'{name_base}.pdf'
         cmd = ['cpdf'] + parts + ['-o', str(output_pdf_path)]
         subprocess.run(cmd, check=True)
 

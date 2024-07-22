@@ -187,11 +187,6 @@ class UserContest(models.Model):
     sealed = models.BooleanField(default=False)
     skip_verification = models.BooleanField(default=False)
     note = models.TextField(default='', blank=True)
-    # FIXME: To be removed
-    extra_country_1_code = models.CharField(max_length=6, blank=True)
-    extra_country_2_code = models.CharField(max_length=6, blank=True)
-    extra_country_1_count = models.PositiveIntegerField(default=0)
-    extra_country_2_count = models.PositiveIntegerField(default=0)
 
     # The print job that corresponds to the latest state, if it is frozen.
     # If the UserContest is not frozen, this is null.

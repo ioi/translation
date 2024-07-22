@@ -190,7 +190,7 @@ class UserContest(models.Model):
 
     # The print job that corresponds to the latest state, if it is frozen.
     # If the UserContest is not frozen, this is null.
-    final_print_job = models.ForeignKey(print_job_queue_models.FinalPrintJob,
+    final_print_job = models.ForeignKey(print_job_queue_models.PrintJob,
                                         null=True,
                                         on_delete=models.PROTECT)
 

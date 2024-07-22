@@ -22,6 +22,7 @@ class StaffCheckMixin(LoginRequiredMixin, object):
         return user.is_superuser or user.groups.filter(name="staff").exists()
 
     def user_check_failed(self, request, *args, **kwargs):
+        logger.warning(f'Staff check failed for user {request.user.username}')
         return redirect(self.user_check_failure_path)
 
     def dispatch(self, request, *args, **kwargs):

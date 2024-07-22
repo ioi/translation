@@ -265,6 +265,7 @@ class AddFinalPDF(StaffCheckMixin, View):
 
         logger.info(f'Uploading final PDF {trans.task.name} for {trans.user.username} by {request.user.username}')
         trans.frozen = True
+        trans.translating = True
         trans.final_pdf = pdf_file
         trans.save()
         return redirect(request.META.get('HTTP_REFERER'))

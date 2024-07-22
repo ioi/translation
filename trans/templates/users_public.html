@@ -7,102 +7,80 @@
 {% block content %}
 
 <div class="container-fluid">
-  <div class="col-md-12 col-lg-12 row">
-    {% for contest in contests %}
-    {% for userpart in users_public %}
-    <div class="col-md-3 col-lg-3">
-      <h2>{{ contest.title }}</h2>
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th style="text-align: left;">Team (Copies)</td>
-            <th>Status</th>
-          </tr>
-        </thead>
+  {% for contest in contests %}
+    <h2>{{ contest.title }}</h2>
 
-        <tbody>
-          {% for user in userpart|dictsort:"username" %}
-            <tr>
-              <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username }}</a></td>
-              <td style="text-align: left;">
-                {{ user.country_name }}
-                {% if user.is_onsite %}
-                  (999)
-                {% else %}
-                  (-)
-                {% endif %}
-              </td>
-              <td>
-                {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
-                  {% if not user.is_onsite %}
-                    <!-- Team is fully remote -->
-                    {% if not user.is_translating or user_contest is not none and user_contest.frozen %}
-                      <!-- If team is not translating, or has finished translation -->
-                      <span style="color: green">
-                        <b>
-                          <i class="fa fa-file-pdf-o fa-lg"></i>
-                          Done (PDF Only)
-                        </b>
-                      </span>
+    <div class="col-md-12 col-lg-12 row">
+      {% for userpart in users_public %}
+        <div class="col-md-3 col-lg-3">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th style="text-align: left;">Team</td>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for user in userpart|dictsort:"username" %}
+                <tr>
+                  <td><a href="{% url 'user_trans' username=user.username %}">{{ user.username }}</a></td>
+
+                  <td style="text-align: left;">
+                    {% if user.is_onsite %}
+                      {{ user.country_name }}
                     {% else %}
-                      <span>
-                        <i class="fa fa-pencil fa-lg"></i>
-                        In Progress
-                      </span>
+                      <i>{{ user.country_name }}</i>
                     {% endif %}
+                  </td>
 
-                  {% else %}
-                    <!-- Team has some on-site contestants. Workflow:
-                         1A. (If translating) Submit own country translations + request other countries translations = "freeze"
-                         1B. (If not translating) Request other countries translations = "freeze"
-                         2. HTC collects printed translations and brings to TL for checking and sealing into envelope
-                    -->
-                    {% if user_contest is none or not user_contest.frozen %}
-                      <!-- Team is at step (1): haven't frozen -->
-                      {% if user.is_translating %}
-                        <!-- 1A: supposed to translate but not yet done -->
-                        <span>
-                          <i class="fa fa-pencil fa-lg"></i>
-                          In Progress
-                        </span>
-                      {% else %}
-                        <!-- 1B: awaiting request other countries translations -->
+                  <td>
+                    {% with user_contest=user_contests|get_dict:user.username|get_dict:contest.id %}
+                      {% if user.is_editor %}
+                        {# Nothing interesting for ISC #}
+                      {% elif user_contest is not None and user_contest.frozen %}
+                        {# Frozen #}
+                        {% if user_contest.sealed %}
+                          {# Sealed: Everything done #}
+                          <span style="color: green">
+                            <b>
+                              <i class="fa fa-envelope fa-lg"></i>
+                              Done {% if user.is_onsite %}(sealed){% else %}(remote){% endif %}
+                            </b>
+                          </span>
+                        {% else %}
+                          <span style="color: orange">
+                            <b>
+                              <i class="fa fa-user fa-lg"></i>
+                              Printing
+                            </b>
+                          </span>
+                        {% endif %}
+                      {% elif not user.is_translating %}
+                        {# Team is not translating #}
                         <span>
                           <i class="fa fa-list fa-lg"></i>
                           Choosing Copies
                         </span>
+                      {% else %}
+                        {# Team is translating #}
+                        <span>
+                          <i class="fa fa-pencil fa-lg"></i>
+                          In Progress
+                        </span>
                       {% endif %}
-                    {% elif not user_contest.sealed %}
-                      <!-- Team is at step (2): awaiting TL seal -->
-                      <span style="color: orange">
-                        <b>
-                          <i class="fa fa-user fa-lg"></i>
-                          Pending Seal
-                        </b>
-                      </span>
-                    {% else %}
-                      <!-- Done: At this point, should be printed and sealed -->
-                      <span style="color: green">
-                        <b>
-                          <i class="fa fa-envelope fa-lg"></i>
-                          Done (Sealed)
-                        </b>
-                      </span>
-                    {% endif %}
-                      
-                  {% endif %}
+                    {% endwith %}
+                  </td>
 
-                {% endwith %}
-            </tr>
-          {% endfor %}
-        </tbody>
-
-      </table>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-    {% endfor %}
-  </div>
+  {% endfor %}
 </div>
 
 {% include "autorefresh.html" %}

@@ -44,6 +44,7 @@ class Home(LoginRequiredMixin, View):
             'title': c.title,
             'slug': c.slug,
             'id': c.id,
+            'frozen': c.frozen,
             'tasks': [],
             'user_contest': UserContest.objects.filter(contest=c, user=user).first(),
         } for c in contests}

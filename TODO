@@ -1,0 +1,26 @@
+Translate:
+- logging
+- check container setup
+
+Discuss:
+- printing of English statements
+- get rid of CRLF
+
+Later cleanup:
+- re-indent trans/urls.py
+- views using init_contest() should get contest slug instead of ID
+- User.objects.get(...request.user...) -> request.user.user ... better change relation name
+- clean up handling of directories in trans/utils/pdf.py
+- clean up settings
+- collectstatic can be called when building the container
+- flash messages
+- access rights
+- fix or remove Healthcheck
+- clean up imports
+
+Doc:
+- custom upload of final PDF requires trans.change_translation permission
+- multiple accounts for a single country
+- print script
+- <hr class=pagebreak>
+- DB migrations don't preserve print job data

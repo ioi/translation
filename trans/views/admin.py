@@ -227,7 +227,8 @@ class UsersList(StaffCheckMixin, View):
         return (contests, contest_tasks, user_translations, user_contests)
 
     def _chunks(self, xs, n):
-        return (xs[i:len(xs):n] for i in range(n))
+        per = len(xs) // n
+        return [xs[i*per : (i+1)*per] for i in range(n)]
 
     def get(self, request, public=False):
         users = self._fetch_users()

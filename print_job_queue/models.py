@@ -1,6 +1,5 @@
 from enum import Enum, unique
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -19,85 +18,77 @@ class PrintJobState(Enum):
     # The job has been invalidated. This is a terminal state.
     INVALID = 3
 
+    # Like IN_PROGRESS, but sent to the printer automatically
+    PRINTING = 4
+
+
+@unique
+class PrintJobType(Enum):
+    DRAFT = 0
+    FINAL = 1
+
+
+STATE_CHOICES = [(item.value, item.name) for item in PrintJobState]
+TYPE_CHOICES = [(item.value, item.name) for item in PrintJobType]
+
+STATE_BY_VALUE = {item.value: item for item in PrintJobState}
+TYPE_BY_VALUE = {item.value: item for item in PrintJobType}
+
+
+class Worker(models.Model):
+    name = models.CharField(max_length=255, blank=False, unique=True)
+
+    # The worker handles only jobs of the given type.
+    job_type = models.IntegerField(choices=TYPE_CHOICES, null=True)
+
+    # If modulo is non-zero, the worker accepts only jobs for which
+    # owner.id % modulo == index
+    modulo = models.PositiveIntegerField(
+        help_text="""
+            If modulo is non-zero, this worker is restricted to jobs whose user ID
+            is equal to index modulo the given number.
+        """
+    )
+    index = models.PositiveIntegerField()
+
+    # Can this worker print directly on the server?
+    server_print = models.BooleanField(
+        help_text="Allow printing on the server."
+    )
+
+    def __str__(self):
+        return self.name
+
 
 class PrintJob(models.Model):
-    STATE = (
-        (member.value, name)
-        for name, member in PrintJobState.__members__.items()
-    )
-    
-    job_id = models.AutoField(primary_key=True)
-
     # See PrintJobState.
-    state = models.IntegerField(choices=STATE)
+    state = models.IntegerField(choices=STATE_CHOICES)
 
     # The group which this job belongs to.
-    group = models.CharField(max_length=25, blank=False, default='default_group')
+    # The translation system sets groups to contest slugs.
+    group = models.CharField(max_length=25, blank=False)
+
+    # See PrintJobType.
+    job_type = models.IntegerField(choices=TYPE_CHOICES)
 
     # The worker that is handling this job. Should be set when the job is in
-    # either PROCESSING or DONE state.
-    worker = models.CharField(max_length=25, blank=True)
+    # either IN_PROGRESS, PRINTING, or DONE state.
+    worker = models.ForeignKey(Worker, on_delete=models.PROTECT, blank=True, null=True)
 
     # The user who owns the printed documents. A user with a print job should
     # not be deleted. This is nullable for backwards compatibility.
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
-    # The country of the user that owns this job. Not a foreign key as users
-    # can't change country anyway.
-    owner_country = models.CharField(max_length=25,
-                                     blank=True,
-                                     default='Nowhere')
-
-    class Meta:
-        abstract = True
-
-    @classmethod
-    def make_pending(cls, owner, owner_country, group):
-        return cls(state=PrintJobState.PENDING.value,
-                   owner=owner,
-                   owner_country=owner_country,
-                   group=group)
-    
     def __str__(self):
-        return '{}'.format(self.job_id)
+        return f'Job #{self.id}'
 
 
 class PrintedDocument(models.Model):
+    # Print job that contains this document.
+    job = models.ForeignKey(PrintJob, on_delete=models.CASCADE, related_name='document_set')
+
     # Path to the document to print.
-    file_path = models.FilePathField(match='*.pdf', recursive=True)
+    file_path = models.FilePathField(match='.*.pdf', recursive=True)
 
-    # The number of times the document should be printed. Should be greater
-    # than zero.
+    # The number of times the document should be printed. Should be greater than zero.
     print_count = models.PositiveIntegerField()
-
-    class Meta:
-        abstract = True
-
-
-class DraftPrintJob(PrintJob):
-    """Print job for draft translations.
-    
-    This is a separate table so job_id can be reused to distribute draft
-    printing jobs in a round-robin fashion.
-    """
-    pass
-
-
-class PrintedDraftDocument(PrintedDocument):
-    # The print job that contains this document.
-    job = models.ForeignKey(
-        DraftPrintJob, on_delete=models.CASCADE, related_name='document_set')
-
-
-class FinalPrintJob(PrintJob):
-    """Print job for final translations.
-    
-    This is a separate table for the same reason DraftPrintJob is.
-    """
-    pass
-
-
-class PrintedFinalDocument(PrintedDocument):
-    # The print job that contains this document.
-    job = models.ForeignKey(
-        FinalPrintJob, on_delete=models.CASCADE, related_name='document_set')

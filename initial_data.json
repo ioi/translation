@@ -81,8 +81,8 @@
       "country": "ISC",
       "text_font_base64": "",
       "text_font_name": "",
-      "groups": [],
-      "user_permissions": []
+      "is_onsite": true,
+      "is_translating": true,
     }
   },
   {
@@ -93,10 +93,8 @@
       "country": "ISC",
       "text_font_base64": "",
       "text_font_name": "",
-      "groups": [
-        1
-      ],
-      "user_permissions": []
+      "is_onsite": true,
+      "is_translating": true,
     }
   },
   {
@@ -107,10 +105,8 @@
       "country": "ISC",
       "text_font_base64": "",
       "text_font_name": "",
-      "groups": [
-        2
-      ],
-      "user_permissions": []
+      "is_onsite": true,
+      "is_translating": true,
     }
   },
   {
@@ -141,14 +137,36 @@
     "model": "trans.flatpage",
     "pk": "home",
     "fields": {
-      "content": "<h1></h1>"
+      "content": ""
     }
   },
   {
     "model": "trans.flatpage",
     "pk": "home-editor",
     "fields": {
-      "content": "<h1></h1>"
+      "content": ""
+    }
+  },
+  {
+    "model": "print_job_queue.worker",
+    "pk": 1,
+    "fields": {
+      "name": "draft",
+      "job_type": 0,
+      "modulo": 0,
+      "index": 0,
+      "server_print": false
+    }
+  },
+  {
+    "model": "print_job_queue.worker",
+    "pk": 2,
+    "fields": {
+      "name": "final",
+      "job_type": 1,
+      "modulo": 0,
+      "index": 0,
+      "server_print": false
     }
   }
 ]

@@ -255,6 +255,9 @@ class Country(models.Model):
     code = models.CharField(primary_key=True, max_length=255)
     code2 = models.CharField(max_length=255, null=True, default=None)
 
+    class Meta:
+        verbose_name_plural = "countries"
+
     def __str__(self):
         return self.name
 

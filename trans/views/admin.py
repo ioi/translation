@@ -31,6 +31,7 @@ class AdminCheckMixin(LoginRequiredMixin, object):
         return user.is_superuser
 
     def user_check_failed(self, request, *args, **kwargs):
+        logger.warning(f'Admin check failed for user {request.user.username}')
         return redirect(self.user_check_failure_path)
 
     def dispatch(self, request, *args, **kwargs):
@@ -46,6 +47,7 @@ class StaffCheckMixin(LoginRequiredMixin, object):
         return user.is_superuser or user.groups.filter(name="staff").exists()
 
     def user_check_failed(self, request, *args, **kwargs):
+        logger.warning(f'Staff check failed for user {request.user.username}')
         return redirect(self.user_check_failure_path)
 
     def dispatch(self, request, *args, **kwargs):
@@ -61,6 +63,7 @@ class EditorCheckMixin(LoginRequiredMixin, object):
         return user.is_superuser or user.groups.filter(name="editor").exists()
 
     def user_check_failed(self, request, *args, **kwargs):
+        logger.warning(f'Editor check failed for user {request.user.username}')
         return redirect(self.user_check_failure_path)
 
     def dispatch(self, request, *args, **kwargs):
@@ -79,6 +82,7 @@ class RightsCheckMixin(object):
         except ObjectDoesNotExist:
             raise Http404('User not found')
         if self.user.id != request.user.id and not request.user.is_superuser and not request.user.is_staff:
+            logger.warning(f'Rights check failed for user {request.user.username} when editing user {self.user.username}')
             raise PermissionDenied('You cannot edit this user')   # Generates HTTP 403
 
     def init_contest(self, request, contest_id, allow_frozen=False):

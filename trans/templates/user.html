@@ -165,8 +165,8 @@
                                 {% if task.final_pdf_url %}
                                     <a href="{{task.final_pdf_url}}" class="btn btn-default" title="PDF"><i class="fa fa-btns fa-file-pdf-o fa-lg"></i></a>
                                 {% elif not cinfo.frozen %}
-                                    {% if can_upload_final_pdf and contest.user_contest.frozen %}
-                                        <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Add User PDF</a>
+                                    {% if can_upload_final_pdf and not contest.user_contest.frozen %}
+                                        <a class="btn btn-info open-UploadTaskPDF" data-id="{{task.trans_id}}" href="#" data-toggle="modal" data-target="#addTransPDF">Upload PDF</a>
                                     {% endif %}
                                 {% endif %}
                             </td>

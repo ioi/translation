@@ -29,8 +29,12 @@ class RecipeContestant:
     def build_parts(self):
         page_counts = self.count_pages()
         parts = [self.build_banner_page(page_counts)]
-        for trans in self.translations:
+
+        for trans, num_pages in zip(self.translations, page_counts):
             parts.append(trans.get_final_pdf_path())
+            if settings.PRINT_BATCH_DUPLEX and num_pages % 2 != 0:
+                parts.append(self.build_blank_page(trans))
+
         return parts
 
     def count_pages(self):
@@ -49,58 +53,92 @@ class RecipeContestant:
         with cairo.PDFSurface(str(banner_pdf_path), A4_WIDTH_POINTS, A4_HEIGHT_POINTS) as surface:
             ctx = cairo.Context(surface)
 
-            def add_text(x, y, font_face, font_size, text, center=False, bold=False, italic=False):
-                ctx.select_font_face(font_face, int(italic), int(bold))
-                ctx.set_font_size(font_size)
-                if center:
-                    textents = ctx.text_extents(text)
-                    fextents = ctx.font_extents()
-                    y += fextents[0]
-                    ctx.move_to(x - textents.width / 2 - textents.x_bearing, y)
-                else:
-                    ctx.move_to(x, y)
-                ctx.show_text(text)
+            self.add_text(ctx,
+                          A4_WIDTH_POINTS / 2, 20 * POINTS_PER_MM,
+                          SANS_FONT, 28,
+                          self.recipe.contest.title.upper(),
+                          center=True)
 
-            add_text(A4_WIDTH_POINTS / 2, 20 * POINTS_PER_MM,
-                     SANS_FONT, 28,
-                     self.recipe.contest.title.upper(),
-                     center=True)
-
-            add_text(A4_WIDTH_POINTS / 2, 50 * POINTS_PER_MM,
-                     SANS_FONT, 40 * POINTS_PER_MM,
-                     self.contestant.code,
-                     bold=True,
-                     center=True)
+            self.add_text(ctx,
+                          A4_WIDTH_POINTS / 2, 50 * POINTS_PER_MM,
+                          SANS_FONT, 40 * POINTS_PER_MM,
+                          self.contestant.code,
+                          bold=True,
+                          center=True)
 
             if not self.recipe.user_contest.skip_verification:
-                add_text(A4_WIDTH_POINTS / 2, 100 * POINTS_PER_MM,
-                         SANS_FONT, 20,
-                         'CHECK WITH TEAM LEADER',
-                         center=True)
+                self.add_text(ctx,
+                              A4_WIDTH_POINTS / 2, 100 * POINTS_PER_MM,
+                              SANS_FONT, 20,
+                              'CHECK WITH TEAM LEADER',
+                              center=True)
 
             x = 20 * POINTS_PER_MM
             y = 130 * POINTS_PER_MM
 
             if self.translations:
-                add_text(x, y, SERIF_FONT, 20, 'Envelope contents:')
+                self.add_text(ctx, x, y, SERIF_FONT, 20, 'Envelope contents:')
                 y += 45
                 for trans, num_pages in zip(self.translations, page_counts):
                     pages = f'{num_pages} page{"s" if num_pages != 1 else ""}'
-                    add_text(x + 20, y,
-                             SERIF_FONT, 20,
-                             f'• {trans.task.name} – {trans.user.language.name} ({trans.user.country.name}) – {pages}')
+                    self.add_text(ctx,
+                                  x + 20, y,
+                                  SERIF_FONT, 20,
+                                  f'• {trans.task.name} – {trans.user.language.name} ({trans.user.country.name}) – {pages}')
                     y += 30
             else:
-                add_text(x, y,
-                         SERIF_FONT, 20,
-                         'No translations requested.')
+                self.add_text(ctx,
+                              x, y,
+                              SERIF_FONT, 20,
+                              'No translations requested.')
 
-            add_text(A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS - 15 * POINTS_PER_MM,
-                     SERIF_FONT, 10,
-                     self.recipe.when.strftime('%Y-%m-%d %H:%M:%S'),
-                     center=True)
+            self.add_text(ctx,
+                          A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS - 15 * POINTS_PER_MM,
+                          SERIF_FONT, 10,
+                          self.recipe.when.strftime('%Y-%m-%d %H:%M:%S'),
+                          center=True)
+
+            ctx.show_page()
+
+            if settings.PRINT_BATCH_DUPLEX:
+                ctx.show_page()
 
         return str(banner_pdf_path)
+
+    def build_blank_page(self, trans):
+        blank_path = Path(settings.CACHE_DIR) / 'blank' / self.recipe.contest.slug
+        blank_path.mkdir(parents=True, exist_ok=True)
+        blank_pdf_path = blank_path / f'{self.contestant.code}-{trans.task.name}.pdf'
+
+        with cairo.PDFSurface(str(blank_pdf_path), A4_WIDTH_POINTS, A4_HEIGHT_POINTS) as surface:
+            ctx = cairo.Context(surface)
+
+            self.add_text(ctx,
+                          A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS - 20 * POINTS_PER_MM,
+                          SANS_FONT, 12,
+                          f'Last page of {trans.task.name} for {self.contestant.code}',
+                          center=True)
+
+            self.add_text(ctx,
+                          A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS / 3,
+                          SERIF_FONT, 20,
+                          'This page is intentionally blank.',
+                          italic=True,
+                          center=True)
+
+        return str(blank_pdf_path)
+
+    def add_text(self, ctx, x, y, font_face, font_size, text, center=False, bold=False, italic=False):
+        ctx.select_font_face(font_face, int(italic), int(bold))
+        ctx.set_font_size(font_size)
+        if center:
+            textents = ctx.text_extents(text)
+            fextents = ctx.font_extents()
+            y += fextents[0]
+            ctx.move_to(x - textents.width / 2 - textents.x_bearing, y)
+        else:
+            ctx.move_to(x, y)
+        ctx.show_text(text)
 
 
 @dataclass

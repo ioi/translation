@@ -77,7 +77,8 @@
                         {% csrf_token %}
                         <button>Mark as complete</button>
                       </form>
-                    {% elif state == 'DONE' %}
+                    {% endif %}
+                    {% if state != 'PENDING' %}
                       <form method="post"
                             action="{% url 'job_restart' job_id=jinfo.id %}">
                         {% csrf_token %}

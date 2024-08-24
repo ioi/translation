@@ -1,4 +1,5 @@
 import logging
+import subprocess
 
 from django.db.models import F, Q
 
@@ -74,7 +75,19 @@ def query_worker_print_jobs(group, job_type, worker):
         .order_by('id'))
 
 
+def print_on_server(worker, job):
+    for doc in job.document_set.all():
+        logger.info(f'Worker {worker.name}: Printing file {doc.file_path}')
+        res = subprocess.run(['./print.sh', worker.name, doc.file_path])
+        if res.returncode != 0:
+            logger.error(f'Print script failed with return code {res.returncode}')
+            raise RuntimeError('Print script failed')
+
+
 def pick_up_print_job(job_id, worker, do_print=False):
+    if not worker.server_print:
+        do_print = False
+
     job = models.PrintJob.objects.filter(id=job_id).first()
     if job is None:
         logger.warning(f'Worker {worker.name}: Attempted to pick-up non-existent job #{job_id}')
@@ -90,9 +103,11 @@ def pick_up_print_job(job_id, worker, do_print=False):
     job.worker = worker
     job.save()
 
-    # FIXME: Implement printing
-
     logger.info(f'Worker {worker.name}: Job {job.id} {"started printing" if do_print else "picked up"}')
+
+    if do_print:
+        print_on_server(worker, job)
+
     return job
 
 

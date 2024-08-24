@@ -25,88 +25,38 @@
             border-collapse: collapse;
             border: 1px solid;
         }
-  
+
         th, td {
             padding: 2px;
             border: 1px solid;
         }
-  
-        table#in-progress-tbl {
-            width: calc(50% + {% if worker_name %}350px{% else %}200px{% endif %});
+
+        table.job-tbl {
+            width: 100%;
         }
         /* ID */
-        table#in-progress-tbl thead th:nth-child(1) {
+        table.job-tbl thead th:nth-child(1) {
             width: 75px;
         }
-        table#in-progress-tbl tbody td:nth-child(1) {
+        table.job-tbl tbody td:nth-child(1) {
             text-align: center;
         }
         /* Country */
-        table#in-progress-tbl thead th:nth-child(2) {
+        table.job-tbl thead th:nth-child(2) {
             width: 75px;
         }
-        table#in-progress-tbl tbody td:nth-child(2) {
+        table.job-tbl tbody td:nth-child(2) {
             text-align: center;
         }
         /* Action or worker handling the request */
-        table#in-progress-tbl thead th:nth-child(4) {
-            width: 150px;
+        table.job-tbl thead th:nth-child(4) {
+            width: 300px;
         }
-        table#in-progress-tbl tbody td:nth-child(4) {
+        table.job-tbl tbody td:nth-child(4) {
             text-align: center;
         }
-  
-        table#pending-tbl {
-            width: {% if worker_name %}300px{% else %}150px{% endif %};
-        }
-        /* ID */
-        table#pending-tbl thead th:nth-child(1) {
-            width: 75px;
-        }
-        table#pending-tbl tbody td:nth-child(1) {
-            text-align: center;
-        }
-        /* Country */
-        table#pending-tbl thead th:nth-child(2) {
-            width: 75px;
-        }
-        table#pending-tbl tbody td:nth-child(2) {
-            text-align: center;
-        }
-        /* Action */
-        /* The guard isn't actually necessary. Added for clarity. */
-        {% if worker_name %}
-        table#pending-tbl thead th:nth-child(3) {
-            width: 150px;
-        }
-        table#pending-tbl tbody td:nth-child(3) {
-            text-align: center;
-        }
-        {% endif %}
-  
-        table#completed-tbl {
-            width: calc(50% + 350px);
-        }
-        /* ID */
-        table#completed-tbl thead th:nth-child(1) {
-            width: 75px;
-        }
-        table#completed-tbl tbody td:nth-child(1) {
-            text-align: center;
-        }
-        /* Country */
-        table#completed-tbl thead th:nth-child(2) {
-            width: 75px;
-        }
-        table#completed-tbl tbody td:nth-child(2) {
-            text-align: center;
-        }
-        /* Worker */
-        table#completed-tbl thead th:nth-child(4) {
-            width: 150px;
-        }
-        table#completed-tbl tbody td:nth-child(4) {
-            text-align: center;
+        table.job-tbl tbody td:nth-child(4) form {
+            display: inline;
         }
       </style>
 

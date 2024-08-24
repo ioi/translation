@@ -1,131 +1,83 @@
 from collections import defaultdict
 import logging
-import os
 
 from django.http import HttpResponse
-from django.http.response import HttpResponseBadRequest
+from django.http.response import HttpResponseBadRequest, Http404
 from django.shortcuts import render, redirect
 from django.urls.base import reverse
 from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
+from django.db.models import Q
 
 from print_job_queue import models, queue
 
 logger = logging.getLogger(__name__)
 
 
-class _PrintJobQueueView(View):
+class StaffCheckMixin(LoginRequiredMixin, object):
+    user_check_failure_path = '/'
 
-    print_job_model_cls = None
-    template_file = None
+    def check_user(self, user):
+        return user.is_superuser or user.groups.filter(name="staff").exists()
 
-    def _make_print_job_view_model(self, job_db_models):
-        job_view_models = defaultdict(list)
-        for job_db_model in job_db_models:
-            job_view_models[job_db_model.state].append({
-                'id':
-                    job_db_model.job_id,
-                'owner_country':
-                    job_db_model.owner_country,
+    def user_check_failed(self, request, *args, **kwargs):
+        return redirect(self.user_check_failure_path)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.check_user(request.user):
+            return self.user_check_failed(request, *args, **kwargs)
+        return super(StaffCheckMixin, self).dispatch(request, *args, **kwargs)
+
+
+class JobQueue(StaffCheckMixin, View):
+    def get(self, request, group, job_type, worker_name=None):
+        job_type_enum = _parse_job_type(job_type)
+
+        if worker_name:
+            worker = _parse_worker(worker_name)
+            jobs = queue.query_worker_print_jobs(group, job_type_enum, worker)
+            workers = None
+        else:
+            worker = None
+            jobs = queue.query_group_print_jobs(group, job_type_enum)
+            workers = models.Worker.objects.filter(Q(job_type=None) | Q(job_type=job_type_enum.value)).order_by('name')
+
+        job_info_by_state = defaultdict(list)
+        for job in jobs:
+            job_info_by_state[models.STATE_BY_VALUE[job.state].name].append({
+                'id': job.id,
+                'owner': job.owner.username,
                 'documents': [(document.file_path, document.print_count)
-                              for document in job_db_model.document_set.all()],
-                'worker': job_db_model.worker,
+                              for document in job.document_set.all()],
+                'worker': job.worker,
             })
-        if models.PrintJobState.DONE.value in job_view_models:
-            job_view_models[models.PrintJobState.DONE.value].reverse()
-        return job_view_models
 
-    def get(self, request, group):
-        assert self.print_job_model_cls is not None
-        assert self.template_file is not None
-
-        # Return a read-only (i.e. non-worker's) view of the jobs.
-        if not request.GET:
-            jobs = self._make_print_job_view_model(
-                job_db_models=queue.query_group_print_jobs(
-                    print_job_model_cls=self.print_job_model_cls, group=group))
-            return render(request,
-                          self.template_file,
-                          context={
-                              'group':
-                                  group,
-                              'in_progress_jobs':
-                                  jobs[models.PrintJobState.IN_PROGRESS.value],
-                              'pending_jobs':
-                                  jobs[models.PrintJobState.PENDING.value],
-                              'completed_jobs':
-                                  jobs[models.PrintJobState.DONE.value],
-                              'worker_name':
-                                  None,
-                          })
-
-        # Return a worker's view of the jobs.
-        worker_name = request.GET.get('name', 'default')
-
-        worker_count = _try_parse_int(request.GET.get('count'), 0)
-        if worker_count <= 0:
-            worker_count = 1
-
-        worker_mod = _try_parse_int(request.GET.get('mod'), -1)
-        if worker_mod < 0 or worker_mod >= worker_count:
-            worker_mod = 0
-
-        jobs = self._make_print_job_view_model(
-            job_db_models=queue.query_worker_print_jobs(
-                print_job_model_cls=self.print_job_model_cls,
-                group=group,
-                worker_name=worker_name,
-                worker_mod=worker_mod,
-                worker_count=worker_count))
-
-        logger.info('jobs = %s', jobs)
-
-        return render(request,
-                      self.template_file,
+        return render(request, 'queue.html',
                       context={
-                          'group':
-                              group,
-                          'worker_name':
-                              worker_name,
-                          'worker_count':
-                              worker_count,
-                          'worker_mod':
-                              worker_mod,
-                          'in_progress_jobs':
-                              jobs[models.PrintJobState.IN_PROGRESS.value],
-                          'pending_jobs':
-                              jobs[models.PrintJobState.PENDING.value],
-                          'completed_jobs':
-                              jobs[models.PrintJobState.DONE.value],
-                          'worker_name':
-                              worker_name,
+                          'group': group,
+                          'job_type': job_type,
+                          'type_header': 'Final Translations' if job_type_enum == models.PrintJobType.FINAL else "Draft Translations",
+                          'worker': worker,
+                          'workers': workers,
+                          'job_info_by_state': job_info_by_state,
+                          'job_states': [
+                              ('Pending', 'PENDING'),
+                              ('In progress', 'IN_PROGRESS'),
+                              ('Printing', 'PRINTING'),
+                              ('Done', 'DONE'),
+                          ],
                       })
 
 
-class DraftJobQueue(_PrintJobQueueView):
-    print_job_model_cls = models.DraftPrintJob
-    template_file = 'draft_queue.html'
+class JobPickUp(StaffCheckMixin, View):
+    @transaction.atomic
+    def post(self, request, worker_name, job_id, job_action):
+        worker = _parse_worker(worker_name)
+        do_print = job_action == 'print'
 
-
-class FinalJobQueue(_PrintJobQueueView):
-    print_job_model_cls = models.FinalPrintJob
-    template_file = 'final_queue.html'
-
-
-class _PrintJobPickUpView(View):
-
-    print_job_model_cls = None
-
-    def post(self, request, job_id):
-        assert self.print_job_model_cls is not None
-
-        worker_name = request.POST.get('worker_name', '')
-        if not worker_name:
-            return HttpResponseBadRequest('Worker name must be non-empty.')
-
-        if not queue.pick_up_print_job(
-                print_job_model_cls=self.print_job_model_cls,
-                job_id=job_id,
-                worker_name=worker_name):
+        job = queue.pick_up_print_job(job_id=job_id, worker=worker, do_print=do_print)
+        if job is None:
             return HttpResponseBadRequest(
                 'Could not pick up job. Check log for more details.')
 
@@ -135,30 +87,12 @@ class _PrintJobPickUpView(View):
         return HttpResponse('Ok!')
 
 
-class DraftJobPickUp(_PrintJobPickUpView):
-    print_job_model_cls = models.DraftPrintJob
+class JobMarkCompletion(StaffCheckMixin, View):
+    @transaction.atomic
+    def post(self, request, worker_name, job_id):
+        worker = _parse_worker(worker_name)
 
-
-class FinalJobPickUp(_PrintJobPickUpView):
-    print_job_model_cls = models.FinalPrintJob
-
-
-class _PrintJobMarkCompletionView(View):
-
-    print_job_model_cls = None
-
-    def post(self, request, job_id):
-        assert self.print_job_model_cls is not None
-
-        worker_name = request.POST.get('worker_name', '')
-
-        if not worker_name:
-            return HttpResponseBadRequest('Worker name must be non-empty.')
-
-        if not queue.mark_print_job_complete(
-                print_job_model_cls=self.print_job_model_cls,
-                job_id=job_id,
-                worker_name=worker_name):
+        if not queue.mark_print_job_complete(job_id=job_id, worker=worker):
             return HttpResponseBadRequest(
                 'Could not mark job as complete. Check log for more details.')
 
@@ -168,16 +102,29 @@ class _PrintJobMarkCompletionView(View):
         return HttpResponse('Ok!')
 
 
-class DraftJobMarkCompletion(_PrintJobMarkCompletionView):
-    print_job_model_cls = models.DraftPrintJob
+class JobRestart(StaffCheckMixin, View):
+    @transaction.atomic
+    def post(self, request, job_id):
+        if not queue.restart_print_job(job_id=job_id):
+            return HttpResponseBadRequest(
+                'Could not restart job. Check log for more details.')
+
+        http_referer = request.headers.get('referer')
+        if http_referer:
+            return redirect(http_referer)
+        return HttpResponse('Ok!')
 
 
-class FinalJobMarkCompletion(_PrintJobMarkCompletionView):
-    print_job_model_cls = models.FinalPrintJob
-
-
-def _try_parse_int(s, default=None):
+def _parse_job_type(job_type):
     try:
-        return int(s)
-    except (ValueError, TypeError):
-        return default
+        return models.PrintJobType[job_type.upper()]
+    except KeyError:
+        raise Http404("Unknown job type")
+
+
+def _parse_worker(worker_name):
+    worker = models.Worker.objects.filter(name=worker_name).first()
+    if worker:
+        return worker
+    else:
+        raise Http404("Unknown worker")

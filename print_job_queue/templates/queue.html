@@ -1,0 +1,105 @@
+{% extends "base_queue.html" %}
+{% load dict_filter %}
+
+{% block title %} {{ type_header }} Print Job Queue {% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="col-md-12 col-lg-10 col-lg-offset-1">
+    <h2>
+      {% if worker %}
+        Worker {{ worker.name }} –
+      {% endif %}
+      {{ type_header }} Print Job Queue
+      ({{ group }})
+    </h2>
+
+    {% if not worker %}
+      <p>Workers:
+        {% if workers %}
+          {% for w in workers %}
+          <a href='{% url 'queue_worker' group=group job_type=job_type worker_name=w.name %}'>
+              {{ w.name }}
+            </a>
+          {% endfor %}
+        {% else %}
+          <i>none</i>
+        {% endif %}
+      </p>
+    {% endif %}
+
+    {% for state_header, state in job_states %}
+      <h3>{{ state_header }}</h3>
+
+      {% if job_info_by_state|get_dict:state %}
+        <table class="job-tbl">
+          <thead>
+            <th>ID</th>
+            <th>User</th>
+            <th>Files</th>
+            {% if worker %} <th>Action</th> {% else %} <th>Claimed by</th> {% endif %}
+          </thead>
+          <tbody>
+            {% for jinfo in job_info_by_state|get_dict:state %}
+              <tr>
+                <td>{{ jinfo.id }}</td>
+                <td><a href="/user/{{ jinfo.owner }}">{{ jinfo.owner }}</a></td>
+                <td>
+                  <ul>
+                    {% for file_path, count in jinfo.documents %}
+                      <li>
+                        <a href="/{{ file_path }}">{{ file_path }}</a>
+                        {% if count > 1 %}
+                          x {{ count }}
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </td>
+                <td>
+                  {% if worker %}
+                    {% if state == "PENDING" %}
+                      <form method="post"
+                            action="{% url 'job_pick_up' worker_name=worker.name job_id=jinfo.id %}">
+                        {% csrf_token %}
+                        <button>Pick up</button>
+                      </form>
+                      {% if worker.server_print %}
+                        <form method="post"
+                              action="{% url 'job_print' worker_name=worker.name job_id=jinfo.id %}">
+                          {% csrf_token %}
+                          <button>Print</button>
+                        </form>
+                      {% endif %}
+                    {% elif state == "IN_PROGRESS" or state == "PRINTING" %}
+                      <form method="post"
+                            action="{% url 'job_mark_completion' worker_name=worker.name job_id=jinfo.id %}">
+                        {% csrf_token %}
+                        <button>Mark as complete</button>
+                      </form>
+                    {% elif state == 'DONE' %}
+                      <form method="post"
+                            action="{% url 'job_restart' job_id=jinfo.id %}">
+                        {% csrf_token %}
+                        <button>Restart</button>
+                      </form>
+                    {% endif %}
+                  {% elif jinfo.worker %}
+                    <a href='{% url 'queue_worker' group=group job_type=job_type worker_name=jinfo.worker.name %}'>
+                      {{ jinfo.worker.name }}
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      {% else %}
+        <p><i>No jobs.</i>
+      {% endif %}
+    {% endfor %}
+
+    </div>
+  </div>
+{% endblock %}

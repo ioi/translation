@@ -24,15 +24,24 @@ class RecipeContestant:
     recipe: 'BatchRecipe'
     contestant: Contestant
     translations: List[Translation] = field(default_factory=list)
+    num_pages: List[int] = field(default_factory=list)
 
     def build_parts(self):
-        parts = [self.build_banner_page()]
+        page_counts = self.count_pages()
+        parts = [self.build_banner_page(page_counts)]
         for trans in self.translations:
-            assert trans.final_pdf
-            parts.append(f'media/{trans.final_pdf.name}')
+            parts.append(trans.get_final_pdf_path())
         return parts
 
-    def build_banner_page(self):
+    def count_pages(self):
+        page_counts = []
+        for trans in self.translations:
+            res = subprocess.run(['cpdf', '-pages', trans.get_final_pdf_path()], check=True, stdout=subprocess.PIPE)
+            num_pages = int(res.stdout)
+            page_counts.append(num_pages)
+        return page_counts
+
+    def build_banner_page(self, page_counts):
         banner_path = Path(settings.CACHE_DIR) / 'banner' / self.recipe.contest.slug
         banner_path.mkdir(parents=True, exist_ok=True)
         banner_pdf_path = banner_path / f'{self.contestant.code}.pdf'
@@ -75,10 +84,11 @@ class RecipeContestant:
             if self.translations:
                 add_text(x, y, SERIF_FONT, 20, 'Envelope contents:')
                 y += 45
-                for trans in self.translations:
+                for trans, num_pages in zip(self.translations, page_counts):
+                    pages = f'{num_pages} page{"s" if num_pages != 1 else ""}'
                     add_text(x + 20, y,
                              SERIF_FONT, 20,
-                             f'• {trans.task.name} – {trans.user.language.name} ({trans.user.country.name})')
+                             f'• {trans.task.name} – {trans.user.language.name} ({trans.user.country.name}) – {pages}')
                     y += 30
             else:
                 add_text(x, y,

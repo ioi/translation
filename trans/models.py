@@ -166,6 +166,10 @@ class Translation(models.Model):
         frozen_by_user_contest = user_contest and user_contest.frozen
         return self.frozen or contest.frozen or frozen_by_user_contest
 
+    def get_final_pdf_path(self):
+        assert self.final_pdf
+        return f'media/{self.final_pdf.name}'
+
     def __str__(self):
         return "{} ({})".format(self.task.name, self.user.username)
 

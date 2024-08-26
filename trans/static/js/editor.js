@@ -57,6 +57,34 @@ function loadTranslationText(text){
     }
 }
 
+function getSelectionHtml() {
+    var html = "";
+    if (typeof window.getSelection != "undefined") {
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+            var container = document.createElement("div");
+            for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                container.appendChild(sel.getRangeAt(i).cloneContents());
+            }
+            html = container.innerText;
+        }
+    } else if (typeof document.selection != "undefined") {
+        if (document.selection.type == "Text") {
+            html = document.selection.createRange().text;
+        }
+    }
+    return html;
+}
+
+function getSelectedText() {
+    if (direction=='rtl') {
+        return getSelectionHtml();
+    }
+    else {
+        return simplemde.codemirror.getSelection();
+    }
+}
+
 function initial(){
 
     $('#left_rendered_text_box').css('direction', direction);
@@ -341,3 +369,4 @@ function sendRelease(note) {
         }
     });
 }
+

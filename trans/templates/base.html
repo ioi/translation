@@ -53,9 +53,6 @@
             <ul class="nav navbar-nav">
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                {% if settings.ENABLE_AUTO_TRANSLATE %}
-                <li><a href="{% url 'auto_translate' %}">Machine Translation</a></li>
-                {% endif %}
                 <li class="dropdown">
                     <span class="notif-badge" id="notif-badge" style="display: none"></span>
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bell"></i></a>

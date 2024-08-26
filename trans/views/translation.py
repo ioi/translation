@@ -105,8 +105,8 @@ class AutoTranslate(LoginRequiredMixin, View):
             "languages": autotranslate.get_supported_languages(),
             'user': user,
             'is_editor': user.is_editor(),
-            'has_contestants': user.has_contestants(),
-            'is_translating': user.is_translating(),
+            'has_contestants': user.contestant_set.count() > 0,
+            'is_translating': user.is_translating,
         })
 
 
@@ -147,7 +147,8 @@ class Translations(LoginRequiredMixin, View):
             'taskID': task.id,
             'language_code': user.language.code,
             'username': user.username,
-            'direction': user.language.direction()
+            'direction': user.language.direction(),
+            "machine_translation_languages": autotranslate.get_supported_languages(),
         })
 
 

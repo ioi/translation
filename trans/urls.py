@@ -46,5 +46,5 @@ urlpatterns = [
           path('user/<str:username>/font.css', UserFont.as_view(), name='userfontcss'),
       ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.ENABLE_AUTO_TRANSLATE:
-    urlpatterns.append(url(r'^autotranslate/', AutoTranslate.as_view(), name='auto_translate'))
+    urlpatterns.append(path(r'autotranslate/', AutoTranslate.as_view(), name='auto_translate'))
 

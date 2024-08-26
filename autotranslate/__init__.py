@@ -1,11 +1,14 @@
 from django.conf import settings
-from google.cloud import translate
+
 
 _cached_language_list = None
 
 __all__ = ["get_supported_languages"]
 
 def get_supported_languages():
+    if not settings.ENABLE_AUTO_TRANSLATE:
+        return []
+    from google.cloud import translate
     global _cached_language_list
     if _cached_language_list is None:
         # TODO: This will not work with deployment as they will fork before this function is called.

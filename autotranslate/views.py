@@ -33,7 +33,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         input_lang = request.POST["input_lang"]
         output_lang = request.POST["output_lang"]
         response = client.translate_text(
-            request={
+            **{
                 "parent": parent,
                 "contents": [request.POST['content']],
                 "mime_type": "text/plain",  # mime types: text/plain, text/html

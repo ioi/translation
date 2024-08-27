@@ -44,7 +44,9 @@
             <input id="spell-checking" type="checkbox" onchange="onChangeSpellChecking()">
             <label for="spell-checking" style="font-weight: normal;">check spelling</label> -->
             {% endif %}
+            {% if machine_translation_languages %}
             <button class="btn btn-default" onclick="showTranslationPane(); translateSelectedText();" title="Translate Selected Text"><i class="fa fa-btn fa-language fa-lg"></i></button>
+            {% endif %}
             {% if not is_editor %}
             <div class="btn-group pull-right" role="group">
                 <button type="button" id="preview-btn" class="btn btn-default" onclick="onPreviewClick()">Preview</button>
@@ -85,7 +87,11 @@
                 </div>
                 
             </div>
-            
+            <div class="row ">
+                <div class="col-xs-12 text-right">
+                Quota: <span id="user_translation_quota">{{user_translation_quota}}</span>
+                </div>
+            </div>
             <textarea style="width: 100%; height: 30%;" id="content_for_translate" placeholder="Enter text here to translate..."></textarea> 
             <div class="row text-center">
                 <div class="cold-sm-12">

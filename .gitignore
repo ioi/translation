@@ -108,7 +108,7 @@ TAGS
 *.el
 
 # Generated static files
-static
+./static/
 
 # Vim swap files
 .*.swp

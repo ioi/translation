@@ -158,7 +158,7 @@ LOGGING = {
             'formatter': 'timestamped',
         },
         'stderr': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
         'sentry': {
@@ -216,9 +216,9 @@ CACHE_DIR = os.path.join(BASE_DIR, "cache")
 HOST_URL = os.environ.get('TRANS_URL', 'http://127.0.0.1:9000/')
 
 ALLOWED_HOSTS = ['*']
-USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_HOST = not DEBUG
 XFF_TRUSTED_PROXY_DEPTH = 1
-XFF_STRICT = True
+XFF_STRICT = not DEBUG
 CSRF_TRUSTED_ORIGINS = [HOST_URL + '*']
 
 ENABLE_AUTO_TRANSLATE = 'autotranslate' in INSTALLED_APPS

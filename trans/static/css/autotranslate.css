@@ -1,0 +1,96 @@
+.main-content {
+    position: relative;
+}
+
+.offcanvasRight {
+    position: absolute;
+    overflow-x: hidden;
+    overflow-y: auto;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: transparent;
+    padding: 0;
+    z-index: 1050; /* Ensure it overlays other content */
+    
+    
+}
+
+
+.insideOffcanvas {
+    position: relative;
+    right: 0;
+    height: 100%;
+    padding: 10px;
+    background-color: white;
+    transition: right 0.3s ease;
+    border-left: 3px solid black;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 100px auto; /* Center horizontally */
+}
+
+.offcanvasRight.closedPane {
+    z-index: -1;
+    transition: z-index 0s 0.3s; 
+    
+}
+
+.closedPane .insideOffcanvas {
+    right: -120%;
+}
+
+
+
+.close-btn {
+    cursor: pointer;
+}
+
+.copy-btn {
+    cursor: pointer;
+}
+
+.auto_translated_header {
+    background-color: black;
+    color: white;
+    padding-right: 2px;
+    padding-left: 2px;
+}
+
+
+.auto_translated_body {
+    background-color: lightcoral;
+    color: white;
+}
+pre.auto_translated_body {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.copy-btn .post-copy {
+    display: none
+}
+
+.copy-btn.copied .post-copy {
+    display: block;
+}
+
+.copy-btn.copied .pre-copy {
+    display: none;
+}
+
+.copy-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none; /* Disables interaction */
+}

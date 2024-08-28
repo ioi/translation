@@ -57,4 +57,4 @@ volumes:
   ioi_pgdata:
   ioi_static:
   ioi_media:
-  ioi_lots:
+  ioi_logs:

@@ -6,7 +6,7 @@ services:
     restart: always
     build: ./
     ports:
-    - 9001:8000 # Debugging
+    - 9001:9000 # Debugging
     volumes:
     - .:/opt/translate/app/ # Debugging
     - ioi_static:/opt/translate/app/static/

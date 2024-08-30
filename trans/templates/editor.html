@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+
 
 {% block title %} {{ task_name }} {% endblock %}
 
@@ -45,7 +47,7 @@
             <label for="spell-checking" style="font-weight: normal;">check spelling</label> -->
             {% endif %}
             {% if machine_translation_languages %}
-            <button class="btn btn-default" onclick="showTranslationPane(); translateSelectedText();" title="Translate Selected Text"><i class="fa fa-btn fa-language fa-lg"></i></button>
+            <button class="btn btn-default" onclick="showTranslationPane(); translateSelectedText();" title="Machine-translate selected text"><i class="fa fa-btn fa-language fa-lg"></i></button>
             {% endif %}
             {% if not is_editor %}
             <div class="btn-group pull-right" role="group">
@@ -127,6 +129,8 @@
                     </div>                    
                 </div>
                 <pre class="auto_translated_body"  id="translated_text">Translation will show up here.</pre>
+                <div class="row auto_translated_footer text-right">
+                    <div class="col-sm-12"><img src="{% static 'img/googletranslate.svg' %}" /></div>
                 </div>
             </div>  
                 

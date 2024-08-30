@@ -50,7 +50,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 "message": "No Translation Quota. Contact Organizer to Recharge."
             })
         
-        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gt=0).update(credit=models.F('credit') - 1)
+        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=len(text)).update(credit=models.F('credit') - len(text))
         if updated_rows == 0:
             return JsonResponse({
                 "success": False,

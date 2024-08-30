@@ -81,8 +81,8 @@
                 alert('Task name is empty.')
                 return false;
             }
-            if (/[^a-z]/.test(name)) {
-                alert('Name can only contain lower-case letters.')
+            if (/[^a-zA-Z0-9_]/.test(name)) {
+                alert('Name can only contain lower-case and upper-case letters, decimal digits, and the `_` character.')
                 return false;
             }
             return true;

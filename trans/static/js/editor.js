@@ -77,12 +77,11 @@ function getSelectionHtml() {
 }
 
 function getSelectedText() {
-    if (direction=='rtl') {
-        return getSelectionHtml();
-    }
-    else {
-        return simplemde.codemirror.getSelection();
-    }
+    var html_select = getSelectionHtml();
+    if (html_select.length > 0 || direction == 'rtl')
+        return html_select;
+    else
+        return simplemde.codemirror.getSelection().trim();
 }
 
 function initial(){

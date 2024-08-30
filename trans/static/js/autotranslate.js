@@ -1,4 +1,5 @@
 var auto_translate_api_url;
+var original_text_changed_since_last_set = false;
 function showTranslationPane() {
     var translationPaneDiv = document.getElementById('translation-pane');
     translationPaneDiv.classList.remove('closedPane');
@@ -47,9 +48,21 @@ function translateSelectedText() {
     let selected_text =  getSelectedText();
     if (selected_text.length > 0)
     {
-        $("#content_for_translate").val(getSelectedText());
-        $("#translate_submit").click()
+        var overwrite_text;
+        if (original_text_changed_since_last_set)
+            overwrite_text = confirm("You have changed the original content manually. Do you want to overwrite it with the selected text?")
+        else
+            overwrite_text = true;
+        if (overwrite_text) {
+            $("#content_for_translate").val(getSelectedText());
+            $("#translate_submit").click()
+            original_text_changed_since_last_set = false;
+        }
     }
+}
+
+function rememberChanged() {
+    original_text_changed_since_last_set = true;
 }
 
 function copyTranslatedText() {

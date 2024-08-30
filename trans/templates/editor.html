@@ -76,25 +76,25 @@
 
     <div id="temp" style="display: none">{{ task }}</div>
     {% if machine_translation_languages %}
-    <div id="translation-pane" class="offcanvasRight closedPane col-md-3" tabindex="-1">
+    <div id="translation-pane" class="offcanvasRight closedPane col-md-12" tabindex="-1">
         <div  class="insideOffcanvas">
             <div class="row">
                 <div class="col-xs-10">
-                    <h1>Machine Translation</h1>
+                    <h2>Machine Translation</h1>
                 </div>
                 <div class="col-xs-2 text-right">
-                    <h1><i class="fa fa-times close-btn" onclick="hideTranslationPane()"></i></h1>
+                    <h2><i class="fa fa-times close-btn" onclick="hideTranslationPane()"></i></h1>
                 </div>
                 
             </div>
             <div class="row ">
-                <div class="col-xs-12 text-right">
+                <div class="col-xs-12 text-left">
                 Quota: <span id="user_translation_quota">{{user_translation_quota}}</span>
                 </div>
             </div>
-            <textarea style="width: 100%; height: 30%;" id="content_for_translate" placeholder="Enter text here to translate..."></textarea> 
-            <div class="row text-center">
-                <div class="cold-sm-12">
+            
+            <div class="row text-left">
+                <div class="col-sm-12">
                     <select id="input_lang">
                     {% for lang_code, lang_name in machine_translation_languages %}
                         <option value="{{lang_code}}" {% if lang_code == "en" %} selected {% endif %}>{{lang_name}}</option>
@@ -105,13 +105,15 @@
                         <option value="{{lang_code}}"  {% if lang_code == language_code %} selected {% endif %}>{{lang_name}}</option>
                     {% endfor %}
                     </select>
+                
+                <button  class="btn btn-default" type="submit" id="translate_submit" onclick="sendTranslate()">Translate</button>
                 </div>
             </div>
-            <div class="row text-center">
-                <button  class="btn btn-default" type="submit" id="translate_submit" onclick="sendTranslate()">Translate</button>
-            </div>
             <div class="row auto_translated_output">
-                <div class="col-sm-12">
+                <div class="translated_content col-sm-6" >
+                <textarea id="content_for_translate" placeholder="Enter text here to translate..."></textarea> 
+                </div>
+                <div class=" original_content col-sm-6" >
                 <div class="auto_translated_header">
                     <div class="text-right copy-btn disabled" id="copy-translation-btn">
                         <div class="pre-copy"  onclick="copyTranslatedText()">

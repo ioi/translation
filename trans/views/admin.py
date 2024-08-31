@@ -158,6 +158,10 @@ class UserTranslations(StaffCheckMixin, View):
                 tr = f'{tu.language.name} ({tu.country.name})' if tu else None
                 contestant_translations.append((ctant, tr))
 
+            cinfo['extra_contestants'] = extra_contestants = []
+            for cc in ContestantContest.objects.filter(contest=contest, translation_by_user=user).exclude(contestant__in=contestants).select_related("contestant"):
+                extra_contestants.append(cc.contestant)
+
         can_upload_final_pdf = request.user.has_perm('trans.change_translation')
         form = UploadFileForm()
         return render(request, 'user.html', context={

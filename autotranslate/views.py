@@ -1,6 +1,7 @@
 import errno
 import logging
 import urllib
+import re
 
 from django.http.response import HttpResponseNotFound
 from django.forms.models import model_to_dict
@@ -44,6 +45,19 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         text = form.cleaned_data["content"]
         input_lang = form.cleaned_data["input_lang"]
         output_lang = form.cleaned_data["output_lang"]
+
+        # Wrap backtick in no-translate blocks
+        def replacer(match):
+            # Extract the code block content
+            block = match.group(1)
+            lines = []
+            for line in block.split("\n"):
+                lines.append(f'<span class="notranslate">{line}</span>')
+            # Return the code block with spans wrapped around each line
+            return "\n".join(lines)
+
+        text =  re.sub(r'(`+[^`]*`+)', replacer, text, flags=re.MULTILINE)
+
         if not hasattr(request.user, "usertranslationquota"):
             UserTranslationQuota.objects.create(
                 user=request.user, 
@@ -66,8 +80,8 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
             response = client.translate_text(
                 **{
                     "parent": parent,
-                    "contents": [text],
-                    "mime_type": "text/plain",  # mime types: text/plain, text/html
+                    "contents": ["<pre>" + text + "</pre>"],
+                    "mime_type": "text/html",  # mime types: text/plain, text/html
                     "source_language_code": input_lang,
                     "target_language_code": output_lang,
                 }
@@ -75,6 +89,11 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
 
             lines = [translation.translated_text for translation in response.translations]
             translated_text = "\n".join(lines)
+            assert translated_text.startswith("<pre>") and translated_text.endswith("</pre>")
+            translated_text = translated_text[len("<pre>"):-len("</pre>")]
+            
+            # Remove no-translate blocks
+            translated_text = re.sub(r'<span class="notranslate">(.*?)</span>', r'\1', translated_text, flags=re.MULTILINE)
             return JsonResponse({
                 "success": True,
                 "message": "",

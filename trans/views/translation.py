@@ -3,6 +3,7 @@ import logging
 
 from django.http.response import HttpResponseNotFound
 from django.forms.models import model_to_dict
+from django.conf import settings
 
 from django.views.generic import View
 from django.shortcuts import render, redirect
@@ -149,7 +150,7 @@ class Translations(LoginRequiredMixin, View):
             'username': user.username,
             'direction': user.language.direction(),
             "machine_translation_languages": autotranslate.get_supported_languages(),
-            "user_translation_quota": user.usertranslationquota.credit if hasattr(user, "usertranslationquota") else 0,
+            "user_translation_quota": user.usertranslationquota.credit if hasattr(user, "usertranslationquota") else settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA,
         })
 
 

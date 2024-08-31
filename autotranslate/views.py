@@ -45,12 +45,14 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         input_lang = form.cleaned_data["input_lang"]
         output_lang = form.cleaned_data["output_lang"]
         if not hasattr(request.user, "usertranslationquota"):
-            return JsonResponse({
-                "success": False,
-                "message": "No Translation Quota. Contact Organizer to Recharge."
-            })
+            UserTranslationQuota.objects.create(
+                user=request.user, 
+                credit=settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA)
         
-        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=len(text)).update(credit=models.F('credit') - len(text))
+        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=len(text)).update(
+            credit=models.F('credit') - len(text),
+            used=models.F('used') + len(text),
+        )
         if updated_rows == 0:
             return JsonResponse({
                 "success": False,

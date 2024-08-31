@@ -212,6 +212,29 @@
                     </a>
                 {% endif %}
             {% endif %}
+
+            {% if cinfo.extra_contestants %}
+                <h3>Other contestants using this translation</h3>
+
+                <table class="table table-hover">
+                    <thead>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Details</th>
+                    <thead>
+                    <tbody>
+                        {% for ctant in cinfo.extra_contestants %}
+                            <tr>
+                                <td>{{ ctant.code }}</td>
+                                <td>{{ ctant.name }}</td>
+                                <td>
+                                    {% if ctant.on_site %}on{% else %}off{% endif %}-site
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
         {% endfor %}
     </div>
 </div>

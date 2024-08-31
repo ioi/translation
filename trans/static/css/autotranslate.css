@@ -62,15 +62,16 @@ body, html {
 }
 
 .auto_translated_header {
-    background-color: black;
-    color: white;
+    background-color: #e8e8e8;
+    color: #ba5700;
     padding-right: 2px;
     padding-left: 2px;
     height:25px;
+    margin: 0;
 }
 .auto_translated_body {
-    background-color: lightcoral;
-    color: white;
+    background-color: #f6f6f6;
+    color: #333;
     margin: 0;
 }
 .translated_content > textarea {
@@ -84,6 +85,8 @@ pre.auto_translated_body {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
     height: 100px;
+    border: none;
+    margin: 0;
 }
 
 .copy-btn .post-copy {

@@ -79,7 +79,7 @@
     <div id="temp" style="display: none">{{ task }}</div>
     {% if machine_translation_languages %}
     <div id="translation-pane" class="offcanvasRight closedPane col-md-12" tabindex="-1">
-        <div  class="insideOffcanvas">
+        <div class="insideOffcanvas container-fluid">
             <div class="row">
                 <div class="col-xs-10">
                     <h2>Machine Translation</h1>
@@ -114,7 +114,7 @@
             </div>
             <div class="row auto_translated_output">
                 <div class="translated_content col-sm-6" >
-                <textarea onchange="rememberChanged()" id="content_for_translate" placeholder="Enter text here to translate..."></textarea> 
+                <textarea onchange="rememberChanged()" id="content_for_translate" placeholder="Enter text here to translate..." style="resize: vertical;"></textarea>
                 </div>
                 <div class=" original_content col-sm-6" >
                 <div class="auto_translated_header">

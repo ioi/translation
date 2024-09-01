@@ -101,7 +101,8 @@
                     {% for lang_code, lang_name in machine_translation_languages %}
                         <option value="{{lang_code}}" {% if lang_code == "en" %} selected {% endif %}>{{lang_name}}</option>
                     {% endfor %}
-                    </select> ->
+                    </select>
+                    <i class="fa fa-arrow-right"></i>
                     <select id="output_lang">
                     {% for lang_code, lang_name in machine_translation_languages %}
                         <option value="{{lang_code}}"  {% if lang_code == language_code %} selected {% endif %}>{{lang_name}}</option>

@@ -393,7 +393,7 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
                     err = None
                     if not trans:
                         err = 'which does not exist'
-                    elif not trans.frozen or not by_user_contest or not by_user_contest.frozen:
+                    elif not trans.frozen or not by_user_contest or (by_user != self.user and not by_user_contest.frozen):
                         err = 'which is not frozen'
                     elif trans.translating:
                         ct_recipe.translations.append(trans)

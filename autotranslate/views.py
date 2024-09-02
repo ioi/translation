@@ -2,6 +2,7 @@ import errno
 import logging
 import urllib
 import re
+import html
 
 from django.http.response import HttpResponseNotFound
 from django.forms.models import model_to_dict
@@ -42,7 +43,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 "success": False,
                 "message": "Error in Translation. Contact Organizers."
             })
-        text = form.cleaned_data["content"]
+        text = html.escape(form.cleaned_data["content"])
         input_lang = form.cleaned_data["input_lang"]
         output_lang = form.cleaned_data["output_lang"]
 
@@ -97,7 +98,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
             return JsonResponse({
                 "success": True,
                 "message": "",
-                "translated_text": translated_text,
+                "translated_text": html.unescape(translated_text),
                 "new_quota": UserTranslationQuota.objects.get(user=request.user).credit
             })
         except Exception as e:

@@ -389,7 +389,7 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
             if by_user is not None:
                 for task in self.tasks:
                     trans = Translation.objects.filter(user=cc.translation_by_user, task=task).first()
-                    by_user_contest = UserContest.objects.get(contest=self.contest, user=cc.translation_by_user)
+                    by_user_contest = UserContest.objects.filter(contest=self.contest, user=cc.translation_by_user).first()
                     err = None
                     if not trans:
                         err = 'which does not exist'

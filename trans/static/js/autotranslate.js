@@ -76,9 +76,21 @@ function rememberChanged() {
 function copyTranslatedText() {
     if ($("#copy-translation-btn").hasClass("disabled"))
         return null;
-    navigator.clipboard.writeText($("#translated_text").text()).then(function () {
+
+    const text = $("#translated_text").text();
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function () {
+            $("#copy-translation-btn").addClass("copied")
+        })
+    } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
         $("#copy-translation-btn").addClass("copied")
-    })
+    }
 }
 
 function resetCopyMarker() {

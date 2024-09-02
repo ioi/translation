@@ -61,6 +61,14 @@ function translateSelectedText() {
     }
 }
 
+function translateDroppedText(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData('text');
+    $("#content_for_translate").val(data);
+    $("#translate_submit").click()
+    original_text_changed_since_last_set = false;
+}
+
 function rememberChanged() {
     original_text_changed_since_last_set = true;
 }

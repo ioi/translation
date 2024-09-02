@@ -28,6 +28,11 @@ body, html {
     border-top: 3px solid black;
 }
 
+.insideOffcanvas h3 {
+    padding: 0;
+    margin: 0;
+}
+
 .spinner {
     width: 40px;
     height: 40px;
@@ -72,7 +77,7 @@ body, html {
     margin: 0;
 }
 .translated_content > textarea {
-    height: 125px;
+    height: 200px;
     width: 100%;
 }
 pre.auto_translated_body {
@@ -81,7 +86,7 @@ pre.auto_translated_body {
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    height: 100px;
+    height: 175px;
     border: none;
     margin: 0;
 }

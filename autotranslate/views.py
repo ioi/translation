@@ -56,8 +56,8 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 lines.append(f'<span class="notranslate">{line}</span>')
             # Return the code block with spans wrapped around each line
             return "\n".join(lines)
-
-        text =  re.sub(r'(`+[^`]*`+)', replacer, text, flags=re.MULTILINE)
+        text =  re.sub(r'((`+)[^`]+?\2|(\$+)[^\$]+?\3)', replacer, text, flags=re.MULTILINE)
+        text = text.replace('</span><span class="notranslate">', "")
 
         if not hasattr(request.user, "usertranslationquota"):
             UserTranslationQuota.objects.create(

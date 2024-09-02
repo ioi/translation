@@ -38,11 +38,18 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         
         form = TranslateRequestForm(request.POST)
         if not form.is_valid():
-            logging.warning("Invalid Input")
-            return JsonResponse({
-                "success": False,
-                "message": "Error in Translation. Contact Organizers."
-            })
+            content_errors = form.errors.as_data().get("content", None)
+            if any([error.code == 'required' for error in content_errors]):
+                return JsonResponse({
+                    "success": False,
+                    "message": "Error. Empty input received. Please enter some text to translate."
+                })    
+            else:
+                logger.warning("Unexpected invalid input.")
+                return JsonResponse({
+                    "success": False,
+                    "message": "Error in Translation. Contact Organizers."
+                })
         text = html.escape(form.cleaned_data["content"])
         input_lang = form.cleaned_data["input_lang"]
         output_lang = form.cleaned_data["output_lang"]

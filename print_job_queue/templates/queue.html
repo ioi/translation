@@ -35,6 +35,7 @@
         <table class="job-tbl">
           <thead>
             <th>ID</th>
+	    <th>Pri</th>
             <th>User</th>
             <th>Files</th>
             {% if worker %} <th>Action</th> {% else %} <th>Claimed by</th> {% endif %}
@@ -43,6 +44,7 @@
             {% for jinfo in job_info_by_state|get_dict:state %}
               <tr>
                 <td>{{ jinfo.id }}</td>
+                <td>{{ jinfo.priority }}</td>
                 <td><a href="/user/{{ jinfo.owner }}">{{ jinfo.owner }}</a></td>
                 <td>
                   <ul>

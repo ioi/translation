@@ -2,6 +2,7 @@ from enum import Enum, unique
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 
 @unique
@@ -78,6 +79,10 @@ class PrintJob(models.Model):
     # The user who owns the printed documents. A user with a print job should
     # not be deleted. This is nullable for backwards compatibility.
     owner = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+
+    create_time = models.DateTimeField(default=timezone.now)
+
+    priority = models.IntegerField(default=0)
 
     def __str__(self):
         return f'Job #{self.id}'

@@ -8,13 +8,14 @@ from print_job_queue import models
 logger = logging.getLogger(__name__)
 
 
-def enqueue_draft_print_job(file_path, print_count, group, owner):
+def enqueue_draft_print_job(file_path, print_count, group, owner, priority=0):
     job = models.PrintJob(state=models.PrintJobState.PENDING.value,
                           group=group,
                           job_type=models.PrintJobType.DRAFT.value,
-                          owner=owner)
+                          owner=owner,
+                          priority=priority)
     job.save()
-    logger.info(f'Job #{job.id}: Enqueued draft job')
+    logger.info(f'Job #{job.id}: Enqueued draft job (priority={priority})')
 
     doc = models.PrintedDocument(job=job,
                                  file_path=file_path,
@@ -25,13 +26,14 @@ def enqueue_draft_print_job(file_path, print_count, group, owner):
     return job
 
 
-def enqueue_final_print_job(file_paths_with_counts, group, owner):
+def enqueue_final_print_job(file_paths_with_counts, group, owner, priority=0):
     job = models.PrintJob(state=models.PrintJobState.PENDING.value,
                           group=group,
                           job_type=models.PrintJobType.FINAL.value,
-                          owner=owner)
+                          owner=owner,
+                          priority=priority)
     job.save()
-    logger.info(f'Job #{job.id}: Enqueued final job')
+    logger.info(f'Job #{job.id}: Enqueued final job (priority={priority})')
 
     for file_path, count in file_paths_with_counts.items():
         doc = models.PrintedDocument(job=job,
@@ -54,7 +56,7 @@ def query_group_print_jobs(group, job_type):
     return list(models.PrintJob.objects
                 .filter(group=group, job_type=job_type.value)
                 .prefetch_related('document_set')
-                .order_by('id'))
+                .order_by('create_time', '-priority'))
 
 
 def query_worker_print_jobs(group, job_type, worker):
@@ -72,7 +74,7 @@ def query_worker_print_jobs(group, job_type, worker):
     return list(
         query
         .prefetch_related('document_set')
-        .order_by('id'))
+        .order_by('create_time', '-priority'))
 
 
 def print_on_server(worker, job):

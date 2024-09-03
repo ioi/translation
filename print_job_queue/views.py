@@ -48,6 +48,7 @@ class JobQueue(StaffCheckMixin, View):
         for job in jobs:
             job_info_by_state[models.STATE_BY_VALUE[job.state].name].append({
                 'id': job.id,
+                'priority': job.priority,
                 'owner': job.owner.username,
                 'documents': [(document.file_path, document.print_count)
                               for document in job.document_set.all()],

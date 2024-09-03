@@ -22,7 +22,8 @@ def handle_user_contest_frozen(user_contest, pdfs):
     user_contest.final_print_job = queue.enqueue_final_print_job(
         file_paths_with_counts={pdf: 1 for pdf in pdfs},
         owner=user,
-        group=contest.slug)
+        group=contest.slug,
+        priority=0 if user_contest.skip_verification else 5)
     user_contest.save()
 
 

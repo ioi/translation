@@ -78,8 +78,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 user=request.user, 
                 credit=settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA)
         
-        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=len(text)).update(
-            credit=models.F('credit') - len(text),
+        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=models.F('used') + len(text)).update(
             used=models.F('used') + len(text),
         )
         if updated_rows == 0:

@@ -150,7 +150,7 @@ class Translations(LoginRequiredMixin, View):
             'username': user.username,
             'direction': user.language.direction(),
             "machine_translation_languages": autotranslate.get_supported_languages(),
-            "user_translation_quota": user.usertranslationquota.credit if hasattr(user, "usertranslationquota") else settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA,
+            "user_translation_quota": (user.usertranslationquota.credit - user.usertranslationquota.used) if hasattr(user, "usertranslationquota") else settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA,
         })
 
 

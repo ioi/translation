@@ -56,7 +56,7 @@ def query_group_print_jobs(group, job_type):
     return list(models.PrintJob.objects
                 .filter(group=group, job_type=job_type.value)
                 .prefetch_related('document_set')
-                .order_by('create_time', '-priority'))
+                .order_by('-priority', 'create_time'))
 
 
 def query_worker_print_jobs(group, job_type, worker):
@@ -74,7 +74,7 @@ def query_worker_print_jobs(group, job_type, worker):
     return list(
         query
         .prefetch_related('document_set')
-        .order_by('create_time', '-priority'))
+        .order_by('-priority', 'create_time'))
 
 
 def print_on_server(worker, job):

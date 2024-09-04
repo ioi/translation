@@ -39,10 +39,15 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         form = TranslateRequestForm(request.POST)
         if not form.is_valid():
             content_errors = form.errors.as_data().get("content", None)
-            if any([error.code == 'required' for error in content_errors]):
+            if content_errors is not None and any([error.code == 'required' for error in content_errors]):
                 return JsonResponse({
                     "success": False,
                     "message": "Error. Empty input received. Please enter some text to translate."
+                })    
+            elif form.non_field_errors():
+                return JsonResponse({
+                    "success": False,
+                    "message": "Error. " + "\n".join(form.non_field_errors()) 
                 })    
             else:
                 logger.warning("Unexpected invalid input.")
@@ -54,16 +59,23 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         input_lang = form.cleaned_data["input_lang"]
         output_lang = form.cleaned_data["output_lang"]
 
-        # Wrap backtick in no-translate blocks
+        # Wrap backtick, dollar sign and images in no-translate blocks
         def replacer(match):
-            # Extract the code block content
-            block = match.group(1)
-            lines = []
-            for line in block.split("\n"):
-                lines.append(f'<span class="notranslate">{line}</span>')
-            # Return the code block with spans wrapped around each line
-            return "\n".join(lines)
-        text =  re.sub(r'((`+)[^`]+?\2|(\$+)[^\$]+?\3)', replacer, text, flags=re.MULTILINE)
+            if match.group("image_pattern"):
+                # Make sure the description gets translated but not the path
+                return f'<span class="notranslate">![</span><span class="translate">{match.group("desc")}</span><span class="notranslate">]({match.group("path")})</span>'
+            else:
+                # Extract the code block content
+                block = match.group(1)
+                lines = []
+                for line in block.split("\n"):
+                    lines.append(f'<span class="notranslate">{line}</span>')
+                # Return the code block with spans wrapped around each line
+                return "\n".join(lines)
+        backtick_pattern = r'(`+)[^`]+?\2'
+        dollar_math_pattern = r'(\$+)[^\$]+?\3'
+        image_pattern = r'(?P<image_pattern>!\[(?P<desc>[^\n\]]*?)\]\((?P<path>[^\n\)]*?)\))'
+        text =  re.sub(fr'({backtick_pattern}|{dollar_math_pattern}|{image_pattern})', replacer, text, flags=re.MULTILINE)
         text = text.replace('</span><span class="notranslate">', "")
 
         if not hasattr(request.user, "usertranslationquota"):
@@ -71,8 +83,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 user=request.user, 
                 credit=settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA)
         
-        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=len(text)).update(
-            credit=models.F('credit') - len(text),
+        updated_rows = UserTranslationQuota.objects.filter(user=request.user, credit__gte=models.F('used') + len(text)).update(
             used=models.F('used') + len(text),
         )
         if updated_rows == 0:
@@ -99,8 +110,10 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
             translated_text = "\n".join(lines)
             assert translated_text.startswith("<pre>") and translated_text.endswith("</pre>")
             translated_text = translated_text[len("<pre>"):-len("</pre>")]
+            print(translated_text, text)
             
             # Remove no-translate blocks
+            translated_text = re.sub(r'</span> <span class="translate">(.*?)</span>', r'</span>\1', translated_text, flags=re.MULTILINE)
             translated_text = re.sub(r'<span class="notranslate">(.*?)</span>', r'\1', translated_text, flags=re.MULTILINE)
             return JsonResponse({
                 "success": True,

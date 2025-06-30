@@ -253,7 +253,23 @@ code, pre {
 }
 
 .rendered_content[lang="zh_Hans"] {
-    font-family: CustomTextFont, 'Noto Sans CJK SC', Arial, sans-serif;
+    font-family: CustomTextFont, FandolSong, 'Noto Sans CJK SC', Arial, sans-serif;
+}
+.rendered_content[lang="zh_Hans"] strong,
+.rendered_content[lang="zh_Hans"] h1,
+.rendered_content[lang="zh_Hans"] h2,
+.rendered_content[lang="zh_Hans"] h3,
+.rendered_content[lang="zh_Hans"] h4,
+.rendered_content[lang="zh_Hans"] th {
+    font-family: CustomTextFont, FandolHei, 'Noto Sans CJK SC', Arial, sans-serif;
+}
+.rendered_content[lang="zh_Hans"] em {
+    font-family: CustomTextFont, FandolKai, 'Noto Sans CJK SC', Arial, sans-serif;
+    font-style: normal;
+}
+.rendered_content[lang="zh_Hans"] code,
+.rendered_content[lang="zh_Hans"] pre {
+    font-family: Menlo, Monaco, Consolas, "DejaVu Sans Mono", "Courier New", monospace;
 }
 
 .rendered_content[lang="ja"] {

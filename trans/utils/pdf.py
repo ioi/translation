@@ -129,7 +129,7 @@ def build_printed_draft_pdf(contest_slug, pdf_file_path, info):
 
 
 def merge_final_pdfs(task_names, contest_slug, language_code):
-    os.system('mkdir -p media/merged/{}'.format(contest_slug)) # create dir silently if doeesnt exist
+    os.system('mkdir -p media/merged/{}'.format(contest_slug)) # create dir silently if doesn't exist
     output_pdf_path = 'media/merged/{}/{}-merged.pdf'.format(contest_slug, language_code)
 
     cmd = 'cpdf '

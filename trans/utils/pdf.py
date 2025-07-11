@@ -1,15 +1,12 @@
 import asyncio
 import os
-from urllib.parse import urljoin
 from uuid import uuid4
 import logging
-import requests
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-from shutil import copyfile
 from pyppeteer import launch
 
 from trans.context_processors import ioi_settings
@@ -18,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 def render_pdf_template(translation, task_type,
                         static_path, images_path, pdf_output):
+    # task_type is either "released" for the ISC version, or "task" for a translation
     requested_user = translation.user
     task = translation.task
 
@@ -125,20 +123,6 @@ def build_printed_draft_pdf(contest_slug, pdf_file_path, info):
     os.system('mkdir -p media/draft/{}'.format(contest_slug))
     output_pdf_path = 'media/draft/{}/{}.pdf'.format(contest_slug, str(uuid4()))
     _add_info_line_to_pdf(output_pdf_path, pdf_file_path, info)
-    return output_pdf_path
-
-
-def merge_final_pdfs(task_names, contest_slug, language_code):
-    os.system('mkdir -p media/merged/{}'.format(contest_slug)) # create dir silently if doesn't exist
-    output_pdf_path = 'media/merged/{}/{}-merged.pdf'.format(contest_slug, language_code)
-
-    cmd = 'cpdf '
-
-    for task_name in task_names:
-        cmd = cmd + 'media/final_pdf/{}/{}.pdf '.format(task_name, language_code)
-    cmd = cmd + '-o {}'.format(output_pdf_path)
-
-    os.system(cmd)
     return output_pdf_path
 
 

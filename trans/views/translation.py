@@ -17,8 +17,7 @@ import datetime
 from trans.utils.translation import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
     can_user_change_translation, get_requested_user
-from trans.utils.pdf import get_file_name_from_path, build_pdf, convert_html_to_pdf, add_page_numbers_to_pdf, \
-    pdf_response, build_printed_draft_pdf, render_pdf_template
+from trans.utils.pdf import get_file_name_from_path, build_pdf, pdf_response, build_printed_draft_pdf
 
 from print_job_queue import queue
 
@@ -216,6 +215,7 @@ class TranslationView(LoginRequiredMixin, View):
 
 class TranslationPDF(TranslationView):
     def get(self, request, contest_slug, task_name, task_type):
+        """Download a task PDF for the current user. The task_type is "released" for ISC version, "task" for the translation."""
         user = User.objects.get(username=request.user)
         translation = self._get_translation_by_contest_and_task_type(request, user, contest_slug, task_name, task_type)
         pdf_file_path = build_pdf(translation, task_type)

@@ -1,4 +1,5 @@
 username,raw_password,country,language,is_onsite,is_translating
+ARE,ARE,ARE,ar,1,1
 ARG,ARG,ARG,es,1,1
 ARM,ARM,ARM,hy,1,1
 AUS,AUS,AUS,en,1,1
@@ -22,6 +23,7 @@ CZE,CZE,CZE,cs,1,1
 DEU,DEU,DEU,de,1,1
 DNK,DNK,DNK,da,1,1
 DOM,DOM,DOM,es,1,1
+DZA,DZA,DZA,ar,1,1
 ECU,ECU,ECU,es,1,1
 EGY,EGY,EGY,ar,1,1
 ESP,ESP,ESP,es,1,1
@@ -30,6 +32,7 @@ FIN,FIN,FIN,fi,1,1
 FRA,FRA,FRA,fr,1,1
 GBR,GBR,GBR,en,1,1
 GEO,GEO,GEO,ka,1,1
+GHA,GHA,GHA,en,1,1
 GRC,GRC,GRC,el,1,1
 HKG,HKG,HKG,en,1,1
 HRV,HRV,HRV,hr,1,1
@@ -46,6 +49,7 @@ JPN,JPN,JPN,ja,1,1
 KAZ,KAZ,KAZ,kk,1,1
 KGZ,KGZ,KGZ,ky,1,1
 KOR,KOR,KOR,ko,1,1
+LBY,LBY,LBY,ar,1,1
 LKA,LKA,LKA,si,1,1
 LTU,LTU,LTU,lt,1,1
 LUX,LUX,LUX,de,1,1
@@ -62,6 +66,7 @@ NGA,NGA,NGA,en,1,1
 NLD,NLD,NLD,nl,1,1
 NOR,NOR,NOR,nb,1,1
 NZL,NZL,NZL,en,1,1
+PAK,PAK,PAK,ur,1,1
 PER,PER,PER,es,1,1
 PHL,PHL,PHL,en,1,1
 POL,POL,POL,pl,1,1
@@ -69,6 +74,7 @@ PRT,PRT,PRT,pt,1,1
 PSE,PSE,PSE,ar,1,1
 ROU,ROU,ROU,ro,1,1
 RUS,RUS,RUS,ru,1,1
+RWA,RWA,RWA,en,1,1
 SAU,SAU,SAU,ar,1,1
 SGP,SGP,SGP,en,1,1
 SLV,SLV,SLV,es,1,1

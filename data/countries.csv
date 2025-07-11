@@ -1,4 +1,5 @@
 name,code,code2
+United Arab Emirates,ARE,AE
 Argentina,ARG,AR
 Armenia,ARM,AM
 Australia,AUS,AU
@@ -22,6 +23,7 @@ Czech Republic,CZE,CZ
 Germany,DEU,DE
 Denmark,DNK,DK
 Dominican Republic,DOM,DO
+Algeria,DZA,DZ
 Ecuador,ECU,EC
 Egypt,EGY,EG
 Spain,ESP,ES
@@ -30,6 +32,7 @@ Finland,FIN,FI
 France,FRA,FR
 United Kingdom,GBR,GB
 Georgia,GEO,GE
+Ghana,GHA,GH
 Greece,GRC,GR
 Hong Kong,HKG,HK
 Croatia,HRV,HR
@@ -46,6 +49,7 @@ Japan,JPN,JP
 Kazakhstan,KAZ,KZ
 Kyrgyzstan,KGZ,KG
 Republic of Korea,KOR,KR
+Libya,LBY,LY
 Sri Lanka,LKA,LK
 Lithuania,LTU,LT
 Luxembourg,LUX,LU
@@ -62,6 +66,7 @@ Nigeria,NGA,NG
 Netherlands,NLD,NL
 Norway,NOR,NO
 New Zealand,NZL,NZ
+Pakistan,PAK,PK
 Peru,PER,PE
 Philippines,PHL,PH
 Poland,POL,PL
@@ -69,6 +74,7 @@ Portugal,PRT,PT
 Palestine,PSE,PS
 Romania,ROU,RO
 Russian Federation,RUS,RU
+Rwanda,RWA,RW
 Saudi Arabia,SAU,SA
 Singapore,SGP,SG
 El Salvador,SLV,SV

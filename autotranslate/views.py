@@ -115,11 +115,13 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
             # Remove no-translate blocks
             translated_text = re.sub(r'</span> <span class="translate">(.*?)</span>', r'</span>\1', translated_text, flags=re.MULTILINE)
             translated_text = re.sub(r'<span class="notranslate">(.*?)</span>', r'\1', translated_text, flags=re.MULTILINE)
+            new_quota = UserTranslationQuota.objects.get(user=request.user)
+            assert new_quota is not None
             return JsonResponse({
                 "success": True,
                 "message": "",
                 "translated_text": html.unescape(translated_text),
-                "new_quota": UserTranslationQuota.objects.get(user=request.user).credit
+                "new_quota": new_quota.credit - new_quota.used,
             })
         except Exception as e:
             logging.error("Error in Translation. ", exc_info=e)

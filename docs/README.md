@@ -16,37 +16,49 @@ The IOI automation scripts already take care of the above security concerns.
 
 ## Basic Concepts
 
-There are three main administrator roles: admin, ISC, and staff.
+There are three user accounts used for administering the system:
 
-Firstly, admin adds countries and languages data. Then, for each country (also called "team"), admin creates a user for the team, which is a pair of (country, language).
+- `admin`: has full access to the Django admin interface.
+- `ISC` (the International Scientific Committee): manages tasks and their primary English
+  statements. ISC belongs to the `editor` group in Django, which can be given some rights
+  to the Django admin interface.
+- `staff`: monitors translations and handles printing.
 
-A team can be:
-
-- **translating**: The team can translate the tasks in the system to their language.
-- **not translating**: The team can only read the tasks in the system.
+There is also a translators' account for each combination of a country (a.k.a. team) and a language.
+If a country translates to multiple languages, they should get multiple accounts.
 
 A team consists of:
 
-- One or more **leaders**, which will receive the team user account for task translation.
-- Zero or more **on-site contestants**, which will receive printed task translations.
-- Zero or more **online contestants** (since IOI 2022), which will NOT receive printed task translations.
+- One or more **leaders**, who will receive the team user account for task translation.
+- Zero or more **on-site contestants**, who will receive printed task translations.
+  For each contestant, the leaders pick the translation to print: it could be their
+  their translation, somebody else's translation, or no translation.
+- Zero or more **online contestants**, which will NOT receive printed task translations.
 
-A team which has one or more on-site contestant is referred to as "on-site team".
+Before the start of a contest translation day, the admin creates a contest in the
+system. Then, the ISC creates the tasks for the contest. For each task, ISC adds
+the problem statement in English, and then they release the first version of the task.
+After all tasks have been released, the admin marks the contest as public.
+The teams then see the tasks and start translating.
 
-Before the start of a contest translation day, admin creates a contest in the system. Then, ISC creates the tasks for the contest. For each task, ISC adds the problem statement in English, and then release a version.
+During the translation session, the staff can monitor the translation status of all
+the teams. On-site teams can also request to print their current translation for
+a task, which will be monitored by staff as well.
 
-After all tasks have been released, admin then marks the contest as public. After which, each team can log in and see the tasks, then start translating. A translating team can also choose not to translate some tasks.
+When a team has finished translating a task, they can **finalize** their translation.
+After all tasks are finalized, the team can **submit** the translations for printing.
+
+The staff will see the submitted translations, print the translations accordingly
+(one copy per language per task per on-site contestant). The team leaders then can
+verify the translations and the staff can mark the translations as **sealed**.
+This is the end of the translation session for the team.
+Optionally, the team can opt out of the verification process when submitting.
 
 
-During the translation session, staff can monitor the translation status of all teams. On-site teams can also request to print their current translation for a task, which will be monitored by staff as well.
+## Initial setup
 
-When a team has finished translating, they can finalize the translation by clicking a submit button. On-site teams can also request the translations of at most two other languages to print for the on-site contestants. Staff will see the finalized status, and then print the translations accordingly, one copy per language per task per on-site contestant.
-
-When the translation (and requested translations from other languages, if any) for a team have been printed, the team leaders can verify the translations, and then staff can mark the translation status as "sealed". This is the end of the translation session for the team.
-
-## User Management
-
-There are 3 administrator users: `admin`, `ISC`, and `staff`. The IOI automation scripts will add those users. If Docker is used, the users will need to be added manually:
+There are 3 administrator users: `admin`, `ISC`, and `staff`.
+The IOI automation scripts will add those users. If Docker is used, the users will need to be added manually:
 
 ```
 docker-compose exec app bash
@@ -58,88 +70,88 @@ and then:
 python3 manage.py loaddata initial_data.json
 ```
 
-The roles of the users are as follows:
-
-- `admin`: has full access to the Django admin interface.
-- `ISC`: manages tasks.
-- `staff`: monitors translations.
-
-(ISC stands for International Scientific Committee.)
-
 ### Changing administrator user passwords
 
-Initially, each of the administrator user's password is the same as the username. For security reasons, we need to change the passwords of all the three users. To do this, log in as `admin`, go to `Trans` -> `Users`, select a user, and change the password using the provided form:
-
-<img src="./images/update-user-password.png" width="600">
+Initially, each of the administrator user's password is the same as the
+username. For security reasons, we need to change the passwords of all the
+three users. To do this, log in as `admin`, go to `Trans` -> `Users`, select
+a user, and change the password using the provided form.
 
 ### Adding countries and languages
 
 Default countries and languages data are provided at `data/countries.csv` and `data/languages.csv`. Modify them as necessary.
 
-Then, log in as `admin`, go to `Trans` -> `Countrys` -> `Import`, select the CSV file, choose the `csv` format, and click `Submit`. Do similarly for languages.
-
-| <img src="./images/import-countries.png" width="300"> | <img src="./images/import-languages.png" width="300"> |
-|-|-|
+Then, log in as `admin`, go to `Trans` -> `Countries` -> `Import`, select the CSV file, choose the `csv` format, and click `Submit`.
+Likewise for languages.
 
 ### Adding users
 
-Similarly, we will import the users via a CSV file. Usually, one country (team) will get one shared user account for all translators in the same country. See the default CSV file at `data/users.csv`. Modify the file as necessary. Here is the explanation of each column:
+Similarly, we will import the users via a CSV file. Beware that Django administration lists two tables called `Users`.
+You should use the one under "Trans", not under "Authentication and authorization".
+
+See the default CSV file at `data/users.csv`. Modify the file as necessary. Here is the explanation of each column:
 
 - `username`: the username, in most cases should be equal to the `country`.
 - `raw_password`: the password (generate it).
 - `country`: the 3-letter code country of this user.
 - `language`: the language this user is translating into. Set as `en` if this user is not translating.
-- `num_of_contestants`: the number of contestants attending the contest on-site. This will be used by the system to determine the number copies that each task should be printed for a country. (For example, in IOI 2022, which was a hybrid IOI, the value varied between 0 and 4.)
+- `is_onsite`: `1` if the user is translating on-site, `0` otherwise
+
+### Adding contestants
+
+Finally, we should import contestants from a CSV file, see the defaults in `data/contestants.csv`.
+Each contestant has the following columns:
+
+- `user`: the name of the user who translates for this contestant (usually equal to the country code)
+- `code`: the code of the contestant (e.g., `GHA1`).
+- `name`: the full name of the contestant
+- `on_site`: `1` if they are competing on-site, `0` otherwise
 
 ## Contest & Task Management
 
 ### Adding contests
 
-To add a contest, log in as `admin`, go to `Trans` -> `Contests` -> `Add contest`:
+To add a contest, log in as `admin`, go to `Trans` -> `Contests` -> `Add contest`.
 
-<img src="./images/add-contest.png" width="300">
+The _slug_ is an alphanumeric identifier used in URLs.
+
+The _public_ flag determines if the contest is visible to the translators.
+
+If a contest is marked as _frozen_, its translation can no longer be edited.
 
 ### Adding tasks
 
-To add a task, log in as `ISC`. Then, click the menu on the top-right corner, and select `Add New Task`:
+To add a task, log in as `ISC`. Then, click the menu on the top-right corner, and select `Add New Task`.
 
-| <img src="./images/add-new-task-1.png" width="300"> | <img src="./images/add-new-task-2.png" width="300"> |
-|-|-|
+The _name_ of the task is the alphanumeric codename used in the contest system.
 
 ### Writing task statements
 
-ISC can start adding task statement via the editor on the left side:
+ISC can start adding the task statement via the embedded editor.
+The left pane is used for editing, the right one shows a preview.
 
-<img src="./images/writing-task-statement.png" width="600">
-
-The statement should be added in Markdown format. Mathematical expressions are supported using [KaTeX](https://katex.org/) syntax.
+The statements are written in Markdown (the [Marked.js dialect](https://marked.js.org/).
+Mathematical expressions are supported using [KaTeX](https://katex.org/) syntax.
 
 It is advisable to write each sentence in a separate line, to make it easier for the translators to track the translation.
 
-To insert an image in the task statement, admin must first upload the image file as an attachment (`Trans` -> `Attachments`):
-
-<img src="./images/add-attachment.png" width="300">
-
-then, the image can be added in the statement using this Markdown syntax: `![](hello_image1.png)`.
+To insert an image in the task statement, admin must first upload the image file as an attachment (`Trans` -> `Attachments`).
+Then, the image can be added in the statement using this Markdown syntax: `![](hello_image1.png)`.
 
 ### Releasing ISC version
 
-Once the statement of a task is final, ISC should release a version for the task:
-
-| <img src="./images/releasing-isc-version-1.png" width="300"> | <img src="./images/releasing-isc-version-2.png" width="400"> |
-|-|-|
-
-Continue adding all tasks for the contest.
+Once the statement of a task is final, ISC should release the first version.
+This is done using the "Release" button in the editor.
 
 ### Making contests public
 
-After ISC has added all tasks for a contest, admin can make the contest public by ticking the `Public` checkbox:
+After the ISC has added all tasks of a contest, the admin can make the contest public by ticking the `Public` checkbox.
+Once a contest is public, the translators will be able to see the latest released version of each task in the contest.
 
-<img src="./images/making-contest-public-1.png" width="300">
+### Releasing further versions
 
-Once a contest is public, users will be able to see the latest released version of each task in the contest:
-
-<img src="./images/making-contest-public-2.png" width="600">
+Later, the ISC can decide to update the official statement and release
+a new version. Each release comes with a release note visible to the translators.
 
 ## Monitoring Translations
 
@@ -147,86 +159,59 @@ Once a contest is public, users will be able to see the latest released version 
 
 Upon login, the `staff` user will be presented with the translation status of all teams.
 
-<img src="./images/monitoring-translations.png" width="600">
-
 The User, Team, and Language columns are self-explanatory.
-
-The Copies column denotes the number of copies that a task must be printed for the team. Basically, equals to the number of on-site contestants (the `num_of_contestants` column when importing users).
 
 The Status column denotes the status of the overall translation:
 
-- `In Progress`: the team has not finalized the translation yet.
-  - Next action for the team: finalize the translation.
-- `Done (PDF Only)`: the team does not have any contestants on-site, and is not translating.
-  - This is a terminal state.
-- `Choosing Copies`: the team is not translating, and has not finalized.
-  - Next action for the team: choose additional languages to print, and finalize.
-- `Pending Seal`: the team has finalized the translation.
-  - Next action for the team: wait for the printed translations.
-    - When they are ready, team to verify and seal them.
-- `Done (Sealed)`: the team has verified and sealed the translations.
-  - This is a terminal state.
+- `In Progress`: the team has not submitted the translation yet.
+- `Printing`: the translations have been submitted and they are now in the print queue.
+  `(needs seal)` is added if manual verification and sealing is requested.
+- `Done (sealed)`: the translation have been printed and sealed
+  (sealed by the staff if the team opted out of verification).
+- `Done (remote)`: the translations have been submitted and the team is off-site,
+  so nothing else needs be done.
 
-If a team requested additional languages to print, the language code(s) are shown below the status.
+The last column contains status of the translation for each task:
 
-Each of the last columns denotes the translation status of a task:
-
-
-- :heavy_minus_sign: : Not applicable because the team is not translating
-- :grey_question: : Not started yet
-- :pencil2: : Started but not finalized
-- :heavy_multiplication_x: : The team decides not to translate this task
-- :page_facing_up: : Finalized
+- :page_facing_up: : shows a PDF file with a finalized translation.
+- :heavy_minus_sign: : the team is not translating.
+- :question: : there is no translation yet.
+- :pencil2: : the team is still editing the translation.
+- :heavy_multiplication_x: : the team decided not to translate this task.
 
 ### Updating translation status
 
-Staff can click on each row in the User column, which will redirect to the detailed translation status of that user (team):
-
-<img src="./images/updating-translation-status-1.png" width="500">
-
-<img src="./images/updating-translation-status-2.png" width="500">
+Staff can click on each row in the User column, which will show the detailed translation
+status status of that user (team).
 
 Here, staff can:
 
-- Force-finalize (freeze) team's overall translation or individual task translations.
+- Force-freeze team's overall translation or individual task translations.
 - Force-reopen (unfreeze) team's overall translation or individual task translations.
-- Mark contestant envelopes (containing printed translations) as sealed by the team, which will mark the translation as done.
+- View and edit the assignment of translations to contestants.
+- Declare contestant envelopes (containing printed translations) sealed by the team, which will mark the translation as done.
 
 ### Showing public translation status
 
-We can show the overall translation status to all teams in the translation room, by clicking the `Public View` menu:
-
-<img src="./images/showing-public-translation-status-1.png" width="300">
-
-This will show the same data, but it is split into multiple tables, so that the whole teams can be visible on a single large screen:
-
-<img src="./images/showing-public-translation-status-2.png" width="800">
+We can show the overall translation status to all teams in the translation room, by clicking the `Public View` in the menu.
+It shows the same data as the staff's status page, but packed, so that it fits on a single large screen.
 
 ## Handling Printing Queues
 
-For each contest, there are two printing queues: **draft** and **final** translation jobs.
+For each contest, there are two printing queues:
 
-### Draft translations queue
+- **draft** print jobs for a working version of a team's translation of a task.
+  They can be requested by clicking a button in the edit interface.
 
-A print job in this queue represents one print request for a current translation version of a task by a team. It will be created each time the following button is clicked:
+- **final** print jobs for finalized translations.
+  There will be (at most) one such print job per on-site team.
+  If the `PRINT_BATCH_WHOLE_TEAM` setting is `False`, the job will consist of separate
+  files for contestants.
 
-  |<img src="./images/draft-translation-action-1.png" width="300">|<img src="./images/draft-translation-action-2.png" width="300">|
-  |-|-|
+If you want to use duplex printing, set `PRINT_BATCH_DUPLEX` to `True`
+to make each task start at an odd page.
 
-### Final translations queue
-
-A print job in this queue represents an on-site team that has finalized their translation. There will be (at most) one such print job per on-site team.
-
-### Viewing print job queue
-
-Staff can visit the dashboard for draft and final printing queue by clicking on the following links:
-
-<img src="./images/handling-printing-queue.png" width="300">
-
-The page shows the file(s) to print for each team, and how many copies.
-
-|<img src="./images/draft-queue-1.png" width="500">|<img src="./images/final-queue-1.png" width="500">|
-|-|-|
+### Print workers
 
 ### Printing jobs
 

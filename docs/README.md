@@ -198,7 +198,7 @@ It shows the same data as the staff's status page, but packed, so that it fits o
 
 ## Handling Printing Queues
 
-For each contest, there are two printing queues:
+For each contest, there are two printing **queues:**
 
 - **draft** print jobs for a working version of a team's translation of a task.
   They can be requested by clicking a button in the edit interface.
@@ -213,29 +213,19 @@ to make each task start at an odd page.
 
 ### Print workers
 
-### Printing jobs
+Each queue can be handled by one or more **workers,** set up in Django administration.
+A worker represents one physical printer station, attended by a runner.
 
-Each queue can be handled by one or more "worker". A worker represents one physical printer station, attended by a runner.
+To distribute the load between available workers, you can give each worker _modulo_ and _index_
+and it will receive jobs whose ID modulo _modulo_ is equal to _index_.
 
-We can distribute the load between available printers. Suppose that there are 3 printers. We can set so that:
+By default, printing is handled by the runners. A runner picks up a job by clicking a button,
+opens the PDF files on their computer, and sends them to the printer.
 
-- the first printer gets all jobs with ID = 0 (mod 3)
-- the second printer gets all jobs with ID = 1 (mod 3)
-- the third printer gets all jobs with ID = 2 (mod 3)
+Alternatively, a worker can have server-side printing enabled. Then the runner just clicks
+a Print button, which invokes the `print.sh` script on the server. You are expected to customize
+the script according to your printing setup.
 
-As instructed in the page, to see the worker view, append `?name={worker name}&count={worker count}&mod={job ID mod}`. Some examples:
-
-- `?name=ballroom-draft&count=1&mod=0`
-- `?name=ballroom&count=1&mod=0`
-- `?name=ballroom&count=3&mod=2`
-
-|<img src="./images/draft-queue-2.png" width="500">|<img src="./images/final-queue-2.png" width="500">|
-|-|-|
-
-The runner at each printer station can then pick up a job, click on each file and print one or more copies of the document, and then mark the job as complete.
-
-**NOTE**: As explained above the printing itself is done manually by the runners. It is NOT automated! This system is not connected to any printer.
-
-After completing a final translation print job, the runner should collect the printed documents and contestant envelopes, reach out to the team leaders, and seal the envelopes. Then, the runner should click on the country link, and then click the "Mark as sealed" button.
-
-<img src="./images/final-queue-3.png" width="300">
+When the job is printed, the runner marks the job as completed. Then they click on the team's
+page to see if the team has requested verification. After verificaton (or if there is none),
+they click the Seal button.

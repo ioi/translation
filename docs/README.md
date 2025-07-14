@@ -255,3 +255,13 @@ could be useful.
 Another potentially useful change is granting permissions on the `Attachment` table
 to the `editor` group. It enables the ISC to create/update/delete images and other
 attachments to the task statement without having to ask the admin every time.
+
+## Miscellaneous
+
+- `<hr class=pagebreak>` in Markdown text forces a page break.
+
+- `./manage.py export` can be used to export all Markdown sources, attachments, and
+  generated PDFs as a directory tree.
+
+- The `Flat pages` table contains HTML snippets that are inserted to the home page
+  of normal users and the ISC.

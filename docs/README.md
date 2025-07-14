@@ -265,3 +265,22 @@ attachments to the task statement without having to ask the admin every time.
 
 - The `Flat pages` table contains HTML snippets that are inserted to the home page
   of normal users and the ISC.
+
+### Directory hierarchy
+
+- `cache/CONTEST/TASK/TYPE/TASK-USER.pdf` is the rendered PDF, where `TYPE` is either `task`
+  for a translation or `released` for the English original. Cached files may be deleted
+  manually to force re-rendering; this is safe except when the user is in the middle of
+  an operation.
+
+- `media/draft/CONTEST/UUID.pdf` are draft print-outs. Files that are not in the draft
+  print queue may be safely deleted.
+
+- `media/final_pdf/CONTEST/TASK/LANGUAGE_COUNTRY.pdf` are the final versions
+  (usually a copy of the cached PDF from the time when the translation of the task was
+  last frozen).
+
+- `media/batch/CONTEST/USER-CONTESTANT.pdf` and `media/batch/CONTEST/USER.pdf`
+  are the final versions for printing. The former one is a batch of all translations
+  for a given contestant. The latter one is for all contestants of the team
+  (which one is produced depends on the `PRINT_BATCH_WHOLE_TEAM` setting.

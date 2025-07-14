@@ -1,12 +1,16 @@
+from django.core.exceptions import PermissionDenied
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
+import logging
 
 from trans.models import Notification, User
 from trans.utils.notification import get_all_notifs, read_this_notif, read_all_notifs, reset_notification_cache
-from trans.views.admin import StaffCheckMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 class ReadNotifications(LoginRequiredMixin, View):
@@ -34,18 +38,24 @@ class ReadNotifications(LoginRequiredMixin, View):
         return HttpResponse("Success")
 
 
-class SendNotification(StaffCheckMixin, View):
+class SendNotification(View):
     def post(self, request):
+        if not request.user.has_perm('trans.send_notifications'):
+            logger.warning(f'Missing permission trans.send_notifications for user {request.user.username}')
+            raise PermissionDenied('Notification rights required')
+
         title = request.POST['title']
         description = request.POST['description']
         notif = Notification(title=title, description=description)
         notif.save()
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-from django.contrib.admin.views.decorators import staff_member_required
 
-@staff_member_required
 def reset_notifications(request):
+    if not request.user.has_perm('trans.delete_notification'):
+        logger.warning(f'Missing permission trans.send_notifications for user {request.user.username}')
+        raise PermissionDenied('Notification rights required')
+
     Notification.objects.all().delete()
     reset_notification_cache(User.objects.all())
     return HttpResponseRedirect(request.META["HTTP_REFERER"])

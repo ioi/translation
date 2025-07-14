@@ -1,6 +1,7 @@
 from collections import defaultdict
 import logging
 
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http.response import HttpResponseBadRequest, Http404
 from django.shortcuts import render, redirect
@@ -16,14 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class StaffCheckMixin(LoginRequiredMixin, object):
-    user_check_failure_path = '/'
-
     def check_user(self, user):
         return user.is_superuser or user.groups.filter(name="staff").exists()
 
     def user_check_failed(self, request, *args, **kwargs):
         logger.warning(f'Staff check failed for user {request.user.username}')
-        return redirect(self.user_check_failure_path)
+        raise PermissionDenied('Staff rights required')
 
     def dispatch(self, request, *args, **kwargs):
         if not self.check_user(request.user):

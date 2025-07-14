@@ -2,7 +2,7 @@ from collections import defaultdict
 import logging
 
 from django import forms
-from django.http.response import HttpResponseBadRequest, HttpResponseNotFound, Http404
+from django.http.response import HttpResponseBadRequest, Http404
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.files import File
@@ -15,9 +15,9 @@ from django.db import transaction
 
 from trans.forms import UploadFileForm
 
-from trans.models import User, Task, Translation, Contest, Contestant, UserContest, ContestantContest, Country
+from trans.models import User, Task, Translation, Contest, Contestant, UserContest, ContestantContest
 from trans.utils.pdf import build_final_pdf
-from trans.utils.batch import BatchRecipe, RecipeContestant
+from trans.utils.batch import BatchRecipe
 from trans.utils.translation import get_trans_by_user_and_task, is_translate_in_editing, unleash_edit_token
 import trans.utils.print_job_queue as print_job_queue
 
@@ -25,14 +25,12 @@ logger = logging.getLogger(__name__)
 
 
 class AdminCheckMixin(LoginRequiredMixin, object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
     def check_user(self, user):
         return user.is_superuser
 
     def user_check_failed(self, request, *args, **kwargs):
         logger.warning(f'Admin check failed for user {request.user.username}')
-        return redirect(self.user_check_failure_path)
+        raise PermissionDenied('Administrator rights required')
 
     def dispatch(self, request, *args, **kwargs):
         if not self.check_user(request.user):
@@ -41,14 +39,12 @@ class AdminCheckMixin(LoginRequiredMixin, object):
 
 
 class StaffCheckMixin(LoginRequiredMixin, object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
     def check_user(self, user):
         return user.is_superuser or user.groups.filter(name="staff").exists()
 
     def user_check_failed(self, request, *args, **kwargs):
         logger.warning(f'Staff check failed for user {request.user.username}')
-        return redirect(self.user_check_failure_path)
+        raise PermissionDenied('Staff rights required')
 
     def dispatch(self, request, *args, **kwargs):
         if not self.check_user(request.user):
@@ -57,14 +53,12 @@ class StaffCheckMixin(LoginRequiredMixin, object):
 
 
 class EditorCheckMixin(LoginRequiredMixin, object):
-    user_check_failure_path = 'home'  # can be path, url name or reverse_lazy
-
     def check_user(self, user):
         return user.is_superuser or user.groups.filter(name="editor").exists()
 
     def user_check_failed(self, request, *args, **kwargs):
         logger.warning(f'Editor check failed for user {request.user.username}')
-        return redirect(self.user_check_failure_path)
+        raise PermissionDenied('Editor rights required')
 
     def dispatch(self, request, *args, **kwargs):
         if not self.check_user(request.user):
@@ -162,7 +156,7 @@ class UserTranslations(StaffCheckMixin, View):
             for cc in ContestantContest.objects.filter(contest=contest, translation_by_user=user).exclude(contestant__in=contestants).select_related("contestant"):
                 extra_contestants.append(cc.contestant)
 
-        can_upload_final_pdf = request.user.has_perm('trans.change_translation')
+        can_upload_final_pdf = request.user.has_perm('trans.upload_translation_pdf')
         form = UploadFileForm()
         return render(request, 'user.html', context={
             'user': user,
@@ -254,8 +248,12 @@ class UsersList(StaffCheckMixin, View):
         })
 
 
-class AddFinalPDF(StaffCheckMixin, View):
+class AddFinalPDF(View):
     def post(self, request):
+        if not request.user.has_perm('trans.upload_translation_pdf'):
+            logger.warning(f'Missing permission trans.upload_translation_pdf for user {request.user.username}')
+            raise PermissionDenied('trans.upload_translation_pdf right required')
+
         id = request.POST['trans_id']
         trans = Translation.objects.filter(id=id).first()
         form = UploadFileForm(request.POST, request.FILES)

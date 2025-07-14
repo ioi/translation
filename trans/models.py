@@ -9,6 +9,13 @@ from print_job_queue import models as print_job_queue_models
 
 
 class User(DjangoUser):
+
+    class Meta(DjangoUser.Meta):
+        permissions = getattr(DjangoUser.Meta, 'permissions', []) + [
+            ("upload_translation_pdf", "Staff member is allowed to upload translations as PDFs"),
+            ("send_notifications", "Send notifications to users"),
+        ]
+
     language = models.ForeignKey('Language', on_delete=models.deletion.CASCADE)
     country = models.ForeignKey('Country', on_delete=models.deletion.CASCADE)
     text_font_base64 = models.TextField(default='', blank=True)

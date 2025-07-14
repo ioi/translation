@@ -24,11 +24,7 @@
       {% if is_editor %}
         <h4>You are editing the primary English version.</h4>
       {% else %}
-        {% if is_translating %}
-          <h4>Your team is translating into <b>{{ user.language.name }} ({{ user.language_code }})</b>.</h4>
-        {% else %}
-          <h4>Your team is not translating.</h4>
-        {% endif %}
+        <h4>Your team is translating into <b>{{ user.language.name }} ({{ user.language_code }})</b>.</h4>
       {% endif %}
 
       {# <div class='smallskip'></div> #}
@@ -39,17 +35,13 @@
         <thead>
           <tr>
             <th width="15%">Task</th>
-            {% if is_editor or is_translating %}
-              <th>Edit</th>
-            {% endif %}
+            <th>Edit</th>
             {% if is_editor %}
               <th>Current Version</th>
               <th>Latest Release</th>
             {% else %}
-              {% if is_translating %}
-                <th>Translation</th>
-              {% endif %}
-              {% if not cinfo.frozen and is_translating %}
+              <th>Translation</th>
+              {% if not cinfo.frozen %}
                 <th>Finalize</th>
               {% endif %}
               <th>ISC Version</th>
@@ -66,59 +58,57 @@
               data-task-frozen="{{ task.frozen|yesno:'True,False' }}">
               <td>{{ task.name }}</td>
 
-              {% if is_editor or is_translating %}
-                {# Edit #}
-                <td>
-                  {% if task.is_editing %}
-                    Is editing
-                  {% elif task.frozen %}
-                    {% if task.translating %}
-                      Finalized
-                    {% else %}
-                      Not translating
-                    {% endif %}
+              {# Edit #}
+              <td>
+                {% if task.is_editing %}
+                  Is editing
+                {% elif task.frozen %}
+                  {% if task.translating %}
+                    Finalized
                   {% else %}
-                    <a href="{% url 'edit' cinfo.slug task.name %}" class="btn btn-default">Edit</a>
+                    Not translating
                   {% endif %}
-                </td>
+                {% else %}
+                  <a href="{% url 'edit' cinfo.slug task.name %}" class="btn btn-default">Edit</a>
+                {% endif %}
+              </td>
 
-                {# Edit buttons #}
-                <td>
-                  <a href="{% url 'revisions' 'task' cinfo.slug task.name %}"
-                     class="btn btn-default"
-                     title="History">
-                    <i class="fa fa-btns fa-history fa-lg"></i>
-                  </a>
-                  {% if not cinfo.frozen and not task.frozen or task.translating %}
-                    <a href="{% url 'task_pdf' 'task' cinfo.slug task.name %}"
-                      class="btn btn-default"
-                      title="PDF">
-                      <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
-                  </a>
-                  {% endif %}
-                  {% if not cinfo.frozen and not task.frozen and is_onsite %}
+              {# Edit buttons #}
+              <td>
+                <a href="{% url 'revisions' 'task' cinfo.slug task.name %}"
+                   class="btn btn-default"
+                   title="History">
+                  <i class="fa fa-btns fa-history fa-lg"></i>
+                </a>
+                {% if not cinfo.frozen and not task.frozen or task.translating %}
+                  <a href="{% url 'task_pdf' 'task' cinfo.slug task.name %}"
+                    class="btn btn-default"
+                    title="PDF">
+                    <i class="fa fa-btns fa-file-pdf-o fa-lg"></i>
+                </a>
+                {% endif %}
+                {% if not cinfo.frozen and not task.frozen and is_onsite %}
+                  <button
+                    onclick="sendPrint('{% url 'task_print' 'task' cinfo.slug task.name %}')"
+                    class="btn btn-default"
+                    title="Print a copy">
+                    <i class="fa fa-btn fa-print fa-lg"></i>
+                  </button>
+                {% endif %}
+                {% if not cinfo.frozen and not task.frozen and task.is_editing %}
+                  <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}" style="display: inline">
+                    {% csrf_token %}
                     <button
-                      onclick="sendPrint('{% url 'task_print' 'task' cinfo.slug task.name %}')"
-                      class="btn btn-default"
-                      title="Print a copy">
-                      <i class="fa fa-btn fa-print fa-lg"></i>
+                      type="submit"
+                      class="btn btn-danger"
+                      title="Break edit lock">
+                      <i class="fa fa-btns fa-bolt fa-lg"></i>
                     </button>
-                  {% endif %}
-                  {% if not cinfo.frozen and not task.frozen and task.is_editing %}
-                    <form method="post" action="{% url 'unleash_edit_token' id=task.trans_id %}" style="display: inline">
-                      {% csrf_token %}
-                      <button
-                        type="submit"
-                        class="btn btn-danger"
-                        title="Break edit lock">
-                        <i class="fa fa-btns fa-bolt fa-lg"></i>
-                      </button>
-                    </form>
-                  {% endif %}
-                </td>
-              {% endif %}
+                  </form>
+                {% endif %}
+              </td>
 
-              {% if not cinfo.frozen and is_translating %}
+              {% if not cinfo.frozen %}
                 {# Finalization #}
                 <td>
                   {% if cinfo.user_contest is None or not cinfo.user_contest.frozen %}
@@ -205,15 +195,13 @@
 
         {# Status of finalization #}
         {% if not cinfo.frozen and cinfo.user_contest and cinfo.user_contest.frozen %}
-          {% if is_translating %}
-            <div class="alert alert-success">
-              <p>Your translation has been submitted.</p>
+          <div class="alert alert-success">
+            <p>Your translation has been submitted.</p>
 
-              {% if cinfo.user_contest.note %}
-                <p><b>Note:</b> {{cinfo.user_contest.note}}</p>
-              {% endif %}
-            </div>
-          {% endif %}
+            {% if cinfo.user_contest.note %}
+              <p><b>Note:</b> {{cinfo.user_contest.note}}</p>
+            {% endif %}
+          </div>
 
           {% if is_onsite %}
             {% if cinfo.user_contest.skip_verification %}
@@ -244,66 +232,53 @@
 
         {# Summary: what will contestants receive #}
         {% if is_onsite %}
-          {% if is_translating %}
-            <p>Your contestants will receive printed <b>English</b> statements and the following translations:</p>
+          <p>Your contestants will receive printed <b>English</b> statements and the following translations:</p>
 
-            {# Languages for contestants #}
-            <table class="table table-hover">
-              <thead>
+          {# Languages for contestants #}
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Translation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ctant, trans in cinfo.contestant_translations %}
                 <tr>
-                  <th>Code</th>
-                  <th>Name</th>
-                  <th>Translation</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for ctant, trans in cinfo.contestant_translations %}
-                  <tr>
-                    <td>{{ ctant.code }}</td>
-                    <td>{{ ctant.name }}</td>
-                    <td>
-                      {% if ctant.on_site %}
-                        {% if trans %}
-                          {{ trans }}
-                        {% else %}
-                          <i>no translation requested</i>
-                        {% endif %}
+                  <td>{{ ctant.code }}</td>
+                  <td>{{ ctant.name }}</td>
+                  <td>
+                    {% if ctant.on_site %}
+                      {% if trans %}
+                        {{ trans }}
                       {% else %}
-                        <i>online contestants receive all translations in CMS</i>
+                        <i>no translation requested</i>
                       {% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-
-          {% else %}
-            <p>Your contestants will receive printed <b>English</b> statements.</p>
-          {% endif %}
+                    {% else %}
+                      <i>online contestants receive all translations in CMS</i>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         {% else %}
-          {% if is_translating %}
-            <p>Your contestants will receive all translations in the CMS.</p>
-          {% endif %}
+          <p>Your contestants will receive all translations in the CMS.</p>
         {% endif %}
 
         {# Buttons for submitting translations and changing settings #}
         {% if not cinfo.frozen %}
-          {% if is_onsite or is_translating %}
-            {% if not cinfo.user_contest or not cinfo.user_contest.frozen %}
-              <div class="button-row">
-                <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
-                  Edit contestants
-                </a>
-                <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
-                  {% if is_translating %}
-                    Submit finalized translation
-                  {% else %}
-                    Submit
-                  {% endif %}
-                </a>
-              </div>
-            {% endif %}
-            {% endif %}
+          {% if not cinfo.user_contest or not cinfo.user_contest.frozen %}
+            <div class="button-row">
+              <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
+                Edit contestants
+              </a>
+              <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
+                Submit finalized translation
+              </a>
+            </div>
+          {% endif %}
         {% endif %}
 
       {# End of contestants, sealing etc. #}

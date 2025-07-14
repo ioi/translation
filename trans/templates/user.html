@@ -175,42 +175,40 @@
                 </tbody>
             </table>
 
-            {% if is_onsite or is_translating %}
-                {# Languages for contestants #}
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>Code</th>
-                      <th>Name</th>
-                      <th>Translation</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for ctant, trans in cinfo.contestant_translations %}
-                      <tr>
-                        <td>{{ ctant.code }}</td>
-                        <td>{{ ctant.name }}</td>
-                        <td>
-                          {% if ctant.on_site %}
-                            {% if trans %}
-                              {{ trans }}
-                            {% else %}
-                              <i>no translation requested</i>
-                            {% endif %}
-                          {% else %}
-                            <i>online</i>
-                          {% endif %}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+            {# Languages for contestants #}
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Translation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for ctant, trans in cinfo.contestant_translations %}
+                  <tr>
+                    <td>{{ ctant.code }}</td>
+                    <td>{{ ctant.name }}</td>
+                    <td>
+                      {% if ctant.on_site %}
+                        {% if trans %}
+                          {{ trans }}
+                        {% else %}
+                          <i>no translation requested</i>
+                        {% endif %}
+                      {% else %}
+                        <i>online</i>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
 
-                {% if not cinfo.frozen and not cinfo.user_contest or not cinfo.user_contest.frozen %}
-                    <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
-                        Edit contestants
-                    </a>
-                {% endif %}
+            {% if not cinfo.frozen and not cinfo.user_contest or not cinfo.user_contest.frozen %}
+                <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
+                    Edit contestants
+                </a>
             {% endif %}
 
             {% if cinfo.extra_contestants %}

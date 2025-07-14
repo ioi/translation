@@ -16,8 +16,6 @@ class User(DjangoUser):
     is_onsite = models.BooleanField(default=True,
                                     verbose_name='Is on-site',
                                     help_text='User is present on-site (e.g., this allows printing)')
-    is_translating = models.BooleanField(default=True,
-                                         verbose_name='Is translating')
 
     def __str__(self):
         return self.username
@@ -219,7 +217,7 @@ class ContestantContest(models.Model):
     def obtain(cls, contestant, contest, user):
         cc, created = cls.objects.get_or_create(contestant=contestant, contest=contest)
         if created:
-            if contestant.on_site and user.is_translating:
+            if contestant.on_site:
                 cc.translation_by_user = user
             cc.save()
         return cc

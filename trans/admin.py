@@ -32,7 +32,7 @@ class CustomUserResource(ModelResource):
 
     class Meta:
         model = User
-        fields = ('username', 'country', 'language', 'raw_password', 'is_onsite', 'is_translating')
+        fields = ('username', 'country', 'language', 'raw_password', 'is_onsite')
         import_id_fields = ('username',)
 
 class ContestantInline(admin.TabularInline):
@@ -43,18 +43,18 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
     resource_class = CustomUserResource
-    list_display = ("username", "translate_versions", "country", "language", 'is_onsite', 'is_translating')
+    list_display = ("username", "translate_versions", "country", "language", 'is_onsite')
     ordering = ("username",)
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
 
     fieldsets = (
-        (None, {'fields': ('username', 'text_font_base64', 'text_font_name', 'password', 'language', 'country', 'is_onsite', 'is_translating')}),
+        (None, {'fields': ('username', 'text_font_base64', 'text_font_name', 'password', 'language', 'country', 'is_onsite')}),
         )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password', 'language', 'country', 'is_onsite', 'is_translating', 'is_superuser', 'is_staff', 'is_active')}
+            'fields': ('username', 'password', 'language', 'country', 'is_onsite', 'is_superuser', 'is_staff', 'is_active')}
             ),
         )
 

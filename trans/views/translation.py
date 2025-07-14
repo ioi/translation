@@ -94,7 +94,6 @@ class Home(LoginRequiredMixin, View):
             'contest_infos': [ci for ci in contest_info.values() if ci['tasks']],
             'home_content': home_content,
             'is_onsite': user.is_onsite,
-            'is_translating': user.is_translating,
         })
 
 class AutoTranslate(LoginRequiredMixin, View):
@@ -106,7 +105,6 @@ class AutoTranslate(LoginRequiredMixin, View):
             'user': user,
             'is_editor': user.is_editor(),
             'has_contestants': user.contestant_set.count() > 0,
-            'is_translating': user.is_translating,
         })
 
 

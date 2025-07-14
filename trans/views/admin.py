@@ -183,7 +183,6 @@ class UsersList(StaffCheckMixin, View):
                 'country_name': user.country,
                 'language_code': user.language_code,
                 'is_onsite': user.is_onsite,
-                'is_translating': user.is_translating,
                 'is_editor': user.is_editor(),
             })
         return users
@@ -337,13 +336,10 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
 
         if self.user.is_staff:
             self.errors.append('Staff does not have translations')
-        elif self.user.is_onsite or self.user.is_translating:
-            if self.user.is_translating:
-                self.check_own_translations()
+        else:
+            self.check_own_translations()
             if self.user.is_onsite:
                 self.make_recipe()
-        else:
-            self.errors.append('You neither have on-site contestants nor you are translating')
 
         if self.errors:
             form = None
@@ -458,7 +454,7 @@ class EditUserContest(LoginRequiredMixin, RightsCheckMixin, View):
 
         contestants = Contestant.objects.filter(user=self.user).order_by('code')
 
-        translating_users = User.objects.filter(is_translating=True).select_related('language', 'country').order_by('language__name', 'country__name')
+        translating_users = User.objects.select_related('language', 'country').order_by('language__name', 'country__name')
         trans_choices = [
             (u.id, f'{u.language.name} ({u.country.name})')
             for u in translating_users

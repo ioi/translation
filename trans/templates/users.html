@@ -38,11 +38,7 @@
               </td>
 
               <td>
-                {% if user.is_translating or user.is_editor %}
-                  {{ user.language_code }}
-                {% else %}
-                  —
-                {% endif %}
+                {{ user.language_code }}
               </td>
 
               <td>
@@ -67,12 +63,6 @@
                         </b>
                       </span>
                     {% endif %}
-                  {% elif not user.is_translating %}
-                    {# Team is not translating #}
-                    <span>
-                      <i class="fa fa-list fa-lg"></i>
-                      Choosing Copies
-                    </span>
                   {% else %}
                     {# Team is translating #}
                     <span>
@@ -91,10 +81,6 @@
                       <a class="btn btn-default" href="{{translation.final_pdf_url}}"><i class="fa fa-file-pdf-o fa-lg"></i></a>
                     {% else %}
                       {% if user.is_editor %}
-                      {% elif not user.is_translating %}
-                        <span style="color: red">
-                          <i class="fa fa-minus fa-lg"></i>
-                        </span>
                       {% elif translation is None %}
                         <span style="color: brown">
                           <i class="fa fa-question fa-lg"></i>

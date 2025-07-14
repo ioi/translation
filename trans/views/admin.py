@@ -262,7 +262,7 @@ class AddFinalPDF(View):
 
         pdf_file = request.FILES.get('uploaded_file', None)
         if not pdf_file or pdf_file.name.split('.')[-1] != 'pdf':
-            return HttpResponseBadRequest("You should attach a pdf file")
+            return HttpResponseBadRequest("You should attach a PDF file")
 
         logger.info(f'Uploading final PDF {trans.task.name} for {trans.user.username} by {request.user.username}')
         trans.frozen = True

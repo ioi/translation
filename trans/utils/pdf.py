@@ -2,6 +2,8 @@ import asyncio
 import os
 from uuid import uuid4
 import logging
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -10,12 +12,76 @@ from django.template.loader import render_to_string
 from pyppeteer import launch
 
 from trans.context_processors import ioi_settings
+from trans.models import Translation, User
 
 logger = logging.getLogger(__name__)
 
-def render_pdf_template(translation, task_type,
-                        static_path, images_path, pdf_output):
+
+def build_pdf(translation: Translation, task_type: str) -> str:
     # task_type is either "released" for the ISC version, or "task" for a translation
+    task = translation.task
+    user = translation.user
+    pdf_file_path = _cached_pdf_path(task.contest.slug, task.name, task_type, user)
+
+    last_edit_time = translation.get_latest_change_time()
+    assert last_edit_time is not None
+    rebuild_needed = not pdf_file_path.exists() or pdf_file_path.stat().st_mtime < last_edit_time
+    if not rebuild_needed:
+        return str(pdf_file_path)
+
+    html = _render_pdf_template(
+        translation, task_type,
+        static_path=settings.STATIC_ROOT,
+        images_path=settings.MEDIA_ROOT + 'images/',
+        pdf_output=True,
+    )
+
+    with TemporaryDirectory(dir=_temp_dir_path()) as temp_dir:
+        temp_dir_path = Path(temp_dir)
+        loop = asyncio.get_event_loop()
+        browser_pdf_path = loop.run_until_complete(_convert_html_to_pdf(html, temp_dir_path))
+        transformed_pdf_path = temp_dir_path / 'transformed.pdf'
+        _add_page_numbers_to_pdf(browser_pdf_path, transformed_pdf_path, task.name)
+        transformed_pdf_path.rename(pdf_file_path)
+
+    return str(pdf_file_path)
+
+
+def build_final_pdf(translation: Translation) -> str:
+    task_type = 'released' if translation.user.username == 'ISC' else 'task'
+    return build_pdf(translation, task_type)
+
+
+def build_printed_draft_pdf(contest_slug: str, pdf_file_path: str, info: str) -> str:
+    draft_dir_path = Path(f'media/draft/{contest_slug}')
+    draft_dir_path.mkdir(parents=True, exist_ok=True)
+    output_pdf_path = draft_dir_path / str(uuid4())
+    _add_info_line_to_pdf(Path(pdf_file_path), output_pdf_path, info)
+    return str(output_pdf_path)
+
+
+def remove_cached_pdfs(user: User) -> None:
+    """Remove all cached generated PDF for a given user."""
+    for trans in Translation.objects.filter(user=user):
+        for task_type in ['released', 'task']:
+            pdf_path = _cached_pdf_path(trans.task.contest.slug, trans.task.name, task_type, user)
+            pdf_path.unlink(missing_ok=True)
+
+
+def get_file_name_from_path(file_path: str) -> str:
+    return file_path.split('/')[-1]
+
+
+def pdf_response(pdf_file_path: str, file_name: str) -> HttpResponse:
+    with open(pdf_file_path, 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename={}'.format(file_name)
+        response['pdf_file_path'] = pdf_file_path
+        return response
+
+
+def _render_pdf_template(translation: Translation, task_type: str,
+                         static_path: str, images_path: str, pdf_output: bool) -> str:
     requested_user = translation.user
     task = translation.task
 
@@ -41,93 +107,50 @@ def render_pdf_template(translation, task_type,
     context.update(ioi_settings(None))
     return render_to_string('pdf-template.html', context=context)
 
-# pdf file paths (excepting final pdf path)
-def output_pdf_path(contest_slug, task_name, task_type, user):
-    file_path = '{}/output/{}/{}/{}'.format(settings.CACHE_DIR, contest_slug, task_name, task_type)
-    file_name = '{}-{}.pdf'.format(task_name, user.username)
-    pdf_file_path = '{}/{}'.format(file_path, file_name)
-    os.makedirs(file_path, exist_ok=True)
-    return pdf_file_path
 
-def released_pdf_path(contest_slug, task_name, user):
-    return output_pdf_path(contest_slug, task_name, 'released', user)
-
-def unreleased_pdf_path(contest_slug, task_name, user):
-    return output_pdf_path(contest_slug, task_name, 'task', user)
-
-def build_pdf(translation, task_type):
-    task = translation.task
-    user = translation.user
-    pdf_file_path = output_pdf_path(task.contest.slug, task.name, task_type, user)
-
-    last_edit_time = translation.get_latest_change_time()
-    rebuild_needed = not os.path.exists(pdf_file_path) or os.path.getmtime(pdf_file_path) < last_edit_time
-    if not rebuild_needed:
-        return pdf_file_path
-
-    html = render_pdf_template(
-        translation, task_type,
-        static_path=settings.STATIC_ROOT,
-        images_path=settings.MEDIA_ROOT + 'images/',
-        pdf_output=True,
-    )
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(convert_html_to_pdf(html, pdf_file_path))
-    add_page_numbers_to_pdf(pdf_file_path, task.name)
-    return pdf_file_path
+def _cached_pdf_path(contest_slug: str, task_name: str, task_type: str, user: User) -> Path:
+    dir_path = Path(f'{settings.CACHE_DIR}/{contest_slug}/{task_name}/{task_type}')
+    dir_path.mkdir(parents=True, exist_ok=True)
+    pdf_path = dir_path / f'{task_name}-{user.username}.pdf'
+    return pdf_path
 
 
-def build_final_pdf(translation):
-    task_type = 'released' if translation.user.username == 'ISC' else 'task'
-    return build_pdf(translation, task_type)
+def _temp_dir_path() -> Path:
+    temp_path = Path(f'{settings.CACHE_DIR}/tmp')
+    os.makedirs(temp_path, exist_ok=True)
+    return temp_path
 
 
-def get_file_name_from_path(file_path):
-    return file_path.split('/')[-1]
+async def _convert_html_to_pdf(html: str, temp_dir_path: Path) -> Path:
+    html_file = temp_dir_path / 'source.html'
+    pdf_file = temp_dir_path / 'browser.pdf'
 
-
-def pdf_response(pdf_file_path, file_name):
-    with open(pdf_file_path, 'rb') as pdf:
-        response = HttpResponse(pdf.read(), content_type='application/pdf')
-        response['Content-Disposition'] = 'inline;filename={}'.format(file_name)
-        response['pdf_file_path'] = pdf_file_path
-        return response
-
-
-async def convert_html_to_pdf(html, pdf_file_path):
     try:
-        html_file_path = '/tmp/{}.html'.format(str(uuid4()))
-        with open(html_file_path, 'wb') as f:
-            f.write(html.encode('utf-8'))
+        with open(html_file, 'w') as f:
+            f.write(html)
         browser = await launch(options={'args': ['--no-sandbox']})
         page = await browser.newPage()
-        await page.goto('file://{}'.format(html_file_path), {
+        await page.goto('file://{}'.format(html_file), {
             'waitUntil': 'networkidle2',
         })
         await page.emulateMedia('print')
-        await page.pdf({'path': pdf_file_path, **settings.PYPPETEER_PDF_OPTIONS})
+        await page.pdf({'path': str(pdf_file), **settings.PYPPETEER_PDF_OPTIONS})
         await browser.close()
-        os.remove(html_file_path)
     except Exception as e:
         logger.error(e)
 
+    return pdf_file
 
-def add_page_numbers_to_pdf(pdf_file_path, task_name):
+
+def _add_page_numbers_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, task_name: str) -> None:
     color =  '-color "0.4 0.4 0.4" '
     cmd = ('cpdf -add-text "{0} (%Page of %EndPage)   " -font "Arial" ' + color + \
-          '-font-size 10 -bottomright .62in {1} -o {1}').format(task_name, pdf_file_path)
+          '-font-size 10 -bottomright .62in {1} -o {2}').format(task_name, src_pdf_path, dst_pdf_path)
     os.system(cmd)
 
 
-def build_printed_draft_pdf(contest_slug, pdf_file_path, info):
-    os.system('mkdir -p media/draft/{}'.format(contest_slug))
-    output_pdf_path = 'media/draft/{}/{}.pdf'.format(contest_slug, str(uuid4()))
-    _add_info_line_to_pdf(output_pdf_path, pdf_file_path, info)
-    return output_pdf_path
-
-
-def _add_info_line_to_pdf(output_pdf_path, pdf_file_path, info):
+def _add_info_line_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, info: str) -> None:
     color =  '-color "0.4 0.4 0.4" '
     cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
-        info, pdf_file_path, output_pdf_path, color)
+        info, src_pdf_path, dst_pdf_path, color)
     os.system(cmd)

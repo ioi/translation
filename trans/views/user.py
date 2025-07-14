@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.shortcuts import render
 from trans.forms import UploadFileForm
 
-from trans.models import User, Translation
-from trans.utils.pdf import released_pdf_path, unreleased_pdf_path
+from trans.models import User
+from trans.utils.pdf import remove_cached_pdfs
 
 
 class FirstPage(View):
@@ -59,7 +59,7 @@ class Settings(LoginRequiredMixin,View):
         import base64
         text_font_base64 = base64.b64encode(font_file.read()).decode('ascii')
         user = User.objects.get(username=request.user.username)
-        self.__remove_user_related_pdfs(user)
+        remove_cached_pdfs(user)
         user.text_font_base64 = text_font_base64
         user.text_font_name = font_file.name
         user.save()
@@ -67,23 +67,12 @@ class Settings(LoginRequiredMixin,View):
 
     def delete(self, request):
         user = User.objects.get(username=request.user)
-        self.__remove_user_related_pdfs(user)
+        remove_cached_pdfs(user)
         user.text_font_base64 = ''
         user.text_font_name = ''
         user.save()
         return JsonResponse({'message': "Done"})
 
-    def __remove_user_related_pdfs(self, user):
-        for trans in Translation.objects.filter(user=user):
-            slug = trans.task.contest.slug
-            task_name = trans.task.name
-            pdf_paths = [
-                released_pdf_path(slug, task_name, user),
-                unreleased_pdf_path(slug, task_name, user)
-            ]
-            for pdf_path in pdf_paths:
-                if os.path.exists(pdf_path):
-                    os.remove(pdf_path)
 
 class Logout(LoginRequiredMixin,View):
     def get(self, request):

@@ -229,3 +229,29 @@ the script according to your printing setup.
 When the job is printed, the runner marks the job as completed. Then they click on the team's
 page to see if the team has requested verification. After verificaton (or if there is none),
 they click the Seal button.
+
+## Permissions
+
+The translation system follows standard Django model of users, groups, and permissions.
+
+Rights for editing the English original are given to members of the `editor` group,
+normally containing only the `ISC` user. Beware that there still remain hard-wired references
+to the user name within the code.
+
+Rights for managing translations and printing are given to members of the `staff` group,
+normally containing only the `staff` user. It could be useful to add `ISC` to this group,
+so that the ISC will see the progress of translations.
+
+The `trans.send_notifications` permission allows to send notifications to all users.
+By default, it's allowed only to the administrator, but it could be useful to give
+this permission to the `editor` or `staff` group.
+
+The `trans.upload_translation_pdf` permission allows a staff member to upload
+the final translation as a raw PDF file. This is meant as a work-around for cases when
+the default formatting is found to be broken for a specific language or script.
+By default, it's allowed only to the administrator, but giving it to the `staff` group
+could be useful.
+
+Another potentially useful change is granting permissions on the `Attachment` table
+to the `editor` group. It enables the ISC to create/update/delete images and other
+attachments to the task statement without having to ask the admin every time.

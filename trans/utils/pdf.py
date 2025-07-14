@@ -53,7 +53,7 @@ def build_final_pdf(translation: Translation) -> str:
 
 
 def build_printed_draft_pdf(contest_slug: str, pdf_file_path: str, info: str) -> str:
-    draft_dir_path = Path(f'media/draft/{contest_slug}')
+    draft_dir_path = Path(f'{settings.MEDIA_ROOT}/draft/{contest_slug}')
     draft_dir_path.mkdir(parents=True, exist_ok=True)
     output_pdf_path = draft_dir_path / (str(uuid4()) + '.pdf')
     _add_info_line_to_pdf(Path(pdf_file_path), output_pdf_path, info)

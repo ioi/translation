@@ -57,6 +57,7 @@ class JobQueue(StaffCheckMixin, View):
         return render(request, 'queue.html',
                       context={
                           'group': group,
+                          'is_admin': request.user.is_superuser,
                           'job_type': job_type,
                           'type_header': 'Final Translations' if job_type_enum == models.PrintJobType.FINAL else "Draft Translations",
                           'worker': worker,

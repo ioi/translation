@@ -14,9 +14,8 @@ from trans.utils.pdf import released_pdf_path, unreleased_pdf_path
 
 class FirstPage(View):
     def get(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            return redirect(to=reverse('admin:index'))
-        if request.user.groups.filter(name="staff").exists():
+        if (request.user.is_superuser
+                or request.user.groups.filter(name="staff").exists()):
             return redirect(to=reverse('users_list'))
 
         if request.user.is_authenticated:

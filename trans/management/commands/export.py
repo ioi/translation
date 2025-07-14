@@ -52,7 +52,7 @@ class Command(BaseCommand):
             f.write(ver.text)
 
         if trans.final_pdf:
-            pdf = settings.MEDIA_ROOT + trans.final_pdf.name
+            pdf = settings.MEDIA_ROOT + '/' + trans.final_pdf.name
         else:
             pdf = build_final_pdf(trans)
         shutil.copyfile(pdf, ver_path.with_suffix('.pdf'))
@@ -65,4 +65,4 @@ class Command(BaseCommand):
         for att in Attachment.objects.all():
             print(f'\t{att.uploaded_file.name}')
             assert att.uploaded_file.name.startswith('images/')
-            shutil.copyfile(settings.MEDIA_ROOT + att.uploaded_file.name, export_path / att.uploaded_file.name)
+            shutil.copyfile(settings.MEDIA_ROOT + '/' + att.uploaded_file.name, export_path / att.uploaded_file.name)

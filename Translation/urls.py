@@ -1,4 +1,4 @@
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django.contrib import admin
 
 from trans.views.user import FirstPage

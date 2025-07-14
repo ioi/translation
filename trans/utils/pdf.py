@@ -32,7 +32,7 @@ def build_pdf(translation: Translation, task_type: str) -> str:
     html = _render_pdf_template(
         translation, task_type,
         static_path=settings.STATIC_ROOT,
-        images_path=settings.MEDIA_ROOT + 'images/',
+        images_path=settings.MEDIA_ROOT + '/images/',
         pdf_output=True,
     )
 

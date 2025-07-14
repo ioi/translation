@@ -110,19 +110,6 @@ class AutoTranslate(LoginRequiredMixin, View):
         })
 
 
-class Healthcheck(View):
-    def get(self, request):
-        try:
-            with open('REVISION', 'r') as f:
-                revision = f.read().strip()
-        except IOError as e:
-            if e.errno != errno.ENOENT:
-                raise e
-            revision = 'unknown'
-
-        return JsonResponse({'revision': revision})
-
-
 class Translations(LoginRequiredMixin, View):
     def get(self, request, contest_slug, task_name):
         user = User.objects.get(username=request.user)

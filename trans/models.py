@@ -113,7 +113,8 @@ class Task(models.Model):
 
 
 def final_pdf_path(instance, _):
-    return 'final_pdf/{}/{}.pdf'.format(
+    return 'final_pdf/{}/{}/{}.pdf'.format(
+        instance.task.contest.slug,
         instance.task.name,
         instance.user.language_code,
     )

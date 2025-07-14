@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User as DjangoUser
 from django.db import models
@@ -174,7 +175,7 @@ class Translation(models.Model):
 
     def get_final_pdf_path(self):
         assert self.final_pdf
-        return f'media/{self.final_pdf.name}'
+        return f'{settings.MEDIA_ROOT}/{self.final_pdf.name}'
 
     def __str__(self):
         return "{} ({})".format(self.task.name, self.user.username)

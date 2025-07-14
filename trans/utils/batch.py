@@ -167,7 +167,7 @@ class BatchRecipe:
         if not parts:
             return None
 
-        output_path = Path('media/batch') / self.contest.slug
+        output_path = Path(settings.MEDIA_ROOT) / 'batch' / str(self.contest.slug)
         output_path.mkdir(parents=True, exist_ok=True)
         output_pdf_path = output_path / f'{name_base}.pdf'
         cmd = ['cpdf'] + parts + ['-o', str(output_pdf_path)]

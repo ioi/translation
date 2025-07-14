@@ -6,7 +6,7 @@ def ioi_settings(request):
         'SITE_TITLE': 'IOI Task Translation System',
         'CONTEST_TITLE': 'IOI',
         'TIME_ZONE': settings.TIME_ZONE,
-        'IMAGES_URL': '/media/images/',
+        'IMAGES_URL': settings.MEDIA_URL + 'images/',
         'ENABLE_AUTO_TRANSLATE': settings.ENABLE_AUTO_TRANSLATE,
     }}
 

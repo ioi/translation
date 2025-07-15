@@ -96,6 +96,18 @@
 </nav>
 
 <div class="main-content container-fluid">
+    {% if messages %}
+        <div class='container'>
+            <div id='messages' class='col-md-12 col-lg-10 col-lg-offset-1'>
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
     {% block content %}{% endblock %}
 
     {% if is_editor %}

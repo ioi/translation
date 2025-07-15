@@ -30,6 +30,10 @@ a:hover {
     margin-bottom: 3ex;
 }
 
+#messages {
+    margin-top: 2ex;
+}
+
 .container h1, .container h2, .container h3, .container h4 {
     font-family: 'Source Sans Pro', arial, sans-serif;
 }

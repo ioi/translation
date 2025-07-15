@@ -186,6 +186,7 @@ class Contestant(models.Model):
     code = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255, blank=True)
     on_site = models.BooleanField(default=True)
+    location = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.code

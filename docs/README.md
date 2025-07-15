@@ -106,6 +106,7 @@ Each contestant has the following columns:
 - `code`: the code of the contestant (e.g., `GHA1`).
 - `name`: the full name of the contestant
 - `on_site`: `1` if they are competing on-site, `0` otherwise
+- `location`: an optional location in the contest hall (e.g., `H25`)
 
 ## Contest & Task Management
 

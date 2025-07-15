@@ -43,7 +43,7 @@ class CustomUserAdmin(ImportExportMixin, UserAdmin):
     # The forms to add and change user instances
     add_form = UserCreationForm
     resource_class = CustomUserResource
-    list_display = ("username", "translate_versions", "country", "language", 'is_onsite')
+    list_display = ("username", "translate_versions", "country", "language", "is_onsite")
     ordering = ("username",)
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage
@@ -121,13 +121,13 @@ class ContestantResource(ModelResource):
 
     class Meta:
         model = Contestant
-        fields = ('code', 'name', 'on_site', 'user')
+        fields = ('code', 'name', 'on_site', 'location', 'user')
         import_id_fields = ('code',)
 
 @admin.register(Contestant)
 class ContestantAdmin(ImportExportModelAdmin):
     resource_class = ContestantResource
-    list_display = ['code', 'name', 'on_site', 'user']
+    list_display = ['code', 'name', 'on_site', 'location', 'user']
     ordering = ['code']
 
     tmp_storage_class = import_export.tmp_storages.MediaStorage

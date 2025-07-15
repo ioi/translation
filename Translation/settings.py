@@ -138,12 +138,6 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'logs/trans.log'),
             'formatter': 'timestamped',
         },
-        'print_job_queue': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/print_job_queue.log'),
-            'formatter': 'timestamped',
-        },
         'stderr': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -155,8 +149,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': os.environ.get('LOG_HANDLERS', 'stderr').split(','), 	#show errors
-#            'handlers': ['file', 'sentry'],	#not show errors
+            'handlers': os.environ.get('LOG_HANDLERS', 'stderr').split(','),
             'level': 'DEBUG',
             'propagate': True,
         },

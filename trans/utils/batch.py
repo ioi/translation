@@ -4,19 +4,13 @@ from datetime import datetime
 from pathlib import Path
 import pytz
 import subprocess
-from typing import List, Optional
+from typing import List
 
 from django.conf import settings
 
 from trans.models import Translation, Contestant, Contest, User, UserContest
+from trans.utils.pdf import POINTS_PER_MM, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS, SERIF_FONT, SANS_FONT
 
-
-POINTS_PER_MM = 72 / 25.4
-A4_WIDTH_POINTS = 210 * POINTS_PER_MM
-A4_HEIGHT_POINTS = 297 * POINTS_PER_MM
-
-SERIF_FONT = 'Times New Roman'
-SANS_FONT = 'Arial'
 
 
 @dataclass
@@ -50,17 +44,17 @@ class RecipeContestant:
         banner_path.mkdir(parents=True, exist_ok=True)
         banner_pdf_path = banner_path / f'{self.contestant.code}.pdf'
 
-        with cairo.PDFSurface(str(banner_pdf_path), A4_WIDTH_POINTS, A4_HEIGHT_POINTS) as surface:
+        with cairo.PDFSurface(str(banner_pdf_path), PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS) as surface:
             ctx = cairo.Context(surface)
 
             self.add_text(ctx,
-                          A4_WIDTH_POINTS / 2, 20 * POINTS_PER_MM,
+                          PAGE_WIDTH_POINTS / 2, 20 * POINTS_PER_MM,
                           SANS_FONT, 28,
                           self.recipe.contest.title.upper(),
                           center=True)
 
             self.add_text(ctx,
-                          A4_WIDTH_POINTS / 2, 50 * POINTS_PER_MM,
+                          PAGE_WIDTH_POINTS / 2, 50 * POINTS_PER_MM,
                           SANS_FONT, 40 * POINTS_PER_MM,
                           self.contestant.code,
                           bold=True,
@@ -68,7 +62,7 @@ class RecipeContestant:
 
             if not self.recipe.user_contest.skip_verification:
                 self.add_text(ctx,
-                              A4_WIDTH_POINTS / 2, 100 * POINTS_PER_MM,
+                              PAGE_WIDTH_POINTS / 2, 100 * POINTS_PER_MM,
                               SANS_FONT, 20,
                               'CHECK WITH TEAM LEADER',
                               center=True)
@@ -93,7 +87,7 @@ class RecipeContestant:
                               'No translations requested.')
 
             self.add_text(ctx,
-                          A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS - 15 * POINTS_PER_MM,
+                          PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM,
                           SERIF_FONT, 10,
                           self.recipe.when.strftime('%Y-%m-%d %H:%M:%S'),
                           center=True)
@@ -110,17 +104,17 @@ class RecipeContestant:
         blank_path.mkdir(parents=True, exist_ok=True)
         blank_pdf_path = blank_path / f'{self.contestant.code}-{trans.task.name}.pdf'
 
-        with cairo.PDFSurface(str(blank_pdf_path), A4_WIDTH_POINTS, A4_HEIGHT_POINTS) as surface:
+        with cairo.PDFSurface(str(blank_pdf_path), PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS) as surface:
             ctx = cairo.Context(surface)
 
             self.add_text(ctx,
-                          A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS - 20 * POINTS_PER_MM,
+                          PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 20 * POINTS_PER_MM,
                           SANS_FONT, 12,
                           f'Last page of {trans.task.name} for {self.contestant.code}',
                           center=True)
 
             self.add_text(ctx,
-                          A4_WIDTH_POINTS / 2, A4_HEIGHT_POINTS / 3,
+                          PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS / 3,
                           SERIF_FONT, 20,
                           'This page is intentionally blank.',
                           italic=True,

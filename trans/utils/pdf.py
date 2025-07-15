@@ -16,6 +16,15 @@ from trans.models import Translation, User
 
 logger = logging.getLogger(__name__)
 
+POINTS_PER_MM = 72 / 25.4
+
+# Default is A4 paper
+PAGE_WIDTH_POINTS = getattr(settings, 'PAGE_WIDTH_MM', 210) * POINTS_PER_MM
+PAGE_HEIGHT_POINTS = getattr(settings, 'PAGE_HEIGHT_MM', 297) * POINTS_PER_MM
+
+SERIF_FONT = 'Times New Roman'
+SANS_FONT = 'Arial'
+
 
 def build_pdf(translation: Translation, task_type: str) -> str:
     # task_type is either "released" for the ISC version, or "task" for a translation

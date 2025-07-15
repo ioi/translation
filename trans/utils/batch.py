@@ -65,15 +65,23 @@ class RecipeContestant:
                           bold=True,
                           center=True)
 
-            if not self.recipe.user_contest.skip_verification:
+            if self.contestant.location != "":
                 self.add_text(ctx,
                               PAGE_WIDTH_POINTS / 2, 100 * POINTS_PER_MM,
+                              SANS_FONT, 20 * POINTS_PER_MM,
+                              self.contestant.location,
+                              bold=True,
+                              center=True)
+
+            if not self.recipe.user_contest.skip_verification:
+                self.add_text(ctx,
+                              PAGE_WIDTH_POINTS / 2, 130 * POINTS_PER_MM,
                               SANS_FONT, 20,
                               'CHECK WITH TEAM LEADER',
                               center=True)
 
             x = 20 * POINTS_PER_MM
-            y = 130 * POINTS_PER_MM
+            y = 160 * POINTS_PER_MM
 
             if self.translations:
                 self.add_text(ctx, x, y, SERIF_FONT, 20, 'Envelope contents:')
@@ -94,7 +102,7 @@ class RecipeContestant:
             self.add_text(ctx,
                           PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM,
                           SERIF_FONT, 10,
-                          self.recipe.when.strftime('%Y-%m-%d %H:%M:%S'),
+                          self.recipe.when.strftime('%Y-%m-%d   %H:%M:%S'),
                           center=True)
 
             ctx.show_page()

@@ -277,6 +277,16 @@
               <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
                 Submit finalized translation
               </a>
+              <form class="form-inline" method="post" action="{% url 'not_translating_user_contest' username=user.username contest_id=cinfo.id %}">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  name="not_translating"
+                  class="btn btn-danger"
+                  title="This will mark all tasks as non-translated. Your contestants will receive only the English task statement.",
+                  onclick="return confirm('Are you sure?');">
+                  Will not translate
+                </button>
             </div>
           {% endif %}
         {% endif %}

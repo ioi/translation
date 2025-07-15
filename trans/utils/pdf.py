@@ -176,32 +176,32 @@ def _add_info_line_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, info: str) -> 
 
 
 def _add_footer_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, temp_dir_path: Path, footer: str, **kwargs):
-    pdf = Pdf.open(src_pdf_path)
-    num_pages = len(pdf.pages)
-    overlay_path = temp_dir_path / 'overlay.pdf'
+    with Pdf.open(src_pdf_path) as pdf:
+        num_pages = len(pdf.pages)
+        overlay_path = temp_dir_path / 'overlay.pdf'
 
-    with cairo.PDFSurface(str(overlay_path), PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS) as surface:
-        ctx = cairo.Context(surface)
+        with cairo.PDFSurface(str(overlay_path), PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS) as surface:
+            ctx = cairo.Context(surface)
 
-        for page in range(num_pages):
-            ctx.select_font_face(SERIF_FONT)
-            ctx.set_font_size(10)
-            ctx.set_source_rgb(0.4, 0.4, 0.4)
+            for page in range(num_pages):
+                ctx.select_font_face(SERIF_FONT)
+                ctx.set_font_size(10)
+                ctx.set_source_rgb(0.4, 0.4, 0.4)
 
-            def add_text(x, y, text) -> None:
-                textents = ctx.text_extents(text)
-                fextents = ctx.font_extents()
-                y += fextents[0]
-                ctx.move_to(x - textents.width / 2 - textents.x_bearing, y)
-                ctx.show_text(text)
+                def add_text(x, y, text) -> None:
+                    textents = ctx.text_extents(text)
+                    fextents = ctx.font_extents()
+                    y += fextents[0]
+                    ctx.move_to(x - textents.width / 2 - textents.x_bearing, y)
+                    ctx.show_text(text)
 
-            add_text(PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM,
-                     footer.format(page=page+1, num_pages=num_pages, **kwargs))
+                add_text(PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM,
+                         footer.format(page=page+1, num_pages=num_pages, **kwargs))
 
-            ctx.show_page()
+                ctx.show_page()
 
-    overlay_pdf = Pdf.open(overlay_path)
-    for page in range(num_pages):
-        pdf.pages[page].add_overlay(overlay_pdf.pages[page], Rectangle(0, 0, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS))
+        with Pdf.open(overlay_path) as overlay_pdf:
+            for page in range(num_pages):
+                pdf.pages[page].add_overlay(overlay_pdf.pages[page], Rectangle(0, 0, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS))
 
-    pdf.save(dst_pdf_path)
+        pdf.save(dst_pdf_path)

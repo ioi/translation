@@ -2,6 +2,7 @@
 # A script for printing on the server
 # When a worker has server-side printing enabled, it calls this
 # script as "./print.sh <worker> <file>"
+# The file name is relative to MEDIA_ROOT.
 
 set -e
 if [ $# != 2 ] ; then

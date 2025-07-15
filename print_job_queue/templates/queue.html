@@ -50,7 +50,7 @@
                   <ul>
                     {% for file_path, count in jinfo.documents %}
                       <li>
-                        <a href="/{{ file_path }}">{{ file_path }}</a>
+                        <a href="{{ media_url }}{{ file_path }}">{{ file_path }}</a>
                         {% if count > 1 %}
                           x {{ count }}
                         {% endif %}

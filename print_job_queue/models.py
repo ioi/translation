@@ -92,7 +92,7 @@ class PrintedDocument(models.Model):
     # Print job that contains this document.
     job = models.ForeignKey(PrintJob, on_delete=models.CASCADE, related_name='document_set')
 
-    # Path to the document to print.
+    # Path to the document to print, relative to MEDIA_ROOT.
     file_path = models.FilePathField(match='.*.pdf', recursive=True)
 
     # The number of times the document should be printed. Should be greater than zero.

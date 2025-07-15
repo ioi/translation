@@ -7,6 +7,7 @@ from django.http.response import HttpResponseBadRequest, Http404
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.files import File
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.urls.base import reverse
 from django.views.generic import View
@@ -326,6 +327,8 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
     def _handle(self, request, username, contest_id, is_post):
         self.init_user(request, username)
         self.init_contest(request, contest_id)
+        assert self.user is not None
+        assert self.contest is not None
 
         self.tasks = self.contest.task_set.order_by('order')
         self.errors = []
@@ -333,7 +336,7 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
         self.batch_recipe = BatchRecipe(contest=self.contest, for_user=self.user, user_contest=user_contest)
 
         if self.user.is_staff:
-            self.errors.append('Staff does not have translations')
+            raise PermissionDenied('Staff does not have translations')
         else:
             self.check_own_translations()
             if self.user.is_onsite:
@@ -412,6 +415,55 @@ class UnfreezeUserContest(StaffCheckMixin, RightsCheckMixin, View):
             user_contest.frozen = False
             print_job_queue.handle_user_contest_unfrozen(user_contest)
             user_contest.save()
+
+        return redirect_to_user_page(request, self.user)
+
+
+class NotTranslatingForm(forms.Form):
+    # Just for CSRF checking
+    pass
+
+
+class NotTranslatingUserContest(LoginRequiredMixin, RightsCheckMixin, View):
+
+    def post(self, request, username, contest_id):
+        self.init_user(request, username)
+        self.init_contest(request, contest_id)
+        assert self.user is not None
+        assert self.contest is not None
+
+        if self.user.is_staff:
+            raise PermissionDenied('Staff does not have translations')
+
+        form = NotTranslatingForm(request.POST)
+        if not form.is_valid():
+            raise PermissionDenied('Invalid form')
+
+        errors = []
+
+        for task in self.contest.task_set.order_by('order'):
+            trans, _ = Translation.objects.get_or_create(user=self.user, task=task)
+            if trans.frozen:
+                if trans.translating:
+                    errors.append(f'Task {task.name} has a frozen translation')
+            else:
+                trans.frozen = True
+                trans.translating = False
+                trans.final_pdf = None
+                trans.save()
+
+        for ctant in Contestant.objects.filter(user=self.user).order_by('code'):
+            if ctant.on_site:
+                cc = ContestantContest.obtain(ctant, self.contest, self.user)
+                cc.translation_by_user = None
+                cc.save()
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            logger.info(f'Marked contest {self.contest.slug} as non-translated for {self.user.username} by {request.user.username}')
+            messages.success(request, "Tasks will not be translated. Your contestants will receive only English task statements. Please press the Submit button to confirm.")
 
         return redirect_to_user_page(request, self.user)
 

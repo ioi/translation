@@ -220,6 +220,9 @@ PRINT_BATCH_WHOLE_TEAM = False
 # Enable if you use duplex printing.
 PRINT_BATCH_DUPLEX = True
 
+# Use cpdf instead of the new pikepdf code to transform PDFs
+USE_CPDF = False
+
 # User-facing URL
 HOST_URL = os.environ.get('TRANS_URL', 'http://127.0.0.1:9000/')
 

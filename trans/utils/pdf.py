@@ -1,8 +1,10 @@
 import asyncio
+import cairo
 import os
 from uuid import uuid4
 import logging
 from pathlib import Path
+from pikepdf import Pdf, Rectangle
 from tempfile import TemporaryDirectory
 
 from django.conf import settings
@@ -50,7 +52,12 @@ def build_pdf(translation: Translation, task_type: str) -> str:
         loop = asyncio.get_event_loop()
         browser_pdf_path = loop.run_until_complete(_convert_html_to_pdf(html, temp_dir_path))
         transformed_pdf_path = temp_dir_path / 'transformed.pdf'
-        _add_page_numbers_to_pdf(browser_pdf_path, transformed_pdf_path, task.name)
+        if settings.USE_CPDF:
+            _add_page_numbers_to_pdf(browser_pdf_path, transformed_pdf_path, task.name)
+        else:
+            _add_footer_to_pdf(browser_pdf_path, transformed_pdf_path, temp_dir_path,
+                               '{task} ({page} of {num_pages})',
+                               task=task.name)
         transformed_pdf_path.rename(pdf_file_path)
 
     return str(pdf_file_path)
@@ -65,7 +72,10 @@ def build_printed_draft_pdf(contest_slug: str, pdf_file_path: str, info: str) ->
     draft_dir_path = Path(f'{settings.MEDIA_ROOT}/draft/{contest_slug}')
     draft_dir_path.mkdir(parents=True, exist_ok=True)
     output_pdf_path = draft_dir_path / (str(uuid4()) + '.pdf')
-    _add_info_line_to_pdf(Path(pdf_file_path), output_pdf_path, info)
+    if settings.USE_CPDF:
+        _add_info_line_to_pdf(Path(pdf_file_path), output_pdf_path, info)
+    else:
+        _add_footer_to_pdf(Path(pdf_file_path), output_pdf_path, _temp_dir_path(), info)
     return str(output_pdf_path)
 
 
@@ -163,3 +173,35 @@ def _add_info_line_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, info: str) -> 
     cmd = 'cpdf -add-text "   {}" -font "Arial" -font-size 10 -bottomleft .62in {} -o {} {}'.format(
         info, src_pdf_path, dst_pdf_path, color)
     os.system(cmd)
+
+
+def _add_footer_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, temp_dir_path: Path, footer: str, **kwargs):
+    pdf = Pdf.open(src_pdf_path)
+    num_pages = len(pdf.pages)
+    overlay_path = temp_dir_path / 'overlay.pdf'
+
+    with cairo.PDFSurface(str(overlay_path), PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS) as surface:
+        ctx = cairo.Context(surface)
+
+        for page in range(num_pages):
+            ctx.select_font_face(SERIF_FONT)
+            ctx.set_font_size(10)
+            ctx.set_source_rgb(0.4, 0.4, 0.4)
+
+            def add_text(x, y, text) -> None:
+                textents = ctx.text_extents(text)
+                fextents = ctx.font_extents()
+                y += fextents[0]
+                ctx.move_to(x - textents.width / 2 - textents.x_bearing, y)
+                ctx.show_text(text)
+
+            add_text(PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM,
+                     footer.format(page=page+1, num_pages=num_pages, **kwargs))
+
+            ctx.show_page()
+
+    overlay_pdf = Pdf.open(overlay_path)
+    for page in range(num_pages):
+        pdf.pages[page].add_overlay(overlay_pdf.pages[page], Rectangle(0, 0, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS))
+
+    pdf.save(dst_pdf_path)

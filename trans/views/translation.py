@@ -1,4 +1,3 @@
-import errno
 import logging
 
 from django.http.response import HttpResponseNotFound
@@ -8,7 +7,7 @@ from django.conf import settings
 from django.views.generic import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from trans.models import User, Task, Translation, Version, Contest, Country, FlatPage, UserContest, Contestant, ContestantContest
+from trans.models import User, Task, Translation, Version, Contest, FlatPage, UserContest, Contestant, ContestantContest
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.urls import reverse
 
@@ -96,10 +95,10 @@ class Home(LoginRequiredMixin, View):
             'is_onsite': user.is_onsite,
         })
 
+
 class AutoTranslate(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(username=request.user)
-        contests = Contest.objects.order_by('order')
         return render(request, 'autotranslate.html', {
             "languages": autotranslate.get_supported_languages(),
             'user': user,
@@ -187,6 +186,7 @@ class TranslationMarkdown(LoginRequiredMixin, View):
                 content = translation.get_latest_text()
 
         return HttpResponse(content, content_type='text/plain; charset=UTF-8')
+
 
 class TranslationView(LoginRequiredMixin, View):
     def _get_translation_by_contest_and_task_type(self, request, user, contest_slug, task_name, task_type):

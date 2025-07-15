@@ -205,6 +205,10 @@ PYPPETEER_PDF_OPTIONS = {
     'printBackground': True,
 }
 
+# This is standard A4
+PAGE_WIDTH_MM = 210
+PAGE_HEIGHT_MM = 297
+
 # How long is an edit lock valid if the user does not interact (seconds)
 TRANSLATION_EDIT_TIME_OUT = 120
 

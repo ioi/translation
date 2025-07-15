@@ -11,6 +11,7 @@ inotify
 ipython
 moratab
 openpyxl
+pikepdf
 psycopg2
 pycairo
 pyppeteer

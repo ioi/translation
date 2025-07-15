@@ -1,20 +1,22 @@
-from django.http.response import HttpResponseForbidden
+import re
 
-from django.shortcuts import render, redirect
-from django.views.generic import View
-from django.urls import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic import View
 
-from trans.utils.translation import get_trans_by_user_and_task
 from trans.models import Task, User, Contest
+from trans.utils.translation import get_trans_by_user_and_task
 from trans.views.admin import EditorCheckMixin
 
 
 class AddTask(EditorCheckMixin, View):
     def post(self, request):
-        if request.user.username != "ISC":
-            return HttpResponseForbidden("You don't have access to this page")
         name = request.POST['name']
+        if not re.fullmatch('[a-zA-Z0-9_]+', name):
+            # This is already checked by client JS, so a crude error message is sufficient
+            return HttpResponseBadRequest("Invalid task name")
+
         contest_id = request.POST['contest']
         contest = Contest.objects.filter(id=contest_id).first()
         contest_tasks = Task.objects.filter(contest=contest)

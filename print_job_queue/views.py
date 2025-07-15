@@ -1,6 +1,7 @@
 from collections import defaultdict
 import logging
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.http.response import HttpResponseBadRequest, Http404
@@ -69,6 +70,7 @@ class JobQueue(StaffCheckMixin, View):
                               ('Printing', 'PRINTING'),
                               ('Done', 'DONE'),
                           ],
+                          'media_url': settings.MEDIA_URL,
                       })
 
 

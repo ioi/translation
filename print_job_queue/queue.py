@@ -1,6 +1,7 @@
 import logging
 import subprocess
 
+from django.conf import settings
 from django.db.models import F, Q
 
 from print_job_queue import models
@@ -18,7 +19,7 @@ def enqueue_draft_print_job(file_path, print_count, group, owner, priority=0):
     logger.info(f'Job #{job.id}: Enqueued draft job (priority={priority})')
 
     doc = models.PrintedDocument(job=job,
-                                 file_path=file_path,
+                                 file_path=_sanitize_file_path(file_path),
                                  print_count=print_count)
     doc.save()
     logger.info(f'Job #{job.id}: Added document {doc.file_path} copies={doc.print_count}')
@@ -37,12 +38,19 @@ def enqueue_final_print_job(file_paths_with_counts, group, owner, priority=0):
 
     for file_path, count in file_paths_with_counts.items():
         doc = models.PrintedDocument(job=job,
-                                     file_path=file_path,
+                                     file_path=_sanitize_file_path(file_path),
                                      print_count=count)
         doc.save()
         logger.info(f'Job #{job.id}: Added document {doc.file_path} copies={doc.print_count}')
 
     return job
+
+
+def _sanitize_file_path(path: str) -> str:
+    # Print jobs contain paths relative to the MEDIA_ROOT,
+    # but callers of enqueue_*_print_job pass full paths.
+    assert path.startswith(settings.MEDIA_ROOT + '/')
+    return path[len(settings.MEDIA_ROOT) + 1 :]
 
 
 def invalidate_print_job(job):

@@ -1,11 +1,13 @@
 import asyncio
 import cairo
-import os
-from uuid import uuid4
+from datetime import datetime
 import logging
+import os
 from pathlib import Path
-from pikepdf import Pdf, Rectangle
+from pikepdf import Pdf, Rectangle, AttachedFileSpec
+from pikepdf.models.metadata import encode_pdf_date
 from tempfile import TemporaryDirectory
+from uuid import uuid4
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -40,8 +42,13 @@ def build_pdf(translation: Translation, task_type: str) -> str:
     if not rebuild_needed:
         return str(pdf_file_path)
 
+    if task_type == 'released':
+        markdown = translation.get_published_text()
+    else:
+        markdown = translation.get_latest_text()
+
     html = _render_pdf_template(
-        translation, task_type,
+        translation, markdown,
         static_path=settings.STATIC_ROOT,
         images_path=settings.MEDIA_ROOT + '/images/',
         pdf_output=True,
@@ -58,6 +65,10 @@ def build_pdf(translation: Translation, task_type: str) -> str:
             _add_footer_to_pdf(browser_pdf_path, transformed_pdf_path, temp_dir_path,
                                '{task} ({page} of {num_pages})',
                                task=task.name)
+        if settings.EMBED_MARKDOWN:
+            embedding_pdf_path = temp_dir_path / 'embedding.pdf'
+            _add_markdown_to_pdf(transformed_pdf_path, embedding_pdf_path, markdown)
+            transformed_pdf_path = embedding_pdf_path
         transformed_pdf_path.rename(pdf_file_path)
 
     return str(pdf_file_path)
@@ -99,18 +110,13 @@ def pdf_response(pdf_file_path: str, file_name: str) -> HttpResponse:
         return response
 
 
-def _render_pdf_template(translation: Translation, task_type: str,
+def _render_pdf_template(translation: Translation, markdown: str,
                          static_path: str, images_path: str, pdf_output: bool) -> str:
     requested_user = translation.user
     task = translation.task
 
-    if task_type == 'released':
-        content = translation.get_published_text()
-    else:
-        content = translation.get_latest_text()
-
     context = {
-        'content': content,
+        'content': markdown,
         'contest': task.contest.title,
         'task_name': task.name,
         'country': requested_user.country.code,
@@ -203,5 +209,21 @@ def _add_footer_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, temp_dir_path: Pa
         with Pdf.open(overlay_path) as overlay_pdf:
             for page in range(num_pages):
                 pdf.pages[page].add_overlay(overlay_pdf.pages[page], Rectangle(0, 0, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS))
+
+        pdf.save(dst_pdf_path)
+
+
+def _add_markdown_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, markdown: str):
+    with Pdf.open(src_pdf_path) as pdf:
+        now = encode_pdf_date(datetime.now().astimezone())
+        # XXX: Declaration of AttachedFileSpec is wrong, it has an extra positional argument
+        afs = AttachedFileSpec(pdf,
+                               markdown.encode('utf-8'),
+                               description='Task statement in Markdown',
+                               filename='task.md',
+                               mime_type='text/markdown; charset=UTF-8',
+                               creation_date=now,
+                               mod_date=now)
+        pdf.attachments['markdown'] = afs
 
         pdf.save(dst_pdf_path)

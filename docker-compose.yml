@@ -7,7 +7,7 @@ services:
     - ioi_static:/opt/translate/app/static/
     - ioi_media:/opt/translate/app/media/
     - ioi_logs:/opt/translate/app/logs/
-    - ./secrets/google_service_account.json:/opt/sa.json:ro
+    - ./secrets/google_service_account.json:/opt/translate/app/secrets/sa.json:ro
     depends_on:
     - postgres
     - redis

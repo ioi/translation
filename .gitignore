@@ -112,3 +112,8 @@ static/
 
 # Vim swap files
 .*.swp
+
+# Secrets & Google Service Account Files
+secrets/*
+!secrets/.gitkeep
+google_service_account.json

@@ -267,6 +267,10 @@ attachments to the task statement without having to ask the admin every time.
 - The `Flat pages` table contains HTML snippets that are inserted to the home page
   of normal users and the ISC.
 
+- As an experimental feature, it is possible to embed the Markdown text of task
+  stataments in the generated PDFs as embedded attachments. See the `EMBED_MARKDOWN`
+  setting.
+
 ### Directory hierarchy
 
 - `cache/CONTEST/TASK/TYPE/TASK-USER.pdf` is the rendered PDF, where `TYPE` is either `task`

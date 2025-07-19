@@ -10,7 +10,7 @@ services:
     - ioi_static:/opt/translate/app/static/
     - ioi_media:/opt/translate/app/media/
     - ioi_logs:/opt/translate/app/logs/
-    - ./secrets/google_service_account.json:/opt/translate/app/secrets/sa.json:ro
+    - ./secrets/:/opt/translate/app/secrets:ro
     depends_on:
     - postgres
     - redis
@@ -31,7 +31,7 @@ services:
       TRANS_DEBUG: 1
       TRANS_TIME_ZONE: 'UTC'
       GCLOUD_PROJECT_ID: "CHANGE_ME_GCP_PROJECT_ID"
-      GCLOUD_SERVICE_ACCOUNT_JSON_PATH: "/opt/translate/app/secrets/sa.json"
+      GCLOUD_SERVICE_ACCOUNT_JSON_PATH: "/opt/translate/app/secrets/google_service_account.json"
 
   nginx:
     restart: always

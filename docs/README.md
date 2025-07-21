@@ -54,6 +54,12 @@ verify the translations and the staff can mark the translations as **sealed**.
 This is the end of the translation session for the team.
 Optionally, the team can opt out of the verification process when submitting.
 
+Special rules apply when using somebody else's translation.
+Consider a case when team A requested that one of their contestants receives
+a translation by team B. Team A's translation may be submitted only if team B
+already submitted their translation, or if team B promised to produce the
+translation (by click the appropriate button on their home page).
+
 
 ## Initial setup
 
@@ -165,6 +171,9 @@ The User, Team, and Language columns are self-explanatory.
 The Status column denotes the status of the overall translation:
 
 - `In Progress`: the team has not submitted the translation yet.
+- `Promised`: the team has not submitted the translation, but has promised to do so.
+- `Waiting`: the translations have been submitted, but they cannot be printed yet,
+  because some contestants are waiting for somebody else's promised translation.
 - `Printing`: the translations have been submitted and they are now in the print queue.
   `(needs seal)` is added if manual verification and sealing is requested.
 - `Done (sealed)`: the translation have been printed and sealed
@@ -189,6 +198,7 @@ Here, staff can:
 
 - Force-freeze team's overall translation or individual task translations.
 - Force-reopen (unfreeze) team's overall translation or individual task translations.
+- Make or break promises on behalf of the team.
 - View and edit the assignment of translations to contestants.
 - Declare contestant envelopes (containing printed translations) sealed by the team, which will mark the translation as done.
 

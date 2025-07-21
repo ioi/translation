@@ -221,6 +221,9 @@
               {% else %}
                 <div class="alert alert-info">
                   <p><b>We are preparing your contestant envelopes.</b></p>
+                  {% if not cinfo.user_contest.ready %}
+                    <p>However, some translations you requested are not ready yet.</p>
+                  {% endif %}
                   <p>Please wait for a runner to approach your desk to verify and seal the envelopes.</p>
                 </div>
               {% endif %}

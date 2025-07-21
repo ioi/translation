@@ -68,8 +68,8 @@ class EditorCheckMixin(LoginRequiredMixin, object):
 
 
 class RightsCheckMixin(object):
-    user = None
-    contest = None
+    user: User
+    contest: Contest
 
     def init_user(self, request, username):
         try:
@@ -81,8 +81,6 @@ class RightsCheckMixin(object):
             raise PermissionDenied('You cannot edit this user')   # Generates HTTP 403
 
     def init_contest(self, request, contest_id, allow_frozen=False):
-        assert self.user is not None
-
         try:
             self.contest = Contest.objects.get(id=contest_id)
         except ObjectDoesNotExist:
@@ -327,8 +325,6 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
     def _handle(self, request, username, contest_id, is_post):
         self.init_user(request, username)
         self.init_contest(request, contest_id)
-        assert self.user is not None
-        assert self.contest is not None
 
         self.tasks = self.contest.task_set.order_by('order')
         self.errors = []

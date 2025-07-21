@@ -236,7 +236,8 @@ class UsersList(StaffCheckMixin, View):
             self._fetch_translations([user['username'] for user in users])
 
         render_page = 'users_public.html' if public else 'users.html'
-        users_public = self._chunks(sorted(users, key=lambda u: u['username']), 4)
+        users_without_editor = [u for u in users if not u['is_editor']]
+        users_public = self._chunks(sorted(users_without_editor, key=lambda u: u['username']), 4)
         return render(request, render_page, context={
             'users': users,
             'users_public': users_public,

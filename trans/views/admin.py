@@ -148,8 +148,19 @@ class UserTranslations(StaffCheckMixin, View):
                 if cc is None:
                     cc = ContestantContest.obtain(ctant, contest, user)
                 tu = cc.translation_by_user
-                tr = f'{tu.language.name} ({tu.country.name})' if tu else None
-                contestant_translations.append((ctant, tr))
+                if tu is not None:
+                    tr = f'{tu.language.name} ({tu.country.name})'
+                    uc, _ = UserContest.objects.get_or_create(user=tu, contest=contest)
+                    if uc.frozen:
+                        status = 'frozen'
+                    elif uc.promised:
+                        status = 'promised'
+                    else:
+                        status = "editing"
+                else:
+                    tr = None
+                    status = None
+                contestant_translations.append((ctant, tr, status))
 
             cinfo['extra_contestants'] = extra_contestants = []
             for cc in ContestantContest.objects.filter(contest=contest, translation_by_user=user).exclude(contestant__in=contestants).select_related("contestant"):

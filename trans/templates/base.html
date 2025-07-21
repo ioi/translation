@@ -79,7 +79,7 @@
                         {% endif %}
                         {% if is_staff %}
                         <li><a href="{% url 'users_list' %}">Staff view</a></li>
-                        <li><a href="{% url 'public_users_list' public='public' %}">Public view</a></li>
+                        <li><a href="{% url 'public_users_list' %}">Public view</a></li>
                         <li role="separator" class="divider"></li>
                         {% endif %}
                         {% if can_send_notifications %}

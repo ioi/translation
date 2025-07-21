@@ -29,7 +29,7 @@ urlpatterns = [
     path('revert/', Revert.as_view(), name='revert'),
 
     path('users/', UsersList.as_view(), name='users_list'),
-    path('users/<str:public>/', UsersList.as_view(), name='public_users_list'),
+    path('users/public/', UsersList.as_view(), name='public_users_list', kwargs={'public': True}),
     path('user/<str:username>/', UserTranslations.as_view(), name='user_trans'),
     path('upload_final_pdf/', AddFinalPDF.as_view(), name='upload_final_pdf'),
     path('freeze_trans/<str:task_name>/<str:username>/', FreezeTranslation.as_view(), name='freeze_trans'),

@@ -230,7 +230,9 @@ class UsersList(StaffCheckMixin, View):
             user_contests[user.username][contest.id] = {
                 'frozen': user_contest.frozen,
                 'note': user_contest.note,
+                'ready': user_contest.ready,
                 'sealed': user_contest.sealed,
+                'promised': user_contest.promised,
                 'skip_verification': user_contest.skip_verification,
             }
 

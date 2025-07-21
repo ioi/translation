@@ -55,14 +55,27 @@
                           Done {% if user.is_onsite %}(sealed){% else %}(remote){% endif %}
                         </b>
                       </span>
-                    {% else %}
+                    {% elif user_contest.ready %}
                       <span style="color: orange">
                         <b>
                           <i class="fa fa-user fa-lg"></i>
                           Printing {% if not user_contest.skip_verification %}(needs seal){% endif %}
                         </b>
                       </span>
+                    {% else %}
+                      <span style="color: mediumpurple">
+                        <b>
+                          <i class="fa fa-clock-o fa-lg"></i>
+                          Waiting {% if not user_contest.skip_verification %}(needs seal){% endif %}
+                        </b>
+                      </span>
                     {% endif %}
+                  {% elif user_contest and user_contest.promised %}
+                    {# Team is translating and they promised to finish the translation #}
+                    <span>
+                      <i class="fa fa-pencil fa-lg"></i>
+                      Promised
+                    </span>
                   {% else %}
                     {# Team is translating #}
                     <span>
@@ -82,20 +95,22 @@
                     {% else %}
                       {% if user.is_editor %}
                       {% elif translation is None %}
-                        <span style="color: brown">
+                        <span style="color: grey">
                           <i class="fa fa-question fa-lg"></i>
                         </span>
-                      {% elif translation.translating is None %}
+                      {% elif not translation.frozen %}
                         <span style="color: brown">
                           <i class="fa fa-pencil fa-lg"></i>
                         </span>
-                      {% elif not translation.translation %}
-                        <span style="color: red">
+                      {% elif not translation.translating %}
+                        <span style="color: orange">
                           <i class="fa fa-times fa-lg"></i>
                         </span>
                       {% else %}
-                        <!-- Where's the PDF file? -->
-                        <i class="fa fa-file-pdf-o fa-lg"></i>
+                        {# Invalid state #}
+                        <span style="color: red">
+                          <i class="fa fa-question fa-lg"></i>
+                        </span>
                       {% endif %}
                     {% endif %}
                   </td>

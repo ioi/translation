@@ -37,7 +37,11 @@
 
                 {% if cinfo.user_contest.sealed %}
                     <h4>Translations are sealed.</h4>
-                {% elif is_onsite %}
+                {% elif not is_onsite %}
+                    <h4>Remote, but unsealed. This should not happen.</h4>
+                {% elif not cinfo.user_contest.ready %}
+                    <h4>Waiting for dependencies.</h4>
+                {% else %}
                     <h4>
                         Printing in progress.
                         {% if cinfo.user_contest.skip_verification %}
@@ -54,8 +58,6 @@
                             Mark as sealed
                         </button>
                     </form>
-                {% else %}
-                    <h4>Remote, but unsealed. This should not happen.</h4>
                 {% endif %}
 
             {% else %}

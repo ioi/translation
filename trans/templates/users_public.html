@@ -49,14 +49,27 @@
                               Done {% if user.is_onsite %}(sealed){% else %}(remote){% endif %}
                             </b>
                           </span>
-                        {% else %}
+                        {% elif user_contest.ready %}
                           <span style="color: orange">
                             <b>
                               <i class="fa fa-user fa-lg"></i>
                               Printing
                             </b>
                           </span>
+                        {% else %}
+                          <span style="color: mediumpurple">
+                            <b>
+                              <i class="fa fa-clock-o fa-lg"></i>
+                              Waiting
+                            </b>
+                          </span>
                         {% endif %}
+                      {% elif user_contest and user_contest.promised %}
+                        {# Team is translating and they promised to finish the translation #}
+                        <span>
+                          <i class="fa fa-pencil fa-lg"></i>
+                          Promised
+                        </span>
                       {% else %}
                         {# Team is translating #}
                         <span>

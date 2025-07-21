@@ -5,7 +5,6 @@ from pathlib import Path
 from pikepdf import Pdf
 import pytz
 import subprocess
-from typing import List
 
 from django.conf import settings
 
@@ -18,10 +17,10 @@ from trans.utils.pdf import POINTS_PER_MM, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS
 class RecipeContestant:
     recipe: 'BatchRecipe'
     contestant: Contestant
-    translations: List[Translation] = field(default_factory=list)
-    num_pages: List[int] = field(default_factory=list)
+    translations: list[Translation] = field(default_factory=list)
+    num_pages: list[int] = field(default_factory=list)
 
-    def build_parts(self):
+    def build_parts(self) -> list[str]:
         page_counts = self.count_pages()
         parts = [self.build_banner_page(page_counts)]
 
@@ -32,7 +31,7 @@ class RecipeContestant:
 
         return parts
 
-    def count_pages(self):
+    def count_pages(self) -> list[int]:
         page_counts = []
         for trans in self.translations:
             if settings.USE_CPDF:
@@ -44,7 +43,7 @@ class RecipeContestant:
             page_counts.append(num_pages)
         return page_counts
 
-    def build_banner_page(self, page_counts):
+    def build_banner_page(self, page_counts) -> str:
         banner_path = Path(settings.CACHE_DIR) / 'banner' / self.recipe.contest.slug
         banner_path.mkdir(parents=True, exist_ok=True)
         banner_pdf_path = banner_path / f'{self.contestant.code}.pdf'
@@ -112,7 +111,7 @@ class RecipeContestant:
 
         return str(banner_pdf_path)
 
-    def build_blank_page(self, trans):
+    def build_blank_page(self, trans: Translation):
         blank_path = Path(settings.CACHE_DIR) / 'blank' / self.recipe.contest.slug
         blank_path.mkdir(parents=True, exist_ok=True)
         blank_pdf_path = blank_path / f'{self.contestant.code}-{trans.task.name}.pdf'
@@ -135,7 +134,14 @@ class RecipeContestant:
 
         return str(blank_pdf_path)
 
-    def add_text(self, ctx, x, y, font_face, font_size, text, center=False, bold=False, italic=False):
+    def add_text(self,
+                 ctx: cairo.Context,
+                 x: float, y: float,
+                 font_face: str, font_size: float,
+                 text: str,
+                 center: bool = False,
+                 bold: bool = False,
+                 italic: bool = False) -> None:
         ctx.select_font_face(font_face, int(italic), int(bold))
         ctx.set_font_size(font_size)
         if center:
@@ -153,10 +159,10 @@ class BatchRecipe:
     contest: Contest
     for_user: User
     user_contest: UserContest
-    ct_recipes: List[RecipeContestant] = field(default_factory=list)
+    ct_recipes: list[RecipeContestant] = field(default_factory=list)
     when: datetime = field(default_factory=lambda: datetime.now().astimezone(pytz.timezone(settings.TIME_ZONE)))
 
-    def build_pdfs(self):
+    def build_pdfs(self) -> list[str]:
         if settings.PRINT_BATCH_WHOLE_TEAM:
             parts = []
             for ct_recipe in self.ct_recipes:
@@ -168,9 +174,9 @@ class BatchRecipe:
                 pdf = self.build_batch(ct_recipe.build_parts(), f'{self.for_user.username}-{ct_recipe.contestant.code}')
                 if pdf is not None:
                     pdfs.append(pdf)
-        return pdfs
+        return [pdf for pdf in pdfs if pdf is not None]
 
-    def build_batch(self, parts, name_base):
+    def build_batch(self, parts, name_base) -> str | None:
         if not parts:
             return None
 
@@ -189,7 +195,7 @@ class BatchRecipe:
 
         return str(output_pdf_path)
 
-    def add_contestant(self, contestant):
+    def add_contestant(self, contestant) -> RecipeContestant:
         ct_recipe = RecipeContestant(recipe=self, contestant=contestant)
         self.ct_recipes.append(ct_recipe)
         return ct_recipe

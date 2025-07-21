@@ -438,6 +438,10 @@ class NotTranslatingUserContest(LoginRequiredMixin, RightsCheckMixin, View):
 
         errors = []
 
+        uc = UserContest.objects.filter(user=self.user, contest=self.contest).first()
+        if uc is not None and uc.promised:
+            errors.append('You promised to translate your tasks.')
+
         for task in self.contest.task_set.order_by('order'):
             trans, _ = Translation.objects.get_or_create(user=self.user, task=task)
             if trans.frozen:

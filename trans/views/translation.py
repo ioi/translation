@@ -82,10 +82,19 @@ class Home(LoginRequiredMixin, View):
                     if tu:
                         tr = f'{tu.language.name} ({tu.country.name})'
                         if tu == user:
-                            tr += ' – your translation'
+                            status = 'your translation'
+                        else:
+                            uc, _ = UserContest.objects.get_or_create(user=tu, contest=contest)
+                            if uc.frozen:
+                                status = 'frozen'
+                            elif uc.promised:
+                                status = 'promised'
+                            else:
+                                status = "editing"
                     else:
                         tr = None
-                    contestant_translations.append((ctant, tr))
+                        status = None
+                    contestant_translations.append((ctant, tr, status))
 
         return render(request, 'home.html', context={
             'user': user,

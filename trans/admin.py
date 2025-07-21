@@ -89,6 +89,7 @@ class UserContestAdmin(admin.ModelAdmin):
         'contest',
         'frozen',
         'sealed',
+        'promised',
         'note',
     ]
     ordering = ['contest', 'user']

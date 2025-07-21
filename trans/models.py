@@ -195,13 +195,23 @@ class Contestant(models.Model):
 class UserContest(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
+    # Moving between states:
+    #   - editing
+    #   - frozen when the user declares the translations finished
+    #   - ready when all dependencies are satisfied, PDFs are produced, and print job issued
+    #   - sealed when the print-outs have been verified (or verification was skipped)
     frozen = models.BooleanField(default=False)
+    ready = models.BooleanField(default=False)
     sealed = models.BooleanField(default=False)
     skip_verification = models.BooleanField(default=False)
     note = models.TextField(default='', blank=True)
+    # The translation may be used by other users if:
+    #   - it's already frozen
+    #   - or it's declared as promised (this user promised that they will finish the translation)
+    promised = models.BooleanField(default=False)
 
-    # The print job that corresponds to the latest state, if it is frozen.
-    # If the UserContest is not frozen, this is null.
+    # The print job that corresponds to the latest state, if it is ready.
+    # If the UserContest is not ready, this is null.
     final_print_job = models.ForeignKey(print_job_queue_models.PrintJob,
                                         blank=True,
                                         null=True,

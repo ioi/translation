@@ -136,7 +136,7 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'django': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
@@ -149,6 +149,7 @@ LOGGING = {
             'formatter': 'timestamped',
         },
         'stderr': {
+            # In production, stderr is captured by gunicorn and sent to gunicorn-error.log.
             'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
@@ -158,18 +159,24 @@ LOGGING = {
         },
     },
     'loggers': {
+        # By default, most messages are logged to stderr,
+        'autotranslate': {
+            'handlers': os.environ.get('TRANS_LOG_HANDLERS', 'trans').split(','),
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'django': {
-            'handlers': os.environ.get('LOG_HANDLERS', 'stderr').split(','),
+            'handlers': os.environ.get('LOG_HANDLERS', 'django,stderr').split(','),
             'level': 'DEBUG',
             'propagate': True,
         },
         'trans': {
-            'handlers': os.environ.get('TRANS_LOG_HANDLERS', 'stderr').split(','),
+            'handlers': os.environ.get('TRANS_LOG_HANDLERS', 'trans').split(','),
             'level': 'DEBUG',
             'propagate': True,
         },
         'print_job_queue': {
-            'handlers': os.environ.get('PRINT_JOB_QUEUE_LOG_HANDLERS', 'stderr').split(','),
+            'handlers': os.environ.get('PRINT_JOB_QUEUE_LOG_HANDLERS', 'trans').split(','),
             'level': 'DEBUG',
             'propagate': True,
         },

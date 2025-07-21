@@ -18,9 +18,8 @@ from trans.forms import UploadFileForm
 
 from trans.models import User, Task, Translation, Contest, Contestant, UserContest, ContestantContest
 from trans.utils.pdf import build_final_pdf
-from trans.utils.batch import BatchRecipe
+from trans.utils.freeze import UserContestFreezer, unfreeze_user_contest
 from trans.utils.translation import get_trans_by_user_and_task, is_translate_in_editing, unleash_edit_token
-import trans.utils.print_job_queue as print_job_queue
 
 logger = logging.getLogger(__name__)
 
@@ -333,77 +332,50 @@ class FreezeForm(forms.ModelForm):
 
 
 class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
-    @transaction.atomic
     def _handle(self, request, username, contest_id, is_post):
         self.init_user(request, username)
         self.init_contest(request, contest_id)
 
-        self.tasks = self.contest.task_set.order_by('order')
-        self.errors = []
-        user_contest, _ = UserContest.objects.get_or_create(contest=self.contest, user=self.user)
-        self.batch_recipe = BatchRecipe(contest=self.contest, for_user=self.user, user_contest=user_contest)
-
         if self.user.is_staff:
             raise PermissionDenied('Staff does not have translations')
-        else:
-            self.check_own_translations()
-            if self.user.is_onsite:
-                self.make_recipe()
 
-        if self.errors:
-            form = None
-        else:
-            if is_post:
-                form = FreezeForm(request.POST, instance=user_contest)
-                if form.is_valid() and not self.errors:
-                    logger.info(f'Freezing contest {self.contest.slug} for {self.user.username} by {request.user.username}')
-                    pdfs = self.batch_recipe.build_pdfs()
-                    user_contest.frozen = True
-                    user_contest.sealed = not self.user.is_onsite
-                    user_contest.save()
-                    print_job_queue.handle_user_contest_frozen(user_contest, pdfs)
-                    logger.info('Freezing completed')
-                    return redirect_to_user_page(request, self.user)
+        with transaction.atomic():
+            self.tasks = self.contest.task_set.order_by('order')
+            self.dependencies = []
+            self.errors = []
+            self.user_contest, _ = UserContest.objects.get_or_create(contest=self.contest, user=self.user)
+            freezer = UserContestFreezer(self.user, self.contest)
+
+            freezer.check_own_translations()
+            freezer.check_contestants()
+            self.dependencies.extend(freezer.dependencies)
+            self.errors.extend(freezer.errors)
+            frozen = False
+
+            if self.errors:
+                form = None
             else:
-                form = FreezeForm(instance=user_contest)
+                if is_post:
+                    form = FreezeForm(request.POST, instance=self.user_contest)
+                    if form.is_valid() and not self.errors:
+                        freezer.freeze(request.user)
+                        frozen = True
+                else:
+                    form = FreezeForm(instance=self.user_contest)
+
+        if frozen:
+            freezer.print_if_ready()
+            freezer.process_waiting()
+            return redirect_to_user_page(request, self.user)
 
         return render(request, 'freeze_user_contest.html', context={
             'form': form,
             'contest': self.contest,
             'for_user': self.user,
             'user': request.user,
+            'warnings': self.dependencies,
             'errors': self.errors,
         })
-
-    def check_own_translations(self):
-        for task in self.tasks:
-            trans = Translation.objects.filter(user=self.user, task=task).first()
-            if not trans:
-                self.errors.append(f'Task {task.name} has no translation')
-            elif not trans.frozen:
-                self.errors.append(f'Task {task.name} translation is not frozen')
-
-    def make_recipe(self):
-        for ctant in Contestant.objects.filter(user=self.user).order_by('code'):
-            if not ctant.on_site:
-                continue
-
-            ct_recipe = self.batch_recipe.add_contestant(ctant)
-            cc = ContestantContest.obtain(ctant, self.contest, self.user)
-            by_user = cc.translation_by_user
-            if by_user is not None:
-                for task in self.tasks:
-                    trans = Translation.objects.filter(user=cc.translation_by_user, task=task).first()
-                    by_user_contest = UserContest.objects.filter(contest=self.contest, user=cc.translation_by_user).first()
-                    err = None
-                    if not trans:
-                        err = 'which does not exist'
-                    elif not trans.frozen or not by_user_contest or (by_user != self.user and not by_user_contest.frozen):
-                        err = 'which is not frozen'
-                    elif trans.translating:
-                        ct_recipe.translations.append(trans)
-                    if err is not None and by_user != self.user:
-                        self.errors.append(f'Contestant {ctant.code} requests translation of {task.name} to {by_user.language.name} ({by_user.country.name}) {err}')
 
     def get(self, request, username, contest_id):
         return self._handle(request, username, contest_id, False)
@@ -416,14 +388,7 @@ class UnfreezeUserContest(StaffCheckMixin, RightsCheckMixin, View):
     def post(self, request, username, contest_id):
         self.init_user(request, username)
         self.init_contest(request, contest_id, allow_frozen=True)
-
-        user_contest = UserContest.objects.filter(contest=self.contest, user=self.user).first()
-        if user_contest is not None:
-            logger.info(f'Unfreezing contest {self.contest.slug} for {self.user.username} by {request.user.username}')
-            user_contest.frozen = False
-            print_job_queue.handle_user_contest_unfrozen(user_contest)
-            user_contest.save()
-
+        unfreeze_user_contest(self.user, self.contest, request.user)
         return redirect_to_user_page(request, self.user)
 
 

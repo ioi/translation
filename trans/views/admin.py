@@ -465,6 +465,42 @@ class NotTranslatingUserContest(LoginRequiredMixin, RightsCheckMixin, View):
         return redirect_to_user_page(request, self.user)
 
 
+class PromiseForm(forms.Form):
+    # Just for CSRF checking
+    pass
+
+
+class PromiseUserContest(LoginRequiredMixin, RightsCheckMixin, View):
+
+    def post(self, request, username, contest_id, withdraw=False):
+        self.init_user(request, username)
+        self.init_contest(request, contest_id)
+        assert self.user is not None
+        assert self.contest is not None
+
+        if self.user.is_staff:
+            raise PermissionDenied('Staff does not have translations')
+        if withdraw and not request.user.is_staff:
+            raise PermissionDenied('Only staff can withdraw promises')
+
+        form = PromiseForm(request.POST)
+        if not form.is_valid():
+            raise PermissionDenied('Invalid form')
+
+        user_contest, _ = UserContest.objects.get_or_create(user=self.user, contest=self.contest)
+        if withdraw:
+            user_contest.promised = False
+            logger.info(f'Unmarked contest {self.contest.slug} as promised for {self.user.username} by {request.user.username}')
+            messages.success(request, 'Promise withdrawn.')
+        else:
+            user_contest.promised = True
+            logger.info(f'Marked contest {self.contest.slug} as promised for {self.user.username} by {request.user.username}')
+            messages.success(request, 'Promise recorded.')
+        user_contest.save()
+
+        return redirect_to_user_page(request, self.user)
+
+
 class SealUserContest(StaffCheckMixin, RightsCheckMixin, View):
     def post(self, request, username, contest_id):
         self.init_user(request, username)

@@ -36,6 +36,8 @@ urlpatterns = [
     path('freeze_user_contest/<str:username>/<int:contest_id>/', FreezeUserContest.as_view(), name='freeze_user_contest'),
     path('unfreeze_user_contest/<str:username>/<int:contest_id>/', UnfreezeUserContest.as_view(), name='unfreeze_user_contest'),
     path('not_translating/<str:username>/<int:contest_id>/', NotTranslatingUserContest.as_view(), name='not_translating_user_contest'),
+    path('promise/<str:username>/<int:contest_id>/', PromiseUserContest.as_view(), name='promise_user_contest'),
+    path('unpromise/<str:username>/<int:contest_id>/', PromiseUserContest.as_view(), name='unpromise_user_contest', kwargs={'withdraw': True}),
     path('seal_user_contest/<str:username>/<int:contest_id>/', SealUserContest.as_view(), name='seal_user_contest'),
     path('edit_user_contest/<str:username>/<int:contest_id>/', EditUserContest.as_view(), name='edit_user_contest'),
     path('unleash_edit_token/<str:id>/', UnleashEditTranslationToken.as_view(), name='unleash_edit_token'),

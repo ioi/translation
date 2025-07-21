@@ -60,9 +60,34 @@
 
             {% else %}
                 {# Not frozen yet #}
-                <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
-                    Force freeze
-                </a>
+                <div class="button-row-left">
+                    <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
+                        Force freeze
+                    </a>
+                    {% if cinfo.user_contest and cinfo.user_contest.promised %}
+                        <form class="form-inline" method="post" action="{% url 'unpromise_user_contest' username=user.username contest_id=cinfo.id %}">
+                          {% csrf_token %}
+                          <button
+                            type="submit"
+                            name="withdraw_promise"
+                            class="btn btn-default"
+                            onclick="return confirm('Are you sure to withdraw the promise?');">
+                            Withdraw promise to translate
+                          </button>
+                        </form>
+                    {% else %}
+                        <form class="form-inline" method="post" action="{% url 'promise_user_contest' username=user.username contest_id=cinfo.id %}">
+                          {% csrf_token %}
+                          <button
+                            type="submit"
+                            name="make_promise"
+                            class="btn btn-default"
+                            onclick="return confirm('Are you sure to make the promise?');">
+                            Promise to translate
+                          </button>
+                        </form>
+                    {% endif %}
+                </div>
             {% endif %}
 
             <div class='smallskip'></div>
@@ -209,6 +234,10 @@
                 <a class="btn btn-info" href="{% url 'edit_user_contest' username=user.username contest_id=cinfo.id %}">
                     Edit contestants
                 </a>
+            {% endif %}
+
+            {% if cinfo.user_contest and cinfo.user_contest.promised %}
+                <h3>Promised to complete the translation.</h3>
             {% endif %}
 
             {% if cinfo.extra_contestants %}

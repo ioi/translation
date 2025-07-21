@@ -86,6 +86,10 @@ a:hover {
     text-align: center;
 }
 
+.button-row-left {
+    text-align: left;
+}
+
 .btn:focus {
     outline: none !important;
 }

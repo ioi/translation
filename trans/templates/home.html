@@ -25,6 +25,9 @@
         <h4>You are editing the primary English version.</h4>
       {% else %}
         <h4>Your team is translating into <b>{{ user.language.name }} ({{ user.language_code }})</b>.</h4>
+        {% if not cinfo.frozen and cinfo.user_contest is not None and cinfo.user_contest.promised %}
+           <h4>You promised to deliver the translation.</h4>
+        {% endif %}
       {% endif %}
 
       {# <div class='smallskip'></div> #}
@@ -277,16 +280,30 @@
               <a class="btn btn-success" href="{% url 'freeze_user_contest' username=user.username contest_id=cinfo.id %}">
                 Submit finalized translation
               </a>
-              <form class="form-inline" method="post" action="{% url 'not_translating_user_contest' username=user.username contest_id=cinfo.id %}">
-                {% csrf_token %}
-                <button
-                  type="submit"
-                  name="not_translating"
-                  class="btn btn-danger"
-                  title="This will mark all tasks as non-translated. Your contestants will receive only the English task statement.",
-                  onclick="return confirm('Are you sure?');">
-                  Will not translate
-                </button>
+              {% if cinfo.user_contest is None or not cinfo.user_contest.promised %}
+                <form class="form-inline" method="post" action="{% url 'not_translating_user_contest' username=user.username contest_id=cinfo.id %}">
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    name="not_translating"
+                    class="btn btn-danger"
+                    title="This will mark all tasks as non-translated. Your contestants will receive only the English task statement.",
+                    onclick="return confirm('Are you sure?');">
+                    Will not translate
+                  </button>
+                </form>
+                <form class="form-inline" method="post" action="{% url 'promise_user_contest' username=user.username contest_id=cinfo.id %}">
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    name="promise"
+                    class="btn btn-default"
+                    title="Promise to other delegations that you will complete your translation.",
+                    onclick="return confirm('Are you sure?');">
+                    Promise to translate
+                  </button>
+                </form>
+              {% endif %}
             </div>
           {% endif %}
         {% endif %}

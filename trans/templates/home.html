@@ -244,10 +244,11 @@
                 <th>Code</th>
                 <th>Name</th>
                 <th>Translation</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {% for ctant, trans in cinfo.contestant_translations %}
+              {% for ctant, trans, status in cinfo.contestant_translations %}
                 <tr>
                   <td>{{ ctant.code }}</td>
                   <td>{{ ctant.name }}</td>
@@ -260,6 +261,11 @@
                       {% endif %}
                     {% else %}
                       <i>online contestants receive all translations in CMS</i>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if ctant.on_site %}
+                      {{ status }}
                     {% endif %}
                   </td>
                 </tr>

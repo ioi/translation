@@ -20,7 +20,7 @@ RUN python3 -m venv --system-site-packages /opt/translate/venv
 COPY requirements.txt constraints.txt /opt/translate/
 RUN /opt/translate/venv/bin/pip3 install -r /opt/translate/requirements.txt -c /opt/translate/constraints.txt
 
-RUN /opt/translate/venv/bin/python3 -c 'import pyppeteer.command; pyppeteer.command.install()'
+RUN /opt/translate/venv/bin/playwright install
 
 COPY trans/static/fonts/ /usr/local/share/fonts/
 

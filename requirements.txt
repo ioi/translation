@@ -12,9 +12,9 @@ ipython
 moratab
 openpyxl
 pikepdf
+playwright
 psycopg2
 pycairo
-pyppeteer
 python-markdown-math
 pytz
 raven

@@ -127,7 +127,18 @@
                 </div>
                 <pre class="auto_translated_body"  id="translated_text">Translation will show up here.</pre>
                 <div class="row auto_translated_footer text-right">
-                    <div class="col-sm-12"><img src="{% static 'img/googletranslate.svg' %}" /></div>
+                    <div class="col-sm-12"></div>
+                        {% for backend in machine_translation_backends %}
+                        <label>
+                        <input type="radio"  name="backend" value="{{backend}}" {% if forloop.first %} checked {% endif %}>
+                        {% if backend == "Google Translate" %}
+                        <img src="{% static 'img/googletranslate.svg' %}" />
+                        {% else %}
+                        {{backend}}
+                        {% endif %}
+                        </label>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>  
                 

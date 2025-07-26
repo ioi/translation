@@ -36,6 +36,7 @@ function sendTranslate() {
             input_lang: $("#input_lang").val(),
             output_lang: $("#output_lang").val(),
             content: $("#content_for_translate").val(),
+            backend: $('input[name="backend"]:checked').val(),
             csrfmiddlewaretoken: csrf_token,
         },
         type: "POST",

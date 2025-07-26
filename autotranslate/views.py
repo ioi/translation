@@ -93,9 +93,10 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
 
             lines = [translation.translated_text for translation in response.translations]
             translated_text = "\n".join(lines)
-            assert translated_text.startswith("<pre>") and translated_text.endswith("</pre>")
-            translated_text = translated_text[len("<pre>"):-len("</pre>")]
-
+            translated_text_match = re.fullmatch(r"<pre.*?>(.*)</pre>", translated_text, re.DOTALL)
+            assert translated_text_match is not None, translated_text
+            translated_text = translated_text_match.group(1)
+            
             # Remove no-translate blocks
             translated_text = re.sub(r'</span> <span class="translate">(.*?)</span>', r'</span>\1', translated_text, flags=re.MULTILINE)
             translated_text = re.sub(r'<span class="notranslate">(.*?)</span>', r'\1', translated_text, flags=re.MULTILINE)
@@ -113,3 +114,4 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 "success": False,
                 "message": "Error in Translation. Contact Organizers."
             })
+

@@ -58,7 +58,7 @@ class GoogleCloudTranslate(TranslationBackend):
         )
         lines = [translation.translated_text for translation in response.translations]
         translated_text = "\n".join(lines)
-        print(text, translated_text)
+        
         translated_text_match = re.fullmatch(r"<pre.*?>(.*)</pre>", translated_text, re.DOTALL)
         assert translated_text_match is not None, translated_text
         translated_text = translated_text_match.group(1)

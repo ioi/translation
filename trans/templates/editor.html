@@ -106,6 +106,22 @@
                     Quota: <span id="user_translation_quota">{{user_translation_quota}} characters</span>
                     <button  class="btn btn-success" type="submit" id="translate_submit" onclick="sendTranslate()">Translate Entered Text</button>
                     <button  class="btn btn-primary" type="submit" id="translate_selected_submit" onclick="translateSelectedText()">Translate Selected Text</button>
+
+                    <span class="text-right auto_translated_footer" style="float: right">
+                        
+                          
+                                {% for backend in machine_translation_backends %}
+                                <label>
+                                <input type="radio"  name="backend" value="{{backend}}" {% if forloop.first %} checked {% endif %}>
+                                {% if backend == "Google Translate" %}
+                                <img src="{% static 'img/googletranslate.svg' %}" />
+                                {% else %}
+                                {{backend}}
+                                {% endif %}
+                                </label>
+                                {% endfor %}
+                            
+                    </span>
                 </div>
             </div>
             <div class="row auto_translated_output">
@@ -126,20 +142,7 @@
                     </div>                    
                 </div>
                 <pre class="auto_translated_body"  id="translated_text">Translation will show up here.</pre>
-                <div class="row auto_translated_footer text-right">
-                    <div class="col-sm-12"></div>
-                        {% for backend in machine_translation_backends %}
-                        <label>
-                        <input type="radio"  name="backend" value="{{backend}}" {% if forloop.first %} checked {% endif %}>
-                        {% if backend == "Google Translate" %}
-                        <img src="{% static 'img/googletranslate.svg' %}" />
-                        {% else %}
-                        {{backend}}
-                        {% endif %}
-                        </label>
-                        {% endfor %}
-                    </div>
-                </div>
+                
             </div>  
                 
         </div>

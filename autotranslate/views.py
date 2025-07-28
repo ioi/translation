@@ -19,7 +19,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
 
-        
+
 
         form = TranslateRequestForm(request.POST)
         if not form.is_valid():
@@ -63,8 +63,8 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
             if match.group("image_pattern"):
                 # Make sure the description gets translated but not the path
                 return (
-                    backend.mark_for_notranslate("![") + 
-                    f'<span class="translate">{match.group("desc")}</span>' + 
+                    backend.mark_for_notranslate("![") +
+                    f'<span class="translate">{match.group("desc")}</span>' +
                     backend.mark_for_notranslate(f']({match.group("path")})')
                 )
             else:

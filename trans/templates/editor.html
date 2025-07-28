@@ -87,7 +87,7 @@
                 <div class="col-xs-2 text-right">
                     <h3><i class="fa fa-times close-btn" onclick="hideTranslationPane()"></i></h3>
                 </div>
-                
+
             </div>
             <div class="row text-left">
                 <div class="col-sm-12">
@@ -102,14 +102,14 @@
                         <option value="{{lang_code}}"  {% if lang_code == language_code %} selected {% endif %}>{{lang_name}}</option>
                     {% endfor %}
                     </select>
-                    
+
                     Quota: <span id="user_translation_quota">{{user_translation_quota}} characters</span>
                     <button  class="btn btn-success" type="submit" id="translate_submit" onclick="sendTranslate()">Translate Entered Text</button>
                     <button  class="btn btn-primary" type="submit" id="translate_selected_submit" onclick="translateSelectedText()">Translate Selected Text</button>
 
                     <span class="text-right auto_translated_footer" style="float: right" id="backend_radios">
-                        
-                          
+
+
                                 {% for backend in machine_translation_backends %}
                                 <label>
                                 <input type="radio"  name="backend" value="{{backend}}" {% if forloop.first %} checked {% endif %}>
@@ -122,7 +122,7 @@
                                 &nbsp; &nbsp;
                                 {% endfor %}
                                 <span id="no_backend" style="display: none; color:red;">No available backend for the selected pair. </span>
-                            
+
                     </span>
                 </div>
             </div>
@@ -141,12 +141,12 @@
                             <i class="fa fa-check"></i>
                             Copied
                         </div>
-                    </div>                    
+                    </div>
                 </div>
                 <pre class="auto_translated_body"  id="translated_text">Translation will show up here.</pre>
-                
-            </div>  
-                
+
+            </div>
+
         </div>
     </div>
     {% endif %}

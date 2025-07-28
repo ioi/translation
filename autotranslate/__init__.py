@@ -48,4 +48,3 @@ def get_supported_languages():
             language_list_by_name[lang_name.lower()] = (lang_code.lower(), backend_name)
     language_list = list(sorted(language_list.items(), key=lambda p: p[1]))
     return language_list
-

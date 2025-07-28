@@ -61,11 +61,11 @@ class GoogleCloudTranslate(TranslationBackend):
         )
         lines = [translation.translated_text for translation in response.translations]
         translated_text = "\n".join(lines)
-        
+
         translated_text_match = re.fullmatch(r"<pre.*?>(.*)</pre>", translated_text, re.DOTALL)
         assert translated_text_match is not None, translated_text
         translated_text = translated_text_match.group(1)
-        
+
         return translated_text
 
     def mark_for_notranslate(self, text):
@@ -73,10 +73,10 @@ class GoogleCloudTranslate(TranslationBackend):
 
     def unmark_for_notranslate(self, text):
         text = re.sub(
-            r'</span>\s*<span class="notranslate">(.*?)</span>', 
+            r'</span>\s*<span class="notranslate">(.*?)</span>',
             r'</span>\1', text, flags=re.MULTILINE)
         return re.sub(
-            r'<span class="notranslate">(.*?)</span>', 
+            r'<span class="notranslate">(.*?)</span>',
             r'\1', text, flags=re.MULTILINE)
 
 
@@ -99,7 +99,7 @@ class DeepLTranslate(TranslationBackend):
             response = client.translate_text(
                 "<pre>" + text + "</pre>",
                 **{
-                    "tag_handling": "xml", 
+                    "tag_handling": "xml",
                     "preserve_formatting": True,
                     "source_lang": input_lang,
                     "target_lang": output_lang,
@@ -118,7 +118,7 @@ class DeepLTranslate(TranslationBackend):
         translated_text_match = re.fullmatch(r"<pre.*?>(.*)</pre>", translated_text, re.DOTALL)
         assert translated_text_match is not None, translated_text
         translated_text = translated_text_match.group(1)
-        
+
         return translated_text
 
     def mark_for_notranslate(self, text):
@@ -126,7 +126,7 @@ class DeepLTranslate(TranslationBackend):
 
     def unmark_for_notranslate(self, text):
         return re.sub(
-            r'<notranslate>(.*?)</notranslate>', 
+            r'<notranslate>(.*?)</notranslate>',
             r'\1', text, flags=re.MULTILINE)
 
 
@@ -137,7 +137,7 @@ def get_available_translation_backends() -> dict[str, TranslationBackend]:
         DeepLTranslate(),
     ]
     return {
-        backend.name: backend 
-        for backend in all_backends 
+        backend.name: backend
+        for backend in all_backends
         if backend.is_available()
     }

@@ -146,9 +146,9 @@ class Translations(LoginRequiredMixin, View):
             "machine_translation_backends_available_languages": json.dumps(
                 {
                     backend_name: [
-                        lang_code 
+                        lang_code
                         for lang_code, _ in backend_langs
-                    ] 
+                    ]
                     for backend_name, backend_langs in autotranslate.get_supported_languages_per_backend().items()
                 }
             ),

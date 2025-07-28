@@ -18,7 +18,7 @@ function updateTranslate(response, textStatus, jqXHR) {
             $("#user_translation_quota").text(response.new_quota)
         } else {
             $("#translated_text").text(response.message)
-            
+
         }
     } else {
         $("#translated_text").text("Error.")
@@ -40,9 +40,9 @@ function sendTranslate() {
             csrfmiddlewaretoken: csrf_token,
         },
         type: "POST",
-        
+
     }).always(updateTranslate)
-    
+
 }
 
 function translateSelectedText() {
@@ -105,7 +105,7 @@ function filterBackends() {
         var $label = $(this);
         var backend = $label.find('input[type=radio]').val();
         var langs = backendLanguages[backend] || [];
-        
+
         // Check if backend supports both src and tgt languages
         var supportsBoth = langs.includes(src) && langs.includes(tgt);
 

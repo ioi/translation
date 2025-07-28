@@ -97,3 +97,48 @@ function copyTranslatedText() {
 function resetCopyMarker() {
     $("#copy-translation-btn").removeClass("copied")
 }
+
+function filterBackends() {
+    var src = $('#input_lang').val().toLowerCase();
+    var tgt = $('#output_lang').val().toLowerCase();
+    $('#backend_radios label').each(function() {
+        var $label = $(this);
+        var backend = $label.find('input[type=radio]').val();
+        var langs = backendLanguages[backend] || [];
+        
+        // Check if backend supports both src and tgt languages
+        var supportsBoth = langs.includes(src) && langs.includes(tgt);
+
+        if (supportsBoth) {
+            $label.show();
+        } else {
+            $label.hide();
+            // Uncheck if hidden
+            $label.find('input[type=radio]').prop('checked', false);
+        }
+    });
+
+    // If no backend checked, check first visible backend
+    $('#no_backend').hide();
+    if ($('#backend_radios input[type=radio]:checked').length === 0) {
+        var first_visible_radio = $('#backend_radios label:visible:first input[type=radio]');
+        if (first_visible_radio.length > 0)
+        {
+            first_visible_radio.prop('checked', true);
+        }
+        else
+        {
+            $('#no_backend').show();
+        }
+    }
+}
+
+$(document).ready(function() {
+    // Initial filter on page load
+    filterBackends();
+
+    // Bind change events on language selects
+    $('#input_lang, #output_lang').on('change', function() {
+        filterBackends();
+    });
+});

@@ -27,6 +27,9 @@ class TranslationBackend:
     def get_supported_languages(self) -> list[tuple[str, str]]:
         ...
 
+class HandledException(Exception):
+    pass
+
 @dataclasses.dataclass(frozen=True)
 class GoogleCloudTranslate(TranslationBackend):
     name: str = 'Google Translate'
@@ -92,16 +95,25 @@ class DeepLTranslate(TranslationBackend):
 
     def translate(self, text: str, input_lang: str, output_lang: str):
         client = deepl.DeepLClient(settings.DEEPL_API_KEY)
-        response = client.translate_text(
-            "<pre>" + text + "</pre>",
-            **{
-                "tag_handling": "xml", 
-                "preserve_formatting": True,
-                "source_lang": input_lang,
-                "target_lang": output_lang,
-                "ignore_tags": ["notranslate"]
-            }
-        )
+        try:
+            response = client.translate_text(
+                "<pre>" + text + "</pre>",
+                **{
+                    "tag_handling": "xml", 
+                    "preserve_formatting": True,
+                    "source_lang": input_lang,
+                    "target_lang": output_lang,
+                    "ignore_tags": ["notranslate"]
+                }
+            )
+        except deepl.exceptions.DeepLException as e:
+            message = str(e)
+            if "message: Value for 'target_lang' not supported." in message:
+                raise HandledException("Target language is not supported by this backend.")
+            elif "message: Value for 'source_lang' not supported." in message:
+                raise HandledException("Source language is not supported by this backend.")
+            else:
+                raise e
         translated_text = response.text
         translated_text_match = re.fullmatch(r"<pre.*?>(.*)</pre>", translated_text, re.DOTALL)
         assert translated_text_match is not None, translated_text

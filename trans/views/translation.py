@@ -12,6 +12,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from django.urls import reverse
 
 import datetime
+import json
 
 from trans.utils.translation import get_translate_edit_permission, can_save_translate, is_translate_in_editing, \
     unleash_edit_token, get_task_by_contest_and_name, get_trans_by_user_and_task, \
@@ -142,6 +143,15 @@ class Translations(LoginRequiredMixin, View):
             'username': user.username,
             'direction': user.language.direction(),
             "machine_translation_languages": autotranslate.get_supported_languages(),
+            "machine_translation_backends_available_languages": json.dumps(
+                {
+                    backend_name: [
+                        lang_code 
+                        for lang_code, _ in backend_langs
+                    ] 
+                    for backend_name, backend_langs in autotranslate.get_supported_languages_per_backend().items()
+                }
+            ),
             "machine_translation_backends": autotranslate.get_available_translation_backend_names(),
             "user_translation_quota": (user.usertranslationquota.credit - user.usertranslationquota.used) if hasattr(user, "usertranslationquota") else settings.INITIAL_DEFAULT_PER_USER_TRANSLATION_QUOTA,
         })

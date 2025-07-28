@@ -107,7 +107,7 @@
                     <button  class="btn btn-success" type="submit" id="translate_submit" onclick="sendTranslate()">Translate Entered Text</button>
                     <button  class="btn btn-primary" type="submit" id="translate_selected_submit" onclick="translateSelectedText()">Translate Selected Text</button>
 
-                    <span class="text-right auto_translated_footer" style="float: right">
+                    <span class="text-right auto_translated_footer" style="float: right" id="backend_radios">
                         
                           
                                 {% for backend in machine_translation_backends %}
@@ -119,7 +119,9 @@
                                 {{backend}}
                                 {% endif %}
                                 </label>
+                                &nbsp; &nbsp;
                                 {% endfor %}
+                                <span id="no_backend" style="display: none; color:red;">No available backend for the selected pair. </span>
                             
                     </span>
                 </div>
@@ -166,6 +168,7 @@
     IMAGES_URL = '{{ settings.IMAGES_URL }}';
     {% if machine_translation_languages %}
     auto_translate_api_url = "{% url 'auto_translate_api' %}"
+    backendLanguages = {{machine_translation_backends_available_languages|safe}}
     {% endif %}
 
 </script>

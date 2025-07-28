@@ -34,12 +34,18 @@ def get_supported_languages():
     if not settings.ENABLE_AUTO_TRANSLATE:
         return []
     language_list = {}
+    language_list_by_name = {}
     for backend_name, backend_langs in get_supported_languages_per_backend().items():
         for lang_code, lang_name in backend_langs:
+            if lang_name.lower() in language_list_by_name:
+                if language_list_by_name[lang_name.lower()][1] == backend_name:
+                    continue
+                if lang_code.lower() != language_list_by_name[lang_name.lower()][0].lower():
+                    lang_name = lang_name + ' - ' + backend_name
             if lang_code.lower() in language_list:
                 assert lang_name.lower() == language_list[lang_code.lower()].lower(), (lang_code, lang_name, language_list[lang_code.lower()])
-            else:
-                language_list[lang_code.lower()] = lang_name
-    language_list = list(language_list.items())
+            language_list[lang_code.lower()] = lang_name
+            language_list_by_name[lang_name.lower()] = (lang_code.lower(), backend_name)
+    language_list = list(sorted(language_list.items(), key=lambda p: p[1]))
     return language_list
 

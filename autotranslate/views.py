@@ -24,10 +24,16 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
         form = TranslateRequestForm(request.POST)
         if not form.is_valid():
             content_errors = form.errors.as_data().get("content", None)
+            backend_errors = form.errors.as_data().get("backend", None)
             if content_errors is not None and any([error.code == 'required' for error in content_errors]):
                 return JsonResponse({
                     "success": False,
                     "message": "Error. Empty input received. Please enter some text to translate."
+                })
+            elif backend_errors is not None and any([error.code == 'required' for error in backend_errors]):
+                return JsonResponse({
+                    "success": False,
+                    "message": "No backend selected."
                 })
             elif form.non_field_errors():
                 return JsonResponse({
@@ -35,7 +41,7 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                     "message": "Error. " + "\n".join(form.non_field_errors())
                 })
             else:
-                logger.warning("Unexpected invalid input.")
+                logger.warning("Unexpected invalid input." + str(form.errors))
                 return JsonResponse({
                     "success": False,
                     "message": "Error in Translation. Contact Organizers."
@@ -100,6 +106,11 @@ class AutoTranslateAPI(LoginRequiredMixin, View):
                 "message": "",
                 "translated_text": translated_text,
                 "new_quota": new_quota.credit - new_quota.used,
+            })
+        except backends.HandledException as e:
+            return JsonResponse({
+                "success": False,
+                "message": str(e),
             })
         except Exception as e:
             logging.error("Error in Translation. ", exc_info=e)

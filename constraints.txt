@@ -8,6 +8,7 @@ cachetools==4.2.4
 certifi==2024.6.2
 charset-normalizer==3.3.2
 decorator==5.1.1
+deepl==1.22.0
 Deprecated==1.2.18
 diff-match-patch==20230430
 Django==5.0.6

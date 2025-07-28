@@ -1,5 +1,6 @@
 Django
 boto3==1.7.67
+deepl
 django-import-export
 django-redis
 django-storages

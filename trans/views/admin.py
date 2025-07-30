@@ -360,7 +360,7 @@ class FreezeUserContest(LoginRequiredMixin, RightsCheckMixin, View):
                 if is_post:
                     form = FreezeForm(request.POST, instance=self.user_contest)
                     if form.is_valid() and not self.errors:
-                        freezer.freeze(request.user)
+                        freezer.freeze(request.user, form.skip_verification)
                         frozen = True
                 else:
                     form = FreezeForm(instance=self.user_contest)

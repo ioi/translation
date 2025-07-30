@@ -78,10 +78,11 @@ class UserContestFreezer:
                     if trans and trans.translating:
                         ct_recipe.translations.append(trans)
 
-    def freeze(self, by_user: User, skip_verification: bool) -> None:
+    def freeze(self, by_user: User, skip_verification: bool, note: str) -> None:
         logger.info(f'Freezing contest {self.contest.slug} for {self.user.username} by {by_user.username}, skip_verification={skip_verification}')
         self.user_contest.frozen = True
         self.user_contest.skip_verification = skip_verification
+        self.user_contest.note = note
         self.user_contest.save()
 
     def print_if_ready(self) -> None:

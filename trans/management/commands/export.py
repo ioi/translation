@@ -42,7 +42,11 @@ class Command(BaseCommand):
                 else:
                     lang =  f'{trans.user.language.code}_{trans.user.country.code2}'
                 ver = trans.get_latest_version()
-                self.export_version(trans, ver, lang, task_path)
+                if ver is not None:
+                    self.export_version(trans, ver, lang, task_path)
+                else:
+                    # XXX: It is unclear how this can happen, but it does.
+                    print(f'\t\tTranslation {lang} DOES NOT EXIST')
 
     def export_version(self, trans, ver, lang, task_path):
         print(f'\t\tTranslation {lang} ({ver.create_time.isoformat()})')

@@ -10,9 +10,25 @@ if [ $# != 2 ] ; then
 	exit 1
 fi
 
-# XXX: You need to customize this
-
 # Stderr is connected to gunicorn error log
 echo >&2 "PRINT: Called with $@"
 
-exit 1
+F=media/$2
+
+case "$1" in
+	draft)
+		lp -da -oDuplex=DuplexNoTumble "$F"
+		;;
+	final1)
+		lp -da -oDuplex=DuplexNoTumble "$F"
+		#lp -db -oKMDuplex=True "$F"
+		;;
+	final2)
+		lp -da -oDuplex=DuplexNoTumble "$F"
+		# lp -dc -oDuplex=DuplexNoTumble "$F"
+		;;
+	*)
+		echo >&2 "PRINT: Unknown worker $1"
+		exit 1
+		;;
+esac

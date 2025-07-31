@@ -64,7 +64,7 @@ def build_pdf(translation: Translation, task_type: str) -> str:
         else:
             _add_footer_to_pdf(browser_pdf_path, transformed_pdf_path, temp_dir_path,
                                '{task} ({page} of {num_pages})',
-                               task=task.name)
+                               task=task.name, align_right=False)
         if settings.EMBED_MARKDOWN:
             embedding_pdf_path = temp_dir_path / 'embedding.pdf'
             _add_markdown_to_pdf(transformed_pdf_path, embedding_pdf_path, markdown)
@@ -86,7 +86,7 @@ def build_printed_draft_pdf(contest_slug: str, pdf_file_path: str, info: str) ->
     if settings.USE_CPDF:
         _add_info_line_to_pdf(Path(pdf_file_path), output_pdf_path, info)
     else:
-        _add_footer_to_pdf(Path(pdf_file_path), output_pdf_path, _temp_dir_path(), info)
+        _add_footer_to_pdf(Path(pdf_file_path), output_pdf_path, _temp_dir_path(), info, align_right=True)
     return str(output_pdf_path)
 
 
@@ -181,7 +181,7 @@ def _add_info_line_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, info: str) -> 
     os.system(cmd)
 
 
-def _add_footer_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, temp_dir_path: Path, footer: str, **kwargs):
+def _add_footer_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, temp_dir_path: Path, footer: str, align_right: bool, **kwargs):
     with Pdf.open(src_pdf_path) as pdf:
         num_pages = len(pdf.pages)
         overlay_path = temp_dir_path / 'overlay.pdf'
@@ -194,15 +194,19 @@ def _add_footer_to_pdf(src_pdf_path: Path, dst_pdf_path: Path, temp_dir_path: Pa
                 ctx.set_font_size(10)
                 ctx.set_source_rgb(0.4, 0.4, 0.4)
 
-                def add_text(x, y, text) -> None:
-                    textents = ctx.text_extents(text)
-                    fextents = ctx.font_extents()
-                    y += fextents[0]
-                    ctx.move_to(x - textents.width / 2 - textents.x_bearing, y)
-                    ctx.show_text(text)
-
-                add_text(PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM,
-                         footer.format(page=page+1, num_pages=num_pages, **kwargs))
+                text = footer.format(page=page+1, num_pages=num_pages, **kwargs)
+                textents = ctx.text_extents(text)
+                fextents = ctx.font_extents()
+                y = PAGE_HEIGHT_POINTS - 15 * POINTS_PER_MM
+                y += fextents[0]
+                margin = 10 * POINTS_PER_MM
+                if align_right:
+                    x = PAGE_WIDTH_POINTS - margin - textents.width
+                else:
+                    x = margin
+                x -= textents.x_bearing
+                ctx.move_to(x, y)
+                ctx.show_text(text)
 
                 ctx.show_page()
 

@@ -89,7 +89,18 @@
                           </button>
                         </form>
                     {% endif %}
-                </div>
+                    {% if cinfo.user_contest is None or not cinfo.user_contest.promised %}
+                        <form class="form-inline" method="post" action="{% url 'not_translating_user_contest' username=user.username contest_id=cinfo.id %}">
+                          {% csrf_token %}
+                          <button
+                            type="submit"
+                            name="not_translating"
+                            class="btn btn-danger"
+                            onclick="return confirm('Are you sure?');">
+                            No translation
+                          </button>
+                        </form>
+                    {% endif %}
             {% endif %}
 
             <div class='smallskip'></div>

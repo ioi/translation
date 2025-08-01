@@ -16,13 +16,15 @@ from trans.utils.pdf import POINTS_PER_MM, PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS
 @dataclass
 class RecipeContestant:
     recipe: 'BatchRecipe'
-    contestant: Contestant
+    contestant: Contestant | None       # None if it's ISC version
     translations: list[Translation] = field(default_factory=list)
     num_pages: list[int] = field(default_factory=list)
 
     def build_parts(self) -> list[str]:
         page_counts = self.count_pages()
-        parts = [self.build_banner_page(page_counts)]
+        parts = []
+        if self.contestant is not None:
+            parts.append(self.build_banner_page(page_counts))
 
         for trans, num_pages in zip(self.translations, page_counts):
             parts.append(trans.get_final_pdf_path())
@@ -44,6 +46,9 @@ class RecipeContestant:
         return page_counts
 
     def build_banner_page(self, page_counts) -> str:
+        assert self.contestant
+        assert self.recipe.user_contest
+
         banner_path = Path(settings.CACHE_DIR) / 'banner' / self.recipe.contest.slug
         banner_path.mkdir(parents=True, exist_ok=True)
         banner_pdf_path = banner_path / f'{self.contestant.code}.pdf'
@@ -114,15 +119,20 @@ class RecipeContestant:
     def build_blank_page(self, trans: Translation):
         blank_path = Path(settings.CACHE_DIR) / 'blank' / self.recipe.contest.slug
         blank_path.mkdir(parents=True, exist_ok=True)
-        blank_pdf_path = blank_path / f'{self.contestant.code}-{trans.task.name}.pdf'
+        blank_pdf_path = blank_path / f'{self.contestant.code if self.contestant else "ISC"}-{trans.task.name}.pdf'
 
         with cairo.PDFSurface(str(blank_pdf_path), PAGE_WIDTH_POINTS, PAGE_HEIGHT_POINTS) as surface:
             ctx = cairo.Context(surface)
 
+            if self.contestant:
+                suffix = " for {self.contestant.code}"
+            else:
+                suffix = ""
+
             self.add_text(ctx,
                           PAGE_WIDTH_POINTS / 2, PAGE_HEIGHT_POINTS - 20 * POINTS_PER_MM,
                           SANS_FONT, 12,
-                          f'Last page of {trans.task.name} for {self.contestant.code}',
+                          f'Last page of {trans.task.name}{suffix}',
                           center=True)
 
             self.add_text(ctx,
@@ -158,7 +168,7 @@ class RecipeContestant:
 class BatchRecipe:
     contest: Contest
     for_user: User
-    user_contest: UserContest
+    user_contest: UserContest | None  # Not given when processing ISC version
     ct_recipes: list[RecipeContestant] = field(default_factory=list)
     when: datetime = field(default_factory=lambda: datetime.now().astimezone(pytz.timezone(settings.TIME_ZONE)))
 
@@ -171,7 +181,7 @@ class BatchRecipe:
         else:
             pdfs = []
             for ct_recipe in self.ct_recipes:
-                pdf = self.build_batch(ct_recipe.build_parts(), f'{self.for_user.username}-{ct_recipe.contestant.code}')
+                pdf = self.build_batch(ct_recipe.build_parts(), f'{self.for_user.username}-{ct_recipe.contestant.code if ct_recipe.contestant else "ISC"}')
                 if pdf is not None:
                     pdfs.append(pdf)
         return [pdf for pdf in pdfs if pdf is not None]
@@ -195,7 +205,7 @@ class BatchRecipe:
 
         return str(output_pdf_path)
 
-    def add_contestant(self, contestant) -> RecipeContestant:
+    def add_contestant(self, contestant: Contestant | None) -> RecipeContestant:
         ct_recipe = RecipeContestant(recipe=self, contestant=contestant)
         self.ct_recipes.append(ct_recipe)
         return ct_recipe

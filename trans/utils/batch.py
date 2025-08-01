@@ -125,7 +125,7 @@ class RecipeContestant:
             ctx = cairo.Context(surface)
 
             if self.contestant:
-                suffix = " for {self.contestant.code}"
+                suffix = f" for {self.contestant.code}"
             else:
                 suffix = ""
 

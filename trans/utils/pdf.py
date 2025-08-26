@@ -13,7 +13,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-from pyppeteer import launch
+from playwright.sync_api import sync_playwright, Playwright
 
 from trans.context_processors import ioi_settings
 from trans.models import Translation, User
@@ -57,7 +57,7 @@ def build_pdf(translation: Translation, task_type: str) -> str:
     with TemporaryDirectory(dir=_temp_dir_path()) as temp_dir:
         temp_dir_path = Path(temp_dir)
         loop = asyncio.get_event_loop()
-        browser_pdf_path = loop.run_until_complete(_convert_html_to_pdf(html, temp_dir_path))
+        browser_pdf_path = _convert_html_to_pdf(html, temp_dir_path)
         transformed_pdf_path = temp_dir_path / 'transformed.pdf'
         if settings.USE_CPDF:
             _add_page_numbers_to_pdf(browser_pdf_path, transformed_pdf_path, task.name)
@@ -146,21 +146,20 @@ def _temp_dir_path() -> Path:
     return temp_path
 
 
-async def _convert_html_to_pdf(html: str, temp_dir_path: Path) -> Path:
+def _convert_html_to_pdf(html: str, temp_dir_path: Path) -> Path:
     html_file = temp_dir_path / 'source.html'
     pdf_file = temp_dir_path / 'browser.pdf'
 
     try:
         with open(html_file, 'w') as f:
             f.write(html)
-        browser = await launch(options={'args': ['--no-sandbox']})
-        page = await browser.newPage()
-        await page.goto('file://{}'.format(html_file), {
-            'waitUntil': 'networkidle2',
-        })
-        await page.emulateMedia('print')
-        await page.pdf({'path': str(pdf_file), **settings.PYPPETEER_PDF_OPTIONS})
-        await browser.close()
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch()
+            page = browser.new_page()
+            page.goto('file://{}'.format(html_file), wait_until = "networkidle")
+            # page.emulateMedia('print')
+            page.pdf(path = str(pdf_file), **settings.PLAYWRIGHT_PDF_OPTIONS)
+            browser.close()
     except Exception as e:
         logger.error(e)
 

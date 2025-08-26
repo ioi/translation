@@ -204,7 +204,7 @@ CACHE_DIR = os.path.join(BASE_DIR, "cache")
 
 # Settings related to production of PDFs from the Markdown sourcs
 
-PYPPETEER_PDF_OPTIONS = {
+PLAYWRIGHT_PDF_OPTIONS = {
     'margin': {
         'left': '0.75in',
         'right': '0.75in',
@@ -212,7 +212,7 @@ PYPPETEER_PDF_OPTIONS = {
         'bottom': '1in',
     },
     'format': 'A4',
-    'printBackground': True,
+    'print_background': True,
 }
 
 # This is standard A4

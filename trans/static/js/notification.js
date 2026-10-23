@@ -80,7 +80,7 @@ function readNotification(id, reload){
         },
         type: "POST",
         success: function (response) {
-            // TODO: This should be more eficient
+            // TODO: This should be more efficient
             if(reload)
                 location.reload(true);
             else
@@ -98,7 +98,7 @@ function readAllNotification(reload){
         },
         type: "POST",
         success: function (response) {
-            // TODO: This should be more eficient
+            // TODO: This should be more efficient
             if(reload)
                 location.reload(true);
             else

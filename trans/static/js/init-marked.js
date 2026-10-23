@@ -1,5 +1,5 @@
 
-// Initilize Makrded.js Renderer
+// Initialize Marked.js Renderer
 
 var renderer = new marked.Renderer();
 var original_table_renderer = renderer.table;

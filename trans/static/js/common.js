@@ -11,7 +11,7 @@ $(document).ready(function(){
         $(this).tooltip('hide')
     });
 
-    // focus on an elemnt when modal is shown
+    // focus on an element when modal is shown
     $(".modal").on('shown.bs.modal', function () {
         $("[data-modalfocus]", this).focus();
     });
